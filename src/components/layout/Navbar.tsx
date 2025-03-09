@@ -6,7 +6,7 @@ import Image from "next/image";
 import logo from "C:/Dchip/PROJECTS/my-99notes-app/public/assets/images/logo.png"; 
 import { navItems, sectionDescriptions } from "../Navbar/navData";
 import CustomDropdown from "../Navbar/CustomDropdown";
-import UPSCNotesDropdown from "../Navbar/UPSCNotesDropdown"; // Ensure this import is correct
+import UPSCNotesDropdown from "../Navbar/UPSCNotesDropdown";
 import SearchBar from "../Navbar/SearchBar";
 
 const Navbar = () => {
@@ -44,20 +44,9 @@ const Navbar = () => {
           <div className="hidden lg:flex flex-1 justify-end items-center gap-6 pl-16">
             <div className="flex items-center space-x-10">
               {Object.entries(navItems).map(([key, value]) => (
-                <div key={key} className="group relative">
-                  <button className="flex items-center space-x-2 text-gray-800 py-6 px-2 hover:text-blue-700">
-                    <span className="text-[14px] font-bold tracking-wide whitespace-nowrap">{key}</span>
-                    <svg
-                      className="w-3.5 h-3.5 text-gray-500 transition-transform group-hover:rotate-180 ml-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+                <div key={key}>
                   {key === "UPSC Notes" ? (
-                    <UPSCNotesDropdown title={key} items={value} /> // Ensure this component is correctly used
+                    <UPSCNotesDropdown title={key} items={value} />
                   ) : (
                     <CustomDropdown 
                       title={key} 

@@ -1,113 +1,105 @@
-# My 99 Notes App
+# 99Notes - UPSC Preparation Platform
 
-My 99 Notes App is a web application for creating, managing, and sharing notes. It is built using Next.js and TypeScript, with a focus on modularity and reusability of components.
+A comprehensive web platform for UPSC aspirants built with Next.js, offering study materials, current affairs updates, and exam resources.
 
-## Table of Contents
+## Features
 
-- [File Structure](#file-structure)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+- **UPSC Notes**
+  - Structured notes for all General Studies papers (GS1, GS2, GS3, GS4)
+  - Topic-wise organization with detailed subtopics
+  - Easy navigation through subjects
 
-## File Structure
+- **Current Affairs**
+  - Daily News Analysis
+  - The Hindu Editorial Analysis
+  - Indian Express Editorial Coverage
+  - PIB Updates
+  - Daily Quiz
+  - Daily Answer Writing Practice
 
-```plaintext
-my-99notes-app/
-├── public/                       // Static assets: images, fonts, icons, etc.
-│   ├── assets/
-│   │   ├── images/
-│   │   └── fonts/
-│   └── favicon.ico
-├── src/                          // All source code for the frontend
-│   ├── components/               // Reusable UI components
-│   │   ├── common/               // Generic components (Button, Card, etc.)
-│   │   ├── layout/               // Layout components (Header, Footer, Sidebar)
-│   │   └── ui/                   // UI-specific components (Carousel, Tabs, etc.)
-│   ├── context/                  // React Context providers (Auth, Theme, etc.)
-│   ├── hooks/                    // Custom React hooks (useAuth, useFetch, etc.)
-│   ├── pages/                    // Next.js pages (routing)
-│   │   ├── api/                  // API routes (serverless functions)
-│   │   │   └── contact.ts        // Example endpoint for contact form
-│   │   ├── _app.tsx              // Global app configuration (providers, etc.)
-│   │   ├── _document.tsx         // Custom document for SSR enhancements
-│   │   ├── index.tsx             // Home/Landing page
-│   │   ├── about.tsx             // Static pages
-│   │   ├── login.tsx             // User authentication page
-│   │   └── [category]/           // Dynamic routes for categories
-│   │       ├── index.tsx         // Category listing page
-│   │       └── [slug].tsx        // Article/note detail page
-│   ├── services/                 // API calls & business logic layer (CMS integrations, etc.)
-│   │   └── cmsService.ts
-│   ├── styles/                   // Global and component-specific styles
-│   │   ├── globals.css          // Global styles
-│   │   └── tailwind.config.js   // Tailwind CSS config (if using Tailwind)
-│   ├── types/                    // TypeScript types and interfaces
-│   │   └── index.d.ts           // Global type definitions
-│   ├── utils/                    // Utility functions (formatDate, etc.)
-│   └── config/                   // Application configuration (API endpoints, etc.)
-│       └── appConfig.ts
-├── .env.local                    // Environment variables for local development
-├── next.config.js                // Next.js configuration
-├── tsconfig.json                 // TypeScript configuration
-├── package.json                  // Dependencies and scripts
-└── README.md                     // Project documentation
+- **Free Study Material**
+  - Previous Year Question Papers (PYQs)
+  - Complete UPSC Syllabus (Prelims, Mains, Optional)
+  - Indian Constitution Study Material
+
+- **Exam Forum**
+  - Recruitment Exams Information
+    - Group A (IAS, IPS, IFS)
+    - Group B (SSC CGL, Banking)
+    - Group C&D
+  - Higher Education Entrance Exams
+    - Engineering (JEE, GATE)
+    - Medical (NEET)
+    - Law (CLAT)
+    - Management (CAT)
+    - Central Universities (CUET)
+
+## Tech Stack
+
+- Next.js 13+ (App Router)
+- TypeScript
+- Tailwind CSS
+- React Icons
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js app router pages
+├── components/            
+│   ├── Navbar/            # Navigation components
+│   └── layout/            # Layout components
+├── pages/                 # File-based routing
+│   ├── current-affairs/   # Current affairs section
+│   ├── exam-forum/        # Exam information
+│   ├── free-study-material/# Study resources
+│   └── upsc-notes/       # UPSC notes section
+└── styles/               # Global styles
 ```
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js (>=14.x)
-- npm or yarn
-
-### Installation
-
 1. Clone the repository:
-    ```bash
-    git clone https://github.com/your-username/my-99notes-app.git
-    cd my-99notes-app
-    ```
+   ```bash
+   git clone https://github.com/va24nsh/99NotesfrontendNEXT.git
+   cd 99NotesfrontendNEXT
+   ```
 
 2. Install dependencies:
-    ```bash
-    npm install
-    # or
-    yarn install
-    ```
+   ```bash
+   npm install
+   ```
 
-3. Create a `.env.local` file and add your environment variables:
-    ```plaintext
-    NEXT_PUBLIC_API_URL=https://api.example.com
-    ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-4. Run the development server:
-    ```bash
-    npm run dev
-    # or
-    yarn dev
-    ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Navigation Structure
 
-## Usage
-
-- Navigate to the home page to view your notes.
-- Use the login page to authenticate.
-- Create, edit, and delete notes from the user interface.
-- Explore different categories and view detailed notes.
+- All navigation is handled through the Navbar component
+- URLs follow a consistent pattern:
+  - UPSC Notes: `/upsc-notes/[section]/[subject]/[topic]`
+  - Current Affairs: `/current-affairs/[section]/[topic]`
+  - Free Study Material: `/free-study-material/[section]`
+  - Exam Forum: 
+    - `/exam-forum/recruitment-exams/[group]/[exam]`
+    - `/exam-forum/higher-education/[category]/[exam]`
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature-branch`).
-6. Open a pull request.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+Project Link: [https://github.com/va24nsh/99NotesfrontendNEXT](https://github.com/va24nsh/99NotesfrontendNEXT)

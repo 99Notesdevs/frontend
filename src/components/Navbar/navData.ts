@@ -152,40 +152,55 @@ export const navItems = {
   'Exam Forum': {
     'Recruitment Exams': {
       'Group A': [
-        'Civil Services',
-        'UPSC',
+        'Civil Services (IAS, IPS, IFS)',
+        'UPSC Engineering Services',
         'UPPCS',
         'MPPSC',
         'MPSC',
-        'Other States'
+        'Other State PSCs'
       ],
       'Group B': [
         'NDA/CDS',
         'SSC (CGL)',
         'State SSC',
-        'RBI',
-        'Insurance Exams',
-        'NABARD',
-        'Teaching Exams',
-        'Judiciary Exams',
-        'RRB NTPC B'
+        'RBI Grade B',
+        'Insurance Officers',
+        'NABARD Grade B',
+        'UGC NET',
+        'Judicial Services'
       ],
       'Group C&D': [
-        'Railways',
+        'Railways (RRB)',
         'SSC (CHSL)',
-        'Banking',
+        'Bank PO/Clerk',
         'Agniveer',
         'Police Constable',
-        'RRB Group D',
-        'Territorial Army'
+        'RRB Group D'
       ]
     },
-    'Higher Edu Exams': {
-      'NEET': [
-        'CUET',
-        'JEE',
-        'CA Foundation',
-        'CLAT'
+    'Higher Education': {
+      'Engineering & Technology': [
+        'JEE Main',
+        'JEE Advanced',
+        'GATE'
+      ],
+      'Medical & Healthcare': [
+        'NEET UG',
+        'NEET PG',
+        'AIIMS'
+      ],
+      'Law': [
+        'CLAT',
+        'AILET'
+      ],
+      'Management': [
+        'CAT',
+        'XAT',
+        'MAT'
+      ],
+      'Central Universities': [
+        'CUET UG',
+        'CUET PG'
       ]
     }
   }
