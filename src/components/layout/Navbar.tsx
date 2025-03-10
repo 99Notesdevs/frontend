@@ -38,24 +38,6 @@ const Navbar = () => {
               </span>
             </Link>
           </div>
-
-          {/* Login Text with Icon - Right Side */}
-          <div>
-            <Link href="/login" passHref>
-              <div className="flex items-center gap-2 hover:text-white/90 transition-colors">
-                <span className="text-[13px] font-bold tracking-wide text-white">
-                  Login
-                </span>
-                <svg 
-                  className="w-6 h-6 text-white" 
-                  viewBox="0 0 24 24" 
-                  fill="currentColor"
-                >
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-            </Link>
-          </div>
         </div>
       </div>
 
@@ -102,13 +84,6 @@ const Navbar = () => {
                   isScrolled ? 'text-black hover:text-gray-800' : 'text-gray-800 hover:text-blue-700'
                 }`}>
                   Blogs
-                </span>
-              </Link>
-              <Link href="/login" passHref>
-                <span className={`text-[14px] font-bold tracking-wide py-6 px-2 transition-colors duration-300 ${
-                  isScrolled ? 'text-black hover:text-gray-800' : 'text-gray-800 hover:text-blue-700'
-                }`}>
-                  Login
                 </span>
               </Link>
 
