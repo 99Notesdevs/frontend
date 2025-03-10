@@ -11,20 +11,29 @@ const SearchBar = () => {
 
   return (
     <form onSubmit={handleSearch} className="flex items-center">
-      <div className="flex">
+      <div className="relative">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search"
-          className="w-[140px] h-[26px] px-2 text-[12px] border border-r-0 border-gray-200 focus:outline-none focus:border-gray-300 rounded-l-sm placeholder-gray-500"
+          className="w-[140px] h-[26px] pl-8 pr-2 text-[12px] border border-gray-200 focus:outline-none focus:border-gray-300 rounded-sm placeholder-gray-500 text-black"
         />
         <button
           type="submit"
-          className="h-[26px] px-2 bg-gray-50 text-[12px] font-medium text-gray-600 border border-l-0 border-gray-200 hover:bg-gray-100 rounded-r-sm flex items-center"
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <svg className="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg 
+            className="w-3.5 h-3.5" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </button>
       </div>

@@ -4,6 +4,7 @@ interface ContactInfoItem {
   icon: JSX.Element;
   title: string;
   value: string;
+  href?: string;
 }
 
 const ContactMap: React.FC = () => {
@@ -15,7 +16,8 @@ const ContactMap: React.FC = () => {
         </svg>
       ),
       title: 'Email',
-      value: 'Info@99notes.in'
+      value: 'Info@99notes.in',
+      href: 'mailto:Info@99notes.in'
     },
     address: {
       icon: (
@@ -25,7 +27,8 @@ const ContactMap: React.FC = () => {
         </svg>
       ),
       title: 'Address',
-      value: '5B, Pusa Rd, opp. to Metro Pillar no. 110, near Karol Bagh Metro, New Delhi-110060'
+      value: '5B, Pusa Rd, opp. to Metro Pillar no. 110, near Karol Bagh Metro, New Delhi-110060',
+      href: 'https://maps.google.com/?q=99Notes+Head+Office+5B+Pusa+Road+Karol+Bagh+New+Delhi+110060'
     },
     phone: {
       icon: (
@@ -34,12 +37,13 @@ const ContactMap: React.FC = () => {
         </svg>
       ),
       title: 'Phone',
-      value: '+91-9654638994'
+      value: '+91-9654638994',
+      href: 'tel:+91-9654638994'
     }
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-10 bg-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Info Cards */}
@@ -47,9 +51,11 @@ const ContactMap: React.FC = () => {
             {Object.values(contactInfo).map((info, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-lg p-6 flex items-start space-x-4 hover:shadow-xl transition-shadow duration-300"
+                className="bg-white rounded-lg border border-gray-100 shadow-md p-6 flex items-start space-x-4 
+                          hover:shadow-2xl hover:shadow-orange-100 hover:border-orange-200 transform hover:scale-105 hover:-translate-y-2 
+                          transition-all duration-300 ease-in-out cursor-pointer"
               >
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 p-3 bg-orange-50 rounded-full">
                   {info.icon}
                 </div>
                 <div>
@@ -57,30 +63,17 @@ const ContactMap: React.FC = () => {
                     {info.title}
                   </h3>
                   <p className="text-gray-600">
-                    {info.title === 'Phone' ? (
-                      <a 
-                        href={`tel:${info.value}`} 
-                        className="hover:text-orange-500 transition-colors"
-                      >
-                        {info.value}
-                      </a>
-                    ) : info.title === 'Email' ? (
-                      <a 
-                        href={`mailto:${info.value}`} 
-                        className="hover:text-orange-500 transition-colors"
-                      >
-                        {info.value}
-                      </a>
-                    ) : (
-                      <a 
-                        href="https://maps.google.com/?q=99Notes+Head+Office+5B+Pusa+Road+Karol+Bagh+New+Delhi+110060" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="hover:text-orange-500 transition-colors"
-                      >
-                        {info.value}
-                      </a>
-                    )}
+                    <a 
+                      href={info.href} 
+                      target={info.title === 'Address' ? "_blank" : undefined}
+                      rel={info.title === 'Address' ? "noopener noreferrer" : undefined}
+                      className="hover:text-orange-500 transition-colors duration-300 relative 
+                                group inline-block"
+                    >
+                      {info.value}
+                      <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-orange-500 
+                                     group-hover:w-full transition-all duration-300"></span>
+                    </a>
                   </p>
                 </div>
               </div>
@@ -88,7 +81,7 @@ const ContactMap: React.FC = () => {
           </div>
 
           {/* Map Section */}
-          <div className="lg:col-span-3 h-[500px] rounded-lg overflow-hidden shadow-lg">
+          <div className="lg:col-span-3 h-[500px] rounded-lg overflow-hidden shadow-lg border border-gray-200">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7003.347428505327!2d77.18153009347897!3d28.639539652643215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03e216d2cca9%3A0x61c92a5509fc5a9c!2s99Notes%20Head%20Office%20-Best%20IAS%20Coaching%20Institute!5e0!3m2!1sen!2sin!4v1741270613524!5m2!1sen!2sin" 
               className="w-full h-full"

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { FaUser, FaEnvelope, FaPhone, FaComment } from 'react-icons/fa';
 
 interface FormData {
   name: string;
@@ -84,46 +85,78 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg w-full max-w-md mx-auto shadow-sm">
-      <h2 className="text-2xl font-semibold text-gray-700 text-center mb-6">
-        Get Free UPSC Study Material
-      </h2>
+    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          Get Free UPSC Study Material
+        </h2>
+      </div>
 
       {submitStatus === 'success' && (
-        <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
+        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-center justify-center">
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+          </svg>
           Thank you! We&apos;ll contact you soon.
         </div>
       )}
 
       {submitStatus === 'error' && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center justify-center">
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
           Something went wrong. Please try again.
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {(['name', 'email', 'mobile', 'message'] as (keyof FormData)[]).map((field) => (
-          <div key={field}>
+        {([
+          { field: 'name', icon: FaUser },
+          { field: 'email', icon: FaEnvelope },
+          { field: 'mobile', icon: FaPhone },
+          { field: 'message', icon: FaComment }
+        ] as { field: keyof FormData; icon: any }[]).map(({ field, icon: Icon }) => (
+          <div key={field} className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Icon className="h-5 w-5 text-gray-400" />
+            </div>
             <input
-              type={field === 'email' ? 'email' : 'text'}
+              type={field === 'email' ? 'email' : field === 'message' ? 'textarea' : 'text'}
               name={field}
               value={formData[field]}
               onChange={handleChange}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-md text-gray-700 text-base transition-all duration-200 ease-in-out focus:outline-none focus:border-gray-400 focus:ring-0 placeholder-gray-400 ${errors[field] ? 'border-red-500' : ''}`}
+              className={`w-full pl-10 pr-4 py-3 border ${
+                errors[field] ? 'border-red-500' : 'border-gray-300'
+              } rounded-lg text-gray-700 text-sm transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#ffc107] focus:border-transparent placeholder-gray-400 ${
+                field === 'message' ? 'h-32 resize-none' : ''
+              }`}
               disabled={isSubmitting}
             />
-            {errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>}
+            {errors[field] && (
+              <p className="text-red-500 text-xs mt-1 ml-1">{errors[field]}</p>
+            )}
           </div>
         ))}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-6">
           <button
             type="submit"
-            className="px-6 py-2 bg-[#ffc107] hover:bg-[#ffb300] text-black font-medium rounded-md transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-[#ffc107] hover:bg-[#ffb300] text-black font-semibold rounded-lg transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-md hover:shadow-lg flex items-center"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+              </>
+            ) : (
+              'Submit'
+            )}
           </button>
         </div>
       </form>

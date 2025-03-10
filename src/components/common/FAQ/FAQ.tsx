@@ -86,20 +86,49 @@ const faqData: FAQData[] = [
 ];
 
 const FAQ: React.FC = () => {
-  return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-4">
-          <span className="text-orange-500 font-medium">99NOTES</span>
-        </div>
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-          FAQ&apos;s Related to Best IAS Coaching in Delhi
-        </h2>
+  // Split the FAQ data into two columns
+  const midpoint = Math.ceil(faqData.length / 2);
+  const leftColumnFaqs = faqData.slice(0, midpoint);
+  const rightColumnFaqs = faqData.slice(midpoint);
 
-        <div className="max-w-4xl mx-auto space-y-4">
-          {faqData.map((faq, index) => (
-            <FAQItem key={index} question={faq.question} answer={faq.answer} number={faq.number} />
-          ))}
+  return (
+    <section className="py-5 bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className="text-center mb-16">
+          <span className="text-orange-500 font-medium tracking-wider text-sm uppercase">Common Questions</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
+            Frequently Asked Questions
+          </h2>
+          <div className="w-24 h-1 bg-orange-500 mx-auto mb-6"></div>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+            Everything you need to know about the best IAS coaching in Delhi
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
+          {/* Left Column */}
+          <div className="space-y-6">
+            {leftColumnFaqs.map((faq, index) => (
+              <FAQItem 
+                key={`left-${index}`} 
+                question={faq.question} 
+                answer={faq.answer} 
+                number={faq.number || index + 1} 
+              />
+            ))}
+          </div>
+          
+          {/* Right Column */}
+          <div className="space-y-6">
+            {rightColumnFaqs.map((faq, index) => (
+              <FAQItem 
+                key={`right-${index}`} 
+                question={faq.question} 
+                answer={faq.answer} 
+                number={faq.number || index + midpoint + 1} 
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -99,8 +99,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
                 <a
                   key={article.slug}
                   href={article.slug}
-                  className="block p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                >
+                  className="block p-6  bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
                   <h3 className="text-xl font-semibold mb-2">{article.title}</h3>
                   <p className="text-gray-600">{article.description}</p>
                 </a>

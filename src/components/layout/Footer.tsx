@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import logo from 'C:/Dchip/PROJECTS/my-99notes-app/public/assets/images/logo.png';
+import logo from '../../../public/assets/images/logo.png';
 
 const Footer = () => {
   return (
