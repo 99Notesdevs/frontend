@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
 import { ParsedUrlQuery } from 'querystring';
+import { env } from '@/config/env';
 
 // Helper function to replace lodash capitalize
 const capitalize = (str: string) => {
@@ -132,7 +133,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { article } = context.params as ParsedUrlQuery;
 
     // Fetch article data from your backend
-    const response = await axios.get(`http://localhost:5000/api/v1/article/slug/${article}`);
+    const response = await axios.get(`${env.API}/article/slug/${article}`);
     const articleData = response.data.data;
 
     return {
