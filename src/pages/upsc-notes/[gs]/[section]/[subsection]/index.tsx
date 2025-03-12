@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
+import { env } from '@/config/env';
 
 // Helper function to replace lodash capitalize
 const capitalize = (str: string) => {
@@ -115,7 +116,7 @@ interface ArticlePreview {
 // ---------
 
 const getArticlesForSubsection = async (subsection: string): Promise<ArticlePreview[]> => {
-    const response = await axios.get(`http://localhost:5000/api/v1/article/${subsection}`);
+    const response = await axios.get(`${env.API}/article/${subsection}`);
     return response.data.data;
 }
 

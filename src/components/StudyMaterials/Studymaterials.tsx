@@ -53,7 +53,7 @@ const StudyMaterials: React.FC = () => {
               key={category}
               onClick={() => setSelectedCategory(category)}
               className={`px-6 py-2 rounded-full transition-all ${
-                selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               {category}
@@ -67,8 +67,8 @@ const StudyMaterials: React.FC = () => {
             <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
               <Image src={material.image} alt={material.title} width={500} height={192} className="w-full h-48 object-cover" />
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">{material.title}</h3>
-                <p className="text-gray-600 mb-4">{material.description}</p>
+                <h3 className="text-xl text-black font-semibold mb-2">{material.title}</h3>
+                <p className="text-black mb-4">{material.description}</p>
                 <Link href={`/study-material/${material.title.toLowerCase().replace(/\s+/g, '-')}`} className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center">
                   Learn More
                   <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

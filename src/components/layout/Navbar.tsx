@@ -8,7 +8,6 @@ import { navItems, sectionDescriptions } from "../Navbar/navData";
 import CustomDropdown from "../Navbar/CustomDropdown";
 import UPSCNotesDropdown from "../Navbar/UPSCNotesDropdown";
 import SearchBar from "../Navbar/SearchBar";
-
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,7 +23,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="w-full fixed top-0 z-50">
+    <nav className="w-full sticky top-0 z-50">
       {/* Top Bar - Hidden when scrolled */}
       <div className={`bg-[#E67E22] w-full border-b border-[#e69b12] transition-all duration-300 ${
         isScrolled ? 'h-0 overflow-hidden' : 'h-12'
@@ -36,6 +35,24 @@ const Navbar = () => {
               <span className="text-[13px] font-bold tracking-wide text-white hover:text-white/90 transition-colors bg-[#d35400] px-4 py-1.5 rounded">
                 Shop Now
               </span>
+            </Link>
+          </div>
+
+          {/* Login Text with Icon - Right Side */}
+          <div>
+            <Link href="/login" passHref>
+              <div className="flex items-center gap-2 hover:text-white/90 transition-colors">
+                <span className="text-[13px] font-bold tracking-wide text-white">
+                  Login
+                </span>
+                <svg 
+                  className="w-6 h-6 text-white" 
+                  viewBox="0 0 24 24" 
+                  fill="currentColor"
+                >
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
             </Link>
           </div>
         </div>
@@ -88,7 +105,7 @@ const Navbar = () => {
               </Link>
 
               {/* Search Bar */}
-              <div className="ml-8">
+              <div className="ml-50">
                 <SearchBar />
               </div>
             </div>
