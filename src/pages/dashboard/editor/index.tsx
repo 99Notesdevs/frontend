@@ -20,7 +20,7 @@ export default function NewArticlePage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl py-20">
+    <div className="w-full bg-gray-100 py-10">
       <ArticleEditor onSave={handleSave} />
     </div>
   )

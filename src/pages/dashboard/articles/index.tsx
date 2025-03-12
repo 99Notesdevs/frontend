@@ -37,61 +37,63 @@ const articles = [
 
 export default function ArticlesPage() {
   return (
-    <div className="flex flex-col gap-6 pt-40">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Articles</h1>
-        <Link
-          href="/dashboard/editor"
-          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900"
-        >
-          <Plus className="mr-2 h-4 w-4" /> New Article
-        </Link>
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
-          <div
-            key={article.id}
-            className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950"
+    <div className="min-h-screen bg-gray-200">
+      <div className="flex flex-col gap-8 pt-40 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-20">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">Articles</h1>
+          <Link
+            href="/dashboard/editor"
+            className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:opacity-90 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
           >
-            <div className="relative">
-              <img src={article.image || "/placeholder.svg"} alt={article.title} className="h-40 w-full object-cover" />
-              <div className="absolute right-2 top-2">
-                <div className="relative inline-block text-left">
-                  <button
-                    className="flex h-8 w-8 items-center justify-center rounded-md bg-white/80 text-gray-700 backdrop-blur-sm hover:bg-white dark:bg-gray-900/80 dark:text-gray-300 dark:hover:bg-gray-900"
-                    aria-label="Article options"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
-                  {/* Dropdown menu would go here in a real implementation */}
+            <Plus className="mr-2 h-4 w-4" /> New Article
+          </Link>
+        </div>
+        <div className=" grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {articles.map((article) => (
+            <div
+              key={article.id}
+              className="group overflow-hidden rounded-xl border border-gray-200/50 bg-white/90 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] dark:border-gray-800/50 dark:bg-gray-900/90"
+            >
+              <div className="relative">
+                <img src={article.image || "/placeholder.svg"} alt={article.title} className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute right-2 top-2">
+                  <div className="relative inline-block text-left">
+                    <button
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-700 backdrop-blur-sm hover:bg-white transition-all duration-200 dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-800"
+                      aria-label="Article options"
+                    >
+                      <MoreHorizontal className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{article.title}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Updated on {article.updatedAt}</p>
-              <p className="mt-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{article.content}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {article.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                  >
-                    {tag}
-                  </span>
-                ))}
+              <div className="p-5">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200">{article.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Updated on {article.updatedAt}</p>
+                <p className="mt-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{article.content}</p>
+                <div className="mt-4 flex flex-wrap gap-1.5 max-w-full">
+                  {article.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-full bg-purple-50/80 px-2.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 transition-colors duration-200 hover:bg-purple-100 dark:hover:bg-purple-900/40 whitespace-nowrap"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="border-t border-gray-100 p-4 dark:border-gray-800/50">
+                <Link
+                  href={`/dashboard/editor/${article.id}`}
+                  className="inline-flex w-full items-center justify-center rounded-lg border border-purple-200 bg-purple-50/80 px-4 py-2.5 text-sm font-medium text-purple-700 transition-all duration-200 hover:bg-purple-100 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:border-purple-800/50 dark:bg-purple-900/20 dark:text-purple-300 dark:hover:bg-purple-900/30 dark:hover:border-purple-700"
+                >
+                  <Edit className="mr-2 h-4 w-4" /> Edit Article
+                </Link>
               </div>
             </div>
-            <div className="border-t border-gray-200 p-4 dark:border-gray-800">
-              <Link
-                href={`/dashboard/editor/${article.id}`}
-                className="inline-flex w-full items-center justify-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50 dark:hover:bg-gray-900 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900"
-              >
-                <Edit className="mr-2 h-4 w-4" /> Edit Article
-              </Link>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )
