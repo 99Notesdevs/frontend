@@ -1,6 +1,9 @@
 import React from 'react';
+import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import axios from 'axios';
+import { ParsedUrlQuery } from 'querystring';
 
 // Helper function to replace lodash capitalize
 const capitalize = (str: string) => {
@@ -21,7 +24,15 @@ const formatBreadcrumbText = (text: string = '') => {
         .join(' ');
 };
 
-const ArticlePage = () => {
+interface ArticleProps {
+    title: string;
+    content: string;
+    tags: string[];
+    image?: string;
+    updatedAt?: string;
+}
+
+const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, updatedAt }) => {
     const router = useRouter();
     const { gs, section, subsection, article } = router.query;
 
@@ -73,17 +84,66 @@ const ArticlePage = () => {
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <article className="prose prose-lg max-w-none">
                     <h1 className="text-4xl font-bold text-gray-900 mb-8">
-                        {article ? formatBreadcrumbText(article as string) : ''}
+                        {title}
                     </h1>
                     
-                    {/* This would be replaced with actual article content from your CMS or database */}
-                    <p className="text-gray-600">
-                        Article content will be loaded here. Connect to your CMS or database to display the actual content.
+                    {image && (
+                        <div className="h-64 bg-gray-200 mb-8">
+                            <img
+                                src={image}
+                                alt={title}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    )}
+
+                    {/* Tags */}
+                    <div className="mb-4">
+                        <div className="flex flex-wrap gap-2">
+                            {tags.map((tag, idx) => (
+                                <span
+                                    key={idx}
+                                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <p className="text-gray-600 mb-8">
+                        {content}
                     </p>
+
+                    {/* Meta Information */}
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        {updatedAt && (
+                            <span>Updated: {updatedAt}</span>
+                        )}
+                    </div>
                 </article>
             </main>
         </div>
     );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const { article } = context.params as ParsedUrlQuery;
+
+    // Fetch article data from your backend
+    const response = await axios.get(`http://localhost:5000/api/v1/article/slug/${article}`);
+    const articleData = response.data.data;
+
+    return {
+        props: {
+            title: articleData.title,
+            content: articleData.content,
+            tags: articleData.tags,
+            image: articleData.image || null,
+            updatedAt: articleData.updatedAt || null,
+        },
+    };
 };
 
 export default ArticlePage; 
