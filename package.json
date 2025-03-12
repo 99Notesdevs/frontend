@@ -10,13 +10,21 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@tiptap/extension-code-block-lowlight": "^2.11.5",
+    "@tiptap/extension-image": "^2.11.5",
+    "@tiptap/extension-link": "^2.11.5",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
     "axios": "^1.8.3",
     "framer-motion": "^12.5.0",
+    "clsx": "^2.1.1",
+    "lowlight": "^3.3.0",
     "lucide-react": "^0.479.0",
     "next": "^15.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
