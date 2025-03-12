@@ -30,13 +30,13 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ title, items }) => {
     // Special case for Current Affairs
     if (title === 'Current Affairs UPSC') {
       if (name === 'Daily Current Affairs') {
-        return '/current-affairs/daily';
+        return '/current-affairs/#';
       }
       if (name === 'Monthly Current Affairs') {
-        return '/current-affairs/monthly';
+        return '/current-affairs/#';
       }
       if (name === 'Yearly Current Affairs') {
-        return '/current-affairs/yearly';
+        return '/current-affairs/#';
       }
       return `/current-affairs/${getFormattedLink(name)}`;
     }

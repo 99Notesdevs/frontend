@@ -1,9 +1,9 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Save, Download, X, Plus } from "lucide-react"
+import TiptapEditor from "./tiptapeditor"
+import { cn } from "@/lib/utils"
 
 interface Article {
   title: string
@@ -13,7 +13,12 @@ interface Article {
   updatedAt?: string
 }
 
-export function ArticleEditor({ initialData }: { initialData?: Article }) {
+interface ArticleEditorProps {
+  initialData?: Article
+  onSave?: (article: Article) => Promise<void>
+}
+
+const ArticleEditor = ({ initialData, onSave }: ArticleEditorProps) => {
   const [article, setArticle] = useState<Article>(
     initialData || {
       title: "",
@@ -21,15 +26,20 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
       tags: [],
       image: "",
       updatedAt: new Date().toISOString().split("T")[0],
-    },
+    }
   )
   const [tagInput, setTagInput] = useState("")
   const [toastVisible, setToastVisible] = useState(false)
   const [toastMessage, setToastMessage] = useState({ title: "", message: "" })
+  const [saving, setSaving] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setArticle((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const setContent = (content: string) => {
+    setArticle((prev) => ({ ...prev, content }))
   }
 
   const addTag = () => {
@@ -63,42 +73,41 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
   }
 
   const exportToJson = () => {
-    // Create a JSON string from the article data
     const jsonData = JSON.stringify(article, null, 2)
-
-    // Create a blob from the JSON string
     const blob = new Blob([jsonData], { type: "application/json" })
-
-    // Create a URL for the blob
     const url = URL.createObjectURL(blob)
-
-    // Create a temporary anchor element
     const a = document.createElement("a")
     a.href = url
     a.download = `article-${article.title.toLowerCase().replace(/\s+/g, "-")}.json`
-
-    // Trigger the download
     document.body.appendChild(a)
     a.click()
-
-    // Clean up
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-
     showToast("Article exported", "Your article has been exported as JSON")
   }
 
-  const saveArticle = () => {
-    // Update the updatedAt timestamp
-    const updatedArticle = {
-      ...article,
-      updatedAt: new Date().toISOString().split("T")[0],
+  const saveArticle = async () => {
+    if (saving) return
+
+    try {
+      setSaving(true)
+      const updatedArticle = {
+        ...article,
+        updatedAt: new Date().toISOString().split("T")[0],
+      }
+
+      if (onSave) {
+        await onSave(updatedArticle)
+      }
+
+      setArticle(updatedArticle)
+      showToast("Article saved", "Your article has been saved successfully")
+    } catch (error) {
+      showToast("Error", "Failed to save article")
+      console.error("Failed to save article:", error)
+    } finally {
+      setSaving(false)
     }
-
-    setArticle(updatedArticle)
-
-    // In a real app, you would save to a database here
-    showToast("Article saved", "Your article has been saved successfully")
   }
 
   return (
@@ -122,19 +131,34 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Edit Article</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          {initialData ? "Edit Article" : "New Article"}
+        </h2>
         <div className="flex gap-2">
           <button
             onClick={exportToJson}
-            className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50 dark:hover:bg-gray-900 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900"
+            className={cn(
+              "inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-4 py-2",
+              "text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50",
+              "focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2",
+              "dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50 dark:hover:bg-gray-900",
+              "dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900"
+            )}
           >
             <Download className="mr-2 h-4 w-4" /> Export JSON
           </button>
           <button
             onClick={saveArticle}
-            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900"
+            disabled={saving}
+            className={cn(
+              "inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2",
+              "text-sm font-medium text-white transition-colors hover:bg-blue-700",
+              "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+              "dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900",
+              "disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
           >
-            <Save className="mr-2 h-4 w-4" /> Save
+            <Save className={cn("mr-2 h-4 w-4", saving && "animate-spin")} /> {saving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
@@ -150,7 +174,13 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
             value={article.title}
             onChange={handleChange}
             placeholder="Enter article title"
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-500"
+            className={cn(
+              "w-full rounded-md border border-gray-300 bg-white px-3 py-2",
+              "text-gray-900 placeholder-gray-400",
+              "focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+              "dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500",
+              "dark:focus:border-blue-500"
+            )}
           />
         </div>
 
@@ -161,15 +191,21 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
           <input
             id="image"
             name="image"
-            value={article.image || ""}
+            value={article.image}
             onChange={handleChange}
             placeholder="Enter image URL"
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-500"
+            className={cn(
+              "w-full rounded-md border border-gray-300 bg-white px-3 py-2",
+              "text-gray-900 placeholder-gray-400",
+              "focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+              "dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500",
+              "dark:focus:border-blue-500"
+            )}
           />
           {article.image && (
             <div className="mt-2">
               <img
-                src={article.image || "/placeholder.svg"}
+                src={article.image}
                 alt="Article preview"
                 className="max-h-40 rounded-md object-cover"
               />
@@ -181,14 +217,7 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
           <label htmlFor="content" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Content
           </label>
-          <textarea
-            id="content"
-            name="content"
-            value={article.content}
-            onChange={handleChange}
-            placeholder="Write your article content here..."
-            className="min-h-[200px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-500"
-          />
+          <TiptapEditor content={article.content} setContent={setContent} />
         </div>
 
         <div className="grid gap-3">
@@ -202,12 +231,24 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Add a tag and press Enter"
-              className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-500"
+              className={cn(
+                "flex-1 rounded-md border border-gray-300 bg-white px-3 py-2",
+                "text-gray-900 placeholder-gray-400",
+                "focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                "dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500",
+                "dark:focus:border-blue-500"
+              )}
             />
             <button
               type="button"
               onClick={addTag}
-              className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50 dark:hover:bg-gray-900 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900"
+              className={cn(
+                "inline-flex items-center justify-center rounded-md border border-gray-200",
+                "bg-white px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50",
+                "focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2",
+                "dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50 dark:hover:bg-gray-900",
+                "dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900"
+              )}
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -244,3 +285,4 @@ export function ArticleEditor({ initialData }: { initialData?: Article }) {
   )
 }
 
+export default ArticleEditor
