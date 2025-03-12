@@ -254,13 +254,7 @@ const SubsectionPage = () => {
                                 <button
                                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300"
                                     onClick={() => router.push({
-                                        pathname: `/upsc-notes/${gs}/${section}/${subsection}/${article.slug}`,
-                                        query: { 
-                                            title: article.title,
-                                            tags: article.tags.join(','),
-                                            image: article.image,
-                                            updatedAt: article.updatedAt
-                                        },
+                                        pathname: `/upsc-notes/${gs}/${section}/${subsection}/${article.slug}`
                                     })}
                                 >
                                     Read More
