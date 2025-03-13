@@ -144,7 +144,7 @@ const SubsectionPage: React.FC<SubsectionPageProps> = ({ articles, gs, section, 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { gs, section, subsection } = context.params as ParsedUrlQuery;
 
-    const response = await axios.get(`${env.API}/article/${subsection}`);
+    const response = await axios.get(`${env.API}/notes/parents/${subsection}`);
     const articles = response.data.data;
 
     return {
