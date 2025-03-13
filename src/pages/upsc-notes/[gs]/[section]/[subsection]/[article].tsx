@@ -127,9 +127,10 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
 
                         {/* Content */}
                         <div className="text-gray-800 leading-relaxed">
-                            <div className="prose prose-lg prose-blue prose-headings:text-gray-900 prose-headings:font-semibold prose-p:text-gray-700 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg">
-                                {content}
-                            </div>
+                            <div 
+                                className="prose prose-lg prose-blue prose-headings:text-gray-900 prose-headings:font-semibold prose-p:text-gray-700 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg"
+                                dangerouslySetInnerHTML={{ __html: content }}
+                            />
                         </div>
 
                         {/* Share and Navigation Section */}
@@ -192,4 +193,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-export default ArticlePage; 
+export default ArticlePage;

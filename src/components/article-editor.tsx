@@ -15,7 +15,7 @@ interface Article {
 
 interface ArticleEditorProps {
   initialData?: Article
-  onSave?: (article: Article) => Promise<void>
+  onSave?: (article: Article, showToast: (title: string, message: string) => void) => Promise<void> | null
 }
 
 const ArticleEditor = ({ initialData, onSave }: ArticleEditorProps) => {
@@ -97,11 +97,10 @@ const ArticleEditor = ({ initialData, onSave }: ArticleEditorProps) => {
       }
 
       if (onSave) {
-        await onSave(updatedArticle)
+        await onSave(updatedArticle, showToast)
       }
 
       setArticle(updatedArticle)
-      showToast("Article saved", "Your article has been saved successfully")
     } catch (error) {
       showToast("Error", "Failed to save article")
       console.error("Failed to save article:", error)

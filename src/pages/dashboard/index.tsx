@@ -65,6 +65,26 @@ export default function Home() {
                 </Link>
               </div>
             </div>
+
+            {/*Update subsection card*/}
+            <div className="group relative overflow-hidden rounded-xl bg-white p-1 shadow-lg transition-all hover:shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-teal-100 opacity-0 transition-opacity group-hover:opacity-100"></div>
+              <div className="relative p-6">
+                <h3 className="text-xl font-semibold text-gray-800">Update Subsections</h3>
+                <p className="mt-2 text-sm text-gray-600">Update the relations among articles</p>
+                <div className="mt-4">
+                  <p className="text-gray-600">Simply select and update.</p>
+                </div>
+              </div>
+              <div className="relative border-t border-gray-100 p-4">
+                <Link 
+                  href="/dashboard/updateSubsections" 
+                  className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                >
+                  Update Subsections <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
             
             {/* Settings Card */}
             <div className="group relative overflow-hidden rounded-xl bg-white p-1 shadow-lg transition-all hover:shadow-xl">

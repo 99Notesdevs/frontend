@@ -1,5 +1,9 @@
+"use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import { env } from '@/config/env';
+import Cookies from 'js-cookie';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -8,13 +12,23 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'sekiro' && password === '007') {
-      console.log('Login successful');
-      router.push('/dashboard');
-    } else {
-      console.log('Invalid credentials');
+    try {
+      const response = await axios.post(`${env.API}/admin`, {
+        email: username,
+        password,
+        secretKey: secret,
+      });
+      if (response.data.success) {
+        Cookies.set('token', response.data.data.token, { expires: 5 });
+        router.push('/dashboard');
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred. Please try again later.");
     }
   };
 

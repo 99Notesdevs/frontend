@@ -5,7 +5,7 @@ import Link from 'next/link';
 interface TopicContent {
     title: string;
     description: string;
-    keyTopics: string[];
+    keyTopics?: string[];
     image?: string;
 }
 
@@ -14,13 +14,6 @@ const sectionContent: Record<string, Record<string, TopicContent>> = {
         'ancient-india': {
             title: 'Ancient India',
             description: 'Comprehensive study of Indian history from prehistoric times to the end of the ancient period.',
-            keyTopics: [
-                'Prehistoric Period and Indus Valley Civilization',
-                'Vedic Age and Literature',
-                'Buddhism and Jainism',
-                'Mauryan Empire',
-                'Gupta Period'
-            ],
             image: '/images/ancient-india.jpg'
         },
         'medieval-india': {
@@ -191,15 +184,8 @@ const SectionPage = () => {
                             <div className="p-6">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-2">{topic.title}</h2>
                                 <p className="text-gray-600 mb-4">{topic.description}</p>
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">Key Topics:</h3>
-                                <ul className="space-y-1 text-gray-600 mb-6">
-                                    {topic.keyTopics.map((keyTopic, index) => (
-                                        <li key={index} className="flex items-start">
-                                            <span className="text-blue-500 mr-2">•</span>
-                                            {keyTopic}
-                                        </li>
-                                    ))}
-                                </ul>
+                                
+                                
                                 <Link href={`/upsc-notes/${gs}/${section}/${slug}`}>
                                     <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300">
                                         Read More
