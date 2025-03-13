@@ -83,20 +83,24 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
 
             {/* Article Content */}
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="bg-white rounded-lg shadow-sm p-6 sm:p-8">
+                <div className="bg-white rounded-xl shadow-md p-6 sm:p-8 border border-gray-100">
                     <article className="prose prose-lg max-w-none">
                         {/* Title Section */}
                         <div className="mb-8 border-b pb-6">
-                            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                                {title}
-                            </h1>
+                            <div className="relative inline-block">
+                                <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2 leading-tight tracking-wide">
+                                    {title}
+                                </h1>
+                                <div className="absolute bottom-0 left-0 w-full h-3 bg-yellow-300 opacity-50 -z-10"></div>
+                            </div>
+                            <div className="w-full h-1 bg-yellow-300 mt-2"></div>
                             
                             {/* Tags */}
-                            <div className="flex flex-wrap gap-2 mb-4">
+                            <div className="flex flex-wrap gap-2 my-6">
                                 {tags.map((tag, idx) => (
                                     <span
                                         key={idx}
-                                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition-colors"
+                                        className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200 hover:from-blue-100 hover:to-blue-150 transition-all duration-300 transform hover:scale-105"
                                     >
                                         #{tag}
                                     </span>
@@ -105,7 +109,7 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
 
                             {/* Meta Information */}
                             {updatedAt && (
-                                <div className="flex items-center text-sm text-gray-500">
+                                <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg w-fit">
                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
@@ -116,7 +120,7 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
 
                         {/* Featured Image */}
                         {image && (
-                            <div className="relative h-[400px] mb-8 rounded-lg overflow-hidden">
+                            <div className="relative h-[500px] mb-8 rounded-xl overflow-hidden shadow-lg transform hover:scale-[1.02] transition-transform duration-300">
                                 <img
                                     src={image}
                                     alt={title}
@@ -128,7 +132,7 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
                         {/* Content */}
                         <div className="text-gray-800 leading-relaxed">
                             <div 
-                                className="prose prose-lg prose-blue prose-headings:text-gray-900 prose-headings:font-semibold prose-p:text-gray-700 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg"
+                                className="prose max-w-none"
                                 dangerouslySetInnerHTML={{ __html: content }}
                             />
                         </div>
@@ -139,7 +143,7 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
                                 {/* Share Buttons */}
                                 <div className="flex items-center space-x-4">
                                     <span className="text-sm font-medium text-gray-700">Share:</span>
-                                    <button className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+                                    <button className="p-2.5 rounded-full bg-gradient-to-r from-blue-50 to-blue-100 text-blue-600 hover:from-blue-100 hover:to-blue-200 transition-all duration-300 transform hover:scale-110">
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/>
                                         </svg>
@@ -159,7 +163,7 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
                                 {/* Print Button */}
                                 <button 
                                     onClick={() => window.print()}
-                                    className="inline-flex items-center px-4 py-2 border border-blue-600 text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors"
+                                    className="inline-flex items-center px-6 py-2.5 border border-blue-600 text-sm font-medium rounded-lg text-blue-600 bg-white hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
                                 >
                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
