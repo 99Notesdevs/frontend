@@ -136,6 +136,7 @@ const ArticlePage: React.FC<ArticleProps> = ({ title, content, tags, image, upda
                                 dangerouslySetInnerHTML={{ __html: content }}
                             />
                         </div>
+                        <div>{content}</div>
 
                         {/* Share and Navigation Section */}
                         <div className="mt-12 pt-6 border-t">
