@@ -46,73 +46,85 @@ const SubsectionPage: React.FC<SubsectionPageProps> = ({ articles, gs, section, 
     const heroTitle = subsection ? formatBreadcrumbText(subsection) : '';
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
             {/* Hero Section */}
-            <div className="relative bg-gray-900 h-72">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-purple-900 opacity-90" />
+            <div className="relative bg-gray-900 h-80">
+                <div className="absolute inset-0">
+                    <div className="absolute inset-0" />
+                    <div className="absolute inset-0 bg-[url('/pattern.png')] opacity-20" />
+                </div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-white">
-                        <h1 className="text-5xl font-bold mb-4">{heroTitle}</h1>
-                        <p className="text-xl max-w-3xl mx-auto">
-                            Explore comprehensive study materials and detailed notes
+                    <div className="text-center text-white px-4">
+                        <h1 className="text-5xl font-bold mb-4 tracking-tight animate-fade-in">
+                            {heroTitle}
+                        </h1>
+                        <p className="text-xl max-w-3xl mx-auto font-light leading-relaxed text-gray-200">
+                            Discover comprehensive study materials and expertly curated notes
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
-                <nav className="flex items-center text-sm font-medium text-gray-500 mb-8">
+                <nav className="flex items-center text-sm font-medium text-gray-600 mb-12 flex-wrap">
                     <Link href="/upsc-notes">
-                        <span className="hover:text-gray-700 cursor-pointer">UPSC Notes</span>
+                        <span className="hover:text-blue-600 transition-colors duration-200 cursor-pointer">
+                            UPSC Notes
+                        </span>
                     </Link>
-                    <span className="mx-2">/</span>
+                    <svg className="mx-2 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
                     <Link href={`/upsc-notes/${gs}`}>
-                        <span className="hover:text-gray-700 cursor-pointer">
+                        <span className="hover:text-blue-600 transition-colors duration-200 cursor-pointer">
                             {gs ? formatBreadcrumbText(gs) : ''}
                         </span>
                     </Link>
-                    <span className="mx-2">/</span>
+                    <svg className="mx-2 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
                     <Link href={`/upsc-notes/${gs}/${section}`}>
-                        <span className="hover:text-gray-700 cursor-pointer">
+                        <span className="hover:text-blue-600 transition-colors duration-200 cursor-pointer">
                             {section ? formatBreadcrumbText(section) : ''}
                         </span>
                     </Link>
-                    <span className="mx-2">/</span>
+                    <svg className="mx-2 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
                     <span className="text-gray-900">{heroTitle}</span>
                 </nav>
 
                 {/* Articles Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     {articles.map((article) => (
                         <div 
                             key={article.slug} 
-                            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                            className="group bg-white rounded-xl shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02]"
                         >
                             {article.image && (
-                                <div className="h-48 bg-gray-200">
+                                <div className="h-64 overflow-hidden rounded-t-xl">
                                     <img
                                         src={article.image}
                                         alt={article.title}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                     />
                                 </div>
                             )}
-                            <div className="p-6">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                            <div className="p-8">
+                                <h2 className="text-2xl font-semibold text-gray-900 mb-4 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
                                     {article.title}
                                 </h2>
-                                <p className="text-gray-600 mb-4">
-                                    Click on Read More to explore detailed notes on this article
+                                <p className="text-gray-600 mb-6 text-base line-clamp-2">
+                                    Click to explore detailed notes on this topic
                                 </p>
                                 
-                                {/* Topics */}
-                                <div className="mb-4">
+                                <div className="mb-6">
                                     <div className="flex flex-wrap gap-2">
                                         {article.tags.map((topic, idx) => (
                                             <span
                                                 key={idx}
-                                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                                className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-300"
                                             >
                                                 {topic}
                                             </span>
@@ -120,15 +132,19 @@ const SubsectionPage: React.FC<SubsectionPageProps> = ({ articles, gs, section, 
                                     </div>
                                 </div>
 
-                                {/* Meta Information */}
-                                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
                                     {article.updatedAt && (
-                                        <span>Updated: {article.updatedAt}</span>
+                                        <span className="flex items-center group-hover:text-blue-600 transition-colors duration-300">
+                                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {article.updatedAt}
+                                        </span>
                                     )}
                                 </div>
 
                                 <Link href={`/upsc-notes/${gs}/${section}/${subsection}/${article.slug}`}>
-                                    <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300">
+                                    <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium shadow-sm hover:shadow-xl text-lg">
                                         Read More
                                     </button>
                                 </Link>
