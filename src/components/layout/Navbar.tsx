@@ -64,18 +64,27 @@ const Navbar = () => {
           ? 'bg-gradient-to-r from-[#f4d03f] via-[#f5ab35] to-[#f39c12] shadow-lg' 
           : 'bg-white'
       }`}>
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 lg:px-6">
           <div className="flex justify-between items-center h-[70px]">
-            {/* Logo */}
-            <Link href="/" passHref>
-              <Image src={logo} alt="99Notes" width={40} height={40} className="h-10 w-auto" />
-            </Link>
+            {/* Logo - Updated with better responsive handling */}
+            <div className="flex-shrink-0 min-w-[40px]">
+              <Link href="/" passHref>
+                <Image 
+                  src={logo} 
+                  alt="99Notes" 
+                  width={40} 
+                  height={40} 
+                  className="h-10 w-auto object-contain"
+                  priority
+                />
+              </Link>
+            </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex flex-1 justify-center items-center gap-1">
-              <div className="flex items-center">
+            {/* Desktop Navigation - Updated with better spacing */}
+            <div className="hidden lg:flex flex-1 justify-center items-center gap-1 ml-4 xl:ml-8">
+              <div className="flex items-center space-x-1 xl:space-x-2">
                 {Object.entries(navItems).map(([key, value], index) => (
-                  <div key={key}>
+                  <div key={key} className="whitespace-nowrap">
                     {key === "UPSC Notes" ? (
                       <UPSCNotesDropdown title={key} items={value} />
                     ) : (
@@ -90,14 +99,14 @@ const Navbar = () => {
               </div>
 
               <Link href="/about" passHref>
-                <span className={`text-[14px] font-bold tracking-wide py-6 px-2 transition-colors duration-300 ${
+                <span className={`text-[14px] whitespace-nowrap font-bold tracking-wide py-6 px-2 xl:px-3 transition-colors duration-300 ${
                   isScrolled ? 'text-black hover:text-gray-800' : 'text-gray-800 hover:text-blue-700'
                 }`}>
                   About 99Notes
                 </span>
               </Link>
               <Link href="/blogs" passHref>
-                <span className={`text-[14px] font-bold tracking-wide py-6 px-2 transition-colors duration-300 ${
+                <span className={`text-[14px] whitespace-nowrap font-bold tracking-wide py-6 px-2 xl:px-3 transition-colors duration-300 ${
                   isScrolled ? 'text-black hover:text-gray-800' : 'text-gray-800 hover:text-blue-700'
                 }`}>
                   Blogs
@@ -105,13 +114,13 @@ const Navbar = () => {
               </Link>
 
               {/* Search Bar */}
-              <div className="ml-50">
+              <div className="ml-2 xl:ml-4">
                 <SearchBar />
               </div>
             </div>
 
             {/* Mobile Menu Button */}
-            <button className="lg:hidden p-2 rounded-md hover:bg-gray-100 focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
+            <button className="lg:hidden p-2 rounded-md hover:bg-gray-100 focus:outline-none ml-2" onClick={() => setIsOpen(!isOpen)}>
               <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

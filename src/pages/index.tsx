@@ -12,7 +12,7 @@ export default function Home() {
       <section className="container mx-auto px-4 ">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text Content */}
-          <div className="space-y-8 ml-30">
+          <div className="space-y-8">
             <div className="space-y-2">
               <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
                 <span className="text-2xl md:text-3xl font-light block mb-1 tracking-wider">The</span>
