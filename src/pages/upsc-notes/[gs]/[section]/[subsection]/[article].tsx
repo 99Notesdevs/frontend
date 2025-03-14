@@ -179,7 +179,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { article } = context.params as ParsedUrlQuery;
 
     // Fetch article data from your backend
-    const response = await axios.get(`${env.API}/article/slug/${article}`);
+    const response = await axios.get(`${env.API}/notes/${article}`);
     const articleData = response.data.data;
 
     return {
