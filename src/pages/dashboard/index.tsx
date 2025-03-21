@@ -1,6 +1,24 @@
 import { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, PlusCircle, Plus, Edit } from 'lucide-react'
+import ArticleBrowser from "@/components/ArticleBrowser"
+import { useRouter } from 'next/navigation';
+
+// Mock articles data - replace with API call
+const mockArticles = [
+  {
+    id: '1',
+    title: 'Introduction to Ancient India',
+    path: ['UPSC Notes', 'General Studies 1', 'History', 'Ancient India'],
+    updatedAt: '2025-03-21',
+  },
+  {
+    id: '2',
+    title: 'Medieval Indian History',
+    path: ['UPSC Notes', 'General Studies 1', 'History', 'Medieval India'],
+    updatedAt: '2025-03-21',
+  },
+];
 
 export const metadata: Metadata = {
   title: "Article Dashboard",
@@ -8,6 +26,8 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 pt-15">
       <section className="w-full py-12">
@@ -17,92 +37,34 @@ export default function Home() {
               Admin Dashboard
             </h1>
             <p className="max-w-[700px] text-slate-600 md:text-lg">
-              Create, manage, and publish your articles with ease.
+              Create and manage your content with ease.
             </p>
           </div>
         </div>
       </section>
+
       <section className="w-full py-6">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Articles Card */}
-            <div className="group relative overflow-hidden rounded-xl bg-white p-1 shadow-lg transition-all hover:shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-indigo-100 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <div className="relative p-6">
-                <h3 className="text-xl font-semibold text-gray-800">Articles</h3>
-                <p className="mt-2 text-sm text-gray-600">View and manage your articles</p>
-                <div className="mt-4">
-                  <p className="text-3xl font-bold text-indigo-600">12</p>
-                  <p className="text-sm text-gray-500">Total articles</p>
-                </div>
-              </div>
-              <div className="relative border-t border-gray-100 p-4">
-                <Link 
-                  href="/dashboard/articles" 
-                  className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          {/* Article Browser Section */}
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Browse & Edit Articles</h2>
+            <div className="grid grid-cols-1 gap-6">
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <button
+                  onClick={() => router.push('/dashboard/add')}
+                  className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                 >
-                  View All <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-            
-            {/* Create New Card */}
-            <div className="group relative overflow-hidden rounded-xl bg-white p-1 shadow-lg transition-all hover:shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-100 to-pink-100 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <div className="relative p-6">
-                <h3 className="text-xl font-semibold text-gray-800">Create New</h3>
-                <p className="mt-2 text-sm text-gray-600">Write a new article</p>
-                <div className="mt-4">
-                  <p className="text-gray-600">Start writing your next article</p>
-                </div>
-              </div>
-              <div className="relative border-t border-gray-100 p-4">
-                <Link 
-                  href="/dashboard/editor" 
-                  className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Article
+                </button>
+                <button
+                  onClick={() => router.push('/dashboard/edit')}
+                  className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                 >
-                  New Article <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/*Update subsection card*/}
-            <div className="group relative overflow-hidden rounded-xl bg-white p-1 shadow-lg transition-all hover:shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-teal-100 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <div className="relative p-6">
-                <h3 className="text-xl font-semibold text-gray-800">Update Subsections</h3>
-                <p className="mt-2 text-sm text-gray-600">Update the relations among articles</p>
-                <div className="mt-4">
-                  <p className="text-gray-600">Simply select and update.</p>
-                </div>
-              </div>
-              <div className="relative border-t border-gray-100 p-4">
-                <Link 
-                  href="/dashboard/updateSubsections" 
-                  className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                >
-                  Update Subsections <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-            
-            {/* Settings Card */}
-            <div className="group relative overflow-hidden rounded-xl bg-white p-1 shadow-lg transition-all hover:shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-teal-100 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <div className="relative p-6">
-                <h3 className="text-xl font-semibold text-gray-800">Settings</h3>
-                <p className="mt-2 text-sm text-gray-600">Configure your dashboard</p>
-                <div className="mt-4">
-                  <p className="text-gray-600">Customize your experience</p>
-                </div>
-              </div>
-              <div className="relative border-t border-gray-100 p-4">
-                <Link 
-                  href="/dashboard/settings" 
-                  className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                >
-                  Settings <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Articles
+                </button>
               </div>
             </div>
           </div>
