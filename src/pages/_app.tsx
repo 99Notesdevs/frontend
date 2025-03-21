@@ -6,10 +6,12 @@ import { useRouter } from "next/router";
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isDashboard = router.pathname.startsWith('/dashboard');
+  const isLogin = router.pathname.startsWith('/login');
 
-  if (isDashboard) {
+  if (isDashboard || isLogin) {
     return <Component {...pageProps} />;
   }
+
 
   return (
     <Layout>

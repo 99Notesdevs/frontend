@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
-import ArticleEditor from "@/components/article-editor"
-import PathSelector from "@/components/PathSelector"
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import ArticleEditor from "@/components/article-editor";
+import PathSelector from "@/components/PathSelector";
 
 interface Article {
   id: string;
@@ -26,26 +26,33 @@ const getArticleById = async (id: string): Promise<Article> => {
   };
 };
 
-export default function EditArticlePage({ params }: { params: { id: string } }) {
+export default function EditArticlePage() {
   const router = useRouter();
+  const { id } = useParams();
   const [article, setArticle] = useState<Article | null>(null);
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
     const loadArticle = async () => {
-      try {
-        const data = await getArticleById(params.id);
-        setArticle(data);
-        setCurrentPath(data.path);
-      } catch (error) {
-        console.error("Failed to load article:", error);
+      if (id) {
+        try {
+          const articleId = Array.isArray(id) ? id[0] : id;
+          const data = await getArticleById(articleId);
+          setArticle(data);
+          setCurrentPath(data.path);
+        } catch (error) {
+          console.error("Failed to load article:", error);
+          router.push("/dashboard/edit");
+        }
+      } else {
+        console.error("Article ID is undefined");
         router.push("/dashboard/edit");
       }
     };
 
     loadArticle();
-  }, [params.id, router]);
+  }, [id, router]);
 
   const handleSave = async (articleData: any) => {
     setPublishing(true);
@@ -86,11 +93,6 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Articles
                 </button>
-
-                {/* Current Path Display */}
-                <div className="text-sm text-gray-500">
-                  Current Path: {currentPath.length > 0 ? currentPath.join(" / ") : "Select a path"}
-                </div>
 
                 {/* Path Selector */}
                 <PathSelector onPathChange={setCurrentPath} />
