@@ -1,48 +1,139 @@
 import { useState, useEffect } from 'react';
-import { navItems } from './Navbar/navData';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 type PathSelectorProps = {
   onPathChange: (path: string[]) => void;
 }
 
-interface NavItemObject {
-  [key: string]: NavItem;
-}
-
-type NavItem = string[] | NavItemObject;
-
-// Type assertion for navItems
-const typedNavItems = navItems as NavItemObject;
-
 export default function PathSelector({ onPathChange }: PathSelectorProps) {
-  const [level1, setLevel1] = useState<string>('UPSC Notes');
-  const [level2, setLevel2] = useState<string>('');
-  const [level3, setLevel3] = useState<string>('');
-  const [level4, setLevel4] = useState<string>('');
-  const [level5, setLevel5] = useState<string>('');
+  const [examID, setExamID] = useState<string>('');
+  const [domainID, setDomainID] = useState<string>('');
+  const [subjectID, setSubjectID] = useState<string>('');
+  const [chapterID, setChapterID] = useState<string>('');
+  const [topicID, setTopicID] = useState<string>('');
+  const [articleID, setArticleID] = useState<string>('');
+
+  const token = Cookies.get('token') || '';
+
+  const [examOptions, setExamOptions] = useState<{ id: string; title: string }[]>([]);
+  const [domainOptions, setDomainOptions] = useState<{ id: string; title: string }[]>([]);
+  const [subjectOptions, setSubjectOptions] = useState<{ id: string; title: string }[]>([]);
+  const [chapterOptions, setChapterOptions] = useState<{ id: string; title: string }[]>([]);
+  const [topicOptions, setTopicOptions] = useState<{ id: string; title: string }[]>([]);
+  const [articleOptions, setArticleOptions] = useState<{ id: string; title: string }[]>([]);
 
   useEffect(() => {
-    onPathChange([level1, level2, level3, level4, level5].filter(Boolean));
-  }, [level1, level2, level3, level4, level5, onPathChange]);
+    onPathChange([examID, domainID, subjectID, chapterID, topicID, articleID].filter(Boolean));
+  }, [examID, domainID, subjectID, chapterID, topicID, articleID, onPathChange]);
 
-  const getOptions = (level: number): string[] => {
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const newOptions = await getOptions(1);
+      setExamOptions(newOptions);
+    };
+    fetchOptions();
+  }, []);
+
+  useEffect(() => {
+    if (examID) {
+      const fetchOptions = async () => {
+        const newOptions = await getOptions(2);
+        setDomainOptions(newOptions);
+      };
+      fetchOptions();
+    }
+  }, [examID]);
+
+  useEffect(() => {
+    if (domainID) {
+      const fetchOptions = async () => {
+        const newOptions = await getOptions(3);
+        setSubjectOptions(newOptions);
+      };
+      fetchOptions();
+    }
+  }, [domainID]);
+
+  useEffect(() => {
+    if (subjectID) {
+      const fetchOptions = async () => {
+        const newOptions = await getOptions(4);
+        setChapterOptions(newOptions);
+      };
+      fetchOptions();
+    }
+  }, [subjectID]);
+
+  useEffect(() => {
+    if (chapterID) {
+      const fetchOptions = async () => {
+        const newOptions = await getOptions(5);
+        setTopicOptions(newOptions);
+      };
+      fetchOptions();
+    }
+  }, [chapterID]);
+
+  useEffect(() => {
+    if (topicID) {
+      const fetchOptions = async () => {
+        const newOptions = await getOptions(6);
+        setArticleOptions(newOptions);
+      };
+      fetchOptions();
+    }
+  }, [topicID]);
+
+  const getOptions = async (level: number): Promise<{ id: string; title: string }[]> => {
     switch (level) {
       case 1:
-        return Object.keys(typedNavItems);
+        const exams = await axios.get('http://localhost:5000/api/v1/exam', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return exams.data.data;
       case 2:
-        if (!level1) return [];
-        const level1Item = typedNavItems[level1] as NavItemObject;
-        return Object.keys(level1Item);
+        if (!examID) return [];
+        const domains = await axios.get(`http://localhost:5000/api/v1/domain/parent/${examID}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return domains.data.data;
       case 3:
-        if (!level1 || !level2) return [];
-        const level2Parent = typedNavItems[level1] as NavItemObject;
-        const level2Item = level2Parent[level2] as NavItemObject;
-        return Object.keys(level2Item);
+        if (!domainID) return [];
+        const subjects = await axios.get(`http://localhost:5000/api/v1/subject/parent/${domainID}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return subjects.data.data;
       case 4:
-        if (!level1 || !level2 || !level3) return [];
-        const level3Parent = (typedNavItems[level1] as NavItemObject)[level2] as NavItemObject;
-        const level3Item = level3Parent[level3];
-        return Array.isArray(level3Item) ? level3Item : [];
+        if (!subjectID) return [];
+        const chapters = await axios.get(`http://localhost:5000/api/v1/chapter/parent/${subjectID}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return chapters.data.data;
+      case 5:
+        if (!chapterID) return [];
+        const topics = await axios.get(`http://localhost:5000/api/v1/topic/parent/${chapterID}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return topics.data.data;
+      case 6:
+        if (!topicID) return [];
+        const articles = await axios.get(`http://localhost:5000/api/v1/article/parent/${topicID}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return articles.data.data;
       default:
         return [];
     }
@@ -51,51 +142,135 @@ export default function PathSelector({ onPathChange }: PathSelectorProps) {
   const handleChange = (level: number, value: string) => {
     switch (level) {
       case 1:
-        setLevel1(value);
-        setLevel2('');
-        setLevel3('');
-        setLevel4('');
-        setLevel5('');
+        setExamID(value);
+        setDomainID('');
+        setSubjectID('');
+        setChapterID('');
+        setTopicID('');
+        setArticleID('');
+        setDomainOptions([]);
+        setSubjectOptions([]);
+        setChapterOptions([]);
+        setTopicOptions([]);
+        setArticleOptions([]);
         break;
       case 2:
-        setLevel2(value);
-        setLevel3('');
-        setLevel4('');
-        setLevel5('');
+        setDomainID(value);
+        setSubjectID('');
+        setChapterID('');
+        setTopicID('');
+        setArticleID('');
+        setSubjectOptions([]);
+        setChapterOptions([]);
+        setTopicOptions([]);
+        setArticleOptions([]);
         break;
       case 3:
-        setLevel3(value);
-        setLevel4('');
-        setLevel5('');
+        setSubjectID(value);
+        setChapterID('');
+        setTopicID('');
+        setArticleID('');
+        setChapterOptions([]);
+        setTopicOptions([]);
+        setArticleOptions([]);
         break;
       case 4:
-        setLevel4(value);
-        setLevel5('');
+        setChapterID(value);
+        setTopicID('');
+        setArticleID('');
+        setTopicOptions([]);
+        setArticleOptions([]);
         break;
       case 5:
-        setLevel5(value);
+        setTopicID(value);
+        setArticleID('');
+        setArticleOptions([]);
+        break;
+      case 6:
+        setArticleID(value);
         break;
     }
-  };
+  };  
 
   return (
     <div className="flex gap-2 items-center">
-      {[1, 2, 3, 4, 5].map((level) => (
-        <select
-          key={level}
-          value={[level1, level2, level3, level4, level5][level - 1]}
-          onChange={(e) => handleChange(level, e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-700 text-sm"
-          disabled={level > 1 && !([level1, level2, level3, level4][level - 2])}
-        >
-          <option value="">Select {level === 1 ? 'Category' : `Level ${level}`}</option>
-          {getOptions(level).map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      ))}
+      <select
+        value={examID}
+        onChange={(e) => handleChange(1, e.target.value)}
+        className="border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-700 text-sm"
+      >
+        <option value="">Select Exam</option>
+        {examOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.title}
+          </option>
+        ))}
+      </select>
+      <select
+        value={domainID}
+        onChange={(e) => handleChange(2, e.target.value)}
+        className="border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-700 text-sm"
+        disabled={!examID}
+      >
+        <option value="">Select Domain</option>
+        {domainOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.title}
+          </option>
+        ))}
+      </select>
+      <select
+        value={subjectID}
+        onChange={(e) => handleChange(3, e.target.value)}
+        className="border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-700 text-sm"
+        disabled={!domainID}
+      >
+        <option value="">Select Subject</option>
+        {subjectOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.title}
+          </option>
+        ))}
+      </select>
+      <select
+        value={chapterID}
+        onChange={(e) => handleChange(4, e.target.value)}
+        className="border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-700 text-sm"
+        disabled={!subjectID}
+      >
+        <option value="">Select Chapter</option>
+        {chapterOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.title}
+          </option>
+        ))}
+      </select>
+      <select
+        value={topicID}
+        onChange={(e) => handleChange(5, e.target.value)}
+        className="border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-700 text-sm"
+        disabled={!chapterID}
+      >
+        <option value="">Select Topic</option>
+        {topicOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.title}
+          </option>
+        ))}
+      </select>
+      <select
+        value={articleID}
+        onChange={(e) => handleChange(6, e.target.value)}
+        className="border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-700 text-sm"
+        disabled={!topicID}
+      >
+        <option value="">Select Article</option>
+        {articleOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.title}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
