@@ -5,19 +5,21 @@ import { Save, Tag, Calendar, Clock } from 'lucide-react';
 const TipTapEditor = dynamic(() => import('./tiptapeditor'), { ssr: false });
 
 export interface ArticleEditorProps {
+  initialTitle?: string;
   initialContent?: string;
   initialTags?: string[];
   onSave: (data: { title: string; content: string; tags: string[]; publishDate?: string }) => void;
   isPublishing?: boolean;
 }
 
-export default function ArticleEditor({ 
+export default function ArticleEditor({
+  initialTitle,
   initialContent, 
   initialTags = [], 
   onSave, 
   isPublishing = false 
 }: ArticleEditorProps) {
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(initialTitle || '');
   const [content, setContent] = useState(initialContent || '');
   const [tags, setTags] = useState<string[]>(initialTags);
   const [newTag, setNewTag] = useState('');

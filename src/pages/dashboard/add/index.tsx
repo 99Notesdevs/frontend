@@ -6,7 +6,6 @@ import PathSelector from "@/components/PathSelector"
 import { env } from "@/config/env"
 import axios from "axios"
 import Cookies from "js-cookie"
-import { title } from "process"
 
 export default function AddArticlePage() {
   const router = useRouter();
@@ -43,7 +42,6 @@ export default function AddArticlePage() {
       const response = await axios.post(`${env.API}/${fetchType}`, {
         title: articleData.title,
         content: articleData.content,
-        slug: 'something1',
         parentID: currentPath[pathLength - 1],
       } , {
         headers: {
