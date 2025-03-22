@@ -193,7 +193,7 @@ export default function PathSelector({ onPathChange }: PathSelectorProps) {
   };  
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex flex-wrap gap-2 items-center justify-center sm:justify-start">
       <select
         value={examID}
         onChange={(e) => handleChange(1, e.target.value)}

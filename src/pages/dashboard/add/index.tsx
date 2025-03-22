@@ -43,7 +43,7 @@ export default function AddArticlePage() {
       const response = await axios.post(`${env.API}/${fetchType}`, {
         title: articleData.title,
         content: articleData.content,
-        slug: 'something',
+        slug: 'something1',
         parentID: currentPath[pathLength - 1],
       } , {
         headers: {
@@ -66,9 +66,9 @@ export default function AddArticlePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <div className="container mx-auto px-4 pt-16">
-        <div className="flex gap-6">
-          <div className="flex-1">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 max-w-7xl">
+        <div className="flex flex-col gap-6">
+          <div className="w-full">
             {/* Top Navigation */}
             <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
               <div className="space-y-4">
@@ -82,7 +82,9 @@ export default function AddArticlePage() {
                 </button>
 
                 {/* Path Selector */}
-                <PathSelector onPathChange={setCurrentPath} />
+                <div className="flex flex-wrap gap-2">
+                  <PathSelector onPathChange={setCurrentPath} />
+                </div>
               </div>
             </div>
 
