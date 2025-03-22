@@ -94,7 +94,7 @@ export default function EditArticlesPage() {
                         </div>
                         <div className="flex items-center space-x-3">
                           <button
-                            onClick={() => router.push(`/dashboard/edit/${article.id}`)}
+                            onClick={() => router.push(`/dashboard/edit/${currentPath.length}/${article.id}`)}
                             className="inline-flex items-center px-4 py-2 text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                           >
                             <Edit className="w-4 h-4 mr-2" />
