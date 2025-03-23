@@ -53,6 +53,13 @@ export default function EditArticlesPage() {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this article?')) {
       // TODO: Implement actual delete logic
+      const fetchType = getType(currentPath.length);
+      const response = await axios.delete(`${env.API}/${fetchType}/${id}`, {
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("token") || ''}`
+        }
+      });
+      console.log(response.data);
       console.log('Deleting article:', id);
     }
   };

@@ -47,7 +47,7 @@ const Navbar = () => {
 
             {/* Login Text with Icon - Right Side */}
             <div className="ml-30">
-              <Link href="/login" passHref>
+              <Link href="/users/login" passHref>
                 <div className="flex items-center gap-2 hover:text-white/90 transition-colors">
                   <span className="text-[13px] font-bold tracking-wide text-white ">
                     Login
