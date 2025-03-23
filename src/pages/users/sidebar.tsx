@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Sidebar = () => {
+const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const navItems = [
@@ -12,15 +12,26 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-[250px] h-screen bg-white border-r border-gray-200 p-8">
-      {/* User Profile Section */}
-      <div className="flex items-center p-4 border-b border-gray-200 mb-8">
-        <div className="w-10 h-10 rounded-full bg-indigo-900 text-white flex items-center justify-center mr-4">
+    <div className="w-[250px] h-screen bg-white border-r border-gray-200 p-4 sm:p-8 relative">
+
+      {/* Mobile close button */}
+      <button 
+        className="absolute top-4 right-4 sm:hidden text-gray-500"
+        onClick={onClose}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      {/* User Profile Section with adjusted spacing */}
+      <div className="flex items-center p-4 border-b border-gray-200 mb-8 mt-6 sm:mt-0">
+        <div className="w-10 h-10 rounded-full bg-yellow-500 text-white flex items-center justify-center mr-4">
           U
         </div>
         <div>
-          <p className="m-0 font-bold text-indigo-900">User Name</p>
-          <small className="text-gray-600">Student</small>
+          <p className="m-0 font-bold text-yellow-600">User Name</p>
+          <small className="text-yellow-500">Student</small>
         </div>
       </div>
 
@@ -35,16 +46,21 @@ const Sidebar = () => {
               ${hoveredItem === item.name ? 'bg-indigo-900 text-white' : 'text-indigo-900'}`}
           >
             {item.name}
+
+      
           </div>
         ))}
       </nav>
 
       {/* Logout Button */}
-      <div className="absolute bottom-8 w-[calc(250px-2rem)]">
-        <button className="w-full py-3 px-4 bg-indigo-900 text-white rounded cursor-pointer transition-all duration-300 hover:bg-indigo-700">
-          Logout
-        </button>
-      </div>
+      <button 
+        className="w-full bg-yellow-500 text-white py-2 sm:py-2.5 rounded-lg hover:bg-slate-700 transition duration-200 font-medium mt-2 text-sm sm:text-base"
+        onClick={() => {
+          // Add logout logic here
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
 };
