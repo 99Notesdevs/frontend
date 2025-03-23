@@ -36,46 +36,46 @@ const BlogsPage: React.FC<BlogsPageProps> = ({ blogs, currentPage, totalPages })
         <meta name="description" content="Read the latest blogs from 99Notes" />
       </Head>
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center">
-        <div className="container mx-auto px-4 py-8 bg-gray-100 rounded-lg shadow-md my-8 max-w-7xl">
-          <h1 className="text-4xl font-bold text-black text-center mb-8">Blogs</h1>
-          <div className="flex flex-col md:flex-row justify-center">
-            <div className="w-full md:w-1/4 pr-4 mb-4 md:mb-0">
-              <div className="mb-4 border border-black p-4 rounded-lg bg-gray-50">
+        <div className="container mx-auto px-4 py-8 bg-gray-100 rounded-xl shadow-lg my-8 max-w-7xl">
+          <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 py-5">Blogs</h1>
+          <div className="flex flex-col md:flex-row justify-center gap-6">
+            <div className="w-full md:w-1/4">
+              <div className="mb-4 p-6 rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-300">
                 <input
                   type="text"
                   placeholder="Search blogs..."
-                  className="border p-2 rounded w-full mb-4 placeholder-black focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="border border-gray-200 p-3 rounded-lg w-full mb-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button className="bg-blue-600 text-white p-2 rounded w-full hover:bg-blue-700 transition-colors duration-300 mb-4" onClick={handleSearch}>
+                <button className="bg-blue-600 text-white p-3 rounded-lg w-full hover:bg-blue-700 transition-all duration-300 mb-4 font-medium shadow-sm hover:shadow-md" onClick={handleSearch}>
                   Search
                 </button>
-                <select className="border p-2 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-600 text-black">
+                <select className="border border-gray-200 p-3 rounded-lg w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 focus:border-transparent transition-all duration-300">
                   <option value="">Select Category</option>
                   <option value="category1">Category 1</option>
                   <option value="category2">Category 2</option>
-                  {/* Add more categories as needed */}
                 </select>
-                <select className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-600 text-black">
+                <select className="border border-gray-200 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 focus:border-transparent transition-all duration-300">
                   <option value="">Sort By</option>
                   <option value="date">Date</option>
                   <option value="popularity">Popularity</option>
-                  {/* Add more sorting options as needed */}
                 </select>
               </div>
             </div>
             <div className="w-full md:w-3/4">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {filteredBlogs.slice(0, 8).map((blog) => (
-                    <div key={blog.id} className="hover:shadow-lg transition-shadow duration-300">
+                    <div key={blog.id} className="rounded-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       <BlogCard blog={blog} />
                     </div>
                   ))}
                 </div>
               </div>
-              <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/blogs" />
+              <div className="mt-8">
+                <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/blogs" />
+              </div>
             </div>
           </div>
         </div>
@@ -83,7 +83,7 @@ const BlogsPage: React.FC<BlogsPageProps> = ({ blogs, currentPage, totalPages })
       <style jsx>{`
         @media (min-width: 1024px) and (max-width: 1550px) {
           .container {
-            padding: 2rem;
+            padding: 2.5rem;
           }
           .text-4xl {
             font-size: 2.5rem;
