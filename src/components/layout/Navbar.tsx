@@ -46,10 +46,10 @@ const Navbar = () => {
             </div>
 
             {/* Login Text with Icon - Right Side */}
-            <div>
-              <Link href="/login" passHref>
+            <div className="ml-30">
+              <Link href="/users/login" passHref>
                 <div className="flex items-center gap-2 hover:text-white/90 transition-colors">
-                  <span className="text-[13px] font-bold tracking-wide text-white">
+                  <span className="text-[13px] font-bold tracking-wide text-white ">
                     Login
                   </span>
                   <svg 

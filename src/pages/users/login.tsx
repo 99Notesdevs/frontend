@@ -1,32 +1,76 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { env } from '@/config/env';
 import Cookies from 'js-cookie';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const token = Cookies.get('token');
+        if (token) {
+          const res = await axios.get(`${env.API}/user/check`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (res.data.success) {
+            router.push('/users/dashboard');
+          }
+        }
+      } catch (error) {
+        console.error("Error checking user authentication: ", error);
+        if (axios.isAxiosError(error) && error.response?.status !== 200) {
+          console.warn("Unauthorized! Redirecting to login...");
+          Cookies.remove('token'); // Remove invalid token
+          window.location.href = "/users/login"; // Redirect user
+        } else {
+          if (axios.isAxiosError(error)) {
+            console.error("API Error:", error.response?.status, error.response?.data);
+          } else {
+            console.error("Unexpected Error:", error);
+          }
+        }
+      }
+    };
+    checkUser();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     try {
-      const response = await axios.post(`${env.API}/admin`, {
-        email: username,
+      const response = await axios.post(`${env.API}/user`, {
+        email,
         password,
       });
       if (response.data.success) {
-        Cookies.set('token', response.data.data.token, { expires: 5 });
-        router.push('/dashboard');
+        const data = response.data.data;
+        if(!data) { 
+          setErrorMessage("No token received from server. Please try again later.");
+          return;
+        }
+        const cookie = data.split(' ')[1];
+        Cookies.set('token', cookie, { expires: 5 });
+        router.push('/users/dashboard');
       } else {
-        alert(response.data.message);
+        setErrorMessage(response.data.message);
       }
     } catch (error) {
-      console.log(error);
-      alert("An error occurred. Please try again later.");
+      console.error("Error during login: ", error);
+      if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
+        setErrorMessage("Invalid email or password. Please try again.");
+      } else {
+        setErrorMessage("An error occurred during login. Please try again later.");
+      }
     }
   };
 
@@ -34,13 +78,18 @@ const Login = () => {
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-white px-4 sm:px-8">
       <div className="bg-white p-8 sm:p-10 rounded-xl h-100 shadow-lg w-full max-w-[500px] sm:max-w-lg border border-gray-200">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-4">Login</h2>
+        {errorMessage && (
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {errorMessage}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Username or Email Adress:</label>
+            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Email:</label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
@@ -90,7 +139,7 @@ const Login = () => {
               href="/users/register" 
               className="text-yellow-500 hover:text-yellow-600 font-medium"
             >
-              Register
+              Don't have an account? Register
             </a>
             <a 
               href="#" 
