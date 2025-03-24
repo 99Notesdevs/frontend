@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen?: boolean }) => {
+  const router = useRouter();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -43,6 +45,11 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const handleProfileClick = () => {
+    router.push('/users/profile');
+    if (onClose) onClose();
+  };
+
   return (
     <div 
       className={`
@@ -65,9 +72,12 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
 
       {/* Content wrapper */}
       <div className="px-4 pt-14 md:pt-4 md:p-6">
-        {/* User Profile Section */}
-        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'p-4'} border-b border-gray-200/50 mb-6`}>
-          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white flex items-center justify-center shadow-lg">
+        {/* Updated User Profile Section */}
+        <div 
+          onClick={handleProfileClick}
+          className={`flex items-center ${isCollapsed ? 'justify-center' : 'p-4'} border-b border-gray-200/50 mb-6 cursor-pointer hover:bg-yellow-50 rounded-lg transition-all duration-200`}
+        >
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200">
             <img src="/default-avatar.png" alt="Profile" className="w-full h-full rounded-full object-cover" />
           </div>
           {!isCollapsed && (
