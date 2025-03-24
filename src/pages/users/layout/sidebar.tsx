@@ -1,3 +1,8 @@
+"use client";
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import { env } from '@/config/env';
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
@@ -7,6 +12,41 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const router = useRouter();
+
+  const logout = async () => {
+    try {
+      const token = Cookies.get('token');
+      Cookies.remove('token');
+      if(token) {
+        const response = await axios.post(`${env.API}/user/logout`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(response.data.success) {
+          router.push('/users/login');
+        } else {
+          router.push('/users/login');
+        }
+      } else {
+        router.push('/users/login');
+      }
+    } catch(error) {
+      console.error("Error checking user authentication: ", error);
+        if (axios.isAxiosError(error) && error.response?.status !== 200) {
+          console.warn("Unauthorized! Redirecting to login...");
+          Cookies.remove('token'); // Remove invalid token
+          window.location.href = "/users/login"; // Redirect user
+        } else {
+          if (axios.isAxiosError(error)) {
+            console.error("API Error:", error.response?.status, error.response?.data);
+          } else {
+            console.error("Unexpected Error:", error);
+          }
+        }
+    }
+  }
 
   const navSections = [
     {
@@ -121,7 +161,7 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
         </nav>
 
         {/* Logout Button */}
-        <button 
+        <button onClick={logout}
           className={`w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white py-7 sm:py-2.5 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200 font-medium mt-10 text-sm sm:text-base`}
         >
           {isCollapsed ? 'L' : 'Logout'}

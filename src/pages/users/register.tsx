@@ -1,19 +1,51 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { env } from '@/config/env';
 import Cookies from 'js-cookie';
 
 const Register = () => {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const token = Cookies.get('token');
+        if (token) {
+          const res = await axios.get(`${env.API}/user/check`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (res.data.success) {
+            router.push('/users/dashboard');
+          }
+        }
+      } catch (error) {
+        console.error("Error checking user authentication: ", error);
+        if (axios.isAxiosError(error) && error.response?.status !== 200) {
+          console.warn("Unauthorized! Redirecting to login...");
+          Cookies.remove('token'); // Remove invalid token
+          window.location.href = "/users/register"; // Redirect user
+        } else {
+          if (axios.isAxiosError(error)) {
+            console.error("API Error:", error.response?.status, error.response?.data);
+          } else {
+            console.error("Unexpected Error:", error);
+          }
+        }
+      }
+    };
+    checkUser();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,21 +55,29 @@ const Register = () => {
     }
     setPasswordError('');
     try {
-      const response = await axios.post(`${env.API}/register`, {
-        username,
+      const response = await axios.post(`${env.API}/user/signup`, {
         email,
-        name,
+        firstName,
+        lastName,
         password,
       });
       if (response.data.success) {
-        Cookies.set('token', response.data.data.token, { expires: 5 });
-        router.push('/dashboard');
+        const data = response.data.data;
+        if (!data) {
+          alert("No token received from server. Please try again later.");
+          return;
+        }
+        const cookie = data.split(' ')[1];
+        Cookies.set('token', cookie, { expires: 5 });
+        router.push('/users/dashboard');
       } else {
         alert(response.data.message);
+        router.push('/users/login');
       }
     } catch (error) {
       console.log(error);
       alert("An error occurred. Please try again later.");
+      router.push('/users/login');
     }
   };
 
@@ -56,31 +96,31 @@ const Register = () => {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-4">Register</h2>
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Username*</label>
+            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">First Name*</label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               required
               className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Email Address*</label>
+            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Email*</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -137,6 +177,14 @@ const Register = () => {
           >
             Register
           </button>
+          <div className="flex justify-between items-center pt-2 text-sm">
+            <a 
+              href="/users/login" 
+              className="text-yellow-500 hover:text-yellow-600 font-medium"
+            >
+              Already have an account? Login
+            </a>
+          </div>
         </form>
       </div>
     </div>

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import Sidebar from './layout/sidebar';
 
@@ -35,7 +36,7 @@ const Dashboard = () => {
           {/* Welcome Message */}
           <div className="bg-white/70 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-900 to-yellow-600 bg-clip-text text-transparent">Welcome back, Student!</h1>
-            <p className="text-gray-600 mt-2 text-lg">Here's your learning overview.</p>
+            <p className="text-gray-600 mt-2 text-lg">Here&apos;s your learning overview.</p>
           </div>
 
           {/* Quick Access Section */}
