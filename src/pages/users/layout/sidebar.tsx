@@ -2,7 +2,6 @@
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { env } from '@/config/env';
-import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
@@ -12,7 +11,6 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const router = useRouter();
 
   const logout = async () => {
     try {
