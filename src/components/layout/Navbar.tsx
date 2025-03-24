@@ -37,7 +37,7 @@ const Navbar = () => {
         }`}>
           <div className="container mx-auto px-6 flex justify-between items-center h-10">
             {/* Shop Now Button - Left Side */}
-            <div>
+            <div className="mt-1.75">
               <Link href="/shop" passHref>
                 <span className="text-[13px] font-bold tracking-wide text-white hover:text-white/90 transition-colors bg-[#d35400] px-4 py-1.5 rounded">
                   Shop Now

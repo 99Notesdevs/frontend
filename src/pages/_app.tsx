@@ -8,12 +8,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isDashboard = router.pathname.startsWith('/dashboard');
   const isLogin = router.pathname.startsWith('/login');
-  const isUserLogin = router.pathname.startsWith('/users/login');
-  const isUserRegister = router.pathname.startsWith('/users/register');
-
+  const isUser = router.pathname.startsWith('/users');
+  
   return (
     <ErrorBoundary>
-      {isDashboard || isLogin || isUserLogin || isUserRegister ? (
+      {isDashboard || isUser || isLogin   ? (
         <Component {...pageProps} />
       ) : (
         <Layout>

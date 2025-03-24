@@ -142,7 +142,7 @@ const Login = () => {
               Don't have an account? Register
             </a>
             <a 
-              href="#" 
+              href="/users/password-reset" 
               className="text-yellow-500 hover:text-yellow-600 font-medium"
             >
               Forgot Password?
