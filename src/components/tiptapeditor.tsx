@@ -108,6 +108,8 @@ const FONT_SIZES = {
 
 const TiptapEditor = ({ content, setContent }: TiptapEditorProps) => {
   const [currentSize, setCurrentSize] = useState('Normal');
+  const [isHtmlMode, setIsHtmlMode] = useState(false);
+  const [htmlContent, setHtmlContent] = useState('');
   const imageInputRef = React.useRef<HTMLInputElement>(null);
 
   const addImage = () => {
@@ -191,6 +193,49 @@ const TiptapEditor = ({ content, setContent }: TiptapEditorProps) => {
     }
   }
 
+  const handleHtmlModeToggle = () => {
+    if (!isHtmlMode) {
+      // Switching to HTML mode
+      setHtmlContent(editor.getHTML());
+    } else {
+      // Switching back to rich text mode
+      editor.commands.setContent(htmlContent);
+      setContent(htmlContent);
+    }
+    setIsHtmlMode(!isHtmlMode);
+  };
+
+  const handleHtmlChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newHtml = e.target.value;
+    setHtmlContent(newHtml);
+    setContent(newHtml);
+  };
+
+  // Add these new functions for HTML mode
+  const wrapTextWithTag = (tag: string) => {
+    const textarea = document.querySelector('textarea');
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = htmlContent.substring(start, end);
+    const newText = `<${tag}>${selectedText}</${tag}>`;
+    
+    const newContent = htmlContent.substring(0, start) + newText + htmlContent.substring(end);
+    setHtmlContent(newContent);
+    setContent(newContent);
+  };
+
+  const insertHtmlElement = (element: string) => {
+    const textarea = document.querySelector('textarea');
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const newContent = htmlContent.substring(0, start) + element + htmlContent.substring(start);
+    setHtmlContent(newContent);
+    setContent(newContent);
+  };
+
   return (
     <div className="border rounded-lg bg-white">
       <input
@@ -203,40 +248,57 @@ const TiptapEditor = ({ content, setContent }: TiptapEditorProps) => {
 
       {/* Editor Toolbar */}
       <div className="border-b p-2 flex flex-wrap gap-1 bg-gray-50">
-        {/* Font Size Selector */}
+        {/* HTML Mode Toggle */}
         <div className="flex items-center gap-1 pr-2 border-r">
-          <div className="flex items-center gap-2">
-            <Type className="w-4 h-4 text-gray-600" />
-            <select
-              onChange={(e) => setFontSize(e.target.value)}
-              value={currentSize}
-              className="border border-gray-300 rounded-md px-2 py-1 text-sm bg-white text-gray-900"
-            >
-              {Object.keys(FONT_SIZES).map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-          </div>
+          <button
+            onClick={handleHtmlModeToggle}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+              isHtmlMode 
+                ? "bg-gray-200 text-gray-900" 
+                : "bg-white text-gray-700 border border-gray-300"
+            )}
+          >
+            {isHtmlMode ? (
+              <>
+                <Type size={16} />
+                Rich Text
+              </>
+            ) : (
+              <>
+                <Code size={16} />
+                HTML
+              </>
+            )}
+          </button>
         </div>
 
+        {/* Always show these tools regardless of mode */}
         <div className="flex items-center gap-1 px-2 border-r">
           <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            isActive={editor.isActive("bold")}
+            onClick={() => isHtmlMode 
+              ? wrapTextWithTag('strong')
+              : editor.chain().focus().toggleBold().run()
+            }
+            isActive={isHtmlMode ? false : editor.isActive("bold")}
             icon={<Bold size={18} />}
             label="Bold"
           />
           <ToolbarButton
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            isActive={editor.isActive("italic")}
+            onClick={() => isHtmlMode 
+              ? wrapTextWithTag('em')
+              : editor.chain().focus().toggleItalic().run()
+            }
+            isActive={isHtmlMode ? false : editor.isActive("italic")}
             icon={<Italic size={18} />}
             label="Italic"
           />
           <ToolbarButton
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            isActive={editor.isActive("strike")}
+            onClick={() => isHtmlMode 
+              ? wrapTextWithTag('s')
+              : editor.chain().focus().toggleStrike().run()
+            }
+            isActive={isHtmlMode ? false : editor.isActive("strike")}
             icon={<Strikethrough size={18} />}
             label="Strike"
           />
@@ -244,99 +306,186 @@ const TiptapEditor = ({ content, setContent }: TiptapEditorProps) => {
 
         <div className="flex items-center gap-1 px-2 border-r">
           <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            isActive={editor.isActive('bulletList')}
-            icon={<List size={18} />}
-            label="Bullet List"
-          />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            isActive={editor.isActive('orderedList')}
-            icon={<ListOrdered size={18} />}
-            label="Ordered List"
-          />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            isActive={editor.isActive("blockquote")}
-            icon={<Quote size={18} />}
-            label="Quote"
-          />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            isActive={editor.isActive("codeBlock")}
-            icon={<Code size={18} />}
-            label="Code Block"
-          />
-        </div>
-
-        <div className="flex items-center gap-1 px-2 border-r">
-          <input
-            type="color"
-            onInput={(e: React.FormEvent<HTMLInputElement>) => 
-              editor.chain().focus().setColor((e.target as HTMLInputElement).value).run()
+            onClick={() => isHtmlMode 
+              ? insertHtmlElement('<a href="' + (window.prompt("Enter URL") || "") + '"></a>')
+              : setLink()
             }
-            value={editor.getAttributes('textStyle').color || '#000000'}
-            className="h-8 w-8 cursor-pointer border-0 bg-transparent p-1"
-            title="Text Color"
-          />
-        </div>
-
-        <div className="flex items-center gap-1 px-2 border-r">
-          <ToolbarButton
-            onClick={setLink}
-            isActive={editor.isActive("link")}
+            isActive={isHtmlMode ? false : editor.isActive("link")}
             icon={<LinkIcon size={18} />}
             label="Add Link"
           />
           <ToolbarButton
-            onClick={addImage}
+            onClick={() => isHtmlMode 
+              ? insertHtmlElement('<img src="' + (window.prompt("Enter image URL") || "") + '" alt=""/>')
+              : addImage()
+            }
             icon={<ImageIcon size={18} />}
             label="Add Image"
           />
         </div>
 
-        <div className="flex items-center gap-1 px-2 border-r">
-          <ToolbarButton
-            onClick={() => editor.commands.setTextAlign('left')}
-            isActive={editor.isActive({ textAlign: 'left' })}
-            icon={<AlignLeft size={18} />}
-            label="Align Left"
-          />
-          <ToolbarButton
-            onClick={() => editor.commands.setTextAlign('center')}
-            isActive={editor.isActive({ textAlign: 'center' })}
-            icon={<AlignCenter size={18} />}
-            label="Align Center"
-          />
-          <ToolbarButton
-            onClick={() => editor.commands.setTextAlign('right')}
-            isActive={editor.isActive({ textAlign: 'right' })}
-            icon={<AlignRight size={18} />}
-            label="Align Right"
-          />
-        </div>
-
         <div className="flex items-center gap-1">
           <ToolbarButton
-            onClick={() => editor.chain().focus().undo().run()}
-            disabled={!editor.can().undo()}
+            onClick={() => {
+              if (isHtmlMode) {
+                document.execCommand('undo')
+              } else {
+                editor.chain().focus().undo().run()
+              }
+            }}
+            disabled={!isHtmlMode && !editor.can().undo()}
             icon={<Undo size={18} />}
             label="Undo"
           />
           <ToolbarButton
-            onClick={() => editor.chain().focus().redo().run()}
-            disabled={!editor.can().redo()}
+            onClick={() => {
+              if (isHtmlMode) {
+                document.execCommand('redo')
+              } else {
+                editor.chain().focus().redo().run()
+              }
+            }}
+            disabled={!isHtmlMode && !editor.can().redo()}
             icon={<Redo size={18} />}
             label="Redo"
           />
         </div>
+
+        {/* Show remaining tools only in rich text mode */}
+        {!isHtmlMode && (
+          <>
+            {/* Font Size Selector */}
+            <div className="flex items-center gap-1 pr-2 border-r">
+              <div className="flex items-center gap-2">
+                <Type className="w-4 h-4 text-gray-600" />
+                <select
+                  onChange={(e) => setFontSize(e.target.value)}
+                  value={currentSize}
+                  className="border border-gray-300 rounded-md px-2 py-1 text-sm bg-white text-gray-900"
+                >
+                  {Object.keys(FONT_SIZES).map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 px-2 border-r">
+              <ToolbarButton
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                isActive={editor.isActive('bulletList')}
+                icon={<List size={18} />}
+                label="Bullet List"
+              />
+              <ToolbarButton
+                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                isActive={editor.isActive('orderedList')}
+                icon={<ListOrdered size={18} />}
+                label="Ordered List"
+              />
+              <ToolbarButton
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                isActive={editor.isActive("blockquote")}
+                icon={<Quote size={18} />}
+                label="Quote"
+              />
+              <ToolbarButton
+                onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                isActive={editor.isActive("codeBlock")}
+                icon={<Code size={18} />}
+                label="Code Block"
+              />
+            </div>
+
+            <div className="flex items-center gap-1 px-2 border-r">
+              <input
+                type="color"
+                onInput={(e: React.FormEvent<HTMLInputElement>) => 
+                  editor.chain().focus().setColor((e.target as HTMLInputElement).value).run()
+                }
+                value={editor.getAttributes('textStyle').color || '#000000'}
+                className="h-8 w-8 cursor-pointer border-0 bg-transparent p-1"
+                title="Text Color"
+              />
+            </div>
+
+            <div className="flex items-center gap-1 px-2 border-r">
+              <ToolbarButton
+                onClick={setLink}
+                isActive={editor.isActive("link")}
+                icon={<LinkIcon size={18} />}
+                label="Add Link"
+              />
+              <ToolbarButton
+                onClick={addImage}
+                icon={<ImageIcon size={18} />}
+                label="Add Image"
+              />
+            </div>
+
+            <div className="flex items-center gap-1 px-2 border-r">
+              <ToolbarButton
+                onClick={() => editor.commands.setTextAlign('left')}
+                isActive={editor.isActive({ textAlign: 'left' })}
+                icon={<AlignLeft size={18} />}
+                label="Align Left"
+              />
+              <ToolbarButton
+                onClick={() => editor.commands.setTextAlign('center')}
+                isActive={editor.isActive({ textAlign: 'center' })}
+                icon={<AlignCenter size={18} />}
+                label="Align Center"
+              />
+              <ToolbarButton
+                onClick={() => editor.commands.setTextAlign('right')}
+                isActive={editor.isActive({ textAlign: 'right' })}
+                icon={<AlignRight size={18} />}
+                label="Align Right"
+              />
+            </div>
+
+            <div className="flex items-center gap-1">
+              <ToolbarButton
+                onClick={() => editor.chain().focus().undo().run()}
+                disabled={!editor.can().undo()}
+                icon={<Undo size={18} />}
+                label="Undo"
+              />
+              <ToolbarButton
+                onClick={() => editor.chain().focus().redo().run()}
+                disabled={!editor.can().redo()}
+                icon={<Redo size={18} />}
+                label="Redo"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Editor Content */}
-      <EditorContent 
-        editor={editor} 
-        className="prose prose-slate max-w-none focus:outline-none min-h-[300px] p-4 text-gray-900" 
-      />
+      {isHtmlMode ? (
+        <div className="p-4">
+          <textarea
+            value={htmlContent}
+            onChange={handleHtmlChange}
+            className="w-full min-h-[300px] font-mono text-sm p-4 border rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none bg-gray-50 text-gray-800"
+            spellCheck={false}
+            placeholder="Enter HTML here..."
+            style={{ 
+              resize: 'vertical',
+              lineHeight: '1.5',
+              tabSize: 2
+            }}
+          />
+        </div>
+      ) : (
+        <EditorContent 
+          editor={editor} 
+          className="prose prose-slate max-w-none focus:outline-none min-h-[300px] p-4 text-gray-900" 
+        />
+      )}
     </div>
   )
 }
