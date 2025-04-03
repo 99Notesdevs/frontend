@@ -85,17 +85,39 @@ export default function UpdateAboutPage() {
     field: string,
     index?: number
   ) => {
-    setTempContent((prev) => ({
-      ...prev,
-      [section]: {
-        ...(prev[section as keyof Content] as any),
-        [field]: Array.isArray((prev[section as keyof Content] as any)[field])
-          ? (prev[section as keyof Content] as any)[field].map(
-              (item: string, i: number) => (i === index ? e.target.value : item)
-            )
-          : e.target.value,
-      },
-    }));
+    setTempContent((prev) => {
+      // Handle top-level fields like heroImage and heroText
+      if (section === "heroImage" || section === "heroText") {
+        return {
+          ...prev,
+          [section]: e.target.value,
+        };
+      }
+
+      // Handle nested fields
+      const sectionData = (prev[section as keyof Content] || {}) as any;
+      if (Array.isArray(sectionData[field])) {
+        // Handle array fields (e.g., images)
+        return {
+          ...prev,
+          [section]: {
+            ...sectionData,
+            [field]: sectionData[field].map((item: any, i: number) =>
+              i === index ? e.target.value : item
+            ),
+          },
+        };
+      } else {
+        // Handle non-array fields
+        return {
+          ...prev,
+          [section]: {
+            ...sectionData,
+            [field]: e.target.value,
+          },
+        };
+      }
+    });
   };
 
   const handleSave = async () => {
