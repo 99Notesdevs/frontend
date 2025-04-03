@@ -11,11 +11,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+  const token = Cookies.get('token');
 
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const token = Cookies.get('token');
         if (token) {
           const res = await axios.get(`${env.API}/user/check`, {
             headers: {

@@ -21,7 +21,6 @@ const CurrentAffairsIndex = async () => {
       next: { revalidate: 3600 }, // Revalidate every hour
     });
     const dailyData = await dailyResponse.json();
-    console.log("Daily current affairs data:", dailyData);
     const dailyPages = dailyData.data as CurrentAffairPage[];
 
     // Fetch monthly current affairs

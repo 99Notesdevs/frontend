@@ -2,15 +2,24 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['m.media-amazon.com', 'www.google.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'm.media-amazon.com',
-        pathname: '/**',
+        pathname: '/**', // Allow all paths under this hostname
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.google.com',
+        pathname: '/**', // Allow all paths under this hostname
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.psdstack.com',
+        pathname: '/**', // Allow all paths for placeholder images
       },
     ],
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

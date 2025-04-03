@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 import type { BaseTemplateProps } from '@/components/templates/types';
 import { UpscNotesTemplate } from '@/components/templates/UpscNotesTemplate';
 import { ArticleTemplate } from '@/components/templates/ArticleTemplate';
@@ -19,28 +18,11 @@ const TEMPLATE_MAP: Record<string, React.FC<any>> = {
 async function getPage(slug: string, section: string[]): Promise<BaseTemplateProps['page'] | null> {
   try {
     const fullPath = `${slug} ${section.join(' ')}`; // slugs seperated by space will be rejoined with / in the backend 
-    console.log('Fetching page for path:', fullPath);
-
     const response = await fetch(`${env.API}/page/slug/${fullPath}`);
     const res = await response.json();
     const page = res.data;
-    console.log(page);
-    
-    // const page = await prisma.page.findUnique({
-    //   where: { slug: fullPath },
-    //   include: {
-    //     template: true,
-    //     parent: true,
-    //     children: {
-    //       include: {
-    //         template: true
-    //       }
-    //     }
-    //   }
-    // });
 
     if (!page) {
-      console.log('Page not found for path:', fullPath);
       return null;
     }
 
@@ -51,13 +33,10 @@ async function getPage(slug: string, section: string[]): Promise<BaseTemplatePro
   }
 }
 
-type PageProps = {
-  params: { slug: string; section: string[] };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
+type Params = Promise<{slug: string; section: string[]}>;
 
-export const generateMetadata = async ({ params }: PageProps): Promise<Metadata> => {
-  const { slug, section } = params;
+export const generateMetadata = async ({ params }: {params: Params}) => {
+  const { slug, section } = await params;
   const page = await getPage(slug, section);
 
   if (!page) {
@@ -73,8 +52,8 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
   };
 };
 
-export default async function Page({ params }: PageProps) {
-  const { slug, section } = params;
+export default async function Page({ params }: {params: Params}) {
+  const { slug, section } = await params;
   const page = await getPage(slug, section);
 
   if (!page) {
@@ -87,7 +66,5 @@ export default async function Page({ params }: PageProps) {
     console.error('No template component found for:', page.template.id);
     notFound();
   }
-
-  console.log('Rendering page with template:', page.template.id);
   return <TemplateComponent page={page} />;
 }

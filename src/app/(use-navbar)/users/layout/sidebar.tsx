@@ -11,10 +11,10 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const token = Cookies.get('token');
 
   const logout = async () => {
     try {
-      const token = Cookies.get('token');
       Cookies.remove('token');
       if(token) {
         const response = await axios.post(`${env.API}/user/logout`, {

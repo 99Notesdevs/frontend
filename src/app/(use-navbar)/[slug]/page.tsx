@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { notFound } from "next/navigation";
 import type { BaseTemplateProps } from "@/components/templates/types";
 import { UpscNotesTemplate } from "@/components/templates/UpscNotesTemplate";
@@ -20,18 +19,14 @@ async function getPage(
   slug: string
 ): Promise<BaseTemplateProps["page"] | null> {
   try {
-    console.log("Fetching page for slug:", slug);
 
     const response = await fetch(`${env.API}/page/slug/${slug}`);
     const res = await response.json();
     const page = res.data;
 
     if (!page) {
-      console.log("Page not found for slug:", slug);
       return null;
     }
-
-    console.log("Found page:", page);
 
     return page as BaseTemplateProps["page"];
   } catch (error) {
@@ -40,9 +35,11 @@ async function getPage(
   }
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
+type Params = Promise<{ slug: string }>;
+
+export default async function Page({ params }: { params: Params }) {
   // Ensure params is properly awaited by using it in an async context
-  const slug = params.slug;
+  const { slug } = await params;
   const page = await getPage(slug);
 
   if (!page) {
@@ -57,6 +54,5 @@ export default async function Page({ params }: { params: { slug: string } }) {
     throw new Error(`Template ${page.template.id} not found`);
   }
 
-  console.log("Rendering page with template:", page.template.id);
   return <Template page={page} />;
 }

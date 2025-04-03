@@ -1,8 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { sectionConfig } from "@/config/currentAffairs";
 import { env } from "@/config/env";
-import CurrentAffairsLayout from "@/components/CurrentAffairs/CurrentAffairsLayout";
 import Head from "next/head";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import { ChevronRight, X } from "lucide-react";
@@ -20,14 +18,12 @@ interface CurrentAffairArticle {
   parentId?: number;
 }
 
-interface CurrentAffairsSectionPageProps {
-  params: { category: string; section: string };
-}
+type Params = Promise<{ category: string; section: string }>;
 
 // This function will be called at request time
-export async function generateMetadata({ params }: CurrentAffairsSectionPageProps) {
+export async function generateMetadata({ params }: { params: Params }) {
   // Await params to fix the Next.js error
-  const { category, section } = await Promise.resolve(params);
+  const { category, section } = await params;
   
   // Fetch the article to get its title
   const article = await fetchArticle(category, section);
@@ -41,9 +37,9 @@ export async function generateMetadata({ params }: CurrentAffairsSectionPageProp
 // Server component to fetch data
 const CurrentAffairArticlePage = async ({
   params,
-}: CurrentAffairsSectionPageProps) => {
+}: {params: Params}) => {
   // Await params to fix the Next.js error
-  const { category, section } = await Promise.resolve(params);
+  const { category, section } = await params;
   
   // The section parameter is actually the article slug
   const articleSlug = section;
@@ -269,15 +265,12 @@ const CurrentAffairArticlePage = async ({
 async function fetchArticle(category: string, articleSlug: string): Promise<CurrentAffairArticle | null> {
   try {
     // Log the input parameters
-    console.log(`Fetching article with parameters: category="${category}", articleSlug="${articleSlug}"`);
     
     // Construct the full slug exactly as it would be in the database
     // Based on the seed data, the format is: current-affairs/category/sample-article
     const fullSlug = `current-affairs/${category}/${articleSlug}`;
-    console.log(`Constructed full slug: "${fullSlug}"`);
     
     // Make a direct API call to get the article by its full slug
-    console.log(`Making API call to: ${env.API}/currentArticle/slug/${encodeURIComponent(fullSlug)}`);
     const response = await fetch(`${env.API}/currentArticle/slug/${encodeURIComponent(fullSlug)}`, {
       headers: {
         "Content-Type": "application/json",
@@ -285,23 +278,17 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
       cache: 'no-store'
     });
     
-    console.log(`API response status: ${response.status}`);
     
     if (response.ok) {
       const data = await response.json();
-      console.log(`API response data:`, data);
       
       if (data.status === 'success' && data.data) {
-        console.log(`Successfully found article: "${data.data.title}"`);
         return data.data;
       } else {
         console.log(`API returned success but no article data was found`);
       }
-    } else {
-      console.log(`Failed to fetch article with full slug: ${fullSlug}`);
-      
+    } else {      
       // Try a different approach - fetch all articles and find a match
-      console.log(`Fetching all articles to find a match...`);
       const allArticlesResponse = await fetch(`${env.API}/currentArticle`, {
         headers: {
           "Content-Type": "application/json",
@@ -314,16 +301,11 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
         
         if (allArticlesData.status === 'success' && allArticlesData.data) {
           const allArticles = allArticlesData.data;
-          console.log(`Found ${allArticles.length} articles in total`);
-          
-          // Log all article slugs to see what's available
-          console.log(`All article slugs:`, allArticles.map((a: any) => a.slug));
           
           // Try to find an article that matches our criteria
           const matchingArticle = allArticles.find((a: any) => {
             // Try exact match on full slug
             if (a.slug === fullSlug) {
-              console.log(`Found exact match on full slug: ${a.slug}`);
               return true;
             }
             
@@ -331,22 +313,18 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
             const slugParts = a.slug.split('/');
             const lastPart = slugParts[slugParts.length - 1];
             if (lastPart === articleSlug) {
-              console.log(`Found match on last part: ${a.slug}`);
               return true;
             }
             
             // Try match on parent slug
             if (a.parentSlug === `current-affairs/${category}`) {
-              console.log(`Found match on parent slug: ${a.slug}`);
               return true;
             }
             
             return false;
           });
           
-          if (matchingArticle) {
-            console.log(`Found matching article: ${matchingArticle.title}`);
-            
+          if (matchingArticle) {            
             // Fetch the full article with content
             const fullArticleResponse = await fetch(`${env.API}/currentArticle/slug/${encodeURIComponent(matchingArticle.slug)}`, {
               headers: {
@@ -358,7 +336,6 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
             if (fullArticleResponse.ok) {
               const fullArticleData = await fullArticleResponse.json();
               if (fullArticleData.status === 'success' && fullArticleData.data) {
-                console.log(`Successfully fetched full article content`);
                 return fullArticleData.data;
               }
             }

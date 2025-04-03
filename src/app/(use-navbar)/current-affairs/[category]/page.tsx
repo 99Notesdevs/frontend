@@ -1,5 +1,4 @@
 import React from "react";
-import Head from "next/head";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import CurrentAffairsLayout from "@/components/CurrentAffairs/CurrentAffairsLayout";
@@ -29,16 +28,14 @@ interface CurrentAffair {
   updatedAt: string;
 }
 
-interface CurrentAffairsSectionPageProps {
-  params: {
-    category: string;
-  };
-}
+type Params = Promise<{
+  category: string;
+}>;
 
 // Make the component async and properly handle the dynamic params
 const CurrentAffairsSectionPage = async ({
   params,
-}: CurrentAffairsSectionPageProps) => {
+}: {params: Params}) => {
   // Await params to fix the Next.js error
   const { category } = await Promise.resolve(params);
 
@@ -52,8 +49,6 @@ const CurrentAffairsSectionPage = async ({
   let articles: Article[] = [];
 
   try {
-    console.log("Fetching section with slug:", fullSlug);
-
     // For server components, use the backend API directly
     // Looking at the backend routes, the endpoint for getting a section by slug is /currentAffair/slug/:slug
     const sectionResponse = await fetch(`${env.API}/currentAffair/slug/${encodeURIComponent(fullSlug)}`, {
@@ -67,7 +62,6 @@ const CurrentAffairsSectionPage = async ({
       const sectionData = await sectionResponse.json();
       if (sectionData.status === 'success' && sectionData.data) {
         currentAffair = sectionData.data;
-        console.log("Found section:", currentAffair?.title || "No title", "ID:", currentAffair?.id);
       } else {
         console.error("Failed to get section data:", sectionData);
       }
@@ -76,7 +70,6 @@ const CurrentAffairsSectionPage = async ({
     }
 
     // Fetch all articles
-    console.log("Fetching all articles");
     const articlesResponse = await fetch(`${env.API}/currentArticle`, {
       headers: {
         "Content-Type": "application/json",
@@ -88,13 +81,10 @@ const CurrentAffairsSectionPage = async ({
       const articlesData = await articlesResponse.json();
       if (articlesData.status === 'success' && articlesData.data) {
         const allArticles = articlesData.data;
-        console.log("Total articles:", allArticles.length);
 
         // Log some sample articles to see their structure
         if (allArticles.length > 0) {
-          console.log("Sample article structure:", JSON.stringify(allArticles[0], null, 2));
           // Log all article slugs to see what we're working with
-          console.log("All article slugs:", allArticles.map((a: Article) => a.slug));
         }
 
         // Based on the logs, it seems the articles don't have a parentSlug property
@@ -109,22 +99,12 @@ const CurrentAffairsSectionPage = async ({
           // Remove the last part (the article name) to get the parent slug
           const extractedParentSlug = slugParts.slice(0, -1).join('/');
 
-          console.log("Article:", article.title);
-          console.log("  Article slug:", article.slug);
-          console.log("  Extracted parent slug:", extractedParentSlug);
-          console.log("  Current page slug:", fullSlug);
-
           // Check if the extracted parent slug matches the current page's fullSlug
           const matches = extractedParentSlug === fullSlug;
-
-          if (matches) {
-            console.log("  MATCH FOUND!");
-          }
 
           return matches;
         });
 
-        console.log("Articles filtered by extracted parent slug:", articles.length);
       } else {
         console.error("Failed to get articles data:", articlesData);
       }

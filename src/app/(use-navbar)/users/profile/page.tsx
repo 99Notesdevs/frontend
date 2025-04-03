@@ -10,6 +10,7 @@ const Profile = () => {
   const [imagePreview, setImagePreview] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const token = Cookies.get("token");
   const [userData, setUserData] = useState({
     firstName: "John",
     lastName: "Doe",
@@ -44,7 +45,6 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = Cookies.get("token");
         if (token) {
           const res = await axios.get(`${env.API}/user`, {
             headers: {

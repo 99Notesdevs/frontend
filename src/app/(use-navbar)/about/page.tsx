@@ -1,10 +1,9 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Head from "next/head";
 import ClientImage from "@/components/About/CientImage";
-import Slider from "@/components/About/Slider";
-import axios from "axios";
 import { env } from "@/config/env";
+import SliderWrapper from "@/components/About/SliderWrapper";
 
 interface Content {
   heroImage: string;
@@ -45,14 +44,43 @@ interface Content {
   };
 }
 
-async function  About() {
-  const res = await axios.get(`${env.API}/about-99-notes`);
-  const result = res.data.data;
-  const title = result.title;
-  const content: Content = JSON.parse(result.content);
+async function fetchContent(): Promise<{ title: string; content: Content }> {
+  const res = await fetch(`${env.API}/about-99-notes`, {
+    cache: "no-store",
+  });
 
-  if (!content) return <p>Loading...</p>;
+  if (!res.ok) {
+    throw new Error("Failed to fetch content");
+  }
 
+  const result = await res.json();
+  const title = result.data.title;
+  const content: Content = JSON.parse(result.data.content);
+
+  return { title, content };
+}
+
+function About() {
+  const [title, setTitle] = React.useState("");
+  const [content, setContent] = React.useState<Content | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { title, content } = await fetchContent();
+        setTitle(title);
+        setContent(content);
+      } catch (error) {
+        console.error("Error fetching content:", error);
+      }
+    };
+
+    fetchData();
+  }
+  , []);
+
+
+  if(!content) return <div>Loading...</div>;
   return (
     <>
       <Head>
@@ -237,7 +265,7 @@ async function  About() {
             </p>
           </div>
           <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-            <Slider images={content.veterans.images} />
+            <SliderWrapper images={content.veterans.images} />
           </div>
         </section>
 
@@ -255,7 +283,7 @@ async function  About() {
             </p>
           </div>
           <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-            <Slider images={content.coreMembers.images} />
+            <SliderWrapper images={content.coreMembers.images} />
           </div>
         </section>
       </main>

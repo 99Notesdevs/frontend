@@ -1,5 +1,4 @@
 "use client";
-import { Metadata } from "next"
 import { useRouter } from 'next/navigation';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { FaPlus, FaEdit } from 'react-icons/fa';
