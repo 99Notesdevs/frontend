@@ -72,10 +72,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const fetchCurrentAffairsByType = async (type: string) => {
     try {
       const token = Cookie.get('token');
-      console.log('Fetching current affairs for type:', type);
-      console.log('API URL:', `${env.API}/currentAffair/type/${type}`);
-      console.log('Token:', token ? 'Present' : 'Not present');
-
       const response = await fetch(`${env.API}/currentAffair/type/${type}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -83,17 +79,12 @@ export function PageForm({ editPage = null }: PageFormProps) {
         }
       });
       
-      console.log('Response status:', response.status);
-      console.log('Response status text:', response.statusText);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'No error details available' }));
         throw new Error(`Failed to fetch current affairs: ${errorData.message || response.statusText}`);
       }
       
       const { data } = await response.json();
-      console.log(`Current Affairs (${type}) from API:`, data);
       setCurrentAffairs(data || []);
     } catch (error) {
       console.error('Detailed error fetching current affairs:', {
@@ -157,9 +148,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
         type: newAffairData.type,
         slug
       };
-
-      console.log('Creating current affair with data:', affairData);
-
       const response = await fetch(`${env.API}/currentAffair`, {
         method: 'POST',
         headers: {

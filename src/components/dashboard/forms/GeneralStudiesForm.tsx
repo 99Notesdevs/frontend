@@ -24,7 +24,6 @@ interface GeneralStudiesFormProps {
 }
 
 export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFormProps) {
-  console.log('GeneralStudiesForm rendered with props:', { defaultValues });
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.image || null);
 
   const form = useForm<GeneralStudiesFormValues>({

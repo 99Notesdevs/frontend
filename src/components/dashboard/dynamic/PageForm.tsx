@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Page } from '@prisma/client';
 import { ArticleForm, GeneralStudiesForm, UpscNotesForm, CurrentAffairForm } from '../forms';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,6 +14,14 @@ interface TemplateType {
   layout: any;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface Page {
+  id: string;
+  title: string;
+  slug: string;
+  level: number;
+  parentId?: string | null;
 }
 
 interface PageWithRelations extends Page {
@@ -108,10 +115,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
       if (!response.ok) throw new Error('Failed to fetch pages');
       const { data } = await response.json();
       
-      // Debug: Log the pages data to see level information
-      console.log('Pages from API:', data);
-      console.log('Pages with level > 1:', data.filter((page: PageWithRelations) => page.level > 1));
-      
       setPages(data);
     } catch (error) {
       console.error('Error fetching pages:', error);
@@ -138,7 +141,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
   };
 
   const handleLevelChange = (level: number, value: string) => {
-    console.log('Selected parent page:', value);
     const newLevels = [...selectedLevels];
     newLevels[level] = value === '_none' ? '' : value; // Convert _none to empty string
     // Clear all subsequent levels
@@ -184,9 +186,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
       if (!currentTemplate) {
         throw new Error("No template selected");
       }
-
-      console.log("Parent ID:", parentId);
-
       // Generate the full path for the slug
       const fullPath = selectedLevels
         .filter((level) => level)
@@ -236,7 +235,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
       // Validate content based on template type
       validateContentByTemplate(currentTemplate.id, pageData.content);
 
-      console.log("Sending page data:", pageData);
 
       // Prepare data for API submission
       const apiPageData = {
@@ -255,10 +253,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
         body: JSON.stringify(apiPageData),
       });
 
-      console.log("API Response Status:", response.status);
       
       const responseData = await response.json().catch(() => ({}));
-      console.log("API Response Data:", responseData);
 
       if (!response.ok) {
         throw new Error(responseData.message || responseData.error || 'Failed to create page');
@@ -339,7 +335,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const renderTemplateForm = () => {
     const currentTemplate = templates.find(t => t.id === selectedTemplate);
     if (!currentTemplate) {
-      console.log('No template selected');
       return null;
     }
 
@@ -348,7 +343,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
       defaultValues: editPage?.data || undefined,
     };
 
-    console.log('Rendering template:', currentTemplate.name, 'with ID:', currentTemplate.id);
 
     // Map template IDs to form components
     const templateForms: Record<string, React.ComponentType<any>> = {
@@ -382,20 +376,20 @@ export function PageForm({ editPage = null }: PageFormProps) {
                     </label>
                     <Select
                       value={selectedLevels[level]}
-                      onValueChange={(value) => handleLevelChange(level, value)}
+                      onValueChange={(value: string) => handleLevelChange(level, value)}
                     >
                       <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
-                        <SelectValue placeholder={level === 0 ? "Select root page" : `Select level ${level + 1} page`} />
+                      <SelectValue placeholder={level === 0 ? "Select root page" : `Select level ${level + 1} page`} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="_none">
-                          {level === 0 ? "No parent (Root level)" : `Create as level ${level + 1} page`}
+                      <SelectItem value="_none">
+                        {level === 0 ? "No parent (Root level)" : `Create as level ${level + 1} page`}
+                      </SelectItem>
+                      {getPagesForLevel(level).map((page: PageWithRelations) => (
+                        <SelectItem key={page.id} value={page.id}>
+                        {page.title}
                         </SelectItem>
-                        {getPagesForLevel(level).map((page) => (
-                          <SelectItem key={page.id} value={page.id}>
-                            {page.title}
-                          </SelectItem>
-                        ))}
+                      ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -418,28 +412,28 @@ export function PageForm({ editPage = null }: PageFormProps) {
           <div className="space-y-6">
             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Template</h3>
-              <Select
+                <Select
                 value={selectedTemplate || '_none'}
-                onValueChange={(value) => {
+                onValueChange={(value: string) => {
                   setSelectedTemplate(value === '_none' ? '' : value);
                 }}
-              >
+                >
                 <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
                   <SelectValue placeholder="Choose a template" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="_none">Choose a template...</SelectItem>
                   {!isLoading && templates?.length > 0 ? (
-                    templates.map((template) => (
-                      <SelectItem key={template.id} value={template.id}>
-                        {template.name}
-                      </SelectItem>
-                    ))
+                  templates.map((template: TemplateType) => (
+                    <SelectItem key={template.id} value={template.id}>
+                    {template.name}
+                    </SelectItem>
+                  ))
                   ) : (
-                    <SelectItem value="_loading">Loading templates...</SelectItem>
+                  <SelectItem value="_loading">Loading templates...</SelectItem>
                   )}
                 </SelectContent>
-              </Select>
+                </Select>
               <div className="mt-6 flex justify-between">
                 <Button
                   onClick={() => setStep(1)}
