@@ -1,5 +1,3 @@
-import { Template } from '@prisma/client';
-import prisma from './db';
 import { env } from '@/config/env';
 
 interface ValidationError {

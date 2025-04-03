@@ -1,5 +1,4 @@
 import { env } from '@/config/env';
-// import prisma from './db'
 import { NavItem } from '@/types/navigation';
 // import { staticNavigationItems } from '@/config/staticNavigation';
 
