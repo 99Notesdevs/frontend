@@ -24,8 +24,6 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const articleContent = JSON.parse(content as unknown as string);
   const mainContent = articleContent.content.mainContent || "";
 
-  console.log("main: ", mainContent);
-
   const { tags, date, readTime, coverImage } = metadata as {
     tags?: string[];
     date?: string;

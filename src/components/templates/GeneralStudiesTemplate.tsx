@@ -37,7 +37,6 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
   // Default image if none is provided
   const pageImage = parsedContent.image || '/images/default-general-studies.jpg';
   
-  console.log('Parsed content:', parsedContent);
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">

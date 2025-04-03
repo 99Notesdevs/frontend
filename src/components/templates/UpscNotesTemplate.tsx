@@ -6,6 +6,7 @@ import ContactForm from "@/components/ui/ContactForm";
 import SidebarNavigation from "@/components/navigation/SidebarNavigation";
 import SocialMedia from "@/components/navigation/socialmedia";
 import { metadata } from "@/app/(use-navbar)/layout";
+import { BaseTemplateProps } from "./types";
 // import { UpscNotesTemplateProps } from "./types";
 
 interface PageItem {
@@ -34,12 +35,6 @@ interface UpscNotesTemplateProps {
 export const UpscNotesTemplate: React.FC<UpscNotesTemplateProps> = ({
   page,
 }) => {
-  console.log("UpscNotesTemplate received page:", {
-    id: page.template.id,
-    title: page.title,
-    content: page.content,
-    metadata: page.metadata,
-  });
 
   const { title, content } = page;
   const jsonContent = JSON.parse(content);
@@ -53,7 +48,6 @@ export const UpscNotesTemplate: React.FC<UpscNotesTemplateProps> = ({
     content: mainContent = "",
   } = jsonContent;
 
-  console.log("Data: ", metadata);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">

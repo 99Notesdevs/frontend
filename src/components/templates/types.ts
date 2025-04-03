@@ -1,4 +1,16 @@
-import { Page, Template } from '@prisma/client';
+
+export interface Page {
+  id: string;
+  title: string;
+  content: string;
+  metadata: Record<string, any>;
+}
+
+export interface Template {
+  id: string;
+    template: Template; // Define the Template interface below
+  description?: string;
+}
 
 export interface BaseTemplateProps {
   page: Page & {
