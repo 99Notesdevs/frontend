@@ -20,7 +20,6 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
 
   useEffect(() => {
     if (!content) return;
-    console.log("Content", content);
 
     // Parse the HTML content to extract headings
     const parser = new DOMParser();

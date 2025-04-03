@@ -88,7 +88,7 @@ export const Comments = () => {
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
-    postComment(newComment, isReplyingTo);
+    postComment(newComment, isReplyingTo ?? undefined);
   };
 
   const handleReplyClick = (commentId: string) => {
