@@ -59,15 +59,15 @@ function NestedNavigation({
               )}
             </Link>
             {item.children.length > 0 && (
-              <div className={`absolute left-0 mt-0 w-[800px] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-gray-200 z-50 ${
-                item.slug === 'current-affairs' ? 'p-6' : ''
+              <div className={`absolute left-0 mt-0 w-[700px] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-gray-200 z-50 ${
+                item.slug === 'current-affairs' ? 'p-4' : ''
               }`}>
-                <div className={`${item.slug === 'current-affairs' ? 'grid grid-cols-4 gap-6' : 'flex h-full'}`}>
+                <div className={`${item.slug === 'current-affairs' ? 'grid grid-cols-4 gap-4' : 'flex h-full'}`}>
                   {item.slug === 'current-affairs' ? (
                     // Special layout for Current Affairs
                     item.children.map((child) => (
                       <div key={child.slug} className="space-y-4">
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <h3 className="text-[15px] font-bold text-gray-900 pb-2 border-b border-gray-100 font-urbanist">
                             {child.title}
                           </h3>

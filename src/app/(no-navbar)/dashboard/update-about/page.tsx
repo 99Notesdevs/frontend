@@ -202,46 +202,67 @@ export default function UpdateAboutPage() {
 
   return (
     <>
-      <main className="w-full bg-gradient-to-b from-white to-gray-50 min-h-screen overflow-hidden">
+      <header className="bg-slate-900 text-white shadow-md">
+        <div className="container mx-auto px-6 py-4">
+          <h1 className="text-2xl font-semibold">Dashboard - Update About Page</h1>
+          <p className="text-slate-300 text-sm mt-1">Make changes to the About page content</p>
+        </div>
+      </header>
+
+      <main className="w-full bg-slate-50 min-h-screen overflow-hidden">
         <div className="container mx-auto p-6">
           {/* Hero Section */}
-          <section className="relative mb-10">
-            <h2 className="text-2xl font-bold">Hero Section</h2>
+          <section id="hero-section" className="relative mb-10 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center">
+              <span className="mr-2">Hero Section</span>
+              {editingSection !== "hero" && (
+                <button
+                  onClick={() => handleEditClick("hero")}
+                  className="ml-auto text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Edit Hero Section"
+                >
+                  <FaPencilAlt className="w-4 h-4" />
+                </button>
+              )}
+            </h2>
             {editingSection === "hero" ? (
               <div className="mt-4">
-                <label className="block">
-                  Hero Image URL:
+                <label className="block mb-4">
+                  <span className="text-slate-700 font-medium">Hero Image URL:</span>
                   <input
                     type="text"
                     value={tempContent.heroImage || ""}
-                    onChange={(e) =>
-                      handleInputChange(e, "heroImage", "heroImage")
-                    }
-                    className="block w-full mt-1 p-2 border rounded"
+                    onChange={(e) => handleInputChange(e, "heroImage", "")}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    placeholder="Enter image URL"
                   />
                 </label>
-                <label className="block mt-2">
-                  Hero Text:
+                <label className="block mb-4">
+                  <span className="text-slate-700 font-medium">Hero Text:</span>
                   <textarea
                     value={tempContent.heroText || ""}
-                    onChange={(e) =>
-                      handleInputChange(e, "heroText", "heroText")
-                    }
-                    className="block w-full mt-1 p-2 border rounded"
-                  />
+                    onChange={(e) => handleInputChange(e, "heroText", "")}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    rows={4}
+                    placeholder="Enter hero text"
+                  ></textarea>
                 </label>
-                <button
-                  onClick={handleSave}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="mt-4 ml-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={handleCancel}
+                    className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
             ) : (
               <div>
@@ -251,503 +272,539 @@ export default function UpdateAboutPage() {
                   className="w-full h-64 object-cover rounded"
                 />
                 <p className="mt-4">{content.heroText}</p>
-                <button
-                  onClick={() => handleEditClick("hero")}
-                  className="absolute top-0 right-0 mt-2 mr-2 text-blue-600 hover:text-blue-800"
-                >
-                  <FaPencilAlt />
-                </button>
               </div>
             )}
           </section>
 
           {/* What We Do Section */}
-          <section className="py-20 bg-gradient-to-b from-white to-blue-50 relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* Edit Icon */}
-              <button
-                onClick={() => handleEditClick("whatWeDo")}
-                className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
-              >
-                <FaPencilAlt size={20} />
-              </button>
-
-              {/* Section Title */}
-              <div className="text-center mb-16 space-y-4">
-                {editingSection === "whatWeDo" ? (
+          <section id="what-we-do-section" className="mb-10 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center">
+              <span className="mr-2">What We Do</span>
+              {editingSection !== "whatWeDo" && (
+                <button
+                  onClick={() => handleEditClick("whatWeDo")}
+                  className="ml-auto text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Edit What We Do Section"
+                >
+                  <FaPencilAlt className="w-4 h-4" />
+                </button>
+              )}
+            </h2>
+            
+            {editingSection === "whatWeDo" ? (
+              <div className="mt-4 space-y-4">
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Title:</span>
                   <input
                     type="text"
                     value={tempContent.whatWeDo?.title || ""}
                     onChange={(e) => handleInputChange(e, "whatWeDo", "title")}
-                    className="block w-full text-center text-6xl font-bold text-gray-900 font-playfair border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    placeholder="Enter title"
                   />
-                ) : (
-                  <h2 className="font-playfair text-6xl font-bold text-gray-900">
-                    {content.whatWeDo.title}
-                  </h2>
-                )}
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto"></div>
-              </div>
-
-              {/* Section Content */}
-              <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div className="space-y-8">
-                  {editingSection === "whatWeDo" ? (
-                    <textarea
-                      value={tempContent.whatWeDo?.description || ""}
-                      onChange={(e) =>
-                        handleInputChange(e, "whatWeDo", "description")
-                      }
-                      className="block w-full text-xl leading-relaxed text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                    />
-                  ) : (
-                    <p className="text-xl leading-relaxed text-gray-700 font-poppins">
-                      {content.whatWeDo.description}
-                    </p>
-                  )}
-
-                  <ul className="space-y-6">
-                    {content.whatWeDo.items.map((item, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center space-x-4 group"
+                </label>
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Description:</span>
+                  <textarea
+                    value={tempContent.whatWeDo?.description || ""}
+                    onChange={(e) =>
+                      handleInputChange(e, "whatWeDo", "description")
+                    }
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    rows={4}
+                    placeholder="Enter description"
+                  ></textarea>
+                </label>
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Image URL:</span>
+                  <input
+                    type="text"
+                    value={tempContent.whatWeDo?.image || ""}
+                    onChange={(e) => handleInputChange(e, "whatWeDo", "image")}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    placeholder="Enter image URL"
+                  />
+                </label>
+                <div>
+                  <span className="text-slate-700 font-medium block mb-2">Items:</span>
+                  {tempContent.whatWeDo?.items.map((item, index) => (
+                    <div key={index} className="flex items-center mb-2">
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) =>
+                          handleInputChange(e, "whatWeDo", "items", index)
+                        }
+                        className="flex-grow px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        placeholder={`Item ${index + 1}`}
+                      />
+                      <button
+                        onClick={() =>
+                          handleRemoveArrayItem("whatWeDo", "items", index)
+                        }
+                        className="ml-2 p-2 text-red-600 hover:text-red-800 focus:outline-none"
+                        title="Remove item"
                       >
-                        <span className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold transform group-hover:scale-110 transition-transform duration-300">
-                          {index + 1}
-                        </span>
-                        {editingSection === "whatWeDo" ? (
-                          <input
-                            type="text"
-                            value={tempContent.whatWeDo?.items[index] || ""}
-                            onChange={(e) =>
-                              handleInputChange(e, "whatWeDo", "items", index)
-                            }
-                            className="block w-full text-xl text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                          />
-                        ) : (
-                          <span className="text-xl text-gray-700 font-poppins group-hover:text-blue-600 transition-colors duration-300">
-                            {item}
-                          </span>
-                        )}
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => handleAddArrayItem("whatWeDo", "items")}
+                    className="mt-2 px-3 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-300 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 flex items-center text-sm"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Item
+                  </button>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={handleCancel}
+                    className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3">{content?.whatWeDo.title}</h3>
+                  <p className="text-slate-600 mb-4">{content?.whatWeDo.description}</p>
+                  <ul className="space-y-2">
+                    {content?.whatWeDo.items.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-slate-900 mr-2">•</span>
+                        <span className="text-slate-700">{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-
-                {/* Section Image */}
-                <div className="relative">
-                  <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl opacity-75 blur-lg"></div>
-                  {editingSection === "whatWeDo" ? (
-                    <input
-                      type="text"
-                      value={tempContent.whatWeDo?.image || ""}
-                      onChange={(e) =>
-                        handleInputChange(e, "whatWeDo", "image")
-                      }
-                      className="relative z-10 block w-full text-center text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                      placeholder="Enter Image URL"
-                    />
-                  ) : (
-                    <ClientImage
-                      src={content.whatWeDo.image}
-                      alt="What we do"
-                      width={600}
-                      height={400}
-                      className="relative rounded-2xl shadow-2xl w-full h-[400px] object-cover transform hover:scale-105 transition-transform duration-500"
-                    />
-                  )}
+                <div className="relative h-64 overflow-hidden rounded-lg shadow-md">
+                  <img
+                    src={content?.whatWeDo.image}
+                    alt="What We Do"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
-
-              {/* Save and Cancel Buttons */}
-              {editingSection === "whatWeDo" && (
-                <div className="mt-8 flex justify-end space-x-4">
-                  <button
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </section>
 
           {/* Mission Section */}
-          <section className="py-20 bg-gradient-to-r from-blue-50 to-indigo-50 relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* Edit Icon */}
-              <button
-                onClick={() => handleEditClick("mission")}
-                className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
-              >
-                <FaPencilAlt size={20} />
-              </button>
-
-              {/* Section Title */}
-              {editingSection === "mission" ? (
-                <input
-                  type="text"
-                  value={tempContent.mission?.title || ""}
-                  onChange={(e) => handleInputChange(e, "mission", "title")}
-                  className="block w-full text-center text-6xl font-bold text-gray-900 font-playfair border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                />
-              ) : (
-                <h2 className="font-playfair text-6xl font-bold text-gray-900">
-                  {content.mission.title}
-                </h2>
+          <section id="mission-section" className="mb-10 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center">
+              <span className="mr-2">Our Mission</span>
+              {editingSection !== "mission" && (
+                <button
+                  onClick={() => handleEditClick("mission")}
+                  className="ml-auto text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Edit Mission Section"
+                >
+                  <FaPencilAlt className="w-4 h-4" />
+                </button>
               )}
-
-              {/* Section Description */}
-              {editingSection === "mission" ? (
-                <textarea
-                  value={tempContent.mission?.description || ""}
-                  onChange={(e) =>
-                    handleInputChange(e, "mission", "description")
-                  }
-                  className="block w-full mt-4 text-xl leading-relaxed text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                />
-              ) : (
-                <p className="text-xl leading-relaxed text-gray-700 font-poppins mt-4">
-                  {content.mission.description}
-                </p>
-              )}
-
-              {/* Save and Cancel Buttons */}
-              {editingSection === "mission" && (
-                <div className="mt-8 flex justify-end space-x-4">
-                  <button
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Save
-                  </button>
+            </h2>
+            
+            {editingSection === "mission" ? (
+              <div className="mt-4 space-y-4">
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Title:</span>
+                  <input
+                    type="text"
+                    value={tempContent.mission?.title || ""}
+                    onChange={(e) => handleInputChange(e, "mission", "title")}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    placeholder="Enter title"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Description:</span>
+                  <textarea
+                    value={tempContent.mission?.description || ""}
+                    onChange={(e) =>
+                      handleInputChange(e, "mission", "description")
+                    }
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    rows={4}
+                    placeholder="Enter description"
+                  ></textarea>
+                </label>
+                <div className="flex justify-end space-x-3 mt-6">
                   <button
                     onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                    className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
                   >
                     Cancel
                   </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+                  >
+                    Save
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="bg-slate-50 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">{content?.mission.title}</h3>
+                <p className="text-slate-600">{content?.mission.description}</p>
+              </div>
+            )}
           </section>
 
           {/* Founder Section */}
-          <section className="py-20 relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* Edit Icon */}
-              <button
-                onClick={() => handleEditClick("founder")}
-                className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
-              >
-                <FaPencilAlt size={20} />
-              </button>
-
-              {/* Section Title */}
-              <h2 className="font-playfair text-6xl font-bold text-gray-900">
-                Meet Our{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                  Founder
-                </span>
-              </h2>
-
-              <div className="flex flex-col md:flex-row items-center gap-12 mt-8">
-                {/* Founder Image */}
-                <div className="md:w-1/2">
-                  {editingSection === "founder" ? (
-                    <input
-                      type="text"
-                      value={tempContent.founder?.image || ""}
-                      onChange={(e) => handleInputChange(e, "founder", "image")}
-                      className="block w-full text-center text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                      placeholder="Enter Image URL"
-                    />
-                  ) : (
-                    <ClientImage
-                      src={content.founder.image}
-                      alt={content.founder.name}
-                      width={500}
-                      height={500}
-                      className="rounded-2xl shadow-2xl"
-                    />
-                  )}
-                </div>
-
-                {/* Founder Details */}
-                <div className="md:w-1/2">
-                  {editingSection === "founder" ? (
-                    <>
+          <section id="founder-section" className="mb-10 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center">
+              <span className="mr-2">Founder</span>
+              {editingSection !== "founder" && (
+                <button
+                  onClick={() => handleEditClick("founder")}
+                  className="ml-auto text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Edit Founder Section"
+                >
+                  <FaPencilAlt className="w-4 h-4" />
+                </button>
+              )}
+            </h2>
+            
+            {editingSection === "founder" ? (
+              <div className="mt-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Name:</span>
                       <input
                         type="text"
                         value={tempContent.founder?.name || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, "founder", "name")
-                        }
-                        className="block w-full text-4xl font-bold text-gray-900 font-playfair border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                        placeholder="Enter Founder Name"
+                        onChange={(e) => handleInputChange(e, "founder", "name")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        placeholder="Enter name"
                       />
+                    </label>
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Title:</span>
                       <input
                         type="text"
                         value={tempContent.founder?.title || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, "founder", "title")
-                        }
-                        className="block w-full mt-4 text-xl text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                        placeholder="Enter Founder Title"
+                        onChange={(e) => handleInputChange(e, "founder", "title")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        placeholder="Enter title"
                       />
+                    </label>
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Quote:</span>
                       <textarea
                         value={tempContent.founder?.quote || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, "founder", "quote")
-                        }
-                        className="block w-full mt-4 text-lg italic text-gray-600 border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                        placeholder="Enter Founder Quote"
+                        onChange={(e) => handleInputChange(e, "founder", "quote")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        rows={3}
+                        placeholder="Enter quote"
+                      ></textarea>
+                    </label>
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Image URL:</span>
+                      <input
+                        type="text"
+                        value={tempContent.founder?.image || ""}
+                        onChange={(e) => handleInputChange(e, "founder", "image")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        placeholder="Enter image URL"
                       />
-                      {tempContent.founder?.description.map((desc, index) => (
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <span className="text-slate-700 font-medium block mb-2">Description:</span>
+                    {tempContent.founder?.description.map((desc, index) => (
+                      <div key={index} className="flex items-center mb-2">
                         <textarea
-                          key={index}
                           value={desc}
                           onChange={(e) =>
-                            handleInputChange(
-                              e,
-                              "founder",
-                              "description",
-                              index
-                            )
+                            handleInputChange(e, "founder", "description", index)
                           }
-                          className="block w-full mt-4 text-lg text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                          placeholder={`Enter Description ${index + 1}`}
-                        />
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-4xl font-playfair font-bold">
-                        {content.founder.name}
-                      </h3>
-                      <p className="text-xl font-poppins text-gray-700">
-                        {content.founder.title}
-                      </p>
-                      <blockquote className="text-lg italic text-gray-600">
-                        {content.founder.quote}
-                      </blockquote>
-                      {content.founder.description.map((desc, index) => (
-                        <p
-                          key={index}
-                          className="text-lg text-gray-700 font-poppins"
+                          className="flex-grow px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          rows={3}
+                          placeholder={`Description paragraph ${index + 1}`}
+                        ></textarea>
+                        <button
+                          onClick={() =>
+                            handleRemoveArrayItem("founder", "description", index)
+                          }
+                          className="ml-2 p-2 text-red-600 hover:text-red-800 focus:outline-none"
+                          title="Remove paragraph"
                         >
-                          {desc}
-                        </p>
-                      ))}
-                    </>
-                  )}
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => handleAddArrayItem("founder", "description")}
+                      className="mt-2 px-3 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-300 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 flex items-center text-sm"
+                    >
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Add Paragraph
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Save and Cancel Buttons */}
-              {editingSection === "founder" && (
-                <div className="mt-8 flex justify-end space-x-4">
-                  <button
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Save
-                  </button>
+                
+                <div className="flex justify-end space-x-3 mt-6">
                   <button
                     onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                    className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
                   >
                     Cancel
                   </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+                  >
+                    Save
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div className="relative h-80 overflow-hidden rounded-lg shadow-md">
+                  <img
+                    src={content?.founder.image}
+                    alt={content?.founder.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-900">{content?.founder.name}</h3>
+                  <p className="text-slate-600 mb-4">{content?.founder.title}</p>
+                  <blockquote className="italic text-slate-700 border-l-4 border-slate-900 pl-4 mb-4">
+                    "{content?.founder.quote}"
+                  </blockquote>
+                  <div className="space-y-2">
+                    {content?.founder.description.map((desc, index) => (
+                      <p key={index} className="text-slate-600">{desc}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Co-Founder Section */}
-          <section className="py-20 relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* Edit Icon */}
-              <button
-                onClick={() => handleEditClick("cofounder")}
-                className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
-              >
-                <FaPencilAlt size={20} />
-              </button>
-
-              {/* Section Title */}
-              <h2 className="font-playfair text-6xl font-bold text-gray-900">
-                Meet Our{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                  Co-Founder
-                </span>
-              </h2>
-
-              <div className="flex flex-col md:flex-row items-center gap-12 mt-8">
-                {/* Co-Founder Image */}
-                <div className="md:w-1/2">
-                  {editingSection === "cofounder" ? (
-                    <input
-                      type="text"
-                      value={tempContent.cofounder?.image || ""}
-                      onChange={(e) =>
-                        handleInputChange(e, "cofounder", "image")
-                      }
-                      className="block w-full text-center text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                      placeholder="Enter Image URL"
-                    />
-                  ) : (
-                    <ClientImage
-                      src={content.cofounder.image}
-                      alt={content.cofounder.name}
-                      width={500}
-                      height={500}
-                      className="rounded-2xl shadow-2xl"
-                    />
-                  )}
-                </div>
-
-                {/* Co-Founder Details */}
-                <div className="md:w-1/2">
-                  {editingSection === "cofounder" ? (
-                    <>
+          <section id="cofounder-section" className="mb-10 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center">
+              <span className="mr-2">Co-Founder</span>
+              {editingSection !== "cofounder" && (
+                <button
+                  onClick={() => handleEditClick("cofounder")}
+                  className="ml-auto text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Edit Co-Founder Section"
+                >
+                  <FaPencilAlt className="w-4 h-4" />
+                </button>
+              )}
+            </h2>
+            
+            {editingSection === "cofounder" ? (
+              <div className="mt-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Name:</span>
                       <input
                         type="text"
                         value={tempContent.cofounder?.name || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, "cofounder", "name")
-                        }
-                        className="block w-full text-4xl font-bold text-gray-900 font-playfair border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                        placeholder="Enter Co-Founder Name"
+                        onChange={(e) => handleInputChange(e, "cofounder", "name")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        placeholder="Enter name"
                       />
+                    </label>
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Title:</span>
                       <input
                         type="text"
                         value={tempContent.cofounder?.title || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, "cofounder", "title")
-                        }
-                        className="block w-full mt-4 text-xl text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                        placeholder="Enter Co-Founder Title"
+                        onChange={(e) => handleInputChange(e, "cofounder", "title")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        placeholder="Enter title"
                       />
+                    </label>
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Quote:</span>
                       <textarea
                         value={tempContent.cofounder?.quote || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, "cofounder", "quote")
-                        }
-                        className="block w-full mt-4 text-lg italic text-gray-600 border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                        placeholder="Enter Co-Founder Quote"
+                        onChange={(e) => handleInputChange(e, "cofounder", "quote")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        rows={3}
+                        placeholder="Enter quote"
+                      ></textarea>
+                    </label>
+                    <label className="block">
+                      <span className="text-slate-700 font-medium">Image URL:</span>
+                      <input
+                        type="text"
+                        value={tempContent.cofounder?.image || ""}
+                        onChange={(e) => handleInputChange(e, "cofounder", "image")}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                        placeholder="Enter image URL"
                       />
-                      {tempContent.cofounder?.description.map((desc, index) => (
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <span className="text-slate-700 font-medium block mb-2">Description:</span>
+                    {tempContent.cofounder?.description.map((desc, index) => (
+                      <div key={index} className="flex items-center mb-2">
                         <textarea
-                          key={index}
                           value={desc}
                           onChange={(e) =>
-                            handleInputChange(
-                              e,
-                              "cofounder",
-                              "description",
-                              index
-                            )
+                            handleInputChange(e, "cofounder", "description", index)
                           }
-                          className="block w-full mt-4 text-lg text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                          placeholder={`Enter Description ${index + 1}`}
-                        />
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-4xl font-playfair font-bold">
-                        {content.cofounder.name}
-                      </h3>
-                      <p className="text-xl font-poppins text-gray-700">
-                        {content.cofounder.title}
-                      </p>
-                      <blockquote className="text-lg italic text-gray-600">
-                        {content.cofounder.quote}
-                      </blockquote>
-                      {content.cofounder.description.map((desc, index) => (
-                        <p
-                          key={index}
-                          className="text-lg text-gray-700 font-poppins"
+                          className="flex-grow px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          rows={3}
+                          placeholder={`Description paragraph ${index + 1}`}
+                        ></textarea>
+                        <button
+                          onClick={() =>
+                            handleRemoveArrayItem("cofounder", "description", index)
+                          }
+                          className="ml-2 p-2 text-red-600 hover:text-red-800 focus:outline-none"
+                          title="Remove paragraph"
                         >
-                          {desc}
-                        </p>
-                      ))}
-                    </>
-                  )}
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => handleAddArrayItem("cofounder", "description")}
+                      className="mt-2 px-3 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-300 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 flex items-center text-sm"
+                    >
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Add Paragraph
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Save and Cancel Buttons */}
-              {editingSection === "cofounder" && (
-                <div className="mt-8 flex justify-end space-x-4">
-                  <button
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Save
-                  </button>
+                
+                <div className="flex justify-end space-x-3 mt-6">
                   <button
                     onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                    className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
                   >
                     Cancel
                   </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+                  >
+                    Save
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-900">{content?.cofounder.name}</h3>
+                  <p className="text-slate-600 mb-4">{content?.cofounder.title}</p>
+                  <blockquote className="italic text-slate-700 border-l-4 border-slate-900 pl-4 mb-4">
+                    "{content?.cofounder.quote}"
+                  </blockquote>
+                  <div className="space-y-2">
+                    {content?.cofounder.description.map((desc, index) => (
+                      <p key={index} className="text-slate-600">{desc}</p>
+                    ))}
+                  </div>
+                </div>
+                <div className="relative h-80 overflow-hidden rounded-lg shadow-md">
+                  <img
+                    src={content?.cofounder.image}
+                    alt={content?.cofounder.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Veterans Section */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
-            <div className="text-center mb-10">
-              {/* Edit Icon */}
-              <button
-                onClick={() => handleEditClick("veterans")}
-                className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
-              >
-                <FaPencilAlt size={20} />
-              </button>
-
-              <h2 className="font-playfair text-4xl font-bold text-gray-900">
-                Battle-Hardened{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                  Veterans
-                </span>
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto mt-4"></div>
-
-              {editingSection === "veterans" ? (
-                <textarea
-                  value={tempContent.veterans?.description || ""}
-                  onChange={(e) =>
-                    handleInputChange(e, "veterans", "description")
-                  }
-                  className="block w-full mt-4 text-gray-600 text-center max-w-2xl mx-auto border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                  placeholder="Enter Veterans Description"
-                />
-              ) : (
-                <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-                  {content.veterans.description}
-                </p>
+          <section id="veterans-section" className="mb-10 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center">
+              <span className="mr-2">Veterans</span>
+              {editingSection !== "veterans" && (
+                <button
+                  onClick={() => handleEditClick("veterans")}
+                  className="ml-auto text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Edit Veterans Section"
+                >
+                  <FaPencilAlt className="w-4 h-4" />
+                </button>
               )}
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-              {editingSection === "veterans" ? (
+            </h2>
+            
+            {editingSection === "veterans" ? (
+              <div className="mt-4 space-y-4">
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Title:</span>
+                  <input
+                    type="text"
+                    value={tempContent.veterans?.title || ""}
+                    onChange={(e) => handleInputChange(e, "veterans", "title")}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    placeholder="Enter title"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Description:</span>
+                  <textarea
+                    value={tempContent.veterans?.description || ""}
+                    onChange={(e) =>
+                      handleInputChange(e, "veterans", "description")
+                    }
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    rows={4}
+                    placeholder="Enter description"
+                  ></textarea>
+                </label>
+                
                 <div>
-                  {/* Render each image object as a form */}
+                  <span className="text-slate-700 font-medium block mb-2">Images:</span>
                   {tempContent.veterans?.images.map((image, index) => (
-                    <div key={index} className="mb-4 border-b pb-4">
+                    <div key={index} className="mb-4 p-4 border border-slate-200 rounded-md bg-slate-50">
                       <label className="block mb-2">
-                        Image URL:
+                        <span className="text-slate-700 text-sm">Image URL:</span>
                         <input
                           type="text"
                           value={image.src}
@@ -760,11 +817,13 @@ export default function UpdateAboutPage() {
                               "src"
                             )
                           }
-                          className="block w-full mt-1 p-2 border rounded"
+                          className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          placeholder="Enter image URL"
                         />
                       </label>
                       <label className="block mb-2">
-                        Alt Text:
+                        <span className="text-slate-700 text-sm">Alt Text:</span>
                         <input
                           type="text"
                           value={image.alt}
@@ -777,11 +836,13 @@ export default function UpdateAboutPage() {
                               "alt"
                             )
                           }
-                          className="block w-full mt-1 p-2 border rounded"
+                          className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          placeholder="Enter alt text"
                         />
                       </label>
                       <label className="block mb-2">
-                        Info:
+                        <span className="text-slate-700 text-sm">Info:</span>
                         <textarea
                           value={image.info}
                           onChange={(e) =>
@@ -793,95 +854,114 @@ export default function UpdateAboutPage() {
                               "info"
                             )
                           }
-                          className="block w-full mt-1 p-2 border rounded"
-                        />
+                          className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          rows={2}
+                          placeholder="Enter image info"
+                        ></textarea>
                       </label>
-                      <button
-                        onClick={() =>
-                          handleRemoveArrayItem("veterans", "images", index)
-                        }
-                        className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() =>
+                            handleRemoveArrayItem("veterans", "images", index)
+                          }
+                          className="px-3 py-1 bg-red-50 text-red-600 rounded-md border border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center text-sm"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   ))}
-
-                  {/* Add New Image */}
                   <button
                     onClick={() => handleAddArrayItem("veterans", "images")}
-                    className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    className="mt-2 px-3 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-300 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 flex items-center text-sm"
                   >
-                    Add New Image
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Image
                   </button>
                 </div>
-              ) : (
-                <SliderWrapper images={content.veterans.images} />
-              )}
-            </div>
-
-            {/* Save and Cancel Buttons */}
-            {editingSection === "veterans" && (
-              <div className="mt-8 flex justify-end space-x-4">
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
+                
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={handleCancel}
+                    className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{content?.veterans.title}</h3>
+                  <p className="text-slate-600">{content?.veterans.description}</p>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <SliderWrapper images={content?.veterans.images} />
+                </div>
               </div>
             )}
           </section>
 
           {/* Core Members Section */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-r from-blue-50 to-indigo-50 relative">
-            <div className="text-center mb-10">
-              {/* Edit Icon */}
-              <button
-                onClick={() => handleEditClick("coreMembers")}
-                className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
-              >
-                <FaPencilAlt size={20} />
-              </button>
-
-              <h2 className="font-playfair text-4xl font-bold text-gray-900">
-                Other{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                  Core Members
-                </span>
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto mt-4"></div>
-
-              {editingSection === "coreMembers" ? (
-                <textarea
-                  value={tempContent.coreMembers?.description || ""}
-                  onChange={(e) =>
-                    handleInputChange(e, "coreMembers", "description")
-                  }
-                  className="block w-full mt-4 text-gray-600 text-center max-w-2xl mx-auto border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                  placeholder="Enter Core Members Description"
-                />
-              ) : (
-                <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-                  {content.coreMembers.description}
-                </p>
+          <section id="core-members-section" className="mb-10 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center">
+              <span className="mr-2">Core Members</span>
+              {editingSection !== "coreMembers" && (
+                <button
+                  onClick={() => handleEditClick("coreMembers")}
+                  className="ml-auto text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Edit Core Members Section"
+                >
+                  <FaPencilAlt className="w-4 h-4" />
+                </button>
               )}
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-              {editingSection === "coreMembers" ? (
+            </h2>
+            
+            {editingSection === "coreMembers" ? (
+              <div className="mt-4 space-y-4">
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Title:</span>
+                  <input
+                    type="text"
+                    value={tempContent.coreMembers?.title || ""}
+                    onChange={(e) => handleInputChange(e, "coreMembers", "title")}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    placeholder="Enter title"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-slate-700 font-medium">Description:</span>
+                  <textarea
+                    value={tempContent.coreMembers?.description || ""}
+                    onChange={(e) =>
+                      handleInputChange(e, "coreMembers", "description")
+                    }
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    rows={4}
+                    placeholder="Enter description"
+                  ></textarea>
+                </label>
+                
                 <div>
-                  {/* Render each image object as a form */}
+                  <span className="text-slate-700 font-medium block mb-2">Images:</span>
                   {tempContent.coreMembers?.images.map((image, index) => (
-                    <div key={index} className="mb-4 border-b pb-4">
+                    <div key={index} className="mb-4 p-4 border border-slate-200 rounded-md bg-slate-50">
                       <label className="block mb-2">
-                        Image URL:
+                        <span className="text-slate-700 text-sm">Image URL:</span>
                         <input
                           type="text"
                           value={image.src}
@@ -894,11 +974,13 @@ export default function UpdateAboutPage() {
                               "src"
                             )
                           }
-                          className="block w-full mt-1 p-2 border rounded"
+                          className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          placeholder="Enter image URL"
                         />
                       </label>
                       <label className="block mb-2">
-                        Alt Text:
+                        <span className="text-slate-700 text-sm">Alt Text:</span>
                         <input
                           type="text"
                           value={image.alt}
@@ -911,11 +993,13 @@ export default function UpdateAboutPage() {
                               "alt"
                             )
                           }
-                          className="block w-full mt-1 p-2 border rounded"
+                          className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          placeholder="Enter alt text"
                         />
                       </label>
                       <label className="block mb-2">
-                        Info:
+                        <span className="text-slate-700 text-sm">Info:</span>
                         <textarea
                           value={image.info}
                           onChange={(e) =>
@@ -927,48 +1011,62 @@ export default function UpdateAboutPage() {
                               "info"
                             )
                           }
-                          className="block w-full mt-1 p-2 border rounded"
-                        />
+                          className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                          focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                          rows={2}
+                          placeholder="Enter image info"
+                        ></textarea>
                       </label>
-                      <button
-                        onClick={() =>
-                          handleRemoveArrayItem("coreMembers", "images", index)
-                        }
-                        className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() =>
+                            handleRemoveArrayItem("coreMembers", "images", index)
+                          }
+                          className="px-3 py-1 bg-red-50 text-red-600 rounded-md border border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center text-sm"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   ))}
-
-                  {/* Add New Image */}
                   <button
                     onClick={() => handleAddArrayItem("coreMembers", "images")}
-                    className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    className="mt-2 px-3 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-300 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 flex items-center text-sm"
                   >
-                    Add New Image
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Image
                   </button>
                 </div>
-              ) : (
-                <SliderWrapper images={content.coreMembers.images} />
-              )}
-            </div>
-
-            {/* Save and Cancel Buttons */}
-            {editingSection === "coreMembers" && (
-              <div className="mt-8 flex justify-end space-x-4">
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
+                
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={handleCancel}
+                    className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{content?.coreMembers.title}</h3>
+                  <p className="text-slate-600">{content?.coreMembers.description}</p>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <SliderWrapper images={content?.coreMembers.images} />
+                </div>
               </div>
             )}
           </section>

@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { TableOfContents } from '@/components/navigation/TableOfContents';
 import SearchBar from '@/components/Navbar/SearchBar';
 import SocialMedia from '@/components/navigation/socialmedia';
+import Ads from '../navigation/Ads';
 
 interface GeneralStudiesContent {
   title: string;
@@ -163,6 +164,10 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                   <div className="py-2">
                     <SocialMedia />
                   </div>
+                </div>
+
+                <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
+                  <Ads imageUrl ="/" altText="ads"  />
                 </div>
               </div>
             </div>
