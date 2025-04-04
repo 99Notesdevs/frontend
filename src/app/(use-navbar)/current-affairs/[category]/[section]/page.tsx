@@ -4,6 +4,7 @@ import { env } from "@/config/env";
 import Head from "next/head";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import { ChevronRight, X } from "lucide-react";
+import DraggableTocButton from "@/components/navigation/DraggableTocButton";
 
 // Define types for the data
 interface CurrentAffairArticle {
@@ -59,56 +60,41 @@ const CurrentAffairArticlePage = async ({
         </Head>
 
         {/* TOC Container with checkbox hack for toggle */}
-        <input type="checkbox" id="toc-toggle" className="hidden peer" />
-        
-        {/* TOC Button - Enhanced styling */}
+      <input type="checkbox" id="toc-toggle" className="hidden peer" />
+      
+      {/* Draggable TOC Button */}
+      <DraggableTocButton />
+
+      {/* TOC Sidebar */}
+      <div className="fixed left-0 top-0 h-full w-[280px] sm:w-[320px] bg-white/95 
+      backdrop-blur-sm shadow-xl -translate-x-full peer-checked:translate-x-0 
+      transition-all duration-300 ease-in-out z-[90] border-r-2 border-gray-200">
+        {/* Close Button - Moved outside scrollable area */}
         <label
           htmlFor="toc-toggle"
-          className="fixed left-0 top-1/2 -translate-y-1/2 z-[100] cursor-pointer 
-          flex items-center bg-white/80 backdrop-blur-sm border border-gray-200 
-          rounded-r-xl px-3 py-4 shadow-lg hover:bg-white/95 transition-all duration-300 
-          peer-checked:translate-x-[320px] hover:shadow-xl group"
+          className="absolute top-4 right-4 p-2 cursor-pointer rounded-full
+          hover:bg-gray-100 transition-colors duration-200 z-[100]
+          bg-white shadow-md border border-gray-200"
         >
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-black text-sm font-medium tracking-wide rotate-180 
-            [writing-mode:vertical-lr] transform transition-transform duration-300">
-              TOC
-            </span>
-            <ChevronRight className="w-4 h-4 text-black transition-all duration-300 
-            group-hover:translate-x-0.5" />
-          </div>
+          <X className="w-5 h-5 text-gray-600 hover:text-gray-900" />
         </label>
 
-        {/* TOC Sidebar - Enhanced styling */}
-        <div className="fixed left-0 top-0 h-full w-[320px] bg-white/90 
-        backdrop-blur-md shadow-2xl -translate-x-full peer-checked:translate-x-0 
-        transition-all duration-300 ease-in-out z-[90] border-r border-gray-200">
-          {/* Close Button - Moved outside scrollable area */}
-          <label
-            htmlFor="toc-toggle"
-            className="absolute top-4 right-4 p-2 cursor-pointer rounded-full
-            hover:bg-gray-100 transition-colors duration-200 z-[100]
-            bg-white shadow-md border border-gray-200"
-          >
-            <X className="w-5 h-5 text-gray-600 hover:text-gray-900" />
-          </label>
-
-          {/* Left TOC Sidebar Content - Enhanced */}
-          <div className="p-6 h-full mt-[50px] pb-24 overflow-y-auto">
-            <div className="bg-gradient-to-br from-blue-50/50 to-gray-50/50 rounded-2xl 
-            p-5 border border-blue-100/50 shadow-inner transition-all duration-300 
-            hover:border-blue-200 sticky top-[100px]">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b-2 
-              border-gray-300 pb-2 flex items-center gap-2">
-                <span className="text-gray-500">📑</span>
-                <span>Table of Content</span>
-              </h3>
-              <div className="pr-2 space-y-1 max-h-[70vh] overflow-y-auto">
-                {article?.content && <TableOfContents content={article.content} />}
-              </div>
+        {/* Left TOC Sidebar */}
+        <div className="p-6 h-full mt-[50px] pb-24 overflow-y-auto">
+          <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200 
+          shadow-inner transition-all duration-300 hover:border-gray-300
+          sticky top-[100px]">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b-2 
+            border-gray-300 pb-2 flex items-center gap-2">
+              <span className="text-gray-500">📑</span>
+              <span>Table of Content</span>
+            </h3>
+            <div className="pr-2 space-y-1 max-h-[70vh] overflow-y-auto">
+              <TableOfContents content={article?.content} />
             </div>
           </div>
         </div>
+      </div>
         
         {article ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
