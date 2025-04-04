@@ -15,6 +15,10 @@ interface Comment {
   parentSlug: string | null;
   createdAt: string;
   replies: Comment[] | null; // Initially null, fetched dynamically
+  user: {
+    firstName: string;
+    lastName?: string; // Optional if needed
+  };
 }
 
 export const Comments = ({ parentId }: { parentId: string }) => {
@@ -104,6 +108,7 @@ export const Comments = ({ parentId }: { parentId: string }) => {
 
       setNewComment("");
       setIsReplyingTo(null);
+      fetchComments();
     } catch (error) {
       console.error("Error posting comment:", error);
     } finally {
@@ -155,25 +160,27 @@ export const Comments = ({ parentId }: { parentId: string }) => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm text-slate-500">
-                  {new Date(comment.createdAt).toLocaleDateString()}
+                  {comment?.user?.firstName} {comment?.user?.lastName} - {new Date(comment.createdAt).toLocaleString()}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleReplyClick(comment.id)}
-                  className="text-sm text-slate-500 hover:text-slate-700"
-                >
-                  Reply
-                </button>
-                <button
-                  onClick={() => toggleRepliesVisibility(comment.id)}
-                  className="text-sm text-slate-500 hover:text-slate-700"
-                >
-                  {visibleReplies.has(comment.id)
-                    ? "Hide Replies"
-                    : "View Replies"}
-                </button>
-              </div>
+              {depth === 0 && ( // Only show buttons for top-level comments
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleReplyClick(comment.id)}
+                    className="text-sm text-slate-500 hover:text-slate-700"
+                  >
+                    Reply
+                  </button>
+                  <button
+                    onClick={() => toggleRepliesVisibility(comment.id)}
+                    className="text-sm text-slate-500 hover:text-slate-700"
+                  >
+                    {visibleReplies.has(comment.id)
+                      ? "Hide Replies"
+                      : "View Replies"}
+                  </button>
+                </div>
+              )}
             </div>
             <div className="mt-2 text-slate-700 whitespace-pre-wrap">
               {comment.content}

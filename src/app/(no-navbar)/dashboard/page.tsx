@@ -6,22 +6,6 @@ import { FaPlus, FaEdit } from 'react-icons/fa';
 const inter = Inter({ subsets: ['latin'] });
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ['latin'] });
 
-// Mock articles data - replace with API call
-const mockArticles = [
-  {
-    id: '1',
-    title: 'Introduction to Ancient India',
-    path: ['UPSC Notes', 'General Studies 1', 'History', 'Ancient India'],
-    updatedAt: '2025-03-21',
-  },
-  {
-    id: '2',
-    title: 'Medieval Indian History',
-    path: ['UPSC Notes', 'General Studies 1', 'History', 'Medieval India'],
-    updatedAt: '2025-03-21',
-  },
-];
-
 
 export default function Dashboard() {
   const router = useRouter();

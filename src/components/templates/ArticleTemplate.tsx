@@ -102,20 +102,6 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 text-transparent px-2">
                   {title}
                 </h1>
-                {date && (
-                  <div className="text-gray-600 mb-2">
-                    {new Date(date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </div>
-                )}
-                {readTime && (
-                  <div className="text-gray-500 text-sm">
-                    ⏱️ {readTime} read
-                  </div>
-                )}
               </div>
 
               <div
