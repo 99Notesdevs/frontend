@@ -7,6 +7,7 @@ import SidebarNavigation from "@/components/navigation/SidebarNavigation";
 import SocialMedia from "@/components/navigation/socialmedia";
 import { metadata } from "@/app/(use-navbar)/layout";
 import { BaseTemplateProps } from "./types";
+import Ads from "../navigation/Ads";
 // import { UpscNotesTemplateProps } from "./types";
 
 interface PageItem {
@@ -93,6 +94,10 @@ export const UpscNotesTemplate: React.FC<UpscNotesTemplateProps> = ({
                   <div className="py-2">
                     <SocialMedia />
                   </div>
+                </div>
+
+                <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
+                  <Ads imageUrl ="/" altText="ads"  />
                 </div>
               </div>
             </div>

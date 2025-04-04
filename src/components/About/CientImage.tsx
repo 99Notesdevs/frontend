@@ -13,13 +13,16 @@ interface ClientImageProps {
 
 const ClientImage: React.FC<ClientImageProps> = ({ src, alt, width, height, className }) => {
   return (
-    <Image
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-    />
+    <div className="relative w-full h-full overflow-hidden">
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        className={`${className || ''}`}
+        style={{ objectFit: "cover", objectPosition: "center" }}
+      />
+    </div>
   );
 };
 
