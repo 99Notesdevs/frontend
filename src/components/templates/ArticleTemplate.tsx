@@ -12,13 +12,10 @@ import DraggableTocButton from "@/components/navigation/DraggableTocButton";
 import { Comments } from "@/components/ui/comments";
 import Ads from "../navigation/Ads";
 
-// interface ArticleContent {
-//   content: string;
-//   image?: string;
-// }
-
 export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
+  // @ts-ignore
+  const parentId = page.slug;
 
   // Safely cast content to ArticleContent with fallbacks
   const articleContent = JSON.parse(content as unknown as string);
@@ -185,7 +182,7 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 dangerouslySetInnerHTML={{ __html: mainContent }}
               />
             </div>
-            <Comments />
+            <Comments parentId={parentId}/>
           </main>
 
           {/* Right Sidebar */}

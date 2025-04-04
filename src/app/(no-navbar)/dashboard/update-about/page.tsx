@@ -6,7 +6,6 @@ import { env } from "@/config/env";
 import { FaPencilAlt } from "react-icons/fa";
 import ClientImage from "@/components/About/CientImage";
 import SliderWrapper from "@/components/About/SliderWrapper";
-import Head from "next/head";
 import Cookies from "js-cookie";
 
 interface Content {
