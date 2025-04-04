@@ -85,6 +85,7 @@ export default function UpdateAboutPage() {
     field: string,
     index?: number
   ) => {
+    console.log("Change......");
     setTempContent((prev) => {
       // Handle top-level fields like heroImage and heroText
       if (section === "heroImage" || section === "heroText") {
@@ -97,6 +98,7 @@ export default function UpdateAboutPage() {
       // Handle nested fields
       const sectionData = (prev[section as keyof Content] || {}) as any;
       if (Array.isArray(sectionData[field])) {
+        console.log("Array field detected");
         // Handle array fields (e.g., images)
         return {
           ...prev,
@@ -108,6 +110,7 @@ export default function UpdateAboutPage() {
           },
         };
       } else {
+        console.log("Non-array field detected");
         // Handle non-array fields
         return {
           ...prev,
@@ -117,6 +120,64 @@ export default function UpdateAboutPage() {
           },
         };
       }
+    });
+  };
+
+  const handleArrayInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    section: string,
+    field: string,
+    index: number,
+    key: string
+  ) => {
+    setTempContent((prev) => {
+      const sectionData = (prev[section as keyof Content] || {}) as any;
+      const updatedArray = [...sectionData[field]];
+      updatedArray[index] = {
+        ...updatedArray[index],
+        [key]: e.target.value,
+      };
+      return {
+        ...prev,
+        [section]: {
+          ...sectionData,
+          [field]: updatedArray,
+        },
+      };
+    });
+  };
+
+  const handleAddArrayItem = (section: string, field: string) => {
+    setTempContent((prev) => {
+      const sectionData = (prev[section as keyof Content] || {}) as any;
+      const updatedArray = [...(sectionData[field] || [])];
+      updatedArray.push({ src: "", alt: "", info: "" }); // Add a new empty object
+      return {
+        ...prev,
+        [section]: {
+          ...sectionData,
+          [field]: updatedArray,
+        },
+      };
+    });
+  };
+
+  const handleRemoveArrayItem = (
+    section: string,
+    field: string,
+    index: number
+  ) => {
+    setTempContent((prev) => {
+      const sectionData = (prev[section as keyof Content] || {}) as any;
+      const updatedArray = [...sectionData[field]];
+      updatedArray.splice(index, 1); // Remove the item at the specified index
+      return {
+        ...prev,
+        [section]: {
+          ...sectionData,
+          [field]: updatedArray,
+        },
+      };
     });
   };
 
@@ -142,17 +203,6 @@ export default function UpdateAboutPage() {
 
   return (
     <>
-      <Head>
-        <title>{title}</title>
-        <meta
-          name="description"
-          content="Learn more about 99Notes, our mission, and our values."
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
       <main className="w-full bg-gradient-to-b from-white to-gray-50 min-h-screen overflow-hidden">
         <div className="container mx-auto p-6">
           {/* Hero Section */}
@@ -295,7 +345,7 @@ export default function UpdateAboutPage() {
                       onChange={(e) =>
                         handleInputChange(e, "whatWeDo", "image")
                       }
-                      className="block w-full text-center text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
+                      className="relative z-10 block w-full text-center text-gray-700 font-poppins border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
                       placeholder="Enter Image URL"
                     />
                   ) : (
@@ -693,16 +743,79 @@ export default function UpdateAboutPage() {
 
             <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
               {editingSection === "veterans" ? (
-                <textarea
-                  value={JSON.stringify(
-                    tempContent.veterans?.images || [],
-                    null,
-                    2
-                  )}
-                  onChange={(e) => handleInputChange(e, "veterans", "images")}
-                  className="block w-full text-gray-600 border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                  placeholder="Enter JSON for Images"
-                />
+                <div>
+                  {/* Render each image object as a form */}
+                  {tempContent.veterans?.images.map((image, index) => (
+                    <div key={index} className="mb-4 border-b pb-4">
+                      <label className="block mb-2">
+                        Image URL:
+                        <input
+                          type="text"
+                          value={image.src}
+                          onChange={(e) =>
+                            handleArrayInputChange(
+                              e,
+                              "veterans",
+                              "images",
+                              index,
+                              "src"
+                            )
+                          }
+                          className="block w-full mt-1 p-2 border rounded"
+                        />
+                      </label>
+                      <label className="block mb-2">
+                        Alt Text:
+                        <input
+                          type="text"
+                          value={image.alt}
+                          onChange={(e) =>
+                            handleArrayInputChange(
+                              e,
+                              "veterans",
+                              "images",
+                              index,
+                              "alt"
+                            )
+                          }
+                          className="block w-full mt-1 p-2 border rounded"
+                        />
+                      </label>
+                      <label className="block mb-2">
+                        Info:
+                        <textarea
+                          value={image.info}
+                          onChange={(e) =>
+                            handleArrayInputChange(
+                              e,
+                              "veterans",
+                              "images",
+                              index,
+                              "info"
+                            )
+                          }
+                          className="block w-full mt-1 p-2 border rounded"
+                        />
+                      </label>
+                      <button
+                        onClick={() =>
+                          handleRemoveArrayItem("veterans", "images", index)
+                        }
+                        className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Add New Image */}
+                  <button
+                    onClick={() => handleAddArrayItem("veterans", "images")}
+                    className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                  >
+                    Add New Image
+                  </button>
+                </div>
               ) : (
                 <SliderWrapper images={content.veterans.images} />
               )}
@@ -764,18 +877,79 @@ export default function UpdateAboutPage() {
 
             <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
               {editingSection === "coreMembers" ? (
-                <textarea
-                  value={JSON.stringify(
-                    tempContent.coreMembers?.images || [],
-                    null,
-                    2
-                  )}
-                  onChange={(e) =>
-                    handleInputChange(e, "coreMembers", "images")
-                  }
-                  className="block w-full text-gray-600 border-b-2 border-gray-300 focus:outline-none focus:border-blue-600"
-                  placeholder="Enter JSON for Images"
-                />
+                <div>
+                  {/* Render each image object as a form */}
+                  {tempContent.coreMembers?.images.map((image, index) => (
+                    <div key={index} className="mb-4 border-b pb-4">
+                      <label className="block mb-2">
+                        Image URL:
+                        <input
+                          type="text"
+                          value={image.src}
+                          onChange={(e) =>
+                            handleArrayInputChange(
+                              e,
+                              "coreMembers",
+                              "images",
+                              index,
+                              "src"
+                            )
+                          }
+                          className="block w-full mt-1 p-2 border rounded"
+                        />
+                      </label>
+                      <label className="block mb-2">
+                        Alt Text:
+                        <input
+                          type="text"
+                          value={image.alt}
+                          onChange={(e) =>
+                            handleArrayInputChange(
+                              e,
+                              "coreMembers",
+                              "images",
+                              index,
+                              "alt"
+                            )
+                          }
+                          className="block w-full mt-1 p-2 border rounded"
+                        />
+                      </label>
+                      <label className="block mb-2">
+                        Info:
+                        <textarea
+                          value={image.info}
+                          onChange={(e) =>
+                            handleArrayInputChange(
+                              e,
+                              "coreMembers",
+                              "images",
+                              index,
+                              "info"
+                            )
+                          }
+                          className="block w-full mt-1 p-2 border rounded"
+                        />
+                      </label>
+                      <button
+                        onClick={() =>
+                          handleRemoveArrayItem("coreMembers", "images", index)
+                        }
+                        className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Add New Image */}
+                  <button
+                    onClick={() => handleAddArrayItem("coreMembers", "images")}
+                    className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                  >
+                    Add New Image
+                  </button>
+                </div>
               ) : (
                 <SliderWrapper images={content.coreMembers.images} />
               )}
