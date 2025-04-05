@@ -96,10 +96,15 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [templates, setTemplates] = useState<TemplateType[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>(Array(7).fill(''));
   const [selectedTemplate, setSelectedTemplate] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState(1); // 1: Path Selection, 2: Template Selection, 3: Form
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const token = Cookie.get('token');
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     fetchPages();
@@ -108,7 +113,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   const fetchPages = async () => {
     try {
-      // if url /add else if add-current-affair
       const response = await fetch(`${env.API}/page`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -118,7 +122,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setPages(data);
     } catch (error) {
       console.error('Error fetching pages:', error);
-      setError('Failed to load pages');
+      showToast('Failed to load pages. Please try again.', 'error');
     }
   };
 
@@ -135,7 +139,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching templates:', error);
-      setError('Failed to load templates');
+      showToast('Failed to load templates. Please try again.', 'error');
       setIsLoading(false);
     }
   };
@@ -235,7 +239,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
       // Validate content based on template type
       validateContentByTemplate(currentTemplate.id, pageData.content);
 
-
       // Prepare data for API submission
       const apiPageData = {
         ...pageData,
@@ -267,11 +270,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
       await fetchPages();
 
       // Show success message
-      setError(null);
-      alert("Page created successfully!");
+      showToast('Page created successfully!', 'success');
     } catch (error) {
       console.error('Error creating page:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create page');
+      showToast('Failed to create page. Please try again.', 'error');
     }
   };
 
@@ -477,6 +479,16 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
+          toast.type === 'success' 
+            ? 'bg-slate-900 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <p className="text-sm">{toast.message}</p>
+        </div>
+      )}
+      
       <div className="flex items-center justify-between mb-8">
         {[
           { number: 1, title: 'Select Path' },
@@ -506,12 +518,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
           </div>
         ))}
       </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600">
-          {error}
-        </div>
-      )}
 
       {renderStepContent()}
     </div>
