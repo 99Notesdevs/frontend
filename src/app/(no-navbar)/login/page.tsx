@@ -11,6 +11,7 @@ const Login = () => {
   const [secret, setSecret] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,11 +26,11 @@ const Login = () => {
         Cookies.set('token', response.data.data.token, { expires: 5 });
         router.push('/dashboard');
       } else {
-        alert(response.data.message);
+        setError("Using wrong credentials");
       }
     } catch (error) {
       console.log(error);
-      alert("An error occurred. Please try again later.");
+      setError("Using wrong credentials");
     }
   };
 
@@ -37,6 +38,11 @@ const Login = () => {
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-white px-4 sm:px-6">
       <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[340px] sm:max-w-sm border border-gray-200">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-4">Login</h2>
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm sm:text-base">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
             <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Username:</label>

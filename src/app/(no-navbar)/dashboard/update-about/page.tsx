@@ -53,6 +53,12 @@ export default function UpdateAboutPage() {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [tempContent, setTempContent] = useState<Partial<Content>>({});
   const [title, setTitle] = useState<string>("");
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const handleEditClick = (section: string) => {
     setEditingSection(section);
@@ -186,10 +192,10 @@ export default function UpdateAboutPage() {
       setContent(tempContent as Content);
       setTitle(title);
       setEditingSection(null);
-      alert("Section updated successfully!");
+      showToast("Section updated successfully!", "success");
     } catch (error) {
       console.error("Error updating section:", error);
-      alert("Failed to update the section.");
+      showToast("Failed to update the section.", "error");
     }
   };
 
@@ -202,6 +208,15 @@ export default function UpdateAboutPage() {
 
   return (
     <>
+      {toast && (
+        <div className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
+          toast.type === 'success' 
+            ? 'bg-slate-900 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <p className="text-sm">{toast.message}</p>
+        </div>
+      )}
       <header className="bg-slate-900 text-white shadow-md">
         <div className="container mx-auto px-6 py-4">
           <h1 className="text-2xl font-semibold">Dashboard - Update About Page</h1>

@@ -9,78 +9,90 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   const router = useRouter();
   const token = Cookies.get('token');
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        if (token) {
-          const res = await axios.get(`${env.API}/user/check`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          if (res.data.success) {
-            router.push('/users/dashboard');
+  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const checkUser = async () => {
+    try {
+      if (token) {
+        const res = await axios.get(`${env.API}/user/check`, {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-        }
-      } catch (error) {
-        console.error("Error checking user authentication: ", error);
-        if (axios.isAxiosError(error) && error.response?.status !== 200) {
-          console.warn("Unauthorized! Redirecting to login...");
-          Cookies.remove('token'); // Remove invalid token
-          window.location.href = "/users/login"; // Redirect user
-        } else {
-          if (axios.isAxiosError(error)) {
-            console.error("API Error:", error.response?.status, error.response?.data);
-          } else {
-            console.error("Unexpected Error:", error);
-          }
+        });
+        if (res.data.success) {
+          router.push('/users/dashboard');
         }
       }
-    };
+    } catch (error) {
+      console.error("Error checking user authentication: ", error);
+      if (axios.isAxiosError(error) && error.response?.status !== 200) {
+        console.warn("Unauthorized! Redirecting to login...");
+        Cookies.remove('token'); // Remove invalid token
+        window.location.href = "/users/login"; // Redirect user
+      } else {
+        if (axios.isAxiosError(error)) {
+          console.error("API Error:", error.response?.status, error.response?.data);
+        } else {
+          console.error("Unexpected Error:", error);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
     checkUser();
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage('');
     try {
-      const response = await axios.post(`${env.API}/user`, {
+      const response = await axios.post(`${env.API}/user/login`, {
         email,
         password,
       });
       if (response.data.success) {
         const data = response.data.data;
         if(!data) { 
-          setErrorMessage("No token received from server. Please try again later.");
+          showToast("No token received from server. Please try again later.", "error");
           return;
         }
         const cookie = data.split(' ')[1];
         Cookies.set('token', cookie, { expires: 5 });
         router.push('/users/dashboard');
+        showToast("Login successful!", "success");
       } else {
-        setErrorMessage(response.data.message);
+        showToast("Incorrect username or password.", "error");
       }
     } catch (error) {
       console.error("Error during login: ", error);
-      if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
-        setErrorMessage("Invalid email or password. Please try again.");
+      if (error instanceof Error) {
+        showToast("Incorrect username or password.", "error");
       } else {
-        setErrorMessage("An error occurred during login. Please try again later.");
+        showToast("An error occurred during login. Please try again later.", "error");
       }
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-white px-4 sm:px-8">
-      <div className="bg-white p-8 sm:p-10 rounded-xl h-100 shadow-lg w-full max-w-[500px] sm:max-w-lg border border-gray-200">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-4">Login</h2>
-        {errorMessage && (
-          <div className="text-red-500 text-sm mb-4 text-center">
-            {errorMessage}
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-white px-4 sm:px-6">
+      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[380px] sm:max-w-sm border border-gray-200">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-2">Login</h2>
+        {toast && (
+          <div className={`mb-4 p-3 rounded-lg shadow-sm transition-all duration-300 ${
+            toast.type === 'success' 
+              ? 'bg-slate-900 text-white' 
+              : toast.type === 'warning'
+              ? 'bg-yellow-500 text-white'
+              : 'bg-red-500 text-white'
+          }`}>
+            <p className="text-sm text-center">{toast.message}</p>
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">

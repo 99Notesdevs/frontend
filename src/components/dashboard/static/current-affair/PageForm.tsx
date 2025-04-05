@@ -38,7 +38,7 @@ interface PageFormProps {
 export function PageForm({ editPage = null }: PageFormProps) {
   // Step management
   const [step, setStep] = useState(1); // 1: Select Type, 2: Select/Create CurrentAffair, 3: Create Article
-  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   
   // Step 1: Type selection
   const [selectedType, setSelectedType] = useState<string>('daily');
@@ -61,6 +61,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
   });
   
   const token = Cookie.get('token');
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Fetch current affairs based on selected type
   useEffect(() => {
@@ -96,12 +101,12 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
       if (error instanceof Error) {
         if (error.name === 'TypeError') {
-          setError('Network error: Could not connect to the server. Please check your internet connection.');
+          showToast('Network error: Could not connect to the server. Please check your internet connection.', 'error');
         } else {
-          setError('Failed to load current affairs. Please check your network connection and try again.');
+          showToast('Failed to load current affairs. Please try again.', 'error');
         }
       } else {
-        setError('Failed to load current affairs. Please check your network connection and try again.');
+        showToast('Failed to load current affairs. Please try again.', 'error');
       }
     }
   };
@@ -158,18 +163,18 @@ export function PageForm({ editPage = null }: PageFormProps) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create current affair');
+        const errorData = await response.json().catch(() => ({ message: 'No error details available' }));
+        throw new Error(`Failed to create current affair: ${errorData.message || response.statusText}`);
       }
 
       const { data } = await response.json();
       setCurrentAffairs([...currentAffairs, data]);
       setSelectedAffairId(data.id.toString());
       setCreateNewAffair(false);
-      setStep(3);
+      showToast('Current affair created successfully!', 'success');
     } catch (error) {
       console.error('Error creating current affair:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create current affair');
+      showToast('Failed to create current affair. Please try again.', 'error');
     }
   };
 
@@ -210,7 +215,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         parentSlug: selectedAffair.slug
       };
 
-      const response = await fetch(`${env.API}/currentArticle`, {
+      const response = await fetch(`${env.API}/currentAffair/article`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,26 +225,28 @@ export function PageForm({ editPage = null }: PageFormProps) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create article');
+        const errorData = await response.json().catch(() => ({ message: 'No error details available' }));
+        throw new Error(`Failed to create article: ${errorData.message || response.statusText}`);
       }
 
-      // Reset form
+      showToast('Article created successfully!', 'success');
+      setStep(1);
+      setSelectedType('daily');
+      setSelectedAffairId('');
+      setCreateNewAffair(false);
+      setNewAffairData({
+        title: '',
+        content: '',
+        type: 'daily'
+      });
       setArticleData({
         title: '',
         content: '',
         author: ''
       });
-      setSelectedAffairId('');
-      setSelectedType('daily');
-      setStep(1);
-
-      // Show success message
-      setError(null);
-      alert('Article created successfully!');
     } catch (error) {
       console.error('Error creating article:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create article');
+      showToast('Failed to create article. Please try again.', 'error');
     }
   };
 
@@ -421,6 +428,16 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
+          toast.type === 'success' 
+            ? 'bg-slate-900 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <p className="text-sm">{toast.message}</p>
+        </div>
+      )}
+      
       <div className="flex items-center justify-between mb-8">
         {[
           { number: 1, title: 'Select Type' },
@@ -450,12 +467,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
           </div>
         ))}
       </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          {error}
-        </div>
-      )}
 
       {renderStepContent()}
     </div>
