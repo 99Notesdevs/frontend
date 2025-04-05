@@ -246,7 +246,6 @@ const DraggableTocButton: React.FC<DraggableTocButtonProps> = ({ className = '' 
         'border-gray-200',
         'rounded-sm',
         'lg:hidden',
-        'md:hidden',
         isTocVisible ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto',
         className,
       ].join(' ')}
