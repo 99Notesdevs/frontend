@@ -43,58 +43,51 @@ const ContactMap: React.FC = () => {
   };
 
   return (
-    <section className="py-10 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Contact Info Cards */}
-          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {Object.values(contactInfo).map((info, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg border border-gray-100 shadow-md p-6 flex items-start space-x-4 
-                          hover:shadow-2xl hover:shadow-orange-100 hover:border-orange-200 transform hover:scale-105 hover:-translate-y-2 
-                          transition-all duration-300 ease-in-out cursor-pointer"
-              >
-                <div className="flex-shrink-0 p-3 bg-orange-50 rounded-full">
-                  {info.icon}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {info.title}
-                  </h3>
-                  <p className="text-gray-600">
-                    <a 
-                      href={info.href} 
-                      target={info.title === 'Address' ? "_blank" : undefined}
-                      rel={info.title === 'Address' ? "noopener noreferrer" : undefined}
-                      className="hover:text-orange-500 transition-colors duration-300 relative 
-                                group inline-block"
-                    >
-                      {info.value}
-                      <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-orange-500 
-                                     group-hover:w-full transition-all duration-300"></span>
-                    </a>
-                  </p>
-                </div>
+    <div className="space-y-8">
+      {/* Contact Info Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {Object.values(contactInfo).map((info, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-lg border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all duration-300"
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className="flex-shrink-0 p-3 bg-orange-50 rounded-full mb-4">
+                {info.icon}
               </div>
-            ))}
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {info.title}
+              </h3>
+              <p className="text-gray-600">
+                <a 
+                  href={info.href} 
+                  target={info.title === 'Address' ? "_blank" : undefined}
+                  rel={info.title === 'Address' ? "noopener noreferrer" : undefined}
+                  className="hover:text-orange-500 transition-colors duration-300 inline-block"
+                >
+                  {info.value}
+                </a>
+              </p>
+            </div>
           </div>
+        ))}
+      </div>
 
-          {/* Map Section */}
-          <div className="lg:col-span-3 h-[500px] rounded-lg overflow-hidden shadow-lg border border-gray-200">
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7003.347428505327!2d77.18153009347897!3d28.639539652643215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03e216d2cca9%3A0x61c92a5509fc5a9c!2s99Notes%20Head%20Office%20-Best%20IAS%20Coaching%20Institute!5e0!3m2!1sen!2sin!4v1741270613524!5m2!1sen!2sin" 
-              className="w-full h-full"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="99Notes Location Map"
-            />
-          </div>
+      {/* Map Section */}
+      <div className="mt-8">
+        <div className="h-[400px] rounded-lg overflow-hidden shadow-lg border border-gray-200">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7003.347428505327!2d77.18153009347897!3d28.639539652643215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03e216d2cca9%3A0x61c92a5509fc5a9c!2s99Notes%20Head%20Office%20-Best%20IAS%20Coaching%20Institute!5e0!3m2!1sen!2sin!4v1741270613524!5m2!1sen!2sin" 
+            className="w-full h-full"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="99Notes Location Map"
+          />
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

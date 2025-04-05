@@ -44,7 +44,7 @@ const CurrentAffairsIndex = async () => {
           <meta name="description" content="Current Affairs for UPSC Civil Services Examination" />
         </Head>
 
-        <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="container mx-auto px-4 pt-12 max-w-5xl">
           {/* Daily Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
@@ -54,13 +54,13 @@ const CurrentAffairsIndex = async () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {dailyPages.map((page) => (
                 <Link key={page.id} href={`/${page.slug}`} className="group">
-                  <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[450px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
+                  <div className="rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[400px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
                       <div className="flex flex-col items-center mb-8">
                       <span className="mb-6 group-hover:text-yellow-600 transition-colors">
                           <Image src="/news.png" alt="News" width={50} height={50} />
                         </span>
-                        <h3 className="text-2xl font-semibold text-gray-800 group-hover:text-yellow-600 transition-colors text-center">
+                        <h3 className="text-2xl font-semibold text-gray-900 group-hover:text-yellow-600 transition-colors text-center">
                           {page.title}
                         </h3>
                       </div>
@@ -86,7 +86,7 @@ const CurrentAffairsIndex = async () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {monthlyPages.map((page) => (
                 <Link key={page.id} href={`/${page.slug}`} className="group">
-                  <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[450px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
+                  <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
                       <div className="flex flex-col items-center mb-8">
                         <span className="mb-6 group-hover:text-yellow-600 transition-colors">
@@ -118,7 +118,7 @@ const CurrentAffairsIndex = async () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {yearlyPages.map((page) => (
                 <Link key={page.id} href={`/${page.slug}`} className="group">
-                  <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[450px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
+                  <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
                       <div className="flex flex-col items-center mb-8">
                       <span className="mb-6 group-hover:text-yellow-600 transition-colors">
@@ -143,15 +143,10 @@ const CurrentAffairsIndex = async () => {
         </div>
 
         {/* Contact Section */}
-        <div className="bg-white py-12">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Contact Us</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <ContactMap />
-              <ContactForm />
-            </div>
+          <div className="container mx-auto max-w-2xl mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">Contact Us</h2>
+                <ContactForm />
           </div>
-        </div>
       </div>
     );
   } catch (error) {

@@ -49,7 +49,7 @@ const CurrentAffairArticlePage = async ({
   const article = await fetchArticle(category, articleSlug);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 pt-5">
       <div className="container max-w-7xl mx-auto px-4 py-8">
         <Head>
           <title>{article?.title || "Article"} | 99Notes</title>
@@ -208,20 +208,20 @@ const CurrentAffairArticlePage = async ({
                 </article>
               </div>
             </div>
-
-            {/* Right Sidebar - Enhanced */}
-            <div className="lg:col-span-4 hidden lg:block mt-5">
-              <div className="sticky top-24 bg-gradient-to-br from-gray-50 to-white 
-              rounded-2xl shadow-lg border border-gray-200/80 overflow-hidden">
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-6 text-gray-900 flex items-center 
-                  gap-2 pb-4 border-b border-gray-200/80">
-                    <span className="text-blue-600">📑</span>
-                    <span className="gradient-text">Table of Contents</span>
-                  </h2>
-                  <div className="space-y-1.5 max-h-[70vh] overflow-y-auto pr-2
-                  scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                    {article?.content && <TableOfContents content={article.content} />}
+            {/* Right Sidebar */}
+            <div className="lg:col-span-4 hidden lg:block space-y-4 sm:space-y-6 mt-12">
+              {/* Sticky Container */}
+              <div className="relative">
+                {/* TOC Section */}
+                <div className="sticky top-8 space-y-4 sm:space-y-6">
+                  <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
+                  transition-all duration-300 hover:shadow-xl">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
+                      📑 Table of Contents
+                    </h3>
+                    <div className="pr-2">
+                      <TableOfContents content={article?.content} />
+                    </div>
                   </div>
                 </div>
               </div>

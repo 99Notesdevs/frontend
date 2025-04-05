@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { env } from "@/config/env";
 import ContactForm from '../common/ContactForm/ContactForm';
 import SocialMedia from '../navigation/socialmedia';
+import Ads from "../navigation/Ads";
 
 interface CurrentAffairSection {
   id: number;
@@ -204,6 +205,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
         {/* Sidebar */}
         <aside className="w-full md:w-[320px] lg:w-[380px] flex-shrink-0">
           <nav className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl md:sticky md:top-8">
+           {/* Navigation section */}
             {loading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500" />
@@ -260,15 +262,22 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
               </section>
             )}
             
-            <footer className="border-t border-gray-200 bg-gray-50 p-6">
-              <ContactForm />
-              <div className="mt-6">
-                <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <span className="text-blue-500">🌐</span>
-                  <span>Follow Us</span>
+            <footer className="border-t border-gray-200 bg-gray-50 p-6 space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <span className="text-blue-600">📝</span>
+                  <span>Get in Touch</span>
                 </h3>
-                <SocialMedia />
+                <ContactForm />
               </div>
+              
+              <div className="space-y-4">
+                  <span className="text-black-600 font-bold text-2xl">🌐 Follow Us</span>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <SocialMedia />
+              </div>
+              </div>
+                <Ads imageUrl="/" altText="Advertisement" />
             </footer>
           </nav>
         </aside>
