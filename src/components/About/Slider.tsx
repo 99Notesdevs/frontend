@@ -10,7 +10,33 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
 
-  const imagesPerSlide = 3;
+  // Responsive images per slide based on screen size
+  const [imagesPerSlide, setImagesPerSlide] = useState(3);
+
+  // Update images per slide based on window size
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 640) {
+          setImagesPerSlide(1); // Mobile: 1 image
+        } else if (window.innerWidth < 1024) {
+          setImagesPerSlide(2); // Tablet: 2 images
+        } else {
+          setImagesPerSlide(3); // Desktop: 3 images
+        }
+      }
+    };
+
+    // Set initial value
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const totalSlides = Math.ceil(images.length / imagesPerSlide);
 
   useEffect(() => {
@@ -44,10 +70,10 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
   };
 
   return (
-    <div className="slider w-full relative">
+    <div className="slider w-full relative px-4 sm:px-2">
       {/* Main Images Display */}
       <div className="relative w-full">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {getCurrentSlideImages().map((image, idx) => (
             <div key={idx} className="relative aspect-[4/3] group overflow-hidden rounded-xl">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
@@ -71,35 +97,35 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
         </div>
       </div>
 
-      {/* Navigation Arrows */}
+      {/* Navigation Arrows - Adjusted for mobile */}
       <button 
         onClick={handlePrevClick}
-        className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
+        className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
         aria-label="Previous slide"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
       <button 
         onClick={handleNextClick}
-        className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
+        className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
         aria-label="Next slide"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
       {/* Navigation Dots */}
-      <div className="flex justify-center mt-6 space-x-2">
+      <div className="flex justify-center mt-4 sm:mt-6 space-x-2">
         {Array.from({ length: totalSlides }).map((_, index) => (
           <button
             key={index}
             onClick={() => handleDotClick(index)}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+            className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
               index === currentIndex 
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 w-5'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 w-4 sm:w-5'
                 : 'bg-gray-300 hover:bg-gray-400'
             }`}
             aria-label={`Go to slide ${index + 1}`}
@@ -107,18 +133,18 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
         ))}
       </div>
 
-      {/* Play/Pause Button */}
+      {/* Play/Pause Button - Adjusted for mobile */}
       <button
         onClick={() => setIsAutoPlay(!isAutoPlay)}
-        className="absolute bottom-4 right-4 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white transition-all duration-200 shadow-md z-30"
+        className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-6 h-6 sm:w-8 sm:h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white transition-all duration-200 shadow-md z-30"
         aria-label={isAutoPlay ? "Pause slideshow" : "Play slideshow"}
       >
         {isAutoPlay ? (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
           </svg>
         ) : (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
           </svg>
         )}
