@@ -62,13 +62,13 @@ function NestedNavigation({
               <div className={`absolute left-0 mt-0 w-[700px] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-gray-200 z-50 ${
                 item.slug === 'current-affairs' ? 'p-4' : ''
               }`}>
-                <div className={`${item.slug === 'current-affairs' ? 'grid grid-cols-4 gap-4' : 'flex h-full'}`}>
+                <div className={`${item.slug === 'current-affairs' ? 'grid grid-cols-3 gap-2' : 'flex h-full'}`}>
                   {item.slug === 'current-affairs' ? (
                     // Special layout for Current Affairs
                     item.children.map((child) => (
-                      <div key={child.slug} className="space-y-4">
-                        <div className="space-y-3">
-                          <h3 className="text-[15px] font-bold text-gray-900 pb-2 border-b border-gray-100 font-urbanist">
+                      <div key={child.slug} className="space-y-2">
+                        <div className="space-y-1">
+                          <h3 className="text-[15px] font-bold text-gray-900 pb-2 border-b border-gray-100 font-urbanist w-full">
                             {child.title}
                           </h3>
                           {child.children.length > 0 && (
@@ -77,7 +77,7 @@ function NestedNavigation({
                                 <Link
                                   key={grandChild.slug}
                                   href={`/${grandChild.slug}`}
-                                  className="block py-1.5 text-[13px] text-gray-600 hover:text-blue-600 transition-colors duration-150 hover:bg-gray-50 rounded px-2 flex items-center font-inter tracking-wide"
+                                  className="block w-full py-1.5 text-[13px] text-gray-600 hover:text-blue-600 transition-colors duration-150 hover:bg-gray-50 rounded px-3 flex items-center font-inter tracking-wide"
                                 >
                                   <svg 
                                     className="w-3 h-3 mr-2 fill-current opacity-80"
@@ -98,12 +98,12 @@ function NestedNavigation({
                     // Original layout for other dropdowns
                     <>
                       {/* Level 2 - Left column */}
-                      <div className="w-[250px] border-r border-gray-100 p-4 h-[350px] overflow-y-auto">
+                      <div className="w-[200px] border-r border-gray-100 p-4 h-[350px] overflow-y-auto">
                         {item.children.map((child) => (
                           <div key={child.slug} className="mb-2">
                             <Link
                               href={`/${child.slug}`}
-                              className="flex px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[14px] font-medium items-center justify-between font-urbanist tracking-wide"
+                              className="flex px-1 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[14px] font-medium items-center justify-between font-urbanist tracking-wide"
                               onMouseEnter={() => setOpenDropdown(child.slug)}
                             >
                               <span>{child.title}</span>
@@ -122,7 +122,7 @@ function NestedNavigation({
                       </div>
                       
                       {/* Level 3 and 4 - Right column */}
-                      <div className="flex-1 p-4 h-[350px] overflow-y-auto">
+                      <div className="flex-1 p-3 h-[350px] overflow-y-auto">
                         {openDropdown &&
                           items.map((parentItem) =>
                             parentItem.slug === hoveredParent &&
@@ -130,9 +130,9 @@ function NestedNavigation({
                               (child) =>
                                 child.slug === openDropdown && (
                                   <div key={child.slug}>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                       {child.children.map((grandChild) => (
-                                        <div key={grandChild.slug} className="mb-4">
+                                        <div key={grandChild.slug} className="mb-2">
                                           <Link
                                             href={`/${grandChild.slug}`}
                                             className="block px-2 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[13.5px] flex items-center font-inter tracking-wide"
@@ -147,12 +147,12 @@ function NestedNavigation({
                                             {grandChild.title}
                                           </Link>
                                           {grandChild.children.length > 0 && (
-                                            <div className="pl-3 mt-2 space-y-1 border-l-2 border-gray-100">
+                                            <div className="pl-2 mt-1 space-y-1 border-l-2 border-gray-100">
                                               {grandChild.children.map((greatGrandChild) => (
                                                 <Link
                                                   key={greatGrandChild.slug}
                                                   href={`/${greatGrandChild.slug}`}
-                                                  className="flex px-3 py-1 text-[12.5px] font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 items-center font-inter tracking-wide"
+                                                  className="flex px-1 py-1 text-[12.5px] font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 items-center font-inter tracking-wide"
                                                 >
                                                   <svg 
                                                     className="w-3 h-3 mr-2 fill-current"
@@ -285,10 +285,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                 <NestedNavigation items={navigation} />
                 <Link href="/about" passHref>
                   <span
-                    className={`text-[14px] whitespace-nowrap font-bold tracking-wide py-6 px-2 xl:px-3 
-                            transition-all duration-300 relative after:absolute after:bottom-5 after:left-2 
-                            after:w-[calc(100%-16px)] after:h-0.5 after:bg-blue-600 after:transform after:scale-x-0 
-                            after:transition-transform after:duration-300 hover:after:scale-x-100 ${
+                    className={`text-[14px] whitespace-nowrap font-bold tracking-wide py-6 px-2 xl:px-3 transition-colors duration-300 ${
                       isScrolled
                         ? "text-gray-800 hover:text-blue-700"
                         : "text-gray-700 hover:text-blue-600"
@@ -411,7 +408,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                         <div className="flex items-center justify-between">
                           <Link
                             href={`/${child.slug}`}
-                            className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+                            className="block px-3 py-2.5 text-base font-medium text-gray-800 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600"
                             onClick={() => setIsOpen(false)}
                           >
                             {child.title}
@@ -441,7 +438,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                                 <div className="flex items-center justify-between">
                                   <Link
                                     href={`/${grandChild.slug}`}
-                                    className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md"
+                                    className="block px-4 py-2 text-sm font-normal text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600"
                                     onClick={() => setIsOpen(false)}
                                   >
                                     {grandChild.title}
@@ -470,7 +467,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                                       <Link
                                         key={greatGrandChild.slug}
                                         href={`/${greatGrandChild.slug}`}
-                                        className="block px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md"
+                                        className="block px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600"
                                         onClick={() => setIsOpen(false)}
                                       >
                                         {greatGrandChild.title}
@@ -489,14 +486,14 @@ export default function Navbar({ navigation }: NavbarProps) {
               </div>
             ))}
             
-            {/* About and Blogs links remain unchanged */}
+            {/* About and Blogs */}
             <Link href="/about" passHref>
-              <span className="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50 rounded-md" onClick={() => setIsOpen(false)}>
+              <span className="block px-3 py-2.5 text-base font-medium text-gray-800 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600" onClick={() => setIsOpen(false)}>
                 About 99Notes
               </span>
             </Link>
             <Link href="/blogs" passHref>
-              <span className="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50 rounded-md" onClick={() => setIsOpen(false)}>
+              <span className="block px-3 py-2.5 text-base font-medium text-gray-800 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600" onClick={() => setIsOpen(false)}>
                 Blogs
               </span>
             </Link>
