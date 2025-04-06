@@ -38,17 +38,10 @@ export const UpscNotesTemplate: React.FC<UpscNotesTemplateProps> = ({
 }) => {
 
   const { title, content } = page;
-  const jsonContent = JSON.parse(content);
 
-  if (!jsonContent || typeof jsonContent !== "object") {
-    console.error("Invalid content structure:", content);
-    return <div>Error: Invalid content structure</div>;
+  if (!content) {
+    return <div>Error: No content available</div>;
   }
-
-  const {
-    content: mainContent = "",
-  } = jsonContent;
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -108,12 +101,12 @@ export const UpscNotesTemplate: React.FC<UpscNotesTemplateProps> = ({
             <article className="bg-white border border-blue-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
               <h1 className="text-4xl sm:text-4xl font-bold mb-8 text-center">
                 <span className="text-indigo-900 border-b-2 border-yellow-400 pb-2">
-                  {title}
+                  {page.title}
                 </span>
               </h1>
 
               <div className="flex flex-wrap gap-2 mb-8 justify-center">
-                {Array.isArray(metadata?.keywords) ? metadata.keywords.map((keyword: string, index: number) => (
+                {Array.isArray(page.metadata?.keywords) ? page.metadata.keywords.map((keyword: string, index: number) => (
                   <Badge
                   key={index}
                   variant="secondary"
@@ -124,54 +117,50 @@ export const UpscNotesTemplate: React.FC<UpscNotesTemplateProps> = ({
                 )) : null}
               </div>
 
-              {mainContent ? (
-                <div
-                  className="prose prose-lg max-w-none
-                    prose-headings:font-bold 
-                    prose-headings:text-center
-                    prose-headings:mb-6
-                    prose-h1:border-b 
-                    prose-h1:border-yellow-500 
-                    prose-h1:pb-2 
-                    prose-h1:text-3xl
-                    prose-h2:border-b 
-                    prose-h2:border-yellow-500 
-                    prose-h2:pb-2 
-                    prose-h2:text-2xl
-                    prose-h3:text-xl
-                    prose-h3:border-0
-                    prose-h4:border-0
-                    prose-h5:border-0
-                    prose-h6:border-0
-                    prose-p:text-gray-700
-                    prose-p:leading-relaxed
-                    prose-p:my-4
-                    prose-a:text-blue-600 
-                    prose-a:no-underline 
-                    hover:prose-a:text-blue-500
-                    prose-a:transition-colors
-                    prose-strong:text-gray-800
-                    prose-ul:list-disc
-                    prose-ul:pl-6
-                    prose-ul:my-4
-                    prose-ol:pl-6
-                    prose-ol:my-4
-                    prose-li:marker:text-gray-500
-                    prose-li:mb-2
-                    prose-blockquote:border-l-4
-                    prose-blockquote:border-gray-300
-                    prose-blockquote:bg-gray-50
-                    prose-blockquote:p-4
-                    prose-blockquote:rounded-r-lg
-                    prose-blockquote:my-6
-                    prose-img:rounded-lg
-                    prose-img:shadow-md
-                    prose-img:my-8"
-                  dangerouslySetInnerHTML={{ __html: mainContent }}
-                />
-              ) : (
-                <div className="text-red-500 text-center font-medium">No content available</div>
-              )}
+              <div
+                className="prose prose-lg max-w-none
+                  prose-headings:font-bold 
+                  prose-headings:text-center
+                  prose-headings:mb-6
+                  prose-h1:border-b 
+                  prose-h1:border-yellow-500 
+                  prose-h1:pb-2 
+                  prose-h1:text-3xl
+                  prose-h2:border-b 
+                  prose-h2:border-yellow-500 
+                  prose-h2:pb-2 
+                  prose-h2:text-2xl
+                  prose-h3:text-xl
+                  prose-h3:border-0
+                  prose-h4:border-0
+                  prose-h5:border-0
+                  prose-h6:border-0
+                  prose-p:text-gray-700
+                  prose-p:leading-relaxed
+                  prose-p:my-4
+                  prose-a:text-blue-600 
+                  prose-a:no-underline 
+                  hover:prose-a:text-blue-500
+                  prose-a:transition-colors
+                  prose-strong:text-gray-800
+                  prose-ul:list-disc
+                  prose-ul:pl-6
+                  prose-ul:my-4
+                  prose-ol:pl-6
+                  prose-ol:my-4
+                  prose-li:marker:text-gray-500
+                  prose-li:mb-2
+                  prose-blockquote:border-l-4
+                  prose-blockquote:border-gray-300
+                  prose-blockquote:bg-gray-50
+                  prose-blockquote:p-4
+                  prose-blockquote:rounded-r-lg
+                  prose-blockquote:my-6
+                  prose-img:rounded-lg
+                  prose-img:shadow-md
+                  prose-img:my-8"
+                dangerouslySetInnerHTML={{ __html: content }}
+              />
             </article>
           </main>
         </div>

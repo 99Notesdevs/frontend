@@ -1,9 +1,30 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../layout/sidebar';
+import { isAuth } from '@/lib/isAuth';
+import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isAuthenticated = await isAuth();
+      if (!isAuthenticated) {
+        router.push('/users/login');
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, [router]);
+ 
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col md:flex-row bg-gradient-to-br from-gray-50 to-yellow-50 min-h-screen">

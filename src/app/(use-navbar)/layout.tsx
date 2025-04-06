@@ -6,7 +6,7 @@ import Footer from "@/components/Footer/Footer";
 import { getNavigationTree, getFooterLinks } from "@/lib/navigation";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin"]
 });
 
 export const metadata: Metadata = {
@@ -19,6 +19,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  
+
   const navigation = await getNavigationTree();
   const footerSections = await getFooterLinks();
 

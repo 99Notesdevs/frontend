@@ -63,8 +63,7 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const parentId = page.slug;
 
   // Safely cast content to ArticleContent with fallbacks
-  const articleContent = JSON.parse(content as unknown as string);
-  const mainContent = articleContent.content || "";
+  const mainContent = content ? JSON.parse(content) : "";
 
   const { tags, date, readTime, coverImage } = metadata as {
     tags?: string[];
@@ -74,18 +73,23 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   };
 
   // Use either the content image or the metadata coverImage
-  const displayImage = articleContent.image || coverImage;
+  const displayImage = coverImage;
 
   // Function to process content and handle lock tags
   const processContent = (content: string) => {
-    const parts = content.split(/(<lock>.*?<\/lock>)/g);
-    return parts.map((part, index) => {
-      if (part.startsWith("<lock>")) {
-        const content = part.replace(/<lock>|<\/lock>/g, "");
-        return <LockContent key={index}>{content}</LockContent>;
-      }
-      return <div key={index} dangerouslySetInnerHTML={{ __html: part }} />;
-    });
+    try {
+      const parts = content.split(/(<lock>.*?<\/lock>)/g);
+      return parts.map((part, index) => {
+        if (part.startsWith("<lock>")) {
+          const content = part.replace(/<lock>|<\/lock>/g, "");
+          return <LockContent key={index}>{content}</LockContent>;
+        }
+        return <div key={index} dangerouslySetInnerHTML={{ __html: part }} />;
+      });
+    } catch (error) {
+      console.error('Error processing content:', error);
+      return <div>{content}</div>;
+    }
   };
 
   return (
@@ -169,20 +173,6 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 >
                   {title}
                 </h1>
-                {date && (
-                  <div className="text-gray-600 mb-2">
-                    {new Date(date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </div>
-                )}
-                {readTime && (
-                  <div className="text-gray-500 text-sm">
-                    ⏱️ {readTime} read
-                  </div>
-                )}
               </div>
 
               <div
@@ -306,7 +296,7 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                   transition-all duration-300 hover:shadow-xl"
                   >
                     <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
-                      🏷️ Tags
+                      🏷 Tags
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag) => (

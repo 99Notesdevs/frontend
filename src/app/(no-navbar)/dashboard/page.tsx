@@ -140,6 +140,27 @@ export default function Dashboard() {
                   </div>
                 </div>
               </button>
+              {/* Edit button*/}
+              <button
+                onClick={() => router.push("/dashboard/editcurrent")}
+                className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50"
+              >
+                <div className="relative flex items-center gap-4 px-8 py-5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
+                    <FaEdit className="h-6 w-6 text-slate-700" />
+                  </div>
+                  <div className="text-left">
+                    <h3
+                      className={`${plusJakarta.className} text-[1.125rem] font-semibold tracking-wide text-slate-800 mb-0.5`}
+                    >
+                      Edit Current Affairs
+                    </h3>
+                    <p className="text-[0.875rem] leading-5 text-slate-600">
+                      Modify existing content
+                    </p>
+                  </div>
+                </div>
+              </button>
 
               {/* Manage Forms button */}
               <button

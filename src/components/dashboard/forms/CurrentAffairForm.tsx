@@ -16,9 +16,10 @@ type CurrentAffairFormValues = z.infer<typeof currentAffairSchema>;
 
 interface CurrentAffairFormProps {
   onSubmit: (data: CurrentAffairFormValues) => void;
+  defaultValues?: CurrentAffairFormValues;
 }
 
-export const CurrentAffairForm: React.FC<CurrentAffairFormProps> = ({ onSubmit }) => {
+export const CurrentAffairForm: React.FC<CurrentAffairFormProps> = ({ onSubmit, defaultValues }) => {
   const form = useForm<CurrentAffairFormValues>({
     resolver: zodResolver(currentAffairSchema),
     defaultValues: {

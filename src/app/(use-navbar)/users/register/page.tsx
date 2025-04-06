@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
+import { isNotAuth } from "@/lib/isAuth";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -200,4 +201,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default isNotAuth(Register);

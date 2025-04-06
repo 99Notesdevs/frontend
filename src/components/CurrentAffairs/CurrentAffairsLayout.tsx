@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -47,12 +47,16 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
     'Yearly Current Affairs': false
   });
 
-  const toggleSection = (sectionTitle: string) => {
+  // Memoize the toggleSection function to prevent unnecessary re-renders
+  const memoizedToggleSection = useCallback((sectionTitle: string) => {
     setExpandedSections(prev => ({
       ...prev,
       [sectionTitle]: !prev[sectionTitle]
     }));
-  };
+  }, []);
+
+  // Memoize the children to prevent unnecessary re-renders
+  const memoizedChildren = useMemo(() => children, [children]);
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -66,21 +70,21 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          cache: 'no-store' // Don't cache the response
+          next: { revalidate: 3600 } // Revalidate every hour
         });
 
         const monthlyResponse = await fetch(`${env.API}/currentAffair/type/monthly`, {
           headers: {
             "Content-Type": "application/json",
           },
-          cache: 'no-store'
+          next: { revalidate: 3600 } // Revalidate every hour
         });
 
         const yearlyResponse = await fetch(`${env.API}/currentAffair/type/yearly`, {
           headers: {
             "Content-Type": "application/json",
           },
-          cache: 'no-store'
+          next: { revalidate: 3600 } // Revalidate every hour
         });
 
         // Combine all the responses
@@ -197,7 +201,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
         <div className="flex flex-col md:hidden">
           <main className="flex-1">
             <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg p-6 md:p-8 transition-all duration-300 hover:shadow-xl">
-              {children}
+              {memoizedChildren}
             </article>
           </main>
         </div>
@@ -215,7 +219,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
                 {navSections.map((section, sectionIndex) => (
                   <article key={sectionIndex} className="border-b border-gray-200 pb-4 last:border-b-0">
                     <button
-                      onClick={() => toggleSection(section.title)}
+                      onClick={() => memoizedToggleSection(section.title)}
                       className="w-full flex items-center justify-between px-4 py-3 text-base font-semibold text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
                     >
                       <span className="flex items-center gap-2">
@@ -286,7 +290,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
         <div className="hidden md:flex flex-1">
           <main className="w-full">
             <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg p-6 md:p-8 transition-all duration-300 hover:shadow-xl">
-              {children}
+              {memoizedChildren}
             </article>
           </main>
         </div>
