@@ -1,5 +1,5 @@
 import React from 'react';
-import ContactForm from '@/components/ui/ContactForm';
+import ContactForm from "@/components/common/ContactForm/ContactForm";
 import AccordionItem from '@/components/ui/AccordionItem';
 
 const CoachingInfo = () => {

@@ -1,5 +1,6 @@
 'use client';
 
+import { env } from '@/config/env';
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaPhone, FaComment } from 'react-icons/fa';
 
@@ -72,7 +73,26 @@ const ContactForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const data = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.mobile,
+        message: formData.message
+      }
+      const response = await fetch(`${env.API}/form`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const result = await response.json();
+      if(!result.success) {
+        throw new Error('Form submission failed');
+      }
       setSubmitStatus('success');
       setFormData({ name: '', email: '', mobile: '', message: '' });
       setTimeout(() => setSubmitStatus(''), 3000);

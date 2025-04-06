@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
 import { env } from '@/config/env';
-import ContactForm from '@/components/ui/ContactForm';
+import ContactForm from "@/components/common/ContactForm/ContactForm";
 
 interface CurrentAffairPage {
   id: string;

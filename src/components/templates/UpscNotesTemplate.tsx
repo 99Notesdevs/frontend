@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
-import ContactForm from "@/components/ui/ContactForm";
+import ContactForm from "@/components/common/ContactForm/ContactForm";
 import SidebarNavigation from "@/components/navigation/SidebarNavigation";
 import SocialMedia from "@/components/navigation/socialmedia";
 import { metadata } from "@/app/(use-navbar)/layout";
