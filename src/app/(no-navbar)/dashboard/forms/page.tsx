@@ -7,7 +7,7 @@ import { env } from "@/config/env";
 import Cookies from "js-cookie";
 
 interface Form {
-  id: string;
+  id: number; // Numeric ID
   name: string;
   email: string;
   phone: string;
@@ -18,9 +18,9 @@ interface Form {
 const FormsPage = () => {
   const [forms, setForms] = useState<Form[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingIds, setDeletingIds] = useState<number[]>([]);
+  const [selectedFormIds, setSelectedFormIds] = useState<number[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
   const token = Cookies.get("token");
   const backendUrl = `${env.API}/form`;
 
@@ -45,23 +45,26 @@ const FormsPage = () => {
     }
   };
 
-  // Delete a form by ID
-  const deleteForm = async (id: string) => {
-    setDeletingId(id);
+  // Delete multiple forms by IDs
+  const deleteForms = async (ids: number[]) => {
+    setDeletingIds(ids);
     try {
-      const response = await fetch(`${backendUrl}/${id}`, {
-        method: "DELETE",
+      const response = await fetch(`${backendUrl}/bulk-delete`, {
+        method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ ids }),
       });
-      if (!response.ok) throw new Error("Failed to delete form");
-      setForms((prev) => prev.filter((form) => form.id !== id));
+      if (!response.ok) throw new Error("Failed to delete forms");
+      setForms((prev) => prev.filter((form) => !ids.includes(form.id)));
     } catch (error) {
-      console.error("Error deleting form:", error);
+      console.error("Error deleting forms:", error);
     } finally {
-      setDeletingId(null);
+      setDeletingIds([]);
       setShowConfirmModal(false);
+      setSelectedFormIds([]);
     }
   };
 
@@ -69,15 +72,26 @@ const FormsPage = () => {
     fetchForms();
   }, []);
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedFormId(id);
+  const handleSelectForm = (id: number) => {
+    setSelectedFormIds((prev) =>
+      prev.includes(id) ? prev.filter((formId) => formId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedFormIds.length === forms.length) {
+      setSelectedFormIds([]);
+    } else {
+      setSelectedFormIds(forms.map((form) => form.id));
+    }
+  };
+
+  const handleDeleteSelected = () => {
     setShowConfirmModal(true);
   };
 
   const handleConfirmDelete = () => {
-    if (selectedFormId) {
-      deleteForm(selectedFormId);
-    }
+    deleteForms(selectedFormIds);
   };
 
   return (
@@ -96,75 +110,83 @@ const FormsPage = () => {
             <p>No forms have been submitted yet.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-            <table className="min-w-full border-collapse">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Mobile
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Message
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Submitted At
-                  </th>
-                  <th className="px-6 py-3 text-center text-sm font-medium text-gray-600">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {forms.map((form) => (
-                  <tr key={form.id} className="border-t">
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      {form.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      <a
-                        href={`mailto:${form.email}`}
-                        className="text-blue-500 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {form.email}
-                      </a>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      {form.phone}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      {form.message}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(form.createdAt).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <Button
-                        variant="destructive"
-                        className="flex items-center justify-center gap-2"
-                        onClick={() => handleDeleteClick(form.id)}
-                        disabled={deletingId === form.id}
-                      >
-                        {deletingId === form.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash className="h-4 w-4" />
-                        )}
-                        Delete
-                      </Button>
-                    </td>
+          <>
+            <div className="flex justify-end mb-4">
+              <Button
+                variant="destructive"
+                onClick={handleDeleteSelected}
+                disabled={selectedFormIds.length === 0}
+              >
+                <Trash className="h-4 w-4 mr-2" />
+                Delete Selected
+              </Button>
+            </div>
+            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+              <table className="min-w-full border-collapse">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedFormIds.length === forms.length}
+                        onChange={handleSelectAll}
+                      />
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                      Mobile
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                      Message
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                      Submitted At
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {forms.map((form) => (
+                    <tr key={form.id} className="border-t">
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedFormIds.includes(form.id)}
+                          onChange={() => handleSelectForm(form.id)}
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800">
+                        {form.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800">
+                        <a
+                          href={`mailto:${form.email}`}
+                          className="text-blue-500 hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {form.email}
+                        </a>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800">
+                        {form.phone}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800">
+                        {form.message}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {new Date(form.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
@@ -176,8 +198,8 @@ const FormsPage = () => {
               Confirm Deletion
             </h2>
             <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete this form? This action cannot be
-              undone.
+              Are you sure you want to delete the selected forms? This action
+              cannot be undone.
             </p>
             <div className="flex justify-end gap-4">
               <Button
@@ -189,9 +211,9 @@ const FormsPage = () => {
               <Button
                 variant="destructive"
                 onClick={handleConfirmDelete}
-                disabled={deletingId === selectedFormId}
+                disabled={deletingIds.length > 0}
               >
-                {deletingId === selectedFormId ? (
+                {deletingIds.length > 0 ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   "Delete"
