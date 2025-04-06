@@ -25,12 +25,7 @@ interface ParentPage {
   // Add other properties that might be needed
 }
 
-interface PageListProps {
-  pages: CurrentAffairArticleType[];
-  selectedType: string; // Add selectedType property to the interface
-}
-
-export function PageListArticles({ selectedType }: PageListProps) {
+export default function PageListArticles() {
   const [selectedPage, setSelectedPage] = useState<CurrentAffairArticleType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -230,9 +225,9 @@ export function PageListArticles({ selectedType }: PageListProps) {
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                {page.content ? page.content.substring(0, 100) : 'No content available'}...
-              </p>
+              <div className="text-gray-600 text-sm mb-4">
+                {page.content ? <p dangerouslySetInnerHTML={{ __html: page.content.substring(0, 100)}}></p> : 'No content available'}...
+              </div>
 
               <div className="flex justify-end space-x-2">
                 <Button
@@ -330,5 +325,3 @@ export function PageListArticles({ selectedType }: PageListProps) {
     </div>
   );
 }
-
-export default PageListArticles;

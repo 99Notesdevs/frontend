@@ -28,7 +28,7 @@ interface CurrentAffairArticleType {
   parentSlug: string;
 }
 
-export function PageListCurrent() {
+export default function PageListCurrent() {
   const [selectedPage, setSelectedPage] = useState<CurrentAffairType |null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -345,5 +345,3 @@ export function PageListCurrent() {
     </div>
   );
 }
-
-export default PageListCurrent;
