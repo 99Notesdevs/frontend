@@ -19,6 +19,8 @@ const FormsPage = () => {
   const [forms, setForms] = useState<Form[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
   const token = Cookies.get("token");
   const backendUrl = `${env.API}/form`;
 
@@ -30,7 +32,7 @@ const FormsPage = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!response.ok) throw new Error("Failed to fetch forms");
@@ -50,8 +52,8 @@ const FormsPage = () => {
       const response = await fetch(`${backendUrl}/${id}`, {
         method: "DELETE",
         headers: {
-            "Authorization": `Bearer ${token}`,
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!response.ok) throw new Error("Failed to delete form");
       setForms((prev) => prev.filter((form) => form.id !== id));
@@ -59,12 +61,24 @@ const FormsPage = () => {
       console.error("Error deleting form:", error);
     } finally {
       setDeletingId(null);
+      setShowConfirmModal(false);
     }
   };
 
   useEffect(() => {
     fetchForms();
   }, []);
+
+  const handleDeleteClick = (id: string) => {
+    setSelectedFormId(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (selectedFormId) {
+      deleteForm(selectedFormId);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -135,7 +149,7 @@ const FormsPage = () => {
                       <Button
                         variant="destructive"
                         className="flex items-center justify-center gap-2"
-                        onClick={() => deleteForm(form.id)}
+                        onClick={() => handleDeleteClick(form.id)}
                         disabled={deletingId === form.id}
                       >
                         {deletingId === form.id ? (
@@ -153,6 +167,40 @@ const FormsPage = () => {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-lg font-bold text-gray-800 mb-4">
+              Confirm Deletion
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete this form? This action cannot be
+              undone.
+            </p>
+            <div className="flex justify-end gap-4">
+              <Button
+                variant="secondary"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={deletingId === selectedFormId}
+              >
+                {deletingId === selectedFormId ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Delete"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
