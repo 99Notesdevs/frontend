@@ -64,7 +64,7 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
 
   // Safely cast content to ArticleContent with fallbacks
   const articleContent = JSON.parse(content as unknown as string);
-  const mainContent = articleContent.content.mainContent || "";
+  const mainContent = articleContent.content || "";
 
   const { tags, date, readTime, coverImage } = metadata as {
     tags?: string[];

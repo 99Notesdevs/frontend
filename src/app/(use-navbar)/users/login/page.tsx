@@ -53,7 +53,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${env.API}/user/login`, {
+      const response = await axios.post(`${env.API}/user/`, {
         email,
         password,
       });

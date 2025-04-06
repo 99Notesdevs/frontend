@@ -106,7 +106,7 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
       headers: {
         "Content-Type": "application/json",
       },
-      cache: 'no-store'
+      next: {revalidate: 3600} 
     });
 
     // Fetch monthly sections
@@ -114,7 +114,7 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
       headers: {
         "Content-Type": "application/json",
       },
-      cache: 'no-store'
+      next: {revalidate: 3600} 
     });
 
     // Fetch yearly sections
@@ -122,7 +122,7 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
       headers: {
         "Content-Type": "application/json",
       },
-      cache: 'no-store'
+      next: {revalidate: 3600} 
     });
 
     // Process daily sections

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { env } from '@/config/env';
 import ContactForm from '@/components/ui/ContactForm';
-import ContactMap from '@/components/ui/ContactMap';
 
 interface CurrentAffairPage {
   id: string;

@@ -182,6 +182,52 @@ export function PageForm({ editPage = null }: PageFormProps) {
     return selectedLevels.filter(Boolean).pop() || null;
   };
 
+  const handleImageUpload = async (content: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    const imgTags = doc.querySelectorAll('img');
+
+    for(const img of imgTags) {
+      const src = img.getAttribute('src');
+      if(!src) continue;
+
+      const isBlob = src.startsWith('blob:');
+      const isBase64 = src.startsWith('data:image');
+
+      if(isBlob || isBase64) {
+        try {
+          const response = await fetch(src);
+          const blob = await response.blob();
+          const formData = new FormData();
+          formData.append('file', blob, 'image.png');
+
+          // const uploadResponse = await fetch(`${env.API}/aws/imageUpload`, {
+          //   method: 'POST',
+          //   headers: {
+          //     Authorization: `Bearer ${token}`
+          //   },
+          //   body: formData,
+          // });
+
+          // if (!uploadResponse.ok) {
+          //   throw new Error('Failed to upload image');
+          // }
+
+          // const { data } = await uploadResponse.json();
+          // const url = data?.url || '';
+          img.setAttribute('src', "flow is working");
+        } catch (error: unknown) {
+          if(error instanceof Error) {
+            console.error('Error uploading image:', error.message);
+          }
+          showToast('Failed to upload image. Please try again.', 'error');
+        }
+      }
+
+      return doc.body.innerHTML;
+    }
+  }
+
   const handleSubmit = async (formData: PageFormData) => {
     try {
       const parentId = getSelectedParentId();
@@ -215,6 +261,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
       // Calculate the correct level based on the path depth
       // This ensures the level in the database matches the actual path depth
       const pathLevel = selectedLevels.filter(Boolean).length + 1;
+
+      // @ts-ignore
+      console.log(formData.content);
+        // @ts-ignore
+      await handleImageUpload(formData.content);
 
       // Create the page data based on template type
       const pageData = {

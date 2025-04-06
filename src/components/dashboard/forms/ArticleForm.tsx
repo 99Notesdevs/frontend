@@ -1,21 +1,19 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import TiptapEditor from '@/components/ui/tiptapeditor';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import Image from 'next/image';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import TiptapEditor from "@/components/ui/tiptapeditor";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 const articleSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  content: z.object({
-    mainContent: z.string().min(1, 'Main content is required'),
-    image: z.string().optional(),
-  }),
+  title: z.string().min(2, "Title must be at least 2 characters"),
+  content: z.string().min(10, "Content must be at least 10 characters"),
+  image: z.string().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -30,7 +28,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   onSubmit,
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(
-    initialData?.content?.image || null
+    initialData?.image || null
   );
 
   const {
@@ -42,16 +40,14 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   } = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
     defaultValues: initialData || {
-      title: '',
-      content: {
-        mainContent: '',
-        image: '',
-      },
+      title: "",
+      content: "",
+      image: "",
     },
   });
 
   const handleEditorChange = (content: string) => {
-    setValue('content.mainContent', content, { shouldValidate: true });
+    setValue("content", content, { shouldValidate: true });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +57,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       reader.onloadend = () => {
         const result = reader.result as string;
         setImagePreview(result);
-        setValue('content.image', result, { shouldValidate: true });
+        setValue("image", result, { shouldValidate: true });
       };
       reader.readAsDataURL(file);
     }
@@ -72,12 +68,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       {/* Title */}
       <div>
         <Label htmlFor="title">Title</Label>
-        <Input
-          type="text"
-          id="title"
-          {...register('title')}
-          className="mt-1"
-        />
+        <Input type="text" id="title" {...register("title")} className="mt-1" />
         {errors.title && (
           <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
         )}
@@ -93,7 +84,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           onChange={handleImageChange}
           className="mt-1"
         />
-        
+
         {imagePreview && (
           <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
             <Image
@@ -111,12 +102,12 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         <Label>Main Content</Label>
         <div className="mt-1">
           <TiptapEditor
-            content={watch('content.mainContent')}
+            content={watch("content")}
             onChange={handleEditorChange}
           />
         </div>
-        {errors.content?.mainContent && (
-          <p className="mt-1 text-sm text-red-600">{errors.content.mainContent.message}</p>
+        {errors.content && (
+          <p className="mt-1 text-sm text-red-600">{errors.content.message}</p>
         )}
       </div>
 
