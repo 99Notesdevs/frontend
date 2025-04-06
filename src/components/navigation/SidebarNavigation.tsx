@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { env } from '@/config/env';
 
 interface PageItem {
   id: string;
@@ -33,11 +34,11 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       try {
         setLoading(true);
         const normalizedBasePath = basePath.startsWith('/') ? basePath.substring(1) : basePath;
-        const response = await fetch(`/api/pages?basePath=${normalizedBasePath}`);
+        const response = await fetch(`${env.API}/page/navigation?basePath=${normalizedBasePath}`);
         if (!response.ok) {
           throw new Error('Failed to fetch pages');
         }
-        const data = await response.json();
+        const { data } = await response.json();
         
         if (data.length === 0 && normalizedBasePath) {
           const allPagesResponse = await fetch('/api/pages');
