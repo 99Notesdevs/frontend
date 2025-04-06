@@ -238,7 +238,9 @@ export function PageListCurrent() {
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
-              <p className="text-gray-600 text-sm mb-4">{page.content.substring(0, 100)}...</p>
+              <p className="text-gray-600 text-sm mb-4">
+                {page.content ? page.content.substring(0, 100) + '...' : 'No content available'}
+              </p>
 
               <div className="flex justify-end space-x-2">
                 <Button

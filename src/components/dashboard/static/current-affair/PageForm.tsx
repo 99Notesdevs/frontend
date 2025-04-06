@@ -215,7 +215,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         parentSlug: selectedAffair.slug
       };
 
-      const response = await fetch(`${env.API}/currentArticle/`, {
+      const response = await fetch(`${env.API}/currentArticle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

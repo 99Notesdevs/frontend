@@ -63,8 +63,18 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     }
   };
 
+  const handleSubmitForm = (data: ArticleFormData) => {
+    // Transform the form data to match the expected page structure
+    const transformedData = {
+      title: data.title,
+      content: data.content,
+      image: data.image || undefined
+    };
+    onSubmit(transformedData);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-6">
       {/* Title */}
       <div>
         <Label htmlFor="title">Title</Label>

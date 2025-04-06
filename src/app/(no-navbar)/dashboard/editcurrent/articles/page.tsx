@@ -156,10 +156,6 @@ export function PageListArticles({ selectedType }: PageListProps) {
         setError('Content is required and must be a string');
         return;
       }
-      if (!formData.parentSlug || typeof formData.parentSlug !== 'string') {
-        setError('Parent slug is required and must be a string');
-        return;
-      }
       if (!formData.author || typeof formData.author !== 'string') {
         setError('Author is required and must be a string');
         return;
@@ -168,7 +164,7 @@ export function PageListArticles({ selectedType }: PageListProps) {
       const updateData = {
         title: formData.title,
         content: formData.content,
-        parentSlug: formData.parentSlug,
+        parentSlug: selectedPage.parentSlug,
         slug,
         author: formData.author
       };

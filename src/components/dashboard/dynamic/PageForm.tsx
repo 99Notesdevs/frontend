@@ -62,12 +62,6 @@ interface GeneralStudiesContent {
   sources?: string;
 }
 
-interface StudyMaterialContent {
-  title: string;
-  subject: string;
-  content: string;
-}
-
 interface PageFormData extends Record<string, any> {
   title?: string;
   hero?: {
@@ -273,7 +267,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         slug: fullPath,
         templateId: currentTemplate.id,
         parentId: parentId || null,
-        content: processContentByTemplate(currentTemplate.id, formData),
+        content: JSON.stringify(formData.content),
         metadata: {
           lastUpdated: new Date().toISOString(),
           teamSize: 0,
@@ -287,13 +281,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
         throw new Error("Title is required");
       }
 
-      // Validate content based on template type
-      validateContentByTemplate(currentTemplate.id, pageData.content);
-
       // Prepare data for API submission
       const apiPageData = {
         ...pageData,
-        content: JSON.stringify(pageData.content),
         metadata: JSON.stringify(pageData.metadata),
       };
 
@@ -328,62 +318,34 @@ export function PageForm({ editPage = null }: PageFormProps) {
     }
   };
 
-  // Process content based on template type
-  const processContentByTemplate = (templateId: string, formData: PageFormData) => {
-    switch (templateId) {
-      case "article":
-        return {
-          title: formData.title || "",
-          content: formData.content || "",
-          image: formData.image || "",
-        };
-      
-      case "general-studies":
-        return {
-          title: formData.title || "",
-          content: formData.content || "",
-          image: formData.image || "",
-        };
-      
-      case "upsc-notes":
-        return {
-          title: formData.title || "",
-          content: formData.content || "",
-        };
-      
-      default:
-        return formData;
-    }
-  };
-
   // Validate content based on template type
-  const validateContentByTemplate = (templateId: string, content: any) => {
-    switch (templateId) {
-      case "article":
-        if (!content.title) throw new Error("Title is required");
-        if (!content.content || content.content.length < 10) {
-          throw new Error("Content must be at least 10 characters");
-        }
-        break;
+  // const validateContentByTemplate = (templateId: string, content: any) => {
+  //   switch (templateId) {
+  //     case "article":
+  //       if (!formData.title) throw new Error("Title is required");
+  //       if (!formData.content || formData.content.length < 10) {
+  //         throw new Error("Content must be at least 10 characters");
+  //       }
+  //       break;
       
-      case "general-studies":
-        if (!content.title) throw new Error("Title is required");
-        if (!content.content || content.content.length < 10) {
-          throw new Error("Content must be at least 10 characters");
-        }
-        break;
+  //     case "general-studies":
+  //       if (!content.title) throw new Error("Title is required");
+  //       if (!content.content || content.content.length < 10) {
+  //         throw new Error("Content must be at least 10 characters");
+  //       }
+  //       break;
       
-      case "upsc-notes":
-        if (!content.title) throw new Error("Title is required");
-        if (!content.content || content.content.length < 10) {
-          throw new Error("Content must be at least 10 characters");
-        }
-        break;
+  //     case "upsc-notes":
+  //       if (!content.title) throw new Error("Title is required");
+  //       if (!content.content || content.content.length < 10) {
+  //         throw new Error("Content must be at least 10 characters");
+  //       }
+  //       break;
       
-      default:
-        break;
-    }
-  };
+  //     default:
+  //       break;
+  //   }
+  // };
 
   const renderTemplateForm = () => {
     const currentTemplate = templates.find(t => t.id === selectedTemplate);
@@ -402,7 +364,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       'article': ArticleForm,
       'general-studies': GeneralStudiesForm,
       'upsc-notes': UpscNotesForm,
-      'current-affair': CurrentAffairForm,
+      'current-affairs': CurrentAffairForm,
     };
 
     const FormComponent = templateForms[currentTemplate.id];

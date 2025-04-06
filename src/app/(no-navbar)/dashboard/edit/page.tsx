@@ -13,16 +13,16 @@ interface Page {
   title: string;
   templateId: string;
   updatedAt: string;
-  content?: {
-    title?: string;
-    content?: string;
-    mainContent?: string;
-    image?: string;
-    metadata?: string;
-  };
+  content: string;
+  image: string | null;
   parentId?: number;
   level?: number;
   order?: number;
+  metadata?: {
+    keywords?: string[];
+    lastUpdated?: string;
+    teamSize?: number;
+  };
 }
 
 function PageList() {
@@ -87,13 +87,8 @@ function PageList() {
           : selectedPage.slug,
         templateId: selectedPage.templateId,
         parentId: selectedPage.parentId || null,
-        content: {
-          title: formData.title,
-          content: formData.content,
-          mainContent: formData.mainContent,
-          image: formData.image,
-        },
-        metadata: selectedPage.content?.metadata || {
+        content: formData.content,
+        metadata: selectedPage.metadata || {
           lastUpdated: new Date().toISOString(),
           teamSize: 0
         },
@@ -131,38 +126,38 @@ function PageList() {
   };
 
   const getInitialFormData = (page: Page, templateId: string): any => {
-    const contentString = typeof page.content === 'string' ? page.content : JSON.stringify(page.content);
-    const parsedContent = contentString ? JSON.parse(contentString) : {};
-    
+    const parsedContent = page.content;
+    const parsedimage=page.image || undefined;
     switch (templateId) {
       case 'article':
         return {
           title: page.title || '',
-          content: {
-            mainContent: parsedContent.content?.mainContent || '',
-            image: parsedContent.image || undefined,
-          }
+          content: parsedContent || '',
         };
       
       case 'general-studies':
         return {
           title: page.title || '',
-          content: parsedContent.content?.mainContent || '',
-          image: parsedContent.image || undefined,
+          content: parsedContent || '',
+          image: parsedimage || undefined,
         };
       
       case 'current-affairs':
         return {
           title: page.title || '',
-          content: parsedContent.content?.mainContent || '',
-          image: parsedContent.image || undefined,
+          content: parsedContent || '',
+          image: parsedimage || undefined,
         };
-      
+      case 'upsc-notes':
+        return {
+          title: page.title || '',
+          content: parsedContent || '',
+        };
       default:
         return {
           title: page.title || '',
-          content: parsedContent.content?.mainContent || '',
-          image: parsedContent.image || undefined,
+          content: parsedContent || '',
+          image: parsedimage || undefined,
         };
     }
   };

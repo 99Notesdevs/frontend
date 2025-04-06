@@ -12,7 +12,7 @@ const TEMPLATE_MAP: Record<string, any> = {
   "article": ArticleTemplate,
   "general-studies": GeneralStudiesTemplate,
   "study-material": ArticleTemplate, // Using ArticleTemplate as base for study material
-  "current-affair": CurrentAffairTemplate,
+  "current-affairs": CurrentAffairTemplate,
 };
 
 async function getPage(
