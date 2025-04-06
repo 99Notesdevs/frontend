@@ -2,7 +2,7 @@ import React from 'react';
 import { BaseTemplateProps } from './types';
 import Image from 'next/image';
 import Link from 'next/link';
-import ContactForm from '@/components/ui/ContactForm';
+import ContactForm from "@/components/common/ContactForm/ContactForm";
 import ContactMap from '@/components/ui/ContactMap';
 
 interface CurrentAffairContent {
