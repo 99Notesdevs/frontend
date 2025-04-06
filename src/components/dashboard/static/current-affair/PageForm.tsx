@@ -205,7 +205,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
-      const articleSlug = `current-affairs/${selectedAffair.slug}/${articleBaseSlug}`;
+      const articleSlug = `${selectedAffair.slug}/${articleBaseSlug}`;
 
       const articlePayload = {
         title: articleData.title,
@@ -215,7 +215,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         parentSlug: selectedAffair.slug
       };
 
-      const response = await fetch(`${env.API}/currentAffair/article`, {
+      const response = await fetch(`${env.API}/currentArticle/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

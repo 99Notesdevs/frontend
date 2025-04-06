@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { BaseTemplateProps } from "./types";
 import { Badge } from "@/components/ui/badge";
@@ -5,12 +6,56 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import SearchBar from "@/components/Navbar/SearchBar";
 import Image from "next/image";
-import { ChevronRight, X } from "lucide-react";
+import { X } from "lucide-react";
 import SocialMedia from "@/components/navigation/socialmedia";
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import DraggableTocButton from "@/components/navigation/DraggableTocButton";
 import { Comments } from "@/components/ui/comments";
 import Ads from "../navigation/Ads";
+import { env } from "@/config/env";
+import axios from "axios";
+import Cookies from "js-cookie";
+
+interface LockContentProps {
+  children: React.ReactNode;
+}
+
+const LockContent: React.FC<LockContentProps> = ({ children }) => {
+  const token = Cookies.get("token");
+
+  // Check if token is valid
+  const checkToken = async () => {
+    if (!token) return false;
+    try {
+      const res = await axios.get(`${env.API}/user/check`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data.success;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const [isAuthorized, setIsAuthorized] = React.useState(false);
+  React.useEffect(() => {
+    checkToken().then(setIsAuthorized);
+  }, []);
+
+  if (!isAuthorized) {
+    return (
+      <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        <p className="text-yellow-800 font-medium">
+          This content is locked and requires authentication. Please log in to
+          view.
+        </p>
+      </div>
+    );
+  }
+
+  return <div dangerouslySetInnerHTML={{ __html: typeof children === "string" ? children : "" }}></div>;
+};
 
 export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
@@ -19,7 +64,7 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
 
   // Safely cast content to ArticleContent with fallbacks
   const articleContent = JSON.parse(content as unknown as string);
-  const mainContent = articleContent.content.mainContent || "";
+  const mainContent = articleContent.content || "";
 
   const { tags, date, readTime, coverImage } = metadata as {
     tags?: string[];
@@ -31,18 +76,32 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   // Use either the content image or the metadata coverImage
   const displayImage = articleContent.image || coverImage;
 
+  // Function to process content and handle lock tags
+  const processContent = (content: string) => {
+    const parts = content.split(/(<lock>.*?<\/lock>)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith("<lock>")) {
+        const content = part.replace(/<lock>|<\/lock>/g, "");
+        return <LockContent key={index}>{content}</LockContent>;
+      }
+      return <div key={index} dangerouslySetInnerHTML={{ __html: part }} />;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative w-full overflow-x-hidden">
       {/* TOC Container with checkbox hack for toggle */}
       <input type="checkbox" id="toc-toggle" className="hidden peer" />
-      
+
       {/* Draggable TOC Button */}
       <DraggableTocButton />
 
       {/* TOC Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-[280px] sm:w-[320px] bg-white/95 
+      <div
+        className="fixed left-0 top-0 h-full w-[280px] sm:w-[320px] bg-white/95 
       backdrop-blur-sm shadow-xl -translate-x-full peer-checked:translate-x-0 
-      transition-all duration-300 ease-in-out z-[90] border-r-2 border-gray-200">
+      transition-all duration-300 ease-in-out z-[90] border-r-2 border-gray-200"
+      >
         {/* Close Button - Moved outside scrollable area */}
         <label
           htmlFor="toc-toggle"
@@ -55,11 +114,15 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
 
         {/* Left TOC Sidebar */}
         <div className="p-6 h-full mt-[50px] pb-24 overflow-y-auto">
-          <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200 
+          <div
+            className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200 
           shadow-inner transition-all duration-300 hover:border-gray-300
-          sticky top-[100px]">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b-2 
-            border-gray-300 pb-2 flex items-center gap-2">
+          sticky top-[100px]"
+          >
+            <h3
+              className="text-lg font-semibold text-gray-800 mb-4 border-b-2 
+            border-gray-300 pb-2 flex items-center gap-2"
+            >
               <span className="text-gray-500">📑</span>
               <span>Table of Content</span>
             </h3>
@@ -71,8 +134,10 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
       </div>
 
       {/* Main Content with padding adjustment */}
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-12 
-      transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]">
+      <div
+        className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-12 
+      transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
+      >
         <Breadcrumb />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8">
@@ -80,7 +145,7 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
           <main className="lg:col-span-8 xl:col-span-9 space-y-4 sm:space-y-8">
             {/* Featured Image */}
             {displayImage && (
-              <div className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden               transition-transform duration-300 hover:scale-[1.02] mb-12">
+              <div className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
                 <div className="relative w-full h-[400px]">
                   <Image
                     src={displayImage}
@@ -97,11 +162,27 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
             <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
               {/* Article Header */}
               <div className="text-center mb-8 sm:mb-12">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 
+                <h1
+                  className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 
                 relative inline-block bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text 
-                text-transparent px-2">
+                text-transparent px-2"
+                >
                   {title}
                 </h1>
+                {date && (
+                  <div className="text-gray-600 mb-2">
+                    {new Date(date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </div>
+                )}
+                {readTime && (
+                  <div className="text-gray-500 text-sm">
+                    ⏱️ {readTime} read
+                  </div>
+                )}
               </div>
 
               <div
@@ -165,17 +246,20 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 prose-ol:list-decimal
                 prose-ol:pl-4 sm:prose-ol:pl-6
                 [&>*]:w-full"
-                dangerouslySetInnerHTML={{ __html: mainContent }}
-              />
+              >
+                {processContent(mainContent)}
+              </div>
             </div>
-            <Comments parentId={parentId}/>
+            <Comments parentId={parentId} />
           </main>
 
           {/* Right Sidebar */}
           <aside className="lg:col-span-4 xl:col-span-3 space-y-4 sm:space-y-6">
             {/* Search Bar - Always visible at top */}
-            <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
-            transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
+            <div
+              className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
+            transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
+            >
               <SearchBar />
             </div>
 
@@ -183,8 +267,10 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
             <div className="relative">
               {/* TOC Section */}
               <div className="sticky top-8 space-y-4 sm:space-y-6">
-                <div className="hidden lg:block bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
-                transition-all duration-300 hover:shadow-xl">
+                <div
+                  className="hidden lg:block bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
+                transition-all duration-300 hover:shadow-xl"
+                >
                   <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
                     📑 Table of Contents
                   </h3>
@@ -210,13 +296,15 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 </div>
 
                 <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
-                  <Ads imageUrl ="/" altText="ads"  />
+                  <Ads imageUrl="/" altText="ads" />
                 </div>
 
                 {/* Tags Section - Fixed below Contact Form */}
                 {tags && tags.length > 0 && (
-                  <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
-                  transition-all duration-300 hover:shadow-xl">
+                  <div
+                    className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
+                  transition-all duration-300 hover:shadow-xl"
+                  >
                     <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
                       🏷️ Tags
                     </h3>

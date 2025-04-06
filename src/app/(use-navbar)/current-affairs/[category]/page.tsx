@@ -55,7 +55,7 @@ const CurrentAffairsSectionPage = async ({
       headers: {
         "Content-Type": "application/json",
       },
-      cache: 'no-store' // Don't cache the response
+      next: {revalidate: 3600} 
     });
 
     if (sectionResponse.ok) {
@@ -74,7 +74,7 @@ const CurrentAffairsSectionPage = async ({
       headers: {
         "Content-Type": "application/json",
       },
-      cache: 'no-store' // Don't cache the response
+      next: { revalidate: 3600 },
     });
 
     if (articlesResponse.ok) {
@@ -84,6 +84,7 @@ const CurrentAffairsSectionPage = async ({
 
         // Log some sample articles to see their structure
         if (allArticles.length > 0) {
+          console.log("Sample articles:", allArticles); // Log first 5 articles
           // Log all article slugs to see what we're working with
         }
 
