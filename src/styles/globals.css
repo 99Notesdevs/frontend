@@ -3,6 +3,253 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+:root {
+  /* Colors */
+  --primary-color: #2563eb; /* blue-600 */
+  --primary-hover: #1d4ed8; /* blue-700 */
+  --primary-active: #1e40af; /* blue-800 */
+  
+  --secondary-color: #64748b; /* slate-600 */
+  --secondary-hover: #788191; /* slate-500 */
+  --secondary-active: #525965; /* slate-700 */
+  
+  --accent-color: #f59e0b; /* amber-600 */
+  --accent-hover: #e88909; /* amber-700 */
+  --accent-active: #d67a08; /* amber-800 */
+  
+  --success-color: #22c55e; /* emerald-500 */
+  --warning-color: #fbbf24; /* yellow-500 */
+  --error-color: #ef4444; /* red-500 */
+  
+  --background-primary: #ffffff; /* white */
+  --background-secondary: #f9fafb; /* gray-50 */
+  --background-tertiary: #e5e7eb; /* gray-200 */
+  
+  --text-primary: #1f2937; /* slate-900 */
+  --text-secondary: #4b5563; /* slate-600 */
+  --text-muted: #9ca3af; /* slate-400 */
+  
+  /* Font Families */
+  --font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Liberation Mono', 'Courier New', monospace;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Border Radii */
+  --border-radius-sm: 0.125rem;
+  --border-radius-base: 0.25rem;
+  --border-radius-lg: 0.5rem;
+  --border-radius-xl: 0.75rem;
+  --border-radius-full: 9999px;
+  
+  /* Box Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Transitions */
+  --transition-base: all 0.2s ease-in-out;
+  --transition-fast: all 0.15s ease-in-out;
+  --transition-slow: all 0.3s ease-in-out;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(to right, var(--primary-color), var(--primary-hover));
+  --gradient-accent: linear-gradient(to right, var(--accent-color), var(--accent-hover));
+}
+
+/* Utility Classes */
+/* Colors */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+.bg-primary { background-color: var(--primary-color); }
+.bg-secondary { background-color: var(--secondary-color); }
+.bg-accent { background-color: var(--accent-color); }
+.bg-success { background-color: var(--success-color); }
+.bg-warning { background-color: var(--warning-color); }
+.bg-error { background-color: var(--error-color); }
+
+/* Typography */
+.font-sans { font-family: var(--font-family-sans); }
+.font-mono { font-family: var(--font-family-mono); }
+
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+.text-5xl { font-size: var(--font-size-5xl); }
+
+/* Border Radius */
+.rounded-sm { border-radius: var(--border-radius-sm); }
+.rounded-base { border-radius: var(--border-radius-base); }
+.rounded-lg { border-radius: var(--border-radius-lg); }
+.rounded-xl { border-radius: var(--border-radius-xl); }
+.rounded-full { border-radius: var(--border-radius-full); }
+
+/* Shadows */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-base { box-shadow: var(--shadow-base); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* Transitions */
+.transition-base { transition: var(--transition-base); }
+.transition-fast { transition: var(--transition-fast); }
+.transition-slow { transition: var(--transition-slow); }
+
+/* Gradients */
+.text-gradient { 
+  -webkit-text-fill-color: transparent;
+  background: var(--gradient-primary);
+}
+
+.bg-gradient { 
+  background: var(--gradient-primary);
+}
+
+/* Component Base Styles */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--background-primary);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-base);
+  transition: var(--transition-base);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-primary:active {
+  background-color: var(--primary-active);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: var(--background-primary);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-base);
+  transition: var(--transition-base);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-hover);
+}
+
+.btn-secondary:active {
+  background-color: var(--secondary-active);
+}
+
+.card {
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-base);
+  transition: var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.tag {
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+}
+
+.badge {
+  background-color: var(--primary-color);
+  color: var(--background-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.badge-secondary {
+  background-color: var(--secondary-color);
+  color: var(--background-primary);
+}
+
+/* Prose Styles */
+.prose {
+  color: var(--text-primary);
+  max-width: 65ch;
+}
+
+.prose h1 {
+  color: var(--text-primary);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 1rem;
+}
+
+.prose h2 {
+  color: var(--text-primary);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.75rem;
+}
+
+.prose h3 {
+  color: var(--text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: 0.5rem;
+}
+
+.prose p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Classes */
+@media (min-width: 640px) {
+  .sm\:text-lg { font-size: var(--font-size-lg); }
+  .sm\:rounded-xl { border-radius: var(--border-radius-xl); }
+  .sm\:space-y-6 { gap: 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:text-xl { font-size: var(--font-size-xl); }
+  .lg\:rounded-xl { border-radius: var(--border-radius-xl); }
+  .lg\:space-y-8 { gap: 2rem; }
+}
+
 /* Yellow icon styling */
 .yellow-icon {
   filter: invert(70%) sepia(80%) saturate(1000%) hue-rotate(360deg) brightness(110%);

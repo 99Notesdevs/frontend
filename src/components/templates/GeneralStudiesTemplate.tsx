@@ -40,7 +40,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
   
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column - Main Image and Content */}
@@ -57,7 +57,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                   <div className="p-8">
-                    <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">{title}</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-primary tracking-tight">{title}</h1>
                   </div>
                 </div>
               </div>
@@ -66,7 +66,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
             {/* Related Topics Section */}
             {page.children && page.children.length > 0 && (
               <div className="mb-10">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center border-b-2 border-blue-500 pb-2 inline-block">
+                <h2 className="text-2xl font-bold text-primary mb-8 text-center border-b-2 border-primary pb-2 inline-block">
                   Related Topics
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -102,7 +102,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
                               <div className="p-6">
-                                <h3 className="text-xl font-semibold text-white group-hover:text-blue-100 transition-colors">
+                                <h3 className="text-xl font-semibold text-primary group-hover:text-accent-color transition-colors">
                                   {child.title}
                                 </h3>
                               </div>
@@ -121,13 +121,13 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
               <CardContent className="p-10">
                 <div 
                   className="prose prose-lg max-w-none
-                    prose-h1:text-gray-900 prose-h1:text-center prose-h1:font-bold prose-h1:border-b-2 prose-h1:border-yellow-400 prose-h1:pb-2 prose-h1:mb-6
-                    prose-h2:text-gray-900 prose-h2:text-center prose-h2:font-bold prose-h2:border-b-2 prose-h2:border-yellow-400 prose-h2:pb-2 prose-h2:mb-6
-                    prose-h3:text-gray-900 prose-h3:text-center prose-h3:font-bold prose-h3:pb-2 prose-h3:mb-6
-                    prose-h4:text-gray-900 prose-h4:text-center prose-h4:font-bold prose-h4:pb-2 prose-h4:mb-6
-                    prose-h5:text-gray-900 prose-h5:text-center prose-h5:font-bold prose-h5:pb-2 prose-h5:mb-6
-                    prose-h6:text-gray-900 prose-h6:text-center prose-h6:font-bold prose-h6:pb-2 prose-h6:mb-6
-                    prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-800 prose-img:rounded-lg prose-img:shadow-lg prose-strong:text-gray-900"
+                    prose-h1:text-primary prose-h1:text-center prose-h1:font-bold prose-h1:border-b-2 prose-h1:border-accent-color prose-h1:pb-2 prose-h1:mb-6
+                    prose-h2:text-primary prose-h2:text-center prose-h2:font-bold prose-h2:border-b-2 prose-h2:border-accent-color prose-h2:pb-2 prose-h2:mb-6
+                    prose-h3:text-primary prose-h3:text-center prose-h3:font-bold prose-h3:pb-2 prose-h3:mb-6
+                    prose-h4:text-primary prose-h4:text-center prose-h4:font-bold prose-h4:pb-2 prose-h4:mb-6
+                    prose-h5:text-primary prose-h5:text-center prose-h5:font-bold prose-h5:pb-2 prose-h5:mb-6
+                    prose-h6:text-primary prose-h6:text-center prose-h6:font-bold prose-h6:pb-2 prose-h6:mb-6
+                    prose-p:text-secondary prose-p:leading-relaxed prose-a:text-primary hover:prose-a:text-accent-color prose-img:rounded-lg prose-img:shadow-md prose-strong:text-primary"
                   dangerouslySetInnerHTML={{ __html: parsedContent.content || '' }} 
                 />
               </CardContent>
@@ -137,7 +137,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
           {/* Right Sidebar */}
           <aside className="lg:col-span-4 xl:col-span-3">
             {/* Search Bar - Always visible at top */}
-            <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl mb-6">
+            <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl mb-6">
               <SearchBar />
             </div>
 
@@ -145,9 +145,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
             <div className="relative">
               <div className="sticky top-8 space-y-6">
                 {/* Table of Contents Section */}
-                <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2 flex items-center gap-2">
-                    <span className="text-blue-500">📑</span>
+                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
+                    <span className="text-primary">📑</span>
                     <span>Table of Contents</span>
                   </h3>
                   <div className="pr-2">
@@ -156,9 +156,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                 </div>
 
                 {/* Social Media Section */}
-                <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-6">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2 flex items-center gap-2">
-                    <span className="text-blue-500">🌐</span>
+                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
+                    <span className="text-primary">🌐</span>
                     <span>Connect With Us</span>
                   </h3>
                   <div className="py-2">
@@ -166,7 +166,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                   </div>
                 </div>
 
-                <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
+                <div className="bg-white border border-background-secondary rounded-xl shadow-lg">
                   <Ads imageUrl ="/" altText="ads"  />
                 </div>
               </div>

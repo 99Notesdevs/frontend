@@ -16,18 +16,18 @@ interface FooterProps {
 
 const Footer = ({ footerSections }: FooterProps) => {
   return (
-    <footer className="bg-white text-gray-800 py-12">
+    <footer className="bg-white text-primary py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {footerSections.map((section) => (
             <div key={section.slug} className="flex flex-col">
-              <h3 className="text-xl font-semibold mb-4">{section.title}</h3>
+              <h3 className="text-xl font-semibold mb-4 text-primary">{section.title}</h3>
               <ul className="space-y-2">
                 {section.children.map((link) => (
                   <li key={link.slug}>
                     <Link
                       href={`/${link.slug}`}
-                      className="hover:text-blue-600"
+                      className="hover:text-primary-active"
                     >
                       {link.title}
                     </Link>
@@ -51,8 +51,8 @@ const Footer = ({ footerSections }: FooterProps) => {
             </div>
           </div>
           <div className="text-center mt-6">
-            <p className="text-sm text-gray-600">
-              © {new Date().getFullYear()} <a href="/">99notes.in</a> All Rights Reserved
+            <p className="text-sm text-secondary">
+              &copy; {new Date().getFullYear()} <a href="/">99notes.in</a> All Rights Reserved
             </p>
           </div>
         </div>
