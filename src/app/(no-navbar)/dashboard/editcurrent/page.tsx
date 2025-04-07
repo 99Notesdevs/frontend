@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect , useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { useForm} from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 interface CurrentAffairType {
   id: number;
   title: string;
@@ -34,39 +37,69 @@ export default function PageListCurrent() {
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState<CurrentAffairType[]>([]);
   const [selectedType, setSelectedType] = useState<'daily' | 'monthly' | 'yearly' | null>(null);
-  const [formData, setFormData] = useState<CurrentAffairType>({
-    id: 0,
-    title: '',
-    content: '<p></p>',
-    type: '',
-    slug: '',
-    createdAt: new Date(),
-    updatedAt: new Date()
+  // const token = Cookie.get('token');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+    getValues
+  } = useForm<CurrentAffairType>({
+    resolver: zodResolver(
+      z.object({
+        id: z.number(),
+        title: z.string().min(1, "Title is required"),
+        content: z.string().min(1, "Content is required"),
+        type: z.string(),
+        slug: z.string(),
+        createdAt: z.date(),
+        updatedAt: z.date()
+      })
+    ),
+    defaultValues: {
+      id: 0,
+      title: "",
+      content: "",
+      type: "",
+      slug: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      dailyArticle: []
+    }
   });
   const token = Cookie.get('token');
 
   useEffect(() => {
     if (selectedPage) {
-      const formattedContent = selectedPage.content ? `<p>${selectedPage.content}</p>` : '<p></p>';
-      
-      setFormData({
+      console.log('Selected page content:', selectedPage);
+      reset({
         id: selectedPage.id,
         title: selectedPage.title,
-        content: formattedContent,
+        content: selectedPage.content || '',
         type: selectedType || selectedPage.type,
         slug: selectedPage.slug,
         createdAt: selectedPage.createdAt,
         updatedAt: selectedPage.updatedAt,
-        dailyArticle: selectedPage.dailyArticle
+        dailyArticle: selectedPage.dailyArticle || []
       });
+      setValue('content', selectedPage.content || '');
     }
-  }, [selectedPage, selectedType]);
+  }, [selectedPage, selectedType, reset, setValue]);
 
-  const handleInputChange = (field: keyof CurrentAffairType, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleEditorChange = (content: string) => {
+    setValue('content', content, { shouldValidate: true });
+    if (selectedPage) {
+      // setEditingArticle(prev => prev ? { ...prev, content } : null);
+    }
   };
 
-  const handleEditSubmit = async () => {
+  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = getValues();
+    console.log("reaches");
     try {
       // Generate slug from title
       const baseSlug = formData.title
@@ -76,7 +109,8 @@ export default function PageListCurrent() {
       const slug = `current-affairs/${baseSlug}`;
 
       const updateData = {
-        ...formData,
+        title: formData.title,
+        content: formData.content,
         type: selectedType || formData.type || 'daily',
         slug,
         updatedAt: new Date()
@@ -86,7 +120,6 @@ export default function PageListCurrent() {
         setError('No page selected');
         return;
       }
-
       const response = await fetch(`${env.API}/currentAffair/${selectedPage.id}`, {
         method: 'PUT',
         headers: {
@@ -103,7 +136,6 @@ export default function PageListCurrent() {
 
       const { data } = await response.json();
       setSelectedPage(data);
-      setFormData(data);
       if (selectedType) {
         fetchPages(selectedType);
       }
@@ -111,6 +143,7 @@ export default function PageListCurrent() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
+
   const fetchPages = async (type: 'daily' | 'monthly' | 'yearly') => {
     try {
       setLoading(true);
@@ -289,54 +322,40 @@ export default function PageListCurrent() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-4">Edit Current Affair</h2>
             
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              await handleEditSubmit();
-            }}>
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title
-                  </label>
-                  <Input
-                    value={formData.title || ''}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Content
-                  </label>
-                  <TiptapEditor
-                    content={formData.content}
-                    onChange={(content: string) => handleInputChange('content', content)}
-                  />
-                </div>
+            <form onSubmit={handleEditSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title
+                </label>
+                <Input
+                  {...register("title")}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Content
+                </label>
+                <TiptapEditor
+                  content={getValues("content") || ""}
+                  onChange={handleEditorChange}
+                />
+              </div>
 
-                <div className="flex justify-end space-x-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedPage(null);
-                      setFormData({
-                        id: 0,
-                        title: '',
-                        content: '<p></p>',
-                        type: '',
-                        slug: '',
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                      });
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    Save Changes
-                  </Button>
-                </div>
+              <div className="flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedPage(null);
+                    reset();
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  Save Changes
+                </Button>
               </div>
             </form>
           </div>

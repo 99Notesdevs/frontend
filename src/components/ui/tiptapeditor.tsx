@@ -28,7 +28,7 @@ import {
   Redo,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const lowlight = createLowlight(common);
 
@@ -117,7 +117,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const [htmlContent, setHtmlContent] = useState("");
   const [currentSize, setCurrentSize] = useState("Normal");
   const imageInputRef = React.useRef<HTMLInputElement>(null);
-
+  console.log(content);
   const addImage = () => {
     imageInputRef.current?.click();
   };
@@ -152,37 +152,32 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
           keepMarks: true,
           keepAttributes: false,
         },
+        codeBlock: false, // Disable codeBlock from StarterKit
+        heading: false,   // Disable heading from StarterKit
       }),
       Heading.configure({
-        levels: [1, 2, 3, 4, 5, 6], // Enable <h1> to <h6>
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: "text-blue-600 hover:underline cursor-pointer",
-        },
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: "max-w-full rounded-lg my-4",
-        },
+        levels: [1, 2, 3, 4, 5, 6],
       }),
       CodeBlockLowlight.configure({
         lowlight,
       }),
-      TextAlign.configure({
-        types: ["paragraph", "heading"], // Allow text alignment for headings
-        defaultAlignment: "left",
+      Link.configure({
+        openOnClick: false,
       }),
-      Color.configure({ types: ["textStyle"] }),
+      Image,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Color,
       TextStyle,
       FontSize,
     ],
-    content,
+    content: content,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      setHtmlContent(html);
-      onChange(html);
+      if (html !== content) {
+        onChange(html);
+      }
     },
     editorProps: {
       attributes: {
@@ -191,6 +186,15 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       },
     },
   });
+
+  useEffect(() => {
+    if (editor && content) {
+      // Only update content if it's different
+      if (editor.getHTML() !== content) {
+        editor.commands.setContent(content, false); // false to prevent focusing
+      }
+    }
+  }, [editor, content]);
 
   const toggleHtmlMode = () => {
     if (!editor) return;

@@ -258,7 +258,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
       // @ts-ignore
       console.log(formData.content);
-        // @ts-ignore
+      // @ts-ignore
       await handleImageUpload(formData.content);
 
       // Create the page data based on template type
@@ -267,7 +267,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         slug: fullPath,
         templateId: currentTemplate.id,
         parentId: parentId || null,
-        content: JSON.stringify(formData.content),
+        content: formData.content,  // Directly use the HTML content
         metadata: {
           lastUpdated: new Date().toISOString(),
           teamSize: 0,

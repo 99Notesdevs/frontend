@@ -8,40 +8,10 @@ import SocialMedia from "@/components/navigation/socialmedia";
 import { metadata } from "@/app/(use-navbar)/layout";
 import { BaseTemplateProps } from "./types";
 import Ads from "../navigation/Ads";
-// import { UpscNotesTemplateProps } from "./types";
 
-interface PageItem {
-  id: string;
-  title: string;
-  slug: string;
-  level: number;
-  children?: PageItem[];
-}
-
-interface UpscNotesTemplateProps {
-  page: {
-    id: string;
-    title: string;
-    content: string;
-    slug: string;
-    metadata: Record<string, any>;
-    template: {
-      id: string;
-      name: string;
-    };
-    children: PageItem[];
-  };
-}
-
-export const UpscNotesTemplate: React.FC<UpscNotesTemplateProps> = ({
-  page,
-}) => {
-
-  const { title, content } = page;
-
-  if (!content) {
-    return <div>Error: No content available</div>;
-  }
+export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
+  const { title, content, children } = page;
+  const mainContent = content || '';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">

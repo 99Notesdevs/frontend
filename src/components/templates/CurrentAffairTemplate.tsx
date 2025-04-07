@@ -1,7 +1,12 @@
 import React from 'react';
 import { BaseTemplateProps } from './types';
+import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
+import { TableOfContents } from '@/components/navigation/TableOfContents';
+import SearchBar from '@/components/Navbar/SearchBar';
+import SocialMedia from '@/components/navigation/socialmedia';
+import Ads from '../navigation/Ads';
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import ContactMap from '@/components/ui/ContactMap';
 
@@ -12,23 +17,8 @@ interface CurrentAffairContent {
 
 export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, children } = page;
-  
-  // Parse the content properly based on the format it's stored in
-  let parsedContent: CurrentAffairContent;
-  try {
-    // Try to parse as JSON if it's a string
-    if (typeof content === 'string') {
-      parsedContent = JSON.parse(content);
-    } else {
-      // If it's already an object, use it directly
-      parsedContent = content as unknown as CurrentAffairContent;
-    }
-  } catch (error) {
-    console.error('Error parsing content:', error);
-    // Fallback to empty content
-    parsedContent = { title: title, content: ''};
-  }
-  
+  const mainContent = content || '';
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="min-h-screen bg-gray-50">
@@ -39,7 +29,7 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({ page }) => 
               <h2 className="text-2xl font-bold text-gray-900 mb-3">{title}</h2>
               <div className="w-24 h-1 bg-yellow-400 rounded-full"></div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {children?.map((child: any) => (
                 <Link key={child.id} href={`/${child.slug}`} className="group">
@@ -48,18 +38,26 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({ page }) => 
                       <div className="flex flex-col items-center mb-8">
                         <h3 className="text-2xl font-semibold text-gray-800 group-hover:text-yellow-600 transition-colors text-center">
                           {child.title}
-                        </h3>
+                  </h3>
+                  </div>
+                      <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
+                        <span className="block overflow-hidden text-ellipsis">
+                          <span 
+                            dangerouslySetInnerHTML={{ __html: child.content }}
+                            className="block overflow-hidden text-ellipsis"
+                          ></span>
+                        </span>
                       </div>
-                      <p className="text-gray-600 text-lg leading-relaxed">
-                        {child.content}
-                      </p>
-                    </div>
+                </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
                       <span className="text-sm">Read More →</span>
                     </div>
                   </div>
                 </Link>
               ))}
+              <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
+                <div dangerouslySetInnerHTML={{ __html: mainContent }}></div>
+              </div>
             </div>
           </div>
         </div>

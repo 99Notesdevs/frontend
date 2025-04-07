@@ -101,7 +101,7 @@ function PageList() {
       // Prepare data for API submission with stringified content and metadata
       const apiPageData = {
         ...pageData,
-        content: JSON.stringify(pageData.content),
+        content: pageData.content,
         metadata: JSON.stringify(pageData.metadata)
       };
 

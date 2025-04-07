@@ -6,7 +6,7 @@ import Image from "next/image";
 import logo from '../../../public/logo.png'
 import SearchBar from "./SearchBar";
 import { NavItem } from "@/types/navigation";
-import { isAuth } from "@/lib/isAuth";
+// import { isAuth } from "@/lib/isAuth";
 
 interface NavbarProps {
   navigation: NavItem[];
@@ -206,21 +206,21 @@ export default function Navbar({ navigation }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const isUserLoggedIn = await isAuth();
-        setIsLoggedIn(isUserLoggedIn);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setIsLoggedIn(false);
-      } finally {
-        setAuthLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const isUserLoggedIn = await isAuth();
+  //       setIsLoggedIn(isUserLoggedIn);
+  //     } catch (error) {
+  //       console.error('Auth check failed:', error);
+  //       setIsLoggedIn(false);
+  //     } finally {
+  //       setAuthLoading(false);
+  //     }
+  //   };
 
-    checkAuth();
-  }, []);
+  //   checkAuth();
+  // }, []);
 
   const toggleMobileSubmenu = (slug: string) => {
     setOpenMenus(prev => ({
@@ -260,17 +260,9 @@ export default function Navbar({ navigation }: NavbarProps) {
             <div className="ml-30">
               <Link href={isLoggedIn ? "/users/dashboard" : "/users/login"} passHref>
                 <div className="flex items-center gap-2 hover:text-white/90 transition-colors">
-                  {authLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  ) : isLoggedIn ? (
-                    <span className="text-[13px] font-bold tracking-wide text-white ">
-                      Dashboard
-                    </span>
-                  ) : (
                     <span className="text-[13px] font-bold tracking-wide text-white ">
                       Login
                     </span>
-                  )}
                   <svg
                     className="w-6 h-6 text-white"
                     viewBox="0 0 24 24"
