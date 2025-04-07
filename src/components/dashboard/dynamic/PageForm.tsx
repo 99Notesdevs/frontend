@@ -1,11 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { ArticleForm, GeneralStudiesForm, UpscNotesForm, CurrentAffairForm } from '../forms';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { env } from '@/config/env';
-import Cookie from 'js-cookie';
+import React, { useState, useEffect } from "react";
+import {
+  ArticleForm,
+  GeneralStudiesForm,
+  UpscNotesForm,
+  CurrentAffairForm,
+} from "../forms";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { env } from "@/config/env";
+import Cookie from "js-cookie";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
 
 interface TemplateType {
   id: string;
@@ -56,7 +68,7 @@ interface GeneralStudiesContent {
   topic: string;
   subtopic: string;
   content: string;
-  importanceLevel: 'low' | 'medium' | 'high';
+  importanceLevel: "low" | "medium" | "high";
   previousYearQuestions?: string;
   keyPoints: string;
   sources?: string;
@@ -88,14 +100,19 @@ interface PageFormData extends Record<string, any> {
 export function PageForm({ editPage = null }: PageFormProps) {
   const [pages, setPages] = useState<PageWithRelations[]>([]);
   const [templates, setTemplates] = useState<TemplateType[]>([]);
-  const [selectedLevels, setSelectedLevels] = useState<string[]>(Array(7).fill(''));
-  const [selectedTemplate, setSelectedTemplate] = useState('');
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [selectedLevels, setSelectedLevels] = useState<string[]>(
+    Array(7).fill("")
+  );
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const token = Cookie.get('token');
+  const token = Cookie.get("token");
 
-  const showToast = (message: string, type: 'success' | 'error') => {
+  const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
@@ -108,15 +125,15 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const fetchPages = async () => {
     try {
       const response = await fetch(`${env.API}/page`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error('Failed to fetch pages');
+      if (!response.ok) throw new Error("Failed to fetch pages");
       const { data } = await response.json();
-      
+
       setPages(data);
     } catch (error) {
-      console.error('Error fetching pages:', error);
-      showToast('Failed to load pages. Please try again.', 'error');
+      console.error("Error fetching pages:", error);
+      showToast("Failed to load pages. Please try again.", "error");
     }
   };
 
@@ -124,26 +141,26 @@ export function PageForm({ editPage = null }: PageFormProps) {
     try {
       setIsLoading(true);
       const response = await fetch(`${env.API}/template`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error('Failed to fetch templates');
+      if (!response.ok) throw new Error("Failed to fetch templates");
       const data = await response.json();
-      
+
       setTemplates(data.templates || []);
       setIsLoading(false);
     } catch (error) {
-      console.error('Error fetching templates:', error);
-      showToast('Failed to load templates. Please try again.', 'error');
+      console.error("Error fetching templates:", error);
+      showToast("Failed to load templates. Please try again.", "error");
       setIsLoading(false);
     }
   };
 
   const handleLevelChange = (level: number, value: string) => {
     const newLevels = [...selectedLevels];
-    newLevels[level] = value === '_none' ? '' : value; // Convert _none to empty string
+    newLevels[level] = value === "_none" ? "" : value; // Convert _none to empty string
     // Clear all subsequent levels
     for (let i = level + 1; i < newLevels.length; i++) {
-      newLevels[i] = '';
+      newLevels[i] = "";
     }
     setSelectedLevels(newLevels);
   };
@@ -151,16 +168,15 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const getPagesForLevel = (level: number): PageWithRelations[] => {
     // For level 0, return only root pages (no parent)
     if (level === 0) {
-      return pages.filter(page => !page.parent);
+      return pages.filter((page) => !page.parent);
     }
-    
+
     const parentId = selectedLevels[level - 1];
     if (!parentId) return [];
-    
+
     // Filter by both parent ID and level to prevent duplicate levels
-    return pages.filter(page => 
-      page.parent?.id === parentId && 
-      page.level === level + 1
+    return pages.filter(
+      (page) => page.parent?.id === parentId && page.level === level + 1
     );
   };
 
@@ -178,49 +194,37 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   const handleImageUpload = async (content: string) => {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
-    const imgTags = doc.querySelectorAll('img');
+    const doc = parser.parseFromString(content, "text/html");
+    const imgTags = doc.querySelectorAll("img");
 
-    for(const img of imgTags) {
-      const src = img.getAttribute('src');
-      if(!src) continue;
+    for (const img of imgTags) {
+      const src = img.getAttribute("src");
+      if (!src) continue;
 
-      const isBlob = src.startsWith('blob:');
-      const isBase64 = src.startsWith('data:image');
+      const isBlob = src.startsWith("blob:");
+      const isBase64 = src.startsWith("data:image");
 
-      if(isBlob || isBase64) {
+      if (isBlob || isBase64) {
         try {
           const response = await fetch(src);
           const blob = await response.blob();
+
           const formData = new FormData();
-          formData.append('file', blob, 'image.png');
+          formData.append("image", blob, "image.png");
 
-          // const uploadResponse = await fetch(`${env.API}/aws/imageUpload`, {
-          //   method: 'POST',
-          //   headers: {
-          //     Authorization: `Bearer ${token}`
-          //   },
-          //   body: formData,
-          // });
-
-          // if (!uploadResponse.ok) {
-          //   throw new Error('Failed to upload image');
-          // }
-
-          // const { data } = await uploadResponse.json();
-          // const url = data?.url || '';
-          img.setAttribute('src', "flow is working");
+          const url = (await uploadImageToS3(formData)) || "error";
+          img.setAttribute("src", url);
         } catch (error: unknown) {
-          if(error instanceof Error) {
-            console.error('Error uploading image:', error.message);
+          if (error instanceof Error) {
+            console.error("Error uploading image:", error.message);
           }
-          showToast('Failed to upload image. Please try again.', 'error');
+          showToast("Failed to upload image. Please try again.", "error");
         }
       }
-
-      return doc.body.innerHTML;
     }
-  }
+
+    return doc.body.innerHTML; // ⬅️ Only return after finishing all images
+  };
 
   const handleSubmit = async (formData: PageFormData) => {
     try {
@@ -236,11 +240,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
         .map((level) => {
           // Get the page for this level
           const page = pages.find((p) => p.id === level);
-          if (!page) return '';
-          
+          if (!page) return "";
+
           // Extract just the last segment of the slug, not the full path
           // This prevents duplication of parent paths
-          const slugParts = page.slug.split('/');
+          const slugParts = page.slug.split("/");
           return slugParts[slugParts.length - 1];
         })
         .concat(
@@ -258,8 +262,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
       // @ts-ignore
       console.log(formData.content);
-        // @ts-ignore
-      await handleImageUpload(formData.content);
+      // @ts-ignore
+      formData.content = await handleImageUpload(formData.content);
 
       // Create the page data based on template type
       const pageData = {
@@ -297,11 +301,12 @@ export function PageForm({ editPage = null }: PageFormProps) {
         body: JSON.stringify(apiPageData),
       });
 
-      
       const responseData = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(responseData.message || responseData.error || 'Failed to create page');
+        throw new Error(
+          responseData.message || responseData.error || "Failed to create page"
+        );
       }
 
       // Reset form and refresh
@@ -311,10 +316,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
       await fetchPages();
 
       // Show success message
-      showToast('Page created successfully!', 'success');
+      showToast("Page created successfully!", "success");
     } catch (error) {
-      console.error('Error creating page:', error);
-      showToast('Failed to create page. Please try again.', 'error');
+      console.error("Error creating page:", error);
+      showToast("Failed to create page. Please try again.", "error");
     }
   };
 
@@ -327,28 +332,28 @@ export function PageForm({ editPage = null }: PageFormProps) {
   //         throw new Error("Content must be at least 10 characters");
   //       }
   //       break;
-      
+
   //     case "general-studies":
   //       if (!content.title) throw new Error("Title is required");
   //       if (!content.content || content.content.length < 10) {
   //         throw new Error("Content must be at least 10 characters");
   //       }
   //       break;
-      
+
   //     case "upsc-notes":
   //       if (!content.title) throw new Error("Title is required");
   //       if (!content.content || content.content.length < 10) {
   //         throw new Error("Content must be at least 10 characters");
   //       }
   //       break;
-      
+
   //     default:
   //       break;
   //   }
   // };
 
   const renderTemplateForm = () => {
-    const currentTemplate = templates.find(t => t.id === selectedTemplate);
+    const currentTemplate = templates.find((t) => t.id === selectedTemplate);
     if (!currentTemplate) {
       return null;
     }
@@ -358,18 +363,20 @@ export function PageForm({ editPage = null }: PageFormProps) {
       defaultValues: editPage?.data || undefined,
     };
 
-
     // Map template IDs to form components
     const templateForms: Record<string, React.ComponentType<any>> = {
-      'article': ArticleForm,
-      'general-studies': GeneralStudiesForm,
-      'upsc-notes': UpscNotesForm,
-      'current-affairs': CurrentAffairForm,
+      article: ArticleForm,
+      "general-studies": GeneralStudiesForm,
+      "upsc-notes": UpscNotesForm,
+      "current-affairs": CurrentAffairForm,
     };
 
     const FormComponent = templateForms[currentTemplate.id];
     if (!FormComponent) {
-      console.error('No form component found for template ID:', currentTemplate.id);
+      console.error(
+        "No form component found for template ID:",
+        currentTemplate.id
+      );
       return null;
     }
 
@@ -382,33 +389,50 @@ export function PageForm({ editPage = null }: PageFormProps) {
         return (
           <div className="space-y-6">
             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Page Location</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                Select Page Location
+              </h3>
               <div className="space-y-4">
-                {Array.from({ length: getCurrentLevel() + 1 }).map((_, level) => (
-                  <div key={level}>
-                    <label className="block text-sm font-medium text-slate-800 mb-1">
-                      Level {level + 1} {level >= 4 && "(Not shown in navbar)"}
-                    </label>
-                    <Select
-                      value={selectedLevels[level]}
-                      onValueChange={(value: string) => handleLevelChange(level, value)}
-                    >
-                      <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
-                      <SelectValue placeholder={level === 0 ? "Select root page" : `Select level ${level + 1} page`} />
-                      </SelectTrigger>
-                      <SelectContent>
-                      <SelectItem value="_none">
-                        {level === 0 ? "No parent (Root level)" : `Create as level ${level + 1} page`}
-                      </SelectItem>
-                      {getPagesForLevel(level).map((page: PageWithRelations) => (
-                        <SelectItem key={page.id} value={page.id}>
-                        {page.title}
-                        </SelectItem>
-                      ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
+                {Array.from({ length: getCurrentLevel() + 1 }).map(
+                  (_, level) => (
+                    <div key={level}>
+                      <label className="block text-sm font-medium text-slate-800 mb-1">
+                        Level {level + 1}{" "}
+                        {level >= 4 && "(Not shown in navbar)"}
+                      </label>
+                      <Select
+                        value={selectedLevels[level]}
+                        onValueChange={(value: string) =>
+                          handleLevelChange(level, value)
+                        }
+                      >
+                        <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
+                          <SelectValue
+                            placeholder={
+                              level === 0
+                                ? "Select root page"
+                                : `Select level ${level + 1} page`
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="_none">
+                            {level === 0
+                              ? "No parent (Root level)"
+                              : `Create as level ${level + 1} page`}
+                          </SelectItem>
+                          {getPagesForLevel(level).map(
+                            (page: PageWithRelations) => (
+                              <SelectItem key={page.id} value={page.id}>
+                                {page.title}
+                              </SelectItem>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )
+                )}
               </div>
               <div className="mt-6 flex justify-end">
                 <Button
@@ -426,29 +450,33 @@ export function PageForm({ editPage = null }: PageFormProps) {
         return (
           <div className="space-y-6">
             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Template</h3>
-                <Select
-                value={selectedTemplate || '_none'}
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                Select Template
+              </h3>
+              <Select
+                value={selectedTemplate || "_none"}
                 onValueChange={(value: string) => {
-                  setSelectedTemplate(value === '_none' ? '' : value);
+                  setSelectedTemplate(value === "_none" ? "" : value);
                 }}
-                >
+              >
                 <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
                   <SelectValue placeholder="Choose a template" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="_none">Choose a template...</SelectItem>
                   {!isLoading && templates?.length > 0 ? (
-                  templates.map((template: TemplateType) => (
-                    <SelectItem key={template.id} value={template.id}>
-                    {template.name}
-                    </SelectItem>
-                  ))
+                    templates.map((template: TemplateType) => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.name}
+                      </SelectItem>
+                    ))
                   ) : (
-                  <SelectItem value="_loading">Loading templates...</SelectItem>
+                    <SelectItem value="_loading">
+                      Loading templates...
+                    </SelectItem>
                   )}
                 </SelectContent>
-                </Select>
+              </Select>
               <div className="mt-6 flex justify-between">
                 <Button
                   onClick={() => setStep(1)}
@@ -474,7 +502,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
           <div className="space-y-6">
             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-slate-900">Fill Page Details</h3>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Fill Page Details
+                </h3>
                 <Button
                   onClick={() => setStep(2)}
                   variant="outline"
@@ -493,41 +523,41 @@ export function PageForm({ editPage = null }: PageFormProps) {
   return (
     <div className="space-y-6">
       {toast && (
-        <div className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
-          toast.type === 'success' 
-            ? 'bg-slate-900 text-white' 
-            : 'bg-red-500 text-white'
-        }`}>
+        <div
+          className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
+            toast.type === "success"
+              ? "bg-slate-900 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
           <p className="text-sm">{toast.message}</p>
         </div>
       )}
-      
+
       <div className="flex items-center justify-between mb-8">
         {[
-          { number: 1, title: 'Select Path' },
-          { number: 2, title: 'Choose Template' },
-          { number: 3, title: 'Fill Details' },
+          { number: 1, title: "Select Path" },
+          { number: 2, title: "Choose Template" },
+          { number: 3, title: "Fill Details" },
         ].map((s) => (
           <div key={s.number} className="flex items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 step >= s.number
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-slate-100 text-slate-500'
+                  ? "bg-slate-800 text-white"
+                  : "bg-slate-100 text-slate-500"
               }`}
             >
               {s.number}
             </div>
             <span
               className={`ml-2 ${
-                step >= s.number ? 'text-slate-900' : 'text-slate-400'
+                step >= s.number ? "text-slate-900" : "text-slate-400"
               }`}
             >
               {s.title}
             </span>
-            {s.number < 3 && (
-              <div className="w-24 h-px mx-4 bg-slate-200" />
-            )}
+            {s.number < 3 && <div className="w-24 h-px mx-4 bg-slate-200" />}
           </div>
         ))}
       </div>
