@@ -17,28 +17,13 @@ interface GeneralStudiesContent {
 }
 
 export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
-  const { title, id } = page;
-  
-  // Parse the content properly based on the format it's stored in
-  let parsedContent: GeneralStudiesContent;
-  try {
-    // Try to parse as JSON if it's a string
-    if (typeof page.content === 'string') {
-      parsedContent = JSON.parse(page.content);
-    } else {
-      // If it's already an object, use it directly
-      parsedContent = page.content as unknown as GeneralStudiesContent;
-    }
-  } catch (error) {
-    console.error('Error parsing content:', error);
-    // Fallback to empty content
-    parsedContent = { title: title, content: '', image: undefined };
-  }
+  const { title, content, children,image } = page;
+  const mainContent = content || '';
   
   // Default image if none is provided
-  const pageImage = parsedContent.image || '/images/default-general-studies.jpg';
+  const pageImage = image || '/images/default-general-studies.jpg';
   
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -74,7 +59,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                     let childContent;
                     try {
                       if (typeof child.content === 'string') {
-                        childContent = JSON.parse(child.content);
+                        childContent = child.content;
                       } else {
                         childContent = child.content || {};
                       }
@@ -83,7 +68,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                       childContent = {};
                     }
                     
-                    const childImage = childContent.image || '/images/default-subtopic.jpg';
+                    const childImage = child.image || '/images/default-subtopic.jpg';
                     
                     return (
                       <Link 
@@ -121,14 +106,14 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
               <CardContent className="p-10">
                 <div 
                   className="prose prose-lg max-w-none
-                    prose-h1:text-primary prose-h1:text-center prose-h1:font-bold prose-h1:border-b-2 prose-h1:border-accent-color prose-h1:pb-2 prose-h1:mb-6
-                    prose-h2:text-primary prose-h2:text-center prose-h2:font-bold prose-h2:border-b-2 prose-h2:border-accent-color prose-h2:pb-2 prose-h2:mb-6
-                    prose-h3:text-primary prose-h3:text-center prose-h3:font-bold prose-h3:pb-2 prose-h3:mb-6
-                    prose-h4:text-primary prose-h4:text-center prose-h4:font-bold prose-h4:pb-2 prose-h4:mb-6
-                    prose-h5:text-primary prose-h5:text-center prose-h5:font-bold prose-h5:pb-2 prose-h5:mb-6
-                    prose-h6:text-primary prose-h6:text-center prose-h6:font-bold prose-h6:pb-2 prose-h6:mb-6
-                    prose-p:text-secondary prose-p:leading-relaxed prose-a:text-primary hover:prose-a:text-accent-color prose-img:rounded-lg prose-img:shadow-md prose-strong:text-primary"
-                  dangerouslySetInnerHTML={{ __html: parsedContent.content || '' }} 
+                    prose-h1:text-gray-900 prose-h1:text-center prose-h1:font-bold prose-h1:border-b-2 prose-h1:border-yellow-400 prose-h1:pb-2 prose-h1:mb-6
+                    prose-h2:text-gray-900 prose-h2:text-center prose-h2:font-bold prose-h2:border-b-2 prose-h2:border-yellow-400 prose-h2:pb-2 prose-h2:mb-6
+                    prose-h3:text-gray-900 prose-h3:text-center prose-h3:font-bold prose-h3:pb-2 prose-h3:mb-6
+                    prose-h4:text-gray-900 prose-h4:text-center prose-h4:font-bold prose-h4:pb-2 prose-h4:mb-6
+                    prose-h5:text-gray-900 prose-h5:text-center prose-h5:font-bold prose-h5:pb-2 prose-h5:mb-6
+                    prose-h6:text-gray-900 prose-h6:text-center prose-h6:font-bold prose-h6:pb-2 prose-h6:mb-6
+                    prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-800 prose-img:rounded-lg prose-img:shadow-lg prose-strong:text-gray-900"
+                  dangerouslySetInnerHTML={{ __html: mainContent }} 
                 />
               </CardContent>
             </Card>
@@ -151,7 +136,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                     <span>Table of Contents</span>
                   </h3>
                   <div className="pr-2">
-                    <TableOfContents content={parsedContent.content} />
+                    <TableOfContents content={mainContent} />
                   </div>
                 </div>
 

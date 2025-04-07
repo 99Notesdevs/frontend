@@ -63,9 +63,14 @@ const CurrentAffairsIndex = async () => {
                           {page.title}
                         </h3>
                       </div>
-                      <p className="text-gray-600 text-lg leading-relaxed">
-                        {page.content}
-                      </p>
+                      <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
+                        <span className="block overflow-hidden text-ellipsis">
+                          <span 
+                            dangerouslySetInnerHTML={{ __html: page.content }}
+                            className="block overflow-hidden text-ellipsis"
+                          ></span>
+                        </span>
+                      </div>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
                       <span className="text-sm">Read More →</span>
@@ -95,9 +100,12 @@ const CurrentAffairsIndex = async () => {
                           {page.title}
                         </h3>
                       </div>
-                      <p className="text-gray-600 text-lg leading-relaxed">
-                        {page.content}
-                      </p>
+                      <span className="block overflow-hidden text-ellipsis">
+                          <span 
+                            dangerouslySetInnerHTML={{ __html: page.content }}
+                            className="block overflow-hidden text-ellipsis"
+                          ></span>
+                        </span>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
                       <span className="text-sm">Read More →</span>
@@ -127,9 +135,12 @@ const CurrentAffairsIndex = async () => {
                           {page.title}
                         </h3>
                       </div>
-                      <p className="text-gray-600 text-lg leading-relaxed">
-                        {page.content}
-                      </p>
+                      <span className="block overflow-hidden text-ellipsis">
+                          <span 
+                            dangerouslySetInnerHTML={{ __html: page.content }}
+                            className="block overflow-hidden text-ellipsis"
+                          ></span>
+                        </span>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
                       <span className="text-sm">Read More →</span>

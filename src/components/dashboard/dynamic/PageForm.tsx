@@ -271,7 +271,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         slug: fullPath,
         templateId: currentTemplate.id,
         parentId: parentId || null,
-        content: JSON.stringify(formData.content),
+        content: formData.content,  // Directly use the HTML content
         metadata: {
           lastUpdated: new Date().toISOString(),
           teamSize: 0,
