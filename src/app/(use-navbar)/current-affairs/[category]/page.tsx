@@ -47,17 +47,15 @@ const CurrentAffairsSectionPage = async ({
   // Fetch the current affair section data
   let currentAffair: CurrentAffair | null = null;
   let articles: Article[] = [];
-  console.log("reaches");
   try {
     // Convert forward slashes to spaces to match backend format
-    const modifiedSlug = fullSlug.replace('/', ' ');
+    const modifiedSlug = fullSlug.replace(/\s+/g, ' ');
     // For server components, use the backend API directly
     // Looking at the backend routes, the endpoint for getting a section by slug is /currentAffair/slug/:slug
     const sectionResponse = await fetch(`${env.API}/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`, {
       headers: {
         "Content-Type": "application/json",
       },
-      next: {revalidate: 3600} 
     });
 
     if (sectionResponse.ok) {
@@ -76,7 +74,6 @@ const CurrentAffairsSectionPage = async ({
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 },
     });
 
     if (articlesResponse.ok) {
@@ -146,6 +143,7 @@ const CurrentAffairsSectionPage = async ({
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
               {currentAffair?.title || sectionInfo.title}
             </h1>
+            <div dangerouslySetInnerHTML={{ __html: currentAffair?.content || '' }}></div>
             {/* <p className="text-lg text-gray-600 mb-6" } /> */}
 
             <div className="flex flex-wrap gap-2">
