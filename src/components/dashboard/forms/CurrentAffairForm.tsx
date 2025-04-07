@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import TiptapEditor from '@/components/ui/tiptapeditor';
 
 const currentAffairSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -22,9 +22,9 @@ interface CurrentAffairFormProps {
 export const CurrentAffairForm: React.FC<CurrentAffairFormProps> = ({ onSubmit, defaultValues }) => {
   const form = useForm<CurrentAffairFormValues>({
     resolver: zodResolver(currentAffairSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       title: '',
-      content: '',
+      content: '<p></p>',
     },
   });
 
@@ -56,7 +56,10 @@ export const CurrentAffairForm: React.FC<CurrentAffairFormProps> = ({ onSubmit, 
             <FormItem>
               <FormLabel>Content</FormLabel>
               <FormControl>
-                <Textarea {...field} placeholder="Enter content" />
+                <TiptapEditor
+                  content={field.value}
+                  onChange={(content) => field.onChange(content)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -97,6 +97,7 @@ export default function Dashboard() {
                 </div>
               </button>
 
+              
               {/* Edit about button*/}
               <button
                 onClick={() => router.push("/dashboard/update-about")}

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BaseTemplateProps } from "./types";
+import { ArticleTemplateProps } from "./types";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
@@ -57,20 +57,20 @@ const LockContent: React.FC<LockContentProps> = ({ children }) => {
   return <div dangerouslySetInnerHTML={{ __html: typeof children === "string" ? children : "" }}></div>;
 };
 
-export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
+export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
   // @ts-ignore
   const parentId = page.slug;
 
-  // Safely cast content to ArticleContent with fallbacks
-  const mainContent = content ? JSON.parse(content) : "";
+  // Use content directly as HTML
+  const mainContent = content || '';
 
   const { tags, date, readTime, coverImage } = metadata as {
     tags?: string[];
     date?: string;
     readTime?: string;
     coverImage?: string;
-  };
+  } || {};
 
   // Use either the content image or the metadata coverImage
   const displayImage = coverImage;
@@ -135,7 +135,7 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
             </div>
           </div>
         </div>
-      </div>
+            </div>
 
       {/* Main Content with padding adjustment */}
       <div
@@ -312,9 +312,8 @@ export const ArticleTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                   </div>
                 )}
               </div>
-            </div>
-          </aside>
-        </div>
+          </div>
+          </aside>        </div>
       </div>
     </div>
   );

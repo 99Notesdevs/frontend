@@ -78,7 +78,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     try {
       const token = Cookie.get('token');
       const response = await fetch(`${env.API}/currentAffair/type/${type}`, {
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
@@ -141,13 +141,13 @@ export function PageForm({ editPage = null }: PageFormProps) {
       const baseSlug = newAffairData.title
         .toLowerCase()
         .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-      const slug = `current-affairs/${baseSlug}`;
+      .replace(/[^a-z0-9-]/g, '');
+    const slug = `current-affairs/${baseSlug}`;
 
-      // Ensure content is a string (even if empty)
-      const content = newAffairData.content || '';
+    // Ensure content is a string (even if empty)
+    const content = newAffairData.content || '';
 
-      const affairData = {
+    const affairData = {
         title: newAffairData.title,
         content,
         type: newAffairData.type,
@@ -180,12 +180,17 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   const handleCreateArticle = async () => {
     try {
+      // Validate all required fields
       if (!articleData.title) {
         throw new Error('Title is required');
       }
 
       if (!articleData.content || articleData.content.length < 10) {
         throw new Error('Content must be at least 10 characters');
+      }
+
+      if (!articleData.author) {
+        throw new Error('Author is required');
       }
 
       if (!selectedAffairId) {
@@ -210,7 +215,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       const articlePayload = {
         title: articleData.title,
         content: articleData.content,
-        author: articleData.author || 'Anonymous',
+        author: articleData.author,
         slug: articleSlug,
         parentSlug: selectedAffair.slug
       };
@@ -246,7 +251,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
       });
     } catch (error) {
       console.error('Error creating article:', error);
-      showToast('Failed to create article. Please try again.', 'error');
+      if (error instanceof Error) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Failed to create article. Please try again.', 'error');
+      }
     }
   };
 
