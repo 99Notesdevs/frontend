@@ -75,24 +75,26 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
       <div className="relative w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {getCurrentSlideImages().map((image, idx) => (
-            <div key={idx} className="relative aspect-[4/3] group overflow-hidden rounded-xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-              <div className="w-full h-full relative">
-                <Image 
-                  src={image.src} 
-                  alt={image.alt}
-                  width={400} 
-                  height={300} 
-                  className="w-full h-full object-cover rounded-xl shadow-md transition-all duration-500 group-hover:scale-105"
-                  style={{ objectPosition: "center" }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex items-end justify-center p-4 z-20">
-                  <p className="text-white text-sm font-medium text-center">
-                    {image.info}
-                  </p>
+            image.src && (
+              <div key={idx} className="relative aspect-[4/3] group overflow-hidden rounded-xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                <div className="w-full h-full relative">
+                  <Image 
+                    src={image.src} 
+                    alt={image.alt}
+                    width={400} 
+                    height={300} 
+                    className="w-full h-full object-cover rounded-xl shadow-md transition-all duration-500 group-hover:scale-105"
+                    style={{ objectPosition: "center" }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex items-end justify-center p-4 z-20">
+                    <p className="text-white text-sm font-medium text-center">
+                      {image.info}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )
           ))}
         </div>
       </div>
