@@ -1,46 +1,40 @@
 "use client";
-import React, { useState } from 'react';
+
+import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { StaticImageData } from 'next/image';
 
 interface CurrentAffairsCardProps {
-  icon: React.ReactNode | { image: StaticImageData };
   title: string;
+  icon: string | { image: StaticImageData };
   link: string;
 }
 
-const CurrentAffairsCard: React.FC<CurrentAffairsCardProps> = ({ icon, title, link }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
+const CurrentAffairsCard: React.FC<CurrentAffairsCardProps> = ({ title, icon, link }) => {
   return (
-    <div
-      className={`bg-white rounded-2xl shadow-lg p-6 transition-transform duration-300 ${
-        isHovered ? 'scale-105 shadow-xl' : ''
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <Link
+      href={link}
+      className="group block bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105"
     >
-      <div className="flex items-center space-x-4">
-        <div className="text-orange-500 text-3xl">
-          {icon && typeof icon === 'object' && 'image' in icon ? (
-            <Image src={icon.image} alt={title} width={32} height={32} />
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+            {title}
+          </h3>
+          {typeof icon === 'object' && 'image' in icon ? (
+            <div className="text-2xl text-blue-600">
+              <Image src={icon.image} alt={title} width={32} height={32} />
+            </div>
           ) : (
-            icon
+            <div className="text-2xl text-blue-600">{icon}</div>
           )}
         </div>
-        <div className="flex-grow">
-          <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-500 hover:text-orange-500 transition-colors"
-          >
-            Check out
-          </a>
-        </div>
+        <p className="text-gray-600">
+          Click to view the latest updates and analysis
+        </p>
       </div>
-    </div>
+    </Link>
   );
 };
 

@@ -1,24 +1,67 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { env } from "@/config/env";
+import axios from "axios";
 import CurrentAffairsCard from './CurrentAffairsCard';
 import { StaticImageData } from 'next/image';
 
-// Define the type for each item in current affairs data
+interface CurrentAffairSection {
+  id: number;
+  title: string;
+  content: string;
+  type: string;
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface CurrentAffairsItem {
   title: string;
   icon: string | { image: StaticImageData };
   link: string;
 }
 
-const currentAffairsData: CurrentAffairsItem[] = [
-  { title: 'Daily Current Affairs', icon: '📰', link: '/current-affairs/news-daily' },
-  { title: 'The Hindu Editorial', icon: '📑', link: '/current-affairs/hindu-editorial' },
-  { title: 'Indian Express Editorial', icon: '📋', link: '/current-affairs/express-editorial' },
-  { title: 'PIB', icon: '🏛️', link: '/current-affairs/pib' },
-  { title: 'Daily Quiz', icon: '❓', link: '/current-affairs/quiz' },
-  { title: 'Daily Answer Writing', icon: '✍️', link: '/current-affairs/answer-writing' },
-];
-
 const CurrentAffairs: React.FC = () => {
+  const [sections, setSections] = useState<CurrentAffairSection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCurrentAffairs = async () => {
+      try {
+        const response = await axios.get(`${env.API}/currentAffair/type/daily`);
+        if (response.data.status === 'success' && response.data.data) {
+          setSections(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching current affairs:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCurrentAffairs();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Loading Current Affairs...</h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const currentAffairsData: CurrentAffairsItem[] = sections.map((section) => ({
+    title: section.title,
+    icon: '📰',
+    link: `/current-affairs/${section.slug.split('/').pop()}`,
+  }));
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
