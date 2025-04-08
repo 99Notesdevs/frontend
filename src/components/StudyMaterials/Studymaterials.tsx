@@ -13,7 +13,7 @@ interface Page {
   content: string;
   metadata: string;
   status: string;
-  image: string;
+  imageUrl: string;
   templateId: string;
   parentId: number | null;
   level: number;
@@ -62,7 +62,7 @@ const StudyMaterials = () => {
         className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
       >
         <Image
-          src={item.metadata ? JSON.parse(item.metadata).image : "https://via.placeholder.com/500x192"}
+          src={item.imageUrl}
           alt={item.title}
           width={500}
           height={192}
@@ -143,7 +143,7 @@ const StudyMaterials = () => {
                   className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
                 >
                   <Image
-                    src={page.metadata ? page.image : "https://via.placeholder.com/500x192"}
+                    src={page?.imageUrl || "https://www.psdstack.com%2Fwp-content%2Fuploads%2F2019%2F08%2Fcopyright-free-images-750x420.jpg&w=828&q=75"}
                     alt={page.title}
                     width={500}
                     height={192}
