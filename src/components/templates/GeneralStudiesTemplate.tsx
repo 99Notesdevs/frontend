@@ -13,15 +13,15 @@ import Ads from '../navigation/Ads';
 interface GeneralStudiesContent {
   title: string;
   content: string;
-  image?: string;
+  imageUrl?: string;
 }
 
 export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
-  const { title, content, children,image } = page;
+  const { title, content, children, imageUrl } = page;
   const mainContent = content || '';
   
   // Default image if none is provided
-  const pageImage = image || '/images/default-general-studies.jpg';
+  const pageImage = imageUrl || null;
   
 
   return (
@@ -34,7 +34,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
             <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-10 transform transition-all hover:scale-[1.02]">
               <div className="relative w-full h-72 md:h-96">
                 <Image 
-                  src={pageImage} 
+                  src={`${pageImage}`} 
                   alt={title}
                   fill
                   className="object-cover"

@@ -26,6 +26,7 @@ export interface TemplateContent {
 export interface BaseTemplateProps {
   page: Page & {
     content: TemplateContent;
+    imageUrl?: String
   };
 }
 

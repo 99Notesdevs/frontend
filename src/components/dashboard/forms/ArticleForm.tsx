@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
 
 const articleSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -50,14 +51,31 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     setValue("content", content, { shouldValidate: true });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        setValue("image", result, { shouldValidate: true });
+      reader.onloadend = async () => {
+        try {
+          // Show a preview of the image
+          const result = reader.result as string;
+          setImagePreview(result);
+          console.log(file);
+
+          // Upload the image to S3
+          const formData = new FormData();
+          formData.append("image", file);
+
+          const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
+          if (s3Url) {
+            // Update the image field with the S3 URL
+            setValue("image", s3Url, { shouldValidate: true });
+          } else {
+            throw new Error("Failed to upload image to S3");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -68,7 +86,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     const transformedData = {
       title: data.title,
       content: data.content,
-      image: data.image || undefined
+      image: data.image || ''
     };
     onSubmit(transformedData);
   };

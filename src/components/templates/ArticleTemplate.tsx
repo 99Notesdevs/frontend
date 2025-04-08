@@ -79,7 +79,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     }) || {};
 
   // Use either the content image or the metadata coverImage
-  const displayImage = coverImage;
+  // @ts-ignore
+  const displayImage = page.imageUrl || coverImage as string;
 
   // Function to process content and handle lock tags
   return (
@@ -142,7 +143,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
               <div className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
                 <div className="relative w-full h-[400px]">
                   <Image
-                    src={displayImage}
+                    src={`${displayImage}`}
                     alt={title}
                     fill
                     className="object-cover"

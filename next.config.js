@@ -5,7 +5,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'm.media-amazon.com',
+        hostname: '99notes-test.s3.eu-north-1.amazonaws.com',
         pathname: '/**', // Allow all paths under this hostname
       },
       {

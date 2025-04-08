@@ -264,7 +264,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       console.log(formData.content);
       // @ts-ignore
       formData.content = await handleImageUpload(formData.content);
-
+      console.log(formData);
       // Create the page data based on template type
       const pageData = {
         title: formData.title || formData.hero?.title,
@@ -276,6 +276,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           lastUpdated: new Date().toISOString(),
           teamSize: 0,
         },
+        imageUrl: formData.image,
         level: pathLevel, // Use the path depth as the level
         showInNav: true,
         order: 0,

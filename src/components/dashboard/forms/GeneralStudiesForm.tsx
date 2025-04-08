@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { useState } from 'react';
 import Image from 'next/image';
+import { uploadImageToS3 } from '@/config/imageUploadS3';
 
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
@@ -36,18 +37,35 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
     },
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        form.setValue('image', result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          try {
+            // Show a preview of the image
+            const result = reader.result as string;
+            setImagePreview(result);
+            console.log(file);
+  
+            // Upload the image to S3
+            const formData = new FormData();
+            formData.append("image", file);
+  
+            const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
+            if (s3Url) {
+              // Update the image field with the S3 URL
+              form.setValue("image", s3Url, { shouldValidate: true });
+            } else {
+              throw new Error("Failed to upload image to S3");
+            }
+          } catch (error) {
+            console.error("Error uploading image:", error);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
   return (
     <Form {...form}>
