@@ -67,6 +67,7 @@ function PageList() {
 
   const saveEdit = async (formData: any) => {
     if (!selectedPage) return;
+    console.log('Form data:', formData);
 
     try {
       // Generate new slug from title if it has changed
@@ -87,6 +88,7 @@ function PageList() {
           : selectedPage.slug,
         templateId: selectedPage.templateId,
         parentId: selectedPage.parentId || null,
+        imageUrl: formData.image,
         content: formData.content,
         metadata: selectedPage.metadata || {
           lastUpdated: new Date().toISOString(),
