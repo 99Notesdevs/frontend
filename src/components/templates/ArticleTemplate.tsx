@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { useState, useEffect } from "react";
 import { ArticleTemplateProps } from "./types";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
@@ -16,82 +16,72 @@ import { env } from "@/config/env";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-interface LockContentProps {
-  children: React.ReactNode;
-}
-
-const LockContent: React.FC<LockContentProps> = ({ children }) => {
-  const token = Cookies.get("token");
-
-  // Check if token is valid
-  const checkToken = async () => {
-    if (!token) return false;
-    try {
-      const res = await axios.get(`${env.API}/user/check`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return res.data.success;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const [isAuthorized, setIsAuthorized] = React.useState(false);
-  React.useEffect(() => {
-    checkToken().then(setIsAuthorized);
-  }, []);
-
-  if (!isAuthorized) {
-    return (
-      <div className="p-4 bg-accent-orange rounded-lg border border-accent-orange-hover">
-        <p className="text-accent-orange-active font-medium">
-          This content is locked and requires authentication. Please log in to
-          view.
-        </p>
-      </div>
-    );
-  }
-
-  return <div dangerouslySetInnerHTML={{ __html: typeof children === "string" ? children : "" }}></div>;
+const processContent = (content: string, isAuthorized: boolean) => {
+  return content.replace(/<lock>(.*?)<\/lock>/g, (lockedContent) => {
+    return isAuthorized
+      ? lockedContent
+      : "<p>This content is locked. Please log in to view.</p>";
+  });
 };
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
+  const [isAuthorized, setIsAuthorized] = useState<null | boolean>(null);
+  const [mainContentFinal, setMainContentFinal] = useState(content || "");
+  const token = Cookies.get("token");
+
+  useEffect(() => {
+    const checkAuthorization = async () => {
+      if (!token) {
+        setIsAuthorized(false);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`${env.API}/user/check`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setIsAuthorized(res.data.success);
+      } catch (error) {
+        setIsAuthorized(false);
+      }
+    };
+
+    checkAuthorization();
+  }, [token]);
+
+  useEffect(() => {
+    if (isAuthorized !== null) {
+      const result = processContent(content || "", isAuthorized);
+      setMainContentFinal(result);
+    }
+  }, [isAuthorized, content]);
+
+  if (isAuthorized === null) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   // @ts-ignore
   const parentId = page.slug;
 
-  // Use content directly as HTML
-  const mainContent = content || '';
-
-  const { tags, date, readTime, coverImage } = metadata as {
-    tags?: string[];
-    date?: string;
-    readTime?: string;
-    coverImage?: string;
-  } || {};
+  const { tags, date, readTime, coverImage } =
+    (metadata as {
+      tags?: string[];
+      date?: string;
+      readTime?: string;
+      coverImage?: string;
+    }) || {};
 
   // Use either the content image or the metadata coverImage
   const displayImage = coverImage;
 
   // Function to process content and handle lock tags
-  const processContent = (content: string) => {
-    try {
-      const parts = content.split(/(<lock>.*?<\/lock>)/g);
-      return parts.map((part, index) => {
-        if (part.startsWith("<lock>")) {
-          const content = part.replace(/<lock>|<\/lock>/g, "");
-          return <LockContent key={index}>{content}</LockContent>;
-        }
-        return <div key={index} dangerouslySetInnerHTML={{ __html: part }} />;
-      });
-    } catch (error) {
-      console.error('Error processing content:', error);
-      return <div>{content}</div>;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white relative w-full overflow-x-hidden">
       {/* TOC Container with checkbox hack for toggle */}
@@ -131,11 +121,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
               <span>Table of Content</span>
             </h3>
             <div className="pr-2 space-y-1 max-h-[70vh] overflow-y-auto">
-              <TableOfContents content={mainContent} />
+              <TableOfContents content={mainContentFinal} />
             </div>
           </div>
         </div>
-            </div>
+      </div>
 
       {/* Main Content with padding adjustment */}
       <div
@@ -237,12 +227,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 prose-ol:pl-4 sm:prose-ol:pl-6
                 [&>*]:w-full"
               >
-                {processContent(mainContent)}
+                {mainContentFinal}
               </div>
             </div>
             <Comments parentId={parentId} />
           </main>
-
           {/* Right Sidebar */}
           <aside className="lg:col-span-4 xl:col-span-3 space-y-4 sm:space-y-6">
             {/* Search Bar - Always visible at top */}
@@ -265,7 +254,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     📑 Table of Contents
                   </h3>
                   <div className="pr-2">
-                    <TableOfContents content={mainContent} />
+                    <TableOfContents content={mainContentFinal} />
                   </div>
                 </div>
 
@@ -312,8 +301,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
                 )}
               </div>
-          </div>
-          </aside>        </div>
+            </div>
+          </aside>{" "}
+        </div>
       </div>
     </div>
   );

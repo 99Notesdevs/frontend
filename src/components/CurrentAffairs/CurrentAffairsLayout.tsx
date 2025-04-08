@@ -70,21 +70,18 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          next: { revalidate: 3600 } // Revalidate every hour
         });
 
         const monthlyResponse = await fetch(`${env.API}/currentAffair/type/monthly`, {
           headers: {
             "Content-Type": "application/json",
           },
-          next: { revalidate: 3600 } // Revalidate every hour
         });
 
         const yearlyResponse = await fetch(`${env.API}/currentAffair/type/yearly`, {
           headers: {
             "Content-Type": "application/json",
           },
-          next: { revalidate: 3600 } // Revalidate every hour
         });
 
         // Combine all the responses

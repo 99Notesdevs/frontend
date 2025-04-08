@@ -3,7 +3,7 @@ import Link from "next/link";
 import { env } from "@/config/env";
 import Head from "next/head";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
-import { ChevronRight, X } from "lucide-react";
+import { X } from "lucide-react";
 import DraggableTocButton from "@/components/navigation/DraggableTocButton";
 
 // Define types for the data
@@ -260,8 +260,7 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
     const response = await fetch(`${env.API}/currentArticle/slug/${encodeURIComponent(fullSlug)}`, {
       headers: {
         "Content-Type": "application/json",
-      },
-      cache: 'no-store'
+      }
     });
     
     
@@ -279,7 +278,7 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
         headers: {
           "Content-Type": "application/json",
         },
-        cache: 'no-store'
+        // cache: 'no-store'
       });
       
       if (allArticlesResponse.ok) {
@@ -316,7 +315,7 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
               headers: {
                 "Content-Type": "application/json",
               },
-              cache: 'no-store'
+              // cache: 'no-store'
             });
             
             if (fullArticleResponse.ok) {

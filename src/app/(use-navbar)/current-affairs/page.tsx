@@ -16,23 +16,17 @@ interface CurrentAffairPage {
 const CurrentAffairsIndex = async () => {
   try {
     // Fetch daily current affairs
-    const dailyResponse = await fetch(`${env.API}/currentAffair/type/daily`, {
-      next: { revalidate: 3600 }, // Revalidate every hour
-    });
+    const dailyResponse = await fetch(`${env.API}/currentAffair/type/daily`);
     const dailyData = await dailyResponse.json();
     const dailyPages = dailyData.data as CurrentAffairPage[];
 
     // Fetch monthly current affairs
-    const monthlyResponse = await fetch(`${env.API}/currentAffair/type/monthly`, {
-      next: { revalidate: 3600 }, // Revalidate every hour
-    });
+    const monthlyResponse = await fetch(`${env.API}/currentAffair/type/monthly`);
     const monthlyData = await monthlyResponse.json();
     const monthlyPages = monthlyData.data as CurrentAffairPage[];
 
     // Fetch yearly current affairs
-    const yearlyResponse = await fetch(`${env.API}/currentAffair/type/yearly`, {
-      next: { revalidate: 3600 }, // Revalidate every hour
-    });
+    const yearlyResponse = await fetch(`${env.API}/currentAffair/type/yearly`);
     const yearlyData = await yearlyResponse.json();
     const yearlyPages = yearlyData.data as CurrentAffairPage[];
 
