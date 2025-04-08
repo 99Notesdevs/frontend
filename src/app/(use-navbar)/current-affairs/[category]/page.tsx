@@ -146,7 +146,7 @@ const CurrentAffairsSectionPage = async ({
             <div dangerouslySetInnerHTML={{ __html: currentAffair?.content || '' }}></div>
             {/* <p className="text-lg text-gray-600 mb-6" } /> */}
 
-            <div className="flex flex-wrap gap-2">
+            {/* <div className="flex flex-wrap gap-2">
               {sectionInfo.topics.map((topic) => (
                 <span
                   key={topic}
@@ -155,7 +155,7 @@ const CurrentAffairsSectionPage = async ({
                   {topic}
                 </span>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

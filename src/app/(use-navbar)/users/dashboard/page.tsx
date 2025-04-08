@@ -1,13 +1,10 @@
 "use client";
 import React, { useState } from 'react';
 import Sidebar from '../layout/sidebar';
-import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute'
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const router = useRouter();
-
   return (
     <ProtectedRoute>
       <div className="flex flex-col md:flex-row bg-gradient-to-br from-gray-50 to-yellow-50 min-h-screen">

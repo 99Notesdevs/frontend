@@ -84,7 +84,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
   // Function to process content and handle lock tags
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white relative w-full overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative w-full overflow-x-hidden">
       {/* TOC Container with checkbox hack for toggle */}
       <input type="checkbox" id="toc-toggle" className="hidden peer" />
 
@@ -101,10 +101,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
         <label
           htmlFor="toc-toggle"
           className="absolute top-4 right-4 p-2 cursor-pointer rounded-full
-          hover:bg-background-secondary transition-colors duration-200 z-[100]
+          hover:bg-gray-100 transition-colors duration-200 z-[100]
           bg-white shadow-md border border-gray-200"
         >
-          <X className="w-5 h-5 text-secondary hover:text-primary" />
+          <X className="w-5 h-5 text-gray-600 hover:text-gray-900" />
         </label>
 
         {/* Left TOC Sidebar */}
@@ -199,25 +199,25 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 prose-h4:text-gray-600
                 prose-h4:font-medium
                 prose-h4:before:content-['§']
-                prose-h4:before:text-accent-color
+                prose-h4:before:text-yellow-500
                 prose-h4:before:mr-2
                 prose-h4:before:opacity-70
                 
-                prose-p:text-secondary
+                prose-p:text-gray-600
                 prose-p:leading-relaxed
                 prose-p:tracking-wide
-                prose-strong:text-primary
-                prose-a:text-primary
+                prose-strong:text-gray-800
+                prose-a:text-blue-600
                 prose-a:no-underline
                 prose-a:border-b-2
-                prose-a:border-primary
+                prose-a:border-blue-200
                 prose-a:transition-colors
-                prose-a:hover:border-primary-active
-                prose-blockquote:border-l-primary
-                prose-blockquote:bg-background-secondary
+                prose-a:hover:border-blue-500
+                prose-blockquote:border-l-blue-500
+                prose-blockquote:bg-blue-50
                 prose-blockquote:p-3 sm:prose-blockquote:p-4
                 prose-blockquote:rounded-r-lg
-                prose-pre:bg-background-secondary
+                prose-pre:bg-gray-50
                 prose-pre:rounded-lg
                 prose-pre:p-3 sm:prose-pre:p-4
                 prose-img:rounded-lg
@@ -237,7 +237,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
           <aside className="lg:col-span-4 xl:col-span-3 space-y-4 sm:space-y-6">
             {/* Search Bar - Always visible at top */}
             <div
-              className="bg-white border border-background-secondary rounded-xl shadow-lg p-4 sm:p-6 
+              className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
             transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
             >
               <SearchBar />
@@ -248,10 +248,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
               {/* TOC Section */}
               <div className="sticky top-8 space-y-4 sm:space-y-6">
                 <div
-                  className="hidden lg:block bg-white border border-background-secondary rounded-xl shadow-lg p-4 sm:p-6 
+                  className="hidden lg:block bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
                 transition-all duration-300 hover:shadow-xl"
                 >
-                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
                     📑 Table of Contents
                   </h3>
                   <div className="pr-2">
@@ -260,9 +260,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 </div>
 
                 {/* Social Media Section - Fixed below TOC */}
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-4 sm:p-6">
-                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                    <span className="text-primary">🌐</span>
+                <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2 flex items-center gap-2">
+                    <span className="text-blue-500">🌐</span>
                     <span>Connect With Us</span>
                   </h3>
                   <div className="py-2 h-9">
@@ -271,21 +271,21 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 </div>
 
                 {/* Contact Form Section */}
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg">
+                <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
                   <ContactForm />
                 </div>
 
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg">
+                <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
                   <Ads imageUrl="/" altText="ads" />
                 </div>
 
                 {/* Tags Section - Fixed below Contact Form */}
                 {tags && tags.length > 0 && (
                   <div
-                    className="bg-white border border-background-secondary rounded-xl shadow-lg p-4 sm:p-6 
+                    className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
                   transition-all duration-300 hover:shadow-xl"
                   >
-                    <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
                       🏷 Tags
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -293,7 +293,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                         <Badge
                           key={tag}
                           variant="secondary"
-                          className="bg-background-secondary text-primary hover:bg-background-tertiary transition-colors duration-200 cursor-pointer"
+                          className="bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
                         >
                           {tag}
                         </Badge>

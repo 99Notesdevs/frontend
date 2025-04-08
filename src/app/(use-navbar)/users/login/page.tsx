@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { env } from '@/config/env';
 import Cookies from 'js-cookie';
+import { isAuth } from '@/lib/isAuth';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -12,7 +13,14 @@ const Login = () => {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   const router = useRouter();
   const token = Cookies.get('token');
-
+    useEffect(() => {
+      const checkAuth = async () => {
+        if (await isAuth()) {
+          router.push('/users/dashboard');
+        }
+      };
+      checkAuth();
+    }, []);
   const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);

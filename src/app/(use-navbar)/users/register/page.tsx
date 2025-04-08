@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
-// import { isNotAuth } from "@/lib/isAuth";
+import { isAuth } from "@/lib/isAuth";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -20,6 +20,15 @@ const Register = () => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (await isAuth()) {
+        router.push('/users/dashboard');
+      }
+    };
+    checkAuth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
