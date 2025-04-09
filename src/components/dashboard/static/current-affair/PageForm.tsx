@@ -8,7 +8,7 @@ import TiptapEditor  from '@/components/ui/tiptapeditor';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 import Image from 'next/image';
-
+import {uploadImageToS3} from '@/config/imageUploadS3';
 // Types for CurrentAffair models
 interface CurrentAffairType {
   id: number;
@@ -292,30 +292,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       reader.readAsDataURL(file);
     }
   };
-
-  const uploadImageToS3 = async (formData: FormData) => {
-    try {
-      const response = await fetch(`${env.API}/upload-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload image');
-      }
-
-      const data = await response.json();
-      return data.url;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      throw error;
-    }
-  };
-
-  const renderStepContent = () => {
+   const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
