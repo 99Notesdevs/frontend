@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useState, useEffect } from "react";
 import { ArticleTemplateProps } from "./types";
 import { Badge } from "@/components/ui/badge";
