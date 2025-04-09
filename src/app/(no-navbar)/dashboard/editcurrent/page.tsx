@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useEffect , useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
-import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
-import { useForm} from 'react-hook-form';
+import { PencilIcon, TrashIcon, EyeIcon, ArrowLeftIcon, CalendarIcon, CalendarDaysIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+
 interface CurrentAffairType {
   id: number;
   title: string;
@@ -20,6 +21,7 @@ interface CurrentAffairType {
   updatedAt: Date;
   dailyArticle?: CurrentAffairArticleType[];
 }
+
 interface CurrentAffairArticleType {
   id: number;
   title: string;
@@ -32,12 +34,11 @@ interface CurrentAffairArticleType {
 }
 
 export default function PageListCurrent() {
-  const [selectedPage, setSelectedPage] = useState<CurrentAffairType |null>(null);
+  const [selectedPage, setSelectedPage] = useState<CurrentAffairType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState<CurrentAffairType[]>([]);
-  const [selectedType, setSelectedType] = useState<'daily' | 'monthly' | 'yearly' | null>(null);
-  // const token = Cookie.get('token');
+  const [selectedType, setSelectedType] = useState<'daily' | 'monthly' | 'yearly'>('daily');
 
   const {
     register,
@@ -71,6 +72,10 @@ export default function PageListCurrent() {
     }
   });
   const token = Cookie.get('token');
+
+  useEffect(() => {
+    fetchPages('daily'); // Fetch daily pages on initial load
+  }, []);
 
   useEffect(() => {
     if (selectedPage) {
@@ -208,8 +213,23 @@ export default function PageListCurrent() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Edit Current Affairs</h1>
+      <div className="mb-8">
+        <div className="bg-slate-800 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-white">Edit Current Affairs</h1>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.href = '/dashboard/current-affair'}
+                className="border-slate-700 text-white hover:bg-slate-700"
+              >
+                <ArrowLeftIcon className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Type Selection */}
@@ -218,23 +238,32 @@ export default function PageListCurrent() {
           <Button
             variant={selectedType === 'daily' ? 'default' : 'outline'}
             onClick={() => handleTypeChange('daily')}
-            className="flex-1"
+            className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
           >
-            Daily
+            <div className="flex items-center justify-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-slate-500" />
+              <span>Daily</span>
+            </div>
           </Button>
           <Button
             variant={selectedType === 'monthly' ? 'default' : 'outline'}
             onClick={() => handleTypeChange('monthly')}
-            className="flex-1"
+            className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
           >
-            Monthly
+            <div className="flex items-center justify-center gap-2">
+              <CalendarDaysIcon className="w-5 h-5 text-slate-500" />
+              <span>Monthly</span>
+            </div>
           </Button>
           <Button
             variant={selectedType === 'yearly' ? 'default' : 'outline'}
             onClick={() => handleTypeChange('yearly')}
-            className="flex-1"
+            className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
           >
-            Yearly
+            <div className="flex items-center justify-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-slate-500" />
+              <span>Yearly</span>
+            </div>
           </Button>
         </div>
       </div>
@@ -271,8 +300,8 @@ export default function PageListCurrent() {
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                {page.content ? page.content.substring(0, 100) + '...' : 'No content available'}
+              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                {page.content ? page.content.substring(0, 150) + '...' : 'No content available'}
               </p>
 
               <div className="flex justify-end space-x-2">
@@ -280,16 +309,18 @@ export default function PageListCurrent() {
                   variant="outline"
                   size="sm"
                   onClick={() => window.location.href = `/current-affairs/${page.slug}`}
+                  className="border-slate-200 text-slate-900 hover:bg-slate-50"
                 >
-                  <EyeIcon className="w-4 h-4 mr-2" />
+                  <EyeIcon className="w-4 h-4 mr-2 text-slate-500" />
                   View
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedPage(page)}
+                  className="border-slate-200 text-blue-600 hover:bg-blue-50"
                 >
-                  <PencilIcon className="w-4 h-4 mr-2" />
+                  <PencilIcon className="w-4 h-4 mr-2 text-blue-500" />
                   Edit
                 </Button>
                 <Button
@@ -299,16 +330,18 @@ export default function PageListCurrent() {
                     const parentPageName = page.slug.replace(/\//g, " ");
                     window.location.href = `/dashboard/editcurrent/articles?parentPageName=${parentPageName}`;
                   }}
+                  className="border-slate-200 text-blue-600 hover:bg-blue-50"
                 >
-                  <PencilIcon className="w-4 h-4 mr-2" />
+                  <PencilIcon className="w-4 h-4 mr-2 text-blue-500" />
                   Edit Articles
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => handleDelete(page.id)}
+                  className="border-slate-200 text-red-600 hover:bg-red-50"
                 >
-                  <TrashIcon className="w-4 h-4 mr-2" />
+                  <TrashIcon className="w-4 h-4 mr-2 text-red-500" />
                   Delete
                 </Button>
               </div>
@@ -319,45 +352,67 @@ export default function PageListCurrent() {
 
       {selectedPage && (
         <div className="mt-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Edit Current Affair</h2>
-            
-            <form onSubmit={handleEditSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title
-                </label>
-                <Input
-                  {...register("title")}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Content
-                </label>
-                <TiptapEditor
-                  content={getValues("content") || ""}
-                  onChange={handleEditorChange}
-                />
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                <Button
-                  type="button"
-                  variant="outline"
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-slate-900">Edit Current Affair</h2>
+                <button
                   onClick={() => {
                     setSelectedPage(null);
                     reset();
                   }}
+                  className="text-slate-500 hover:text-slate-700"
                 >
                   Cancel
-                </Button>
-                <Button type="submit">
-                  Save Changes
-                </Button>
+                </button>
               </div>
-            </form>
+
+              <div className="space-y-6">
+                <form onSubmit={handleEditSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Title
+                    </label>
+                    <Input
+                      {...register("title")}
+                      className="w-full"
+                      placeholder="Enter title"
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-slate-700">
+                      Content
+                    </label>
+                    <div className="rounded-lg border border-slate-200 bg-white">
+                      <TiptapEditor
+                        content={getValues("content") || ""}
+                        onChange={handleEditorChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-4">
+                    <Button
+                      variant="outline"
+                      type="button"
+                      onClick={() => {
+                        setSelectedPage(null);
+                        reset();
+                      }}
+                      className="border-slate-200 text-slate-900 hover:bg-slate-50"
+                    >
+                      <XMarkIcon className="w-4 h-4 mr-2 text-slate-500" />
+                      Cancel
+                    </Button>
+                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                      <CheckIcon className="w-4 h-4 mr-2 text-white" />
+                      Save Changes
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       )}

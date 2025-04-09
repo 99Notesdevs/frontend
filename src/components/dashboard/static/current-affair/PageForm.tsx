@@ -304,10 +304,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   value={selectedType}
                   onValueChange={handleTypeChange}
                 >
-                  <SelectTrigger className="w-full border-slate-200 focus:border-slate-400 focus:ring-slate-400">
+                  <SelectTrigger className="w-full border-white text-white focus:border-white focus:ring-white">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white text-white">
                     <SelectItem value="daily">Daily</SelectItem>
                     <SelectItem value="monthly">Monthly</SelectItem>
                     <SelectItem value="yearly">Yearly</SelectItem>
@@ -337,7 +337,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   value={createNewAffair ? 'new' : selectedAffairId}
                   onValueChange={handleAffairChange}
                 >
-                  <SelectTrigger className="w-full border-slate-200 focus:border-slate-400 focus:ring-slate-400">
+                  <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
                     <SelectValue placeholder="Select a current affair or create new" />
                   </SelectTrigger>
                   <SelectContent>
