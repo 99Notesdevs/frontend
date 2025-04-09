@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useEffect , useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
-import { useForm} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { uploadImageToS3 } from '@/config/imageUploadS3';
+import Image from 'next/image';
+
 interface CurrentAffairType {
   id: number;
   title: string;
@@ -18,8 +21,10 @@ interface CurrentAffairType {
   slug: string;
   createdAt: Date;
   updatedAt: Date;
+  imageUrl: string | null;
   dailyArticle?: CurrentAffairArticleType[];
 }
+
 interface CurrentAffairArticleType {
   id: number;
   title: string;
@@ -32,12 +37,15 @@ interface CurrentAffairArticleType {
 }
 
 export default function PageListCurrent() {
-  const [selectedPage, setSelectedPage] = useState<CurrentAffairType |null>(null);
+  const [selectedPage, setSelectedPage] = useState<CurrentAffairType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState<CurrentAffairType[]>([]);
   const [selectedType, setSelectedType] = useState<'daily' | 'monthly' | 'yearly' | null>(null);
-  // const token = Cookie.get('token');
+  const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
+  const [imageLoading, setImageLoading] = useState(false);
+
+  const token = Cookie.get('token');
 
   const {
     register,
@@ -56,7 +64,8 @@ export default function PageListCurrent() {
         type: z.string(),
         slug: z.string(),
         createdAt: z.date(),
-        updatedAt: z.date()
+        updatedAt: z.date(),
+        imageUrl: z.string().nullable()
       })
     ),
     defaultValues: {
@@ -67,10 +76,10 @@ export default function PageListCurrent() {
       slug: "",
       createdAt: new Date(),
       updatedAt: new Date(),
+      imageUrl: null,
       dailyArticle: []
     }
   });
-  const token = Cookie.get('token');
 
   useEffect(() => {
     if (selectedPage) {
@@ -83,9 +92,11 @@ export default function PageListCurrent() {
         slug: selectedPage.slug,
         createdAt: selectedPage.createdAt,
         updatedAt: selectedPage.updatedAt,
+        imageUrl: selectedPage.imageUrl || null,
         dailyArticle: selectedPage.dailyArticle || []
       });
       setValue('content', selectedPage.content || '');
+      setImagePreview(selectedPage.imageUrl || null);
     }
   }, [selectedPage, selectedType, reset, setValue]);
 
@@ -93,6 +104,38 @@ export default function PageListCurrent() {
     setValue('content', content, { shouldValidate: true });
     if (selectedPage) {
       // setEditingArticle(prev => prev ? { ...prev, content } : null);
+    }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageLoading(true);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          // Show a preview of the image
+          const result = reader.result as string;
+          setImagePreview(result);
+
+          // Upload the image to S3
+          const formData = new FormData();
+          formData.append("image", file);
+
+          const s3Url = await uploadImageToS3(formData);
+          if (s3Url) {
+            setValue("imageUrl", s3Url, { shouldValidate: true });
+          } else {
+            throw new Error("Failed to upload image to S3");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          setError("Failed to upload image. Please try again.");
+        } finally {
+          setImageLoading(false);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -113,13 +156,15 @@ export default function PageListCurrent() {
         content: formData.content,
         type: selectedType || formData.type || 'daily',
         slug,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        imageUrl: formData.imageUrl,
       };
 
       if (!selectedPage) {
         setError('No page selected');
         return;
       }
+      
       const response = await fetch(`${env.API}/currentAffair/${selectedPage.id}`, {
         method: 'PUT',
         headers: {
@@ -139,6 +184,9 @@ export default function PageListCurrent() {
       if (selectedType) {
         fetchPages(selectedType);
       }
+      
+      // Refresh the page after successful submission
+      window.location.reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -340,6 +388,40 @@ export default function PageListCurrent() {
                   content={getValues("content") || ""}
                   onChange={handleEditorChange}
                 />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image
+                </label>
+                {imagePreview && (
+                  <div className="relative w-full h-64 mb-4">
+                    <Image
+                      src={imagePreview}
+                      alt="Preview"
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+                <input
+                  type="file"
+                  id="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  disabled={imageLoading}
+                  className="block w-full text-sm text-slate-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-violet-50 file:text-violet-700
+                    hover:file:bg-violet-100"
+                />
+                {imageLoading && (
+                  <div className="text-sm text-gray-600">Uploading image...</div>
+                )}
+                {errors.imageUrl && (
+                  <p className="mt-1 text-sm text-red-600">{errors.imageUrl.message}</p>
+                )}
               </div>
 
               <div className="flex justify-end space-x-4">

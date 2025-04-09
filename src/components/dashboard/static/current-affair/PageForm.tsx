@@ -41,7 +41,13 @@ export function PageForm({ editPage = null }: PageFormProps) {
   // Step management
   const [step, setStep] = useState(1); // 1: Select Type, 2: Select/Create CurrentAffair, 3: Create Article
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  
+  const [isLoading, setIsLoading] = useState({
+    fetchingAffairs: false,
+    creatingAffair: false,
+    creatingArticle: false,
+    uploadingImage: false
+  });
+
   // Step 1: Type selection
   const [selectedType, setSelectedType] = useState<string>('daily');
   
@@ -80,6 +86,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   const fetchCurrentAffairsByType = async (type: string) => {
     try {
+      setIsLoading(prev => ({ ...prev, fetchingAffairs: true }));
       const token = Cookie.get('token');
       const response = await fetch(`${env.API}/currentAffair/type/${type}`, {
         headers: {
@@ -99,19 +106,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
       console.error('Detailed error fetching current affairs:', {
         error: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
-        name: error instanceof Error ? error.name : undefined,
-        type: error instanceof Error ? error.constructor.name : typeof error
       });
-
-      if (error instanceof Error) {
-        if (error.name === 'TypeError') {
-          showToast('Network error: Could not connect to the server. Please check your internet connection.', 'error');
-        } else {
-          showToast('Failed to load current affairs. Please try again.', 'error');
-        }
-      } else {
-        showToast('Failed to load current affairs. Please try again.', 'error');
-      }
+      showToast('Failed to fetch current affairs. Please try again.', 'error');
+    } finally {
+      setIsLoading(prev => ({ ...prev, fetchingAffairs: false }));
     }
   };
 
@@ -135,8 +133,40 @@ export function PageForm({ editPage = null }: PageFormProps) {
     }
   };
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          setIsLoading(prev => ({ ...prev, uploadingImage: true }));
+          const result = reader.result as string;
+          setImagePreview(result);
+          
+          // Upload the image to S3
+          const formData = new FormData();
+          formData.append("image", file);
+
+          const s3Url = await uploadImageToS3(formData);
+          if (s3Url) {
+            setNewAffairData(prev => ({ ...prev, imageUrl: s3Url }));
+          } else {
+            throw new Error("Failed to upload image to S3");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          setToast({ message: "Failed to upload image", type: "error" });
+        } finally {
+          setIsLoading(prev => ({ ...prev, uploadingImage: false }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleCreateAffair = async () => {
     try {
+      setIsLoading(prev => ({ ...prev, creatingAffair: true }));
       if (!newAffairData.title) {
         throw new Error('Title is required');
       }
@@ -145,19 +175,20 @@ export function PageForm({ editPage = null }: PageFormProps) {
       const baseSlug = newAffairData.title
         .toLowerCase()
         .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
-    const slug = `current-affairs/${baseSlug}`;
+        .replace(/[^a-z0-9-]/g, '');
+      const slug = `current-affairs/${baseSlug}`;
 
-    // Ensure content is a string (even if empty)
-    const content = newAffairData.content || '';
+      // Ensure content is a string (even if empty)
+      const content = newAffairData.content || '';
 
-    const affairData = {
+      const affairData = {
         title: newAffairData.title,
         content,
         imageUrl: newAffairData.imageUrl,
         type: newAffairData.type,
         slug
       };
+
       const response = await fetch(`${env.API}/currentAffair`, {
         method: 'POST',
         headers: {
@@ -180,11 +211,14 @@ export function PageForm({ editPage = null }: PageFormProps) {
     } catch (error) {
       console.error('Error creating current affair:', error);
       showToast('Failed to create current affair. Please try again.', 'error');
+    } finally {
+      setIsLoading(prev => ({ ...prev, creatingAffair: false }));
     }
   };
 
   const handleCreateArticle = async () => {
     try {
+      setIsLoading(prev => ({ ...prev, creatingArticle: true }));
       // Validate all required fields
       if (!articleData.title) {
         throw new Error('Title is required');
@@ -265,34 +299,35 @@ export function PageForm({ editPage = null }: PageFormProps) {
     }
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        try {
-          const result = reader.result as string;
-          setImagePreview(result);
+  // const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = async () => {
+  //       try {
+  //         const result = reader.result as string;
+  //         setImagePreview(result);
           
-          // Upload the image to S3
-          const formData = new FormData();
-          formData.append("image", file);
+  //         // Upload the image to S3
+  //         const formData = new FormData();
+  //         formData.append("image", file);
 
-          const s3Url = await uploadImageToS3(formData);
-          if (s3Url) {
-            setNewAffairData(prev => ({ ...prev, imageUrl: s3Url }));
-          } else {
-            throw new Error("Failed to upload image to S3");
-          }
-        } catch (error) {
-          console.error("Error uploading image:", error);
-          setToast({ message: "Failed to upload image", type: "error" });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-   const renderStepContent = () => {
+  //         const s3Url = await uploadImageToS3(formData);
+  //         if (s3Url) {
+  //           setNewAffairData(prev => ({ ...prev, imageUrl: s3Url }));
+  //         } else {
+  //           throw new Error("Failed to upload image to S3");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error uploading image:", error);
+  //         setToast({ message: "Failed to upload image", type: "error" });
+  //       }
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+  const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
@@ -367,6 +402,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
                         Image
                       </label>
                       <div className="flex flex-col gap-2">
+                        {isLoading.uploadingImage && (
+                          <div className="flex items-center justify-center p-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                          </div>
+                        )}
                         {imagePreview && (
                           <div className="relative w-32 h-32">
                             <Image
@@ -381,12 +421,14 @@ export function PageForm({ editPage = null }: PageFormProps) {
                           type="file"
                           accept="image/*"
                           onChange={handleImageChange}
+                          disabled={isLoading.uploadingImage}
                           className="block w-full text-sm text-slate-500
                                     file:mr-4 file:py-2 file:px-4
                                     file:rounded-full file:border-0
                                     file:text-sm file:font-semibold
                                     file:bg-blue-50 file:text-blue-700
-                                    hover:file:bg-blue-100"
+                                    hover:file:bg-blue-100
+                                    disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         {newAffairData.imageUrl && (
                           <div className="mt-2">
@@ -415,8 +457,16 @@ export function PageForm({ editPage = null }: PageFormProps) {
                     <Button
                       onClick={handleCreateAffair}
                       className="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors duration-200"
+                      disabled={isLoading.creatingAffair}
                     >
-                      Create Current Affair
+                      {isLoading.creatingAffair ? (
+                        <div className="flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                          Creating...
+                        </div>
+                      ) : (
+                        'Create Current Affair'
+                      )}
                     </Button>
                   </div>
                 )}
@@ -493,8 +543,16 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   <Button
                     onClick={handleCreateArticle}
                     className="bg-slate-800 text-white px-8 py-2 rounded-lg hover:bg-slate-700 transition-colors duration-200"
+                    disabled={isLoading.creatingArticle}
                   >
-                    Create Article
+                    {isLoading.creatingArticle ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                        Creating...
+                      </div>
+                    ) : (
+                      'Create Article'
+                    )}
                   </Button>
                 </div>
               </div>

@@ -49,53 +49,52 @@ const CurrentAffairsSectionPage = async ({
   // Fetch the current affair section data
   let currentAffair: CurrentAffair | null = null;
   let articles: Article[] = [];
+  let error: string | null = null;
+
   try {
     // Convert forward slashes to spaces to match backend format
     const modifiedSlug = fullSlug.replace(/\s+/g, ' ');
-    // For server components, use the backend API directly
-    // Looking at the backend routes, the endpoint for getting a section by slug is /currentAffair/slug/:slug
-    const sectionResponse = await fetch(`${env.API}/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
+    try {
+      // For server components, use the backend API directly
+      // Looking at the backend routes, the endpoint for getting a section by slug is /currentAffair/slug/:slug
+      const sectionResponse = await fetch(`${env.API}/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (sectionResponse.ok) {
+      if (!sectionResponse.ok) {
+        throw new Error(`Failed to fetch section data: ${sectionResponse.statusText}`);
+      }
+
       const sectionData = await sectionResponse.json();
       if (sectionData.status === 'success' && sectionData.data) {
         currentAffair = sectionData.data;
       } else {
-        console.error("Failed to get section data:", sectionData);
+        throw new Error("Invalid response from server");
       }
-    } else {
-      console.error("Section response not OK:", sectionResponse.status);
+    } catch (fetchError) {
+      console.error("Error fetching section data:", fetchError);
+      error = "Failed to load section data. Please check your internet connection and try again.";
     }
 
-    // Fetch all articles
-    const articlesResponse = await fetch(`${env.API}/currentArticle`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      // Fetch all articles
+      const articlesResponse = await fetch(`${env.API}/currentArticle`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (articlesResponse.ok) {
+      if (!articlesResponse.ok) {
+        throw new Error(`Failed to fetch articles: ${articlesResponse.statusText}`);
+      }
+
       const articlesData = await articlesResponse.json();
       if (articlesData.status === 'success' && articlesData.data) {
         const allArticles = articlesData.data;
-
-        // Log some sample articles to see their structure
-        if (allArticles.length > 0) {
-          console.log("Sample articles:", allArticles); // Log first 5 articles
-          // Log all article slugs to see what we're working with
-        }
-
-        // Based on the logs, it seems the articles don't have a parentSlug property
-        // Instead, we need to extract the parent slug from the article's slug
-
-        // Filter articles by extracting parent slug from the article's slug
         articles = allArticles.filter((article: Article) => {
-          // For an article with slug like "current-affairs/news-analysis/sample-article"
-          // We need to extract "current-affairs/news-analysis" as the parent slug
           const slugParts = article.slug.split('/');
 
           // Remove the last part (the article name) to get the parent slug
@@ -108,13 +107,29 @@ const CurrentAffairsSectionPage = async ({
         });
 
       } else {
-        console.error("Failed to get articles data:", articlesData);
+        throw new Error("Invalid response from server");
       }
-    } else {
-      console.error("Articles response not OK:", articlesResponse.status);
+    } catch (fetchError) {
+      console.error("Error fetching articles:", fetchError);
+      error = error || "Failed to load articles. Please check your internet connection and try again.";
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error in CurrentAffairsSectionPage:", error);
+    error = "Failed to load data. Please check your internet connection and try again.";
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center p-8">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Link href="/current-affairs" className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Go Back
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   // Get the section config for this category
