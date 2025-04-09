@@ -48,3 +48,62 @@
     /* Example: 16px */
     margin-bottom: 0.5rem;
 }
+
+.locked-content {
+    position: relative;
+    overflow: hidden;
+    max-height: 200px;
+    /* Adjust the height to control how much content is initially visible */
+    margin-bottom: 1rem;
+}
+
+.locked-content::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0) 50%,
+            /* Fully transparent at the top */
+            rgba(255, 255, 255, 0.8) 80%,
+            /* Semi-transparent in the middle */
+            rgba(255, 255, 255, 1) 100%
+            /* Fully opaque at the bottom */
+        );
+    pointer-events: none;
+    /* Ensure the gradient doesn't block interactions */
+}
+
+.locked-content p {
+    filter: blur(2px);
+    /* Slight blur for the text */
+    opacity: 0.8;
+    /* Slightly reduce the opacity */
+}
+
+.locked-content .login-link {
+    position: absolute;
+    top: 50%;
+    /* Center vertically */
+    left: 50%;
+    /* Center horizontally */
+    transform: translate(-50%, -50%);
+    /* Adjust for the element's size */
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Semi-transparent black background */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.locked-content .login-link:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    /* Darker background on hover */
+}

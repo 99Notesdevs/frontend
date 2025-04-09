@@ -20,7 +20,10 @@ const processContent = (content: string, isAuthorized: boolean) => {
   return content.replace(/<lock>(.*?)<\/lock>/g, (lockedContent) => {
     return isAuthorized
       ? lockedContent
-      : "<p>This content is locked. Please log in to view.</p>";
+      : `<div class="locked-content">
+           <p>${lockedContent}</p>
+           <a href="/users/login" class="login-link">Log in to view</a>
+         </div>`;
   });
 };
 
