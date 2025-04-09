@@ -142,13 +142,15 @@ const StudyMaterials = () => {
                   className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
                 >
                   <Image
-                    src={
-                      page.imageUrl
-                    }
+                    src={page?.imageUrl || "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"}
                     alt={page.title}
                     width={500}
                     height={192}
                     className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      img.src = "https://via.placeholder.com/500x192?text=Image+Not+Available";
+                    }}
                   />
                   <div className="p-6">
                     <h3 className="text-xl text-black font-semibold mb-2">
