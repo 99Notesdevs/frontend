@@ -20,7 +20,10 @@ const processContent = (content: string, isAuthorized: boolean) => {
   return content.replace(/<lock>(.*?)<\/lock>/g, (lockedContent) => {
     return isAuthorized
       ? lockedContent
-      : "<p>This content is locked. Please log in to view.</p>";
+      : `<div class="locked-content">
+           <p>${lockedContent}</p>
+           <a href="/users/login" class="login-link">Log in to view</a>
+         </div>`;
   });
 };
 
@@ -157,13 +160,13 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
               {/* Article Header */}
               <div className="text-center mb-8 sm:mb-12">
-                <h1
+                {/* <h1
                   className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 
                 relative inline-block bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text 
                 text-transparent px-2"
                 >
                   {title}
-                </h1>
+                </h1> */}
               </div>
 
               <div

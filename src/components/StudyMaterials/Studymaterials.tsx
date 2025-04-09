@@ -72,9 +72,6 @@ const StudyMaterials = () => {
           <h3 className="text-xl text-black font-semibold mb-2">
             {item.title}
           </h3>
-          <p className="text-black mb-4">
-            {item.content ? item.content.substring(0, 100) + "..." : "No description available"}
-          </p>
           <Link
             href={`${item.slug}`}
             className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
@@ -117,8 +114,10 @@ const StudyMaterials = () => {
           {[
             "All",
             ...pages
-              .filter(item => item.slug.startsWith("upsc-notes") && item.level === 2)
-              .map(item => item.title)
+              .filter(
+                (item) => item.slug.startsWith("upsc-notes") && item.level === 2
+              )
+              .map((item) => item.title),
           ].map((category) => (
             <button
               key={category}
@@ -136,7 +135,7 @@ const StudyMaterials = () => {
 
         {/* Study Materials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {selectedCategory === "All" 
+          {selectedCategory === "All"
             ? getFilteredMaterials().map((page) => (
                 <div
                   key={page.id}
@@ -157,7 +156,14 @@ const StudyMaterials = () => {
                     <h3 className="text-xl text-black font-semibold mb-2">
                       {page.title}
                     </h3>
-                    <p className="text-black mb-4" dangerouslySetInnerHTML={{ __html: page.content ? page.content.substring(0, 100) + "..." : "No description available" }} />
+                    <p
+                      className="text-black mb-4"
+                      dangerouslySetInnerHTML={{
+                        __html: page.content
+                          ? page.content.substring(0, 100) + "..."
+                          : "No description available",
+                      }}
+                    />
                     <Link
                       href={`${page.slug}`}
                       className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"

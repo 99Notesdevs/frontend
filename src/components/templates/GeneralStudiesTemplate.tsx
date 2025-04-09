@@ -21,6 +21,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
   
   // Default image if none is provided
   const pageImage = imageUrl || null;
+  console.log(children);
   
 
   return (
@@ -40,9 +41,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                  <div className="p-8">
+                  {/* <div className="p-8">
                     <h1 className="text-3xl md:text-4xl font-bold text-primary tracking-tight">{title}</h1>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </Card>
@@ -67,7 +68,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                       childContent = {};
                     }
                     
-                    const childImage = child.image || '/images/default-subtopic.jpg';
+                    const childImage = child.imageUrl || '/public/';
                     
                     return (
                       <Link 

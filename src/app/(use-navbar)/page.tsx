@@ -6,50 +6,12 @@ import FAQ from "@/components/common/FAQ/FAQ";
 import ContactMap from "@/components/common/Contact/ContactMap";
 import Reason99notes from "@/components/CoachingInfo/Reason99notes";
 import Slider from "@/components/About/Slider";
+import axios from "axios";
+import { env } from "@/config/env";
 
-export default function Home() {
-  const coreMemberImages = [
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 1",
-      info: "Information about Core Member 1",
-    },
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 2",
-      info: "Information about Core Member 2",
-    },
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 3",
-      info: "Information about Core Member 3",
-    },
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 4",
-      info: "Information about Core Member 4",
-    },
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 5",
-      info: "Information about Core Member 5",
-    },
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 6",
-      info: "Information about Core Member 6",
-    },
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 7",
-      info: "Information about Core Member 7",
-    },
-    {
-      src: "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg",
-      alt: "Core Member 8",
-      info: "Information about Core Member 8",
-    },
-  ];
+export default async function Home() {
+  const response = await axios.get(`${env.API}/about-99-notes/coreMembers`);
+  const coreMemberImages = response.data.data;
 
   return (
     <div className="min-h-screen bg-gray-50">
