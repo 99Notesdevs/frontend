@@ -14,7 +14,7 @@ import { uploadImageToS3 } from "@/config/imageUploadS3";
 const articleSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   content: z.string().min(10, "Content must be at least 10 characters"),
-  image: z.string().optional(),
+  imageUrl: z.string().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -29,7 +29,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   onSubmit,
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(
-    initialData?.image || null
+    initialData?.imageUrl || null
   );
 
   const {
@@ -43,7 +43,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     defaultValues: initialData || {
       title: "",
       content: "",
-      image: "",
+      imageUrl: "",
     },
   });
 
@@ -69,7 +69,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
           if (s3Url) {
             // Update the image field with the S3 URL
-            setValue("image", s3Url, { shouldValidate: true });
+            setValue("imageUrl", s3Url, { shouldValidate: true });
           } else {
             throw new Error("Failed to upload image to S3");
           }
@@ -86,7 +86,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     const transformedData = {
       title: data.title,
       content: data.content,
-      image: data.image || ''
+      image: data.imageUrl || ''
     };
     onSubmit(transformedData);
   };
