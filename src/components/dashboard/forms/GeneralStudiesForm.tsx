@@ -14,7 +14,7 @@ import { uploadImageToS3 } from '@/config/imageUploadS3';
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
   content: z.string().min(10, 'Content must be at least 10 characters'),
-  image: z.string().optional(),
+  imageUrl: z.string().optional(),
 });
 
 export type GeneralStudiesFormValues = z.infer<typeof formSchema>;
@@ -25,14 +25,15 @@ interface GeneralStudiesFormProps {
 }
 
 export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFormProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.image || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
+  console.log(defaultValues)
 
   const form = useForm<GeneralStudiesFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
       content: '',
-      image: '',
+      imageUrl: '',
       ...defaultValues,
     },
   });
@@ -55,7 +56,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
             if (s3Url) {
               // Update the image field with the S3 URL
-              form.setValue("image", s3Url, { shouldValidate: true });
+              form.setValue("imageUrl", s3Url, { shouldValidate: true });
             } else {
               throw new Error("Failed to upload image to S3");
             }
@@ -92,7 +93,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
         {/* Image Upload */}
         <FormField
           control={form.control}
-          name="image"
+          name="imageUrl"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
               <FormLabel className="text-gray-500 font-medium">Featured Image</FormLabel>

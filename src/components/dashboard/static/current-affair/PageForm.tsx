@@ -7,12 +7,14 @@ import { Input } from '@/components/ui/input';
 import TiptapEditor  from '@/components/ui/tiptapeditor';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
-
+import Image from 'next/image';
+import {uploadImageToS3} from '@/config/imageUploadS3';
 // Types for CurrentAffair models
 interface CurrentAffairType {
   id: number;
   title: string;
   content: string;
+  imageUrl: string;
   type: string; // daily, monthly, yearly
   slug: string;
   createdAt: Date;
@@ -50,9 +52,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [newAffairData, setNewAffairData] = useState({
     title: '',
     content: '',
+    imageUrl: '',
     type: 'daily'
   });
-  
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   // Step 3: Article creation
   const [articleData, setArticleData] = useState({
     title: '',
@@ -150,6 +154,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     const affairData = {
         title: newAffairData.title,
         content,
+        imageUrl: newAffairData.imageUrl,
         type: newAffairData.type,
         slug
       };
@@ -242,6 +247,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setNewAffairData({
         title: '',
         content: '',
+        imageUrl: '',
         type: 'daily'
       });
       setArticleData({
@@ -259,7 +265,34 @@ export function PageForm({ editPage = null }: PageFormProps) {
     }
   };
 
-  const renderStepContent = () => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const result = reader.result as string;
+          setImagePreview(result);
+          
+          // Upload the image to S3
+          const formData = new FormData();
+          formData.append("image", file);
+
+          const s3Url = await uploadImageToS3(formData);
+          if (s3Url) {
+            setNewAffairData(prev => ({ ...prev, imageUrl: s3Url }));
+          } else {
+            throw new Error("Failed to upload image to S3");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          setToast({ message: "Failed to upload image", type: "error" });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+   const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
@@ -326,9 +359,49 @@ export function PageForm({ editPage = null }: PageFormProps) {
                       <Input
                         value={newAffairData.title}
                         onChange={(e) => setNewAffairData({ ...newAffairData, title: e.target.value })}
-                        placeholder="Enter current affair title"
-                        className="w-full"
+                        placeholder="Enter title"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Image
+                      </label>
+                      <div className="flex flex-col gap-2">
+                        {imagePreview && (
+                          <div className="relative w-32 h-32">
+                            <Image
+                              src={imagePreview}
+                              alt="Preview"
+                              fill
+                              className="object-cover rounded"
+                            />
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="block w-full text-sm text-slate-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-full file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-blue-50 file:text-blue-700
+                                    hover:file:bg-blue-100"
+                        />
+                        {newAffairData.imageUrl && (
+                          <div className="mt-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                              Image URL
+                            </label>
+                            <Input
+                              value={newAffairData.imageUrl}
+                              onChange={(e) => setNewAffairData({ ...newAffairData, imageUrl: e.target.value })}
+                              placeholder="Enter image URL"
+                              className="w-full"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -414,8 +487,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
                     value={articleData.author}
                     onChange={(e) => setArticleData({ ...articleData, author: e.target.value })}
                     placeholder="Enter author name"
-                    className="w-full"
-                  />
+                    className="w-full"                  />
                 </div>
                 <div className="mt-6 flex justify-end">
                   <Button

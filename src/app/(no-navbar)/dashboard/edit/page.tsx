@@ -14,7 +14,7 @@ interface Page {
   templateId: string;
   updatedAt: string;
   content: string;
-  image: string | null;
+  imageUrl: string | null;
   parentId?: number;
   level?: number;
   order?: number;
@@ -129,26 +129,27 @@ function PageList() {
 
   const getInitialFormData = (page: Page, templateId: string): any => {
     const parsedContent = page.content;
-    const parsedimage=page.image || undefined;
+    const parsedimage=page.imageUrl || undefined;
     switch (templateId) {
       case 'article':
         return {
           title: page.title || '',
           content: parsedContent || '',
+          imageUrl: parsedimage || undefined,
         };
       
       case 'general-studies':
         return {
           title: page.title || '',
           content: parsedContent || '',
-          image: parsedimage || undefined,
+          imageUrl: parsedimage || undefined,
         };
       
       case 'current-affairs':
         return {
           title: page.title || '',
           content: parsedContent || '',
-          image: parsedimage || undefined,
+          imageUrl: parsedimage || undefined,
         };
       case 'upsc-notes':
         return {

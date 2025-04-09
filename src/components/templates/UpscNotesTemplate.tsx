@@ -69,11 +69,11 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
           {/* Main Content with reduced width */}
           <main className="lg:col-span-7 xl:col-span-8 order-1 lg:order-2">
             <article className="bg-white border border-background-secondary rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
-              <h1 className="text-4xl sm:text-4xl font-bold mb-8 text-center">
+              {/* <h1 className="text-4xl sm:text-4xl font-bold mb-8 text-center">
                 <span className="text-primary border-b-2 border-accent-color pb-2">
                   {page.title}
                 </span>
-              </h1>
+              </h1> */}
 
               <div className="flex flex-wrap gap-2 mb-8 justify-center">
                 {Array.isArray(page.metadata?.keywords) ? page.metadata.keywords.map((keyword: string, index: number) => (
