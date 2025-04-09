@@ -45,9 +45,7 @@ interface Content {
 }
 
 async function fetchContent(): Promise<{ title: string; content: Content }> {
-  const res = await fetch(`${env.API}/about-99-notes`, {
-    cache: "no-store", // Disable caching for fresh data on every request
-  });
+  const res = await fetch(`${env.API}/about-99-notes`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch content");
