@@ -402,7 +402,6 @@ export default function PageListCurrent() {
         <div className="mt-8">
           <div className="bg-white rounded-lg shadow-sm">
             <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-slate-900">Edit Current Affair</h2>
                 <form onSubmit={handleEditSubmit} className="space-y-6">
                   <div>
@@ -485,7 +484,6 @@ export default function PageListCurrent() {
               </div>
             </div>
           </div>
-        </div>
       )}
     </div>
   );
