@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import CurrentAffairsLayout from "@/components/CurrentAffairs/CurrentAffairsLayout";
 import { sectionConfig } from "@/config/currentAffairs";
@@ -26,6 +27,7 @@ interface CurrentAffair {
   type: string;
   createdAt: string;
   updatedAt: string;
+  imageUrl?: string;
 }
 
 type Params = Promise<{
@@ -138,7 +140,18 @@ const CurrentAffairsSectionPage = async ({
       <div className="bg-gradient-to-r from-blue-50 via-white to-blue-50 border-b">
         <div className="container mx-auto px-4 sm:px-6 py-8">
           <Breadcrumb />
-
+          {/*Image */}
+          {currentAffair?.imageUrl && (
+            <div className="relative aspect-video w-full mb-6 rounded-lg overflow-hidden">
+              <Image
+                src={currentAffair.imageUrl}
+                alt={currentAffair.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+              />
+            </div>
+          )}
           <div className="max-w-4xl">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
               {currentAffair?.title || sectionInfo.title}
