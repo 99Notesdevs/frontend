@@ -53,7 +53,7 @@ export async function getNavigationTree(): Promise<NavItem[]> {
         } else {
           const newItem: NavItem = {
             slug: currentPath,
-            title: index === parts.length - 1 ? page.title : part,
+            title: index === parts.length ? (page.title) : part.toUpperCase().replace(/\-/g, ' '),
             children: [],
           };
           currentLevel.push(newItem);

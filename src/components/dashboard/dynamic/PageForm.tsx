@@ -276,7 +276,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           lastUpdated: new Date().toISOString(),
           teamSize: 0,
         },
-        imageUrl: formData.image,
+        imageUrl: formData.imageUrl,
         level: pathLevel, // Use the path depth as the level
         showInNav: true,
         order: 0,

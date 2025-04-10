@@ -10,6 +10,7 @@ import TiptapEditor from '@/components/ui/tiptapeditor';
 import { useState } from 'react';
 import Image from 'next/image';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
+import { set } from 'date-fns';
 
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
@@ -26,6 +27,7 @@ interface GeneralStudiesFormProps {
 
 export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
+  const [isUploading, setIsUploading] = useState(false);
   console.log(defaultValues)
 
   const form = useForm<GeneralStudiesFormValues>({
@@ -41,6 +43,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+        setIsUploading(true);
         const reader = new FileReader();
         reader.onloadend = async () => {
           try {
@@ -51,7 +54,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
   
             // Upload the image to S3
             const formData = new FormData();
-            formData.append("image", file);
+            formData.append("imageUrl", file);
   
             const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
             if (s3Url) {
@@ -62,6 +65,8 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             }
           } catch (error) {
             console.error("Error uploading image:", error);
+          } finally {
+            setIsUploading(false);
           }
         };
         reader.readAsDataURL(file);
@@ -147,10 +152,11 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
         {/* Submit Button */}
         <div className="flex justify-end">
           <Button 
+            disabled={isUploading}
             type="submit" 
             className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-2 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-colors duration-200"
           >
-            Save
+            {isUploading ? 'Uploading...' : 'Save'}
           </Button>
         </div>
       </form>

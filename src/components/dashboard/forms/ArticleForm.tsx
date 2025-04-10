@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,6 +30,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(
     initialData?.imageUrl || null
   );
+  const [isUploading, setIsUploading] =  useState(false);
 
   const {
     register,
@@ -54,6 +54,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setIsUploading(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -64,17 +65,22 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
 
           // Upload the image to S3
           const formData = new FormData();
-          formData.append("image", file);
+          formData.append("imageUrl", file);
+
+          console.log(formData);
 
           const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
           if (s3Url) {
             // Update the image field with the S3 URL
             setValue("imageUrl", s3Url, { shouldValidate: true });
           } else {
+            setValue("imageUrl", "www.google.com/fallbackUrl")
             throw new Error("Failed to upload image to S3");
           }
         } catch (error) {
           console.error("Error uploading image:", error);
+        } finally {
+          setIsUploading(false);
         }
       };
       reader.readAsDataURL(file);
@@ -86,7 +92,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     const transformedData = {
       title: data.title,
       content: data.content,
-      image: data.imageUrl || ''
+      imageUrl: data.imageUrl || ''
     };
     onSubmit(transformedData);
   };
@@ -139,8 +145,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         )}
       </div>
 
-      <Button type="submit" className="w-full">
-        Save
+      <Button disabled={isUploading} type="submit" className="w-full">
+        {isUploading ? 'Uploading...' : 'Save'}
       </Button>
     </form>
   );

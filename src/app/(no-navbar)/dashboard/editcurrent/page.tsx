@@ -264,12 +264,16 @@ export default function PageListCurrent() {
       <div className="mb-8">
         <div className="bg-slate-800 rounded-lg p-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white">Edit Current Affairs</h1>
+            <h1 className="text-2xl font-bold text-white">
+              Edit Current Affairs
+            </h1>
             <div className="flex items-center gap-4">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.location.href = '/dashboard/current-affair'}
+                onClick={() =>
+                  (window.location.href = "/dashboard/current-affair")
+                }
                 className="border-slate-700 text-white hover:bg-slate-700"
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-2" />
@@ -284,8 +288,8 @@ export default function PageListCurrent() {
       <div className="mb-8">
         <div className="flex gap-4">
           <Button
-            variant={selectedType === 'daily' ? 'default' : 'outline'}
-            onClick={() => handleTypeChange('daily')}
+            variant={selectedType === "daily" ? "default" : "outline"}
+            onClick={() => handleTypeChange("daily")}
             className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
           >
             <div className="flex items-center justify-center gap-2">
@@ -294,8 +298,8 @@ export default function PageListCurrent() {
             </div>
           </Button>
           <Button
-            variant={selectedType === 'monthly' ? 'default' : 'outline'}
-            onClick={() => handleTypeChange('monthly')}
+            variant={selectedType === "monthly" ? "default" : "outline"}
+            onClick={() => handleTypeChange("monthly")}
             className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
           >
             <div className="flex items-center justify-center gap-2">
@@ -304,8 +308,8 @@ export default function PageListCurrent() {
             </div>
           </Button>
           <Button
-            variant={selectedType === 'yearly' ? 'default' : 'outline'}
-            onClick={() => handleTypeChange('yearly')}
+            variant={selectedType === "yearly" ? "default" : "outline"}
+            onClick={() => handleTypeChange("yearly")}
             className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
           >
             <div className="flex items-center justify-center gap-2">
@@ -322,11 +326,7 @@ export default function PageListCurrent() {
         </div>
       )}
 
-      {error && (
-        <div className="text-red-500 mb-4">
-          Error: {error}
-        </div>
-      )}
+      {error && <div className="text-red-500 mb-4">Error: {error}</div>}
 
       {!loading && !error && !selectedType && (
         <div className="text-center py-8">
@@ -348,15 +348,24 @@ export default function PageListCurrent() {
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                {page.content ? page.content.substring(0, 150) + '...' : 'No content available'}
-              </p>
+                <div
+                  className="text-gray-600 text-sm mb-4 line-clamp-3"
+                  dangerouslySetInnerHTML={{
+                    __html: page.content ? (
+                      page.content.substring(0, 100)
+                    ) : (
+                      <p>No content Available</p>
+                    ),
+                  }}
+                ></div>
 
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.location.href = `/current-affairs/${page.slug}`}
+                  onClick={() =>
+                    (window.location.href = `/current-affairs/${page.slug}`)
+                  }
                   className="border-slate-200 text-slate-900 hover:bg-slate-50"
                 >
                   <EyeIcon className="w-4 h-4 mr-2 text-slate-500" />
@@ -402,88 +411,97 @@ export default function PageListCurrent() {
         <div className="mt-8">
           <div className="bg-white rounded-lg shadow-sm">
             <div className="p-6">
-                <h2 className="text-xl font-semibold text-slate-900">Edit Current Affair</h2>
-                <form onSubmit={handleEditSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Title
-                    </label>
-                    <Input
-                      {...register("title")}
-                      className="w-full"
-                      placeholder="Enter title"
+              <h2 className="text-xl font-semibold text-slate-900">
+                Edit Current Affair
+              </h2>
+              <form onSubmit={handleEditSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Title
+                  </label>
+                  <Input
+                    {...register("title")}
+                    className="w-full"
+                    placeholder="Enter title"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium text-slate-700">
+                    Content
+                  </label>
+                  <div className="rounded-lg border border-slate-200 bg-white">
+                    <TiptapEditor
+                      content={getValues("content") || ""}
+                      onChange={handleEditorChange}
                     />
                   </div>
+                </div>
 
-                  <div className="space-y-4">
-                    <label className="block text-sm font-medium text-slate-700">
-                      Content
-                    </label>
-                    <div className="rounded-lg border border-slate-200 bg-white">
-                      <TiptapEditor
-                        content={getValues("content") || ""}
-                        onChange={handleEditorChange}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Image
+                  </label>
+                  {imagePreview && (
+                    <div className="relative w-full h-64 mb-4">
+                      <Image
+                        src={imagePreview}
+                        alt="Preview"
+                        fill
+                        className="object-cover rounded-lg"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image
-                </label>
-                {imagePreview && (
-                  <div className="relative w-full h-64 mb-4">
-                    <Image
-                      src={imagePreview}
-                      alt="Preview"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-                <input
-                  type="file"
-                  id="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  disabled={imageLoading}
-                  className="block w-full text-sm text-slate-500
+                  )}
+                  <input
+                    type="file"
+                    id="image"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    disabled={imageLoading}
+                    className="block w-full text-sm text-slate-500
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
                     file:text-sm file:font-semibold
                     file:bg-violet-50 file:text-violet-700
                     hover:file:bg-violet-100"
-                />
-                {imageLoading && (
-                  <div className="text-sm text-gray-600">Uploading image...</div>
-                )}
-                {errors.imageUrl && (
-                  <p className="mt-1 text-sm text-red-600">{errors.imageUrl.message}</p>
-                )}
-              </div>
+                  />
+                  {imageLoading && (
+                    <div className="text-sm text-gray-600">
+                      Uploading image...
+                    </div>
+                  )}
+                  {errors.imageUrl && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.imageUrl.message}
+                    </p>
+                  )}
+                </div>
 
-                  <div className="flex justify-end space-x-4">
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={() => {
-                        setSelectedPage(null);
-                        reset();
-                      }}
-                      className="border-slate-200 text-slate-900 hover:bg-slate-50"
-                    >
-                      <XMarkIcon className="w-4 h-4 mr-2 text-slate-500" />
-                      Cancel
-                    </Button>
-                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                      <CheckIcon className="w-4 h-4 mr-2 text-white" />
-                      Save Changes
-                    </Button>
-                  </div>
-                </form>
-              </div>
+                <div className="flex justify-end space-x-4">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => {
+                      setSelectedPage(null);
+                      reset();
+                    }}
+                    className="border-slate-200 text-slate-900 hover:bg-slate-50"
+                  >
+                    <XMarkIcon className="w-4 h-4 mr-2 text-slate-500" />
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <CheckIcon className="w-4 h-4 mr-2 text-white" />
+                    Save Changes
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
+        </div>
       )}
     </div>
   );

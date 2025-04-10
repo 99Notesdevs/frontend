@@ -193,8 +193,8 @@ export default function Navbar({ navigation }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
-  const [authLoading, setAuthLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  console.log(navigation);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -205,22 +205,6 @@ export default function Navbar({ navigation }: NavbarProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     try {
-  //       const isUserLoggedIn = await isAuth();
-  //       setIsLoggedIn(isUserLoggedIn);
-  //     } catch (error) {
-  //       console.error('Auth check failed:', error);
-  //       setIsLoggedIn(false);
-  //     } finally {
-  //       setAuthLoading(false);
-  //     }
-  //   };
-
-  //   checkAuth();
-  // }, []);
 
   const toggleMobileSubmenu = (slug: string) => {
     setOpenMenus(prev => ({
