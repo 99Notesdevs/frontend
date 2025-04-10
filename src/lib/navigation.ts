@@ -53,7 +53,7 @@ export async function getNavigationTree(): Promise<NavItem[]> {
         } else {
           const newItem: NavItem = {
             slug: currentPath,
-            title: index === parts.length ? (page.title) : part.toUpperCase().replace(/\-/g, ' '),
+            title: index === parts.length ? (page.title) : part.replace(/\-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
             children: [],
           };
           currentLevel.push(newItem);
@@ -234,7 +234,7 @@ export async function getFooterLinks(): Promise<NavItem[]> {
         } else {
           const newItem: NavItem = {
             slug: currentPath,
-            title: index === parts.length - 1 ? page.title : part,
+            title: index === parts.length - 1 ? page.title : part.replace(/\-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
             children: [],
           };
           currentLevel.push(newItem);
