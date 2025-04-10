@@ -124,8 +124,8 @@ const CurrentAffairArticlePage = async ({
                   <div className="p-8 md:p-10">
                     {/* Article Header - Enhanced */}
                     <header className="mb-10 border-b border-gray-200/80 pb-8">
-                      <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900
-                      leading-tight gradient-text">{article.title}</h1>
+                      {/* <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900
+                      leading-tight gradient-text">{article.title}</h1> */}
                       
                       {/* Metadata - Enhanced */}
                       <div className="flex flex-wrap items-center gap-4 text-sm">

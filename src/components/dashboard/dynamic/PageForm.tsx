@@ -200,7 +200,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     for (const img of imgTags) {
       const src = img.getAttribute("src");
       if (!src) continue;
-
+      console.log("I was here");
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
 
@@ -210,7 +210,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           const blob = await response.blob();
 
           const formData = new FormData();
-          formData.append("image", blob, "image.png");
+          formData.append("imageUrl", blob, "image.png");
 
           const url = (await uploadImageToS3(formData)) || "error";
           img.setAttribute("src", url);
@@ -261,10 +261,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       const pathLevel = selectedLevels.filter(Boolean).length + 1;
 
       // @ts-ignore
-      console.log(formData.content);
-      // @ts-ignore
       formData.content = await handleImageUpload(formData.content);
-      console.log(formData);
       // Create the page data based on template type
       const pageData = {
         title: formData.title || formData.hero?.title,

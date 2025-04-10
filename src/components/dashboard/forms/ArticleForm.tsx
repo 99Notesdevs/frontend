@@ -61,13 +61,10 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           // Show a preview of the image
           const result = reader.result as string;
           setImagePreview(result);
-          console.log(file);
 
           // Upload the image to S3
           const formData = new FormData();
           formData.append("imageUrl", file);
-
-          console.log(formData);
 
           const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
           if (s3Url) {

@@ -145,7 +145,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           
           // Upload the image to S3
           const formData = new FormData();
-          formData.append("image", file);
+          formData.append("imageUrl", file);
 
           const s3Url = await uploadImageToS3(formData);
           if (s3Url) {
@@ -164,6 +164,40 @@ export function PageForm({ editPage = null }: PageFormProps) {
     }
   };
 
+  const handleImageUpload = async (content: string) => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, "text/html");
+      const imgTags = doc.querySelectorAll("img");
+  
+      for (const img of imgTags) {
+        const src = img.getAttribute("src");
+        if (!src) continue;
+        console.log("I was here");
+        const isBlob = src.startsWith("blob:");
+        const isBase64 = src.startsWith("data:image");
+  
+        if (isBlob || isBase64) {
+          try {
+            const response = await fetch(src);
+            const blob = await response.blob();
+  
+            const formData = new FormData();
+            formData.append("imageUrl", blob, "image.png");
+  
+            const url = (await uploadImageToS3(formData)) || "error";
+            img.setAttribute("src", url);
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              console.error("Error uploading image:", error.message);
+            }
+            showToast("Failed to upload image. Please try again.", "error");
+          }
+        }
+      }
+  
+      return doc.body.innerHTML; // ⬅️ Only return after finishing all images
+    };
+
   const handleCreateAffair = async () => {
     try {
       setIsLoading(prev => ({ ...prev, creatingAffair: true }));
@@ -180,10 +214,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
       // Ensure content is a string (even if empty)
       const content = newAffairData.content || '';
+      const updatedContent = await handleImageUpload(content);
 
       const affairData = {
         title: newAffairData.title,
-        content,
+        content: updatedContent,
         imageUrl: newAffairData.imageUrl,
         type: newAffairData.type,
         slug
@@ -213,6 +248,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       showToast('Failed to create current affair. Please try again.', 'error');
     } finally {
       setIsLoading(prev => ({ ...prev, creatingAffair: false }));
+      setStep(1);
     }
   };
 
@@ -250,10 +286,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
       const articleSlug = `${selectedAffair.slug}/${articleBaseSlug}`;
+      const content = await handleImageUpload(articleData.content);
 
       const articlePayload = {
         title: articleData.title,
-        content: articleData.content,
+        content,
         author: articleData.author,
         slug: articleSlug,
         parentSlug: selectedAffair.slug
@@ -296,36 +333,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
       } else {
         showToast('Failed to create article. Please try again.', 'error');
       }
+    } finally {
+      setStep(1);
     }
   };
-
-  // const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = async () => {
-  //       try {
-  //         const result = reader.result as string;
-  //         setImagePreview(result);
-          
-  //         // Upload the image to S3
-  //         const formData = new FormData();
-  //         formData.append("image", file);
-
-  //         const s3Url = await uploadImageToS3(formData);
-  //         if (s3Url) {
-  //           setNewAffairData(prev => ({ ...prev, imageUrl: s3Url }));
-  //         } else {
-  //           throw new Error("Failed to upload image to S3");
-  //         }
-  //       } catch (error) {
-  //         console.error("Error uploading image:", error);
-  //         setToast({ message: "Failed to upload image", type: "error" });
-  //       }
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
 
   const renderStepContent = () => {
     switch (step) {
