@@ -36,7 +36,7 @@ const StudyMaterials = () => {
   useEffect(() => {
     const fetchPages = async () => {
       try {
-        const navigationResponse = await axios.get(`${env.API}/page/order`);
+        const navigationResponse = await axios.get(`${env.API}/page/upsc-notes`);
         const navigationData = navigationResponse.data.data;
         setPages(navigationData);
       } catch (error) {
