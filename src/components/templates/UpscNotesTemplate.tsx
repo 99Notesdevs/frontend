@@ -1,94 +1,146 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import SidebarNavigation from "@/components/navigation/SidebarNavigation";
 import SocialMedia from "@/components/navigation/socialmedia";
-import { metadata } from "@/app/(use-navbar)/layout";
 import { BaseTemplateProps } from "./types";
 import Ads from "../navigation/Ads";
+import { isGeneratorFunction } from "util/types";
 
 export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
-  const { title, content, children } = page;
-  const mainContent = content || '';
+  const { title, content, metadata } = page;
+  // @ts-ignore
+  const jsonLD = JSON.parse(metadata).schemaData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumb />
+    <>
+    <section>
+      <script 
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: jsonLD }} />
+    </section>
+      {/* <Head>
+        <title>{JSONMetaData?.metaTitle || "Default Title"}</title>
+        <meta
+          name="description"
+          content={JSONMetaData?.metaDescription || "Default description"}
+        />
+        <meta
+          name="keywords"
+          content={JSONMetaData?.metaKeywords || "Default keywords"}
+        />
+        <meta name="robots" content={JSONMetaData?.robots || "index, follow"} />
+        <meta
+          property="og:title"
+          content={JSONMetaData?.ogTitle || "Default OG Title"}
+        />
+        <meta
+          property="og:description"
+          content={JSONMetaData?.ogDescription || "Default OG Description"}
+        />
+        <meta
+          property="og:image"
+          content={
+            JSONMetaData?.ogImage || "https://example.com/default-image.jpg"
+          }
+        />
+        <meta property="og:type" content={JSONMetaData?.ogType || "website"} />
+        <meta
+          name="twitter:card"
+          content={JSONMetaData?.twitterCard || "summary_large_image"}
+        />
+        <meta
+          name="twitter:title"
+          content={JSONMetaData?.twitterTitle || "Default Twitter Title"}
+        />
+        <meta
+          name="twitter:description"
+          content={
+            JSONMetaData?.twitterDescription || "Default Twitter Description"
+          }
+        />
+      </Head> */}
+      <main>
+        <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <Breadcrumb />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-          {/* Left Sidebar with increased width */}
-          <aside className="lg:col-span-5 xl:col-span-4 order-2 lg:order-1">
-            {/* Sticky Container */}
-            <div className="relative">
-              <div className="sticky top-8 space-y-6">
-                {/* Navigation Section */}
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                    <span className="text-primary">📚</span>
-                    <span>Complete UPSC Notes</span>
-                  </h3>
-                  <div className="pr-2 max-h-[60vh] overflow-y-auto">
-                    <SidebarNavigation 
-                      currentPageId={page.id.toString()} 
-                      basePath={page.slug.split('/')[0]}
-                      hideParent={true}
-                    />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+              {/* Left Sidebar with increased width */}
+              <aside className="lg:col-span-5 xl:col-span-4 order-2 lg:order-1">
+                {/* Sticky Container */}
+                <div className="relative">
+                  <div className="sticky top-8 space-y-6">
+                    {/* Navigation Section */}
+                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
+                        <span className="text-primary">📚</span>
+                        <span>Complete UPSC Notes</span>
+                      </h3>
+                      <div className="pr-2 max-h-[60vh] overflow-y-auto">
+                        <SidebarNavigation
+                          currentPageId={page.id.toString()}
+                          basePath={page.slug.split("/")[0]}
+                          hideParent={true}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Contact Form */}
+                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
+                        <span className="text-primary">📝</span>
+                        <span>Contact Us</span>
+                      </h3>
+                      <ContactForm />
+                    </div>
+
+                    {/* Social Media Section */}
+                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
+                        <span className="text-primary">🌐</span>
+                        <span>Connect With Us</span>
+                      </h3>
+                      <div className="py-2">
+                        <SocialMedia />
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg">
+                      <Ads imageUrl="/" altText="ads" />
+                    </div>
                   </div>
                 </div>
+              </aside>
 
-                {/* Contact Form */}
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                    <span className="text-primary">📝</span>
-                    <span>Contact Us</span>
-                  </h3>
-                  <ContactForm />
-                </div>
-
-                {/* Social Media Section */}
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                    <span className="text-primary">🌐</span>
-                    <span>Connect With Us</span>
-                  </h3>
-                  <div className="py-2">
-                    <SocialMedia />
-                  </div>
-                </div>
-
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg">
-                  <Ads imageUrl ="/" altText="ads"  />
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* Main Content with reduced width */}
-          <main className="lg:col-span-7 xl:col-span-8 order-1 lg:order-2">
-            <article className="bg-white border border-background-secondary rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
-              {/* <h1 className="text-4xl sm:text-4xl font-bold mb-8 text-center">
+              {/* Main Content with reduced width */}
+              <main className="lg:col-span-7 xl:col-span-8 order-1 lg:order-2">
+                <article className="bg-white border border-background-secondary rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
+                  {/* <h1 className="text-4xl sm:text-4xl font-bold mb-8 text-center">
                 <span className="text-primary border-b-2 border-accent-color pb-2">
                   {page.title}
                 </span>
               </h1> */}
 
-              <div className="flex flex-wrap gap-2 mb-8 justify-center">
-                {Array.isArray(page.metadata?.keywords) ? page.metadata.keywords.map((keyword: string, index: number) => (
-                  <Badge
-                  key={index}
-                  variant="secondary"
-                  className="text-sm px-4 py-2 bg-background-secondary text-primary border border-background-secondary rounded-lg hover:bg-background-tertiary transition-colors duration-200"
-                  >
-                  {keyword}
-                  </Badge>
-                )) : null}
-              </div>
+                  <div className="flex flex-wrap gap-2 mb-8 justify-center">
+                    {Array.isArray(page.metadata?.keywords)
+                      ? page.metadata.keywords.map(
+                          (keyword: string, index: number) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="text-sm px-4 py-2 bg-background-secondary text-primary border border-background-secondary rounded-lg hover:bg-background-tertiary transition-colors duration-200"
+                            >
+                              {keyword}
+                            </Badge>
+                          )
+                        )
+                      : null}
+                  </div>
 
-              <div
-                className="prose prose-lg max-w-none
+                  <div
+                    className="prose prose-lg max-w-none
                   prose-headings:font-bold 
                   prose-headings:text-center
                   prose-headings:mb-6
@@ -129,13 +181,15 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                   prose-img:rounded-lg
                   prose-img:shadow-md
                   prose-img:my-8"
-                dangerouslySetInnerHTML={{ __html: content }}
-              />
-            </article>
-          </main>
+                    dangerouslySetInnerHTML={{ __html: content }}
+                  />
+                </article>
+              </main>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </main>
+    </>
   );
 };
 

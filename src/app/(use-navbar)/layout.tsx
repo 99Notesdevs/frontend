@@ -9,10 +9,10 @@ const inter = Inter({
   subsets: ["latin"]
 });
 
-export const metadata: Metadata = {
-  title: "99Notes",
-  description: "Your learning companion",
-};
+// export const metadata: Metadata = {
+//   title: "99Notes",
+//   description: "Your learning companion",
+// };
 
 export default async function RootLayout({
   children,
@@ -25,7 +25,7 @@ export default async function RootLayout({
   const footerSections = await getFooterLinks();
 
   return (
-    <html lang="en">
+    <html>
       <body className={inter.className}>
         <Navbar navigation={navigation} />
         {children}

@@ -268,10 +268,24 @@ export function PageForm({ editPage = null }: PageFormProps) {
         slug: fullPath,
         templateId: currentTemplate.id,
         parentId: parentId || null,
-        content: formData.content,  // Directly use the HTML content
+        content: formData.content, // Directly use the HTML content
         metadata: {
           lastUpdated: new Date().toISOString(),
-          teamSize: 0,
+          teamSize: formData.metadata?.teamSize || 0,
+          metaTitle: formData.metaTitle || "",
+          metaDescription: formData.metaDescription || "",
+          metaKeywords: formData.metaKeywords || "",
+          robots: formData.robots || "",
+          ogTitle: formData.ogTitle || "",
+          ogDescription: formData.ogDescription || "",
+          ogImage: formData.ogImage || "",
+          ogType: formData.ogType || "",
+          twitterCard: formData.twitterCard || "",
+          twitterTitle: formData.twitterTitle || "",
+          twitterDescription: formData.twitterDescription || "",
+          twitterImage: formData.twitterImage || "",
+          canonicalUrl: formData.canonicalUrl || "",
+          schemaData: formData.schemaData || "",
         },
         imageUrl: formData.imageUrl,
         level: pathLevel, // Use the path depth as the level
