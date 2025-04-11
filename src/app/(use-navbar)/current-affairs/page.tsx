@@ -34,14 +34,19 @@ const CurrentAffairsIndex = async () => {
       <div className="min-h-screen bg-gray-50">
         <Head>
           <title>Current Affairs - 99Notes</title>
-          <meta name="description" content="Current Affairs for UPSC Civil Services Examination" />
+          <meta
+            name="description"
+            content="Current Affairs for UPSC Civil Services Examination"
+          />
         </Head>
 
         <div className="container mx-auto px-4 pt-12 max-w-5xl">
           {/* Daily Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">Daily Current Affairs</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                Daily Current Affairs
+              </h2>
               <div className="w-24 h-1 bg-yellow-400 rounded-full"></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -50,8 +55,13 @@ const CurrentAffairsIndex = async () => {
                   <div className="rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[400px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
                       <div className="flex flex-col items-center mb-8">
-                      <span className="mb-6 group-hover:text-yellow-600 transition-colors">
-                          <Image src="/news.png" alt="News" width={50} height={50} />
+                        <span className="mb-6 group-hover:text-yellow-600 transition-colors">
+                          <Image
+                            src="/news.png"
+                            alt="News"
+                            width={50}
+                            height={50}
+                          />
                         </span>
                         <h3 className="text-2xl font-semibold text-gray-900 group-hover:text-yellow-600 transition-colors text-center">
                           {page.title}
@@ -59,7 +69,7 @@ const CurrentAffairsIndex = async () => {
                       </div>
                       <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
                         <span className="block overflow-hidden text-ellipsis">
-                          <span 
+                          <span
                             dangerouslySetInnerHTML={{ __html: page.content }}
                             className="block overflow-hidden text-ellipsis"
                           ></span>
@@ -78,7 +88,9 @@ const CurrentAffairsIndex = async () => {
           {/* Monthly Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">Monthly Current Affairs</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                Monthly Current Affairs
+              </h2>
               <div className="w-24 h-1 bg-yellow-400 rounded-full"></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -88,18 +100,25 @@ const CurrentAffairsIndex = async () => {
                     <div>
                       <div className="flex flex-col items-center mb-8">
                         <span className="mb-6 group-hover:text-yellow-600 transition-colors">
-                          <Image src="/news.png" alt="News" width={50} height={50} />
+                          <Image
+                            src="/news.png"
+                            alt="News"
+                            width={50}
+                            height={50}
+                          />
                         </span>
                         <h3 className="text-2xl font-semibold text-gray-800 group-hover:text-yellow-600 transition-colors text-center">
                           {page.title}
                         </h3>
                       </div>
-                      <span className="block overflow-hidden text-ellipsis">
-                          <span 
+                      <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
+                        <span className="block overflow-hidden text-ellipsis">
+                          <span
                             dangerouslySetInnerHTML={{ __html: page.content }}
                             className="block overflow-hidden text-ellipsis"
                           ></span>
                         </span>
+                      </div>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
                       <span className="text-sm">Read More →</span>
@@ -113,7 +132,9 @@ const CurrentAffairsIndex = async () => {
           {/* Yearly Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">Yearly Current Affairs</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                Yearly Current Affairs
+              </h2>
               <div className="w-24 h-1 bg-yellow-400 rounded-full"></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -122,19 +143,26 @@ const CurrentAffairsIndex = async () => {
                   <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
                       <div className="flex flex-col items-center mb-8">
-                      <span className="mb-6 group-hover:text-yellow-600 transition-colors">
-                          <Image src="/news.png" alt="News" width={50} height={50} />
+                        <span className="mb-6 group-hover:text-yellow-600 transition-colors">
+                          <Image
+                            src="/news.png"
+                            alt="News"
+                            width={50}
+                            height={50}
+                          />
                         </span>
                         <h3 className="text-2xl font-semibold text-gray-800 group-hover:text-yellow-600 transition-colors text-center">
                           {page.title}
                         </h3>
                       </div>
-                      <span className="block overflow-hidden text-ellipsis">
-                          <span 
+                      <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
+                        <span className="block overflow-hidden text-ellipsis">
+                          <span
                             dangerouslySetInnerHTML={{ __html: page.content }}
                             className="block overflow-hidden text-ellipsis"
                           ></span>
                         </span>
+                      </div>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
                       <span className="text-sm">Read More →</span>
@@ -147,10 +175,12 @@ const CurrentAffairsIndex = async () => {
         </div>
 
         {/* Contact Section */}
-          <div className="container mx-auto max-w-2xl mb-4">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">Contact Us</h2>
-                <ContactForm />
-          </div>
+        <div className="container mx-auto max-w-2xl mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+            Contact Us
+          </h2>
+          <ContactForm />
+        </div>
       </div>
     );
   } catch (error) {
