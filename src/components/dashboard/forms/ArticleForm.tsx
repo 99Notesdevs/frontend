@@ -9,11 +9,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 const articleSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   content: z.string().min(10, "Content must be at least 10 characters"),
   imageUrl: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  metaKeywords: z.string().optional(),
+  robots: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
+  ogImage: z.string().url("OG Image must be a valid URL").optional(),
+  ogType: z.string().optional(),
+  twitterCard: z.string().optional(),
+  twitterTitle: z.string().optional(),
+  twitterDescription: z.string().optional(),
+  twitterImage: z.string().url("Twitter Image must be a valid URL").optional(),
+  canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
+  schemaData: z.string().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -30,25 +52,33 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(
     initialData?.imageUrl || null
   );
-  const [isUploading, setIsUploading] =  useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-  } = useForm<ArticleFormData>({
+  const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
     defaultValues: initialData || {
       title: "",
       content: "",
       imageUrl: "",
+      metaTitle: "",
+      metaDescription: "",
+      metaKeywords: "",
+      robots: "",
+      ogTitle: "",
+      ogDescription: "",
+      ogImage: "",
+      ogType: "",
+      twitterCard: "",
+      twitterTitle: "",
+      twitterDescription: "",
+      twitterImage: "",
+      canonicalUrl: "",
+      schemaData: "",
     },
   });
 
   const handleEditorChange = (content: string) => {
-    setValue("content", content, { shouldValidate: true });
+    form.setValue("content", content, { shouldValidate: true });
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,20 +88,17 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
-          // Show a preview of the image
           const result = reader.result as string;
           setImagePreview(result);
 
-          // Upload the image to S3
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
+          const s3Url = await uploadImageToS3(formData);
           if (s3Url) {
-            // Update the image field with the S3 URL
-            setValue("imageUrl", s3Url, { shouldValidate: true });
+            form.setValue("imageUrl", s3Url, { shouldValidate: true });
           } else {
-            setValue("imageUrl", "www.google.com/fallbackUrl")
+            form.setValue("imageUrl", "www.google.com/fallbackUrl");
             throw new Error("Failed to upload image to S3");
           }
         } catch (error) {
@@ -85,66 +112,298 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   };
 
   const handleSubmitForm = (data: ArticleFormData) => {
-    // Transform the form data to match the expected page structure
     const transformedData = {
       title: data.title,
       content: data.content,
-      imageUrl: data.imageUrl || ''
+      imageUrl: data.imageUrl || '',
+      metaTitle: data.metaTitle,
+      metaDescription: data.metaDescription,
+      metaKeywords: data.metaKeywords,
+      robots: data.robots,
+      ogTitle: data.ogTitle,
+      ogDescription: data.ogDescription,
+      ogImage: data.ogImage,
+      ogType: data.ogType,
+      twitterCard: data.twitterCard,
+      twitterTitle: data.twitterTitle,
+      twitterDescription: data.twitterDescription,
+      twitterImage: data.twitterImage,
+      canonicalUrl: data.canonicalUrl,
+      schemaData: data.schemaData
     };
     onSubmit(transformedData);
   };
 
   return (
-    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-6">
-      {/* Title */}
-      <div>
-        <Label htmlFor="title">Title</Label>
-        <Input type="text" id="title" {...register("title")} className="mt-1" />
-        {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
-        )}
-      </div>
-
-      {/* Image Upload */}
-      <div>
-        <Label htmlFor="image">Featured Image</Label>
-        <Input
-          type="file"
-          id="image"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="mt-1"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmitForm)} className="space-y-6">
+        {/* Title */}
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
-        {imagePreview && (
-          <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
-            <Image
-              src={imagePreview}
-              alt="Image preview"
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
-      </div>
+        {/* Image Upload */}
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Featured Image</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  id="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="mt-1"
+                />
+              </FormControl>
+              {imagePreview && (
+                <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
+                  <Image
+                    src={imagePreview}
+                    alt="Image preview"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      {/* Main Content */}
-      <div>
-        <Label>Main Content</Label>
-        <div className="mt-1">
-          <TiptapEditor
-            content={watch("content")}
-            onChange={handleEditorChange}
+        {/* Main Content */}
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Main Content</FormLabel>
+              <FormControl>
+                <TiptapEditor
+                  content={field.value}
+                  onChange={handleEditorChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Metadata */}
+        <div className="grid  gap-6">
+          <FormField
+            control={form.control}
+            name="metaTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Title</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="metaDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Description</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="metaKeywords"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Keywords</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="robots"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Robots</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="ogTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Title</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="ogDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Description</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="ogImage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Image</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="ogType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Type</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="twitterCard"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Card</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="twitterTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Title</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="twitterDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Description</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="twitterImage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Image</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="canonicalUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Canonical URL</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="schemaData"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Schema Data</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
-        {errors.content && (
-          <p className="mt-1 text-sm text-red-600">{errors.content.message}</p>
-        )}
-      </div>
 
-      <Button disabled={isUploading} type="submit" className="w-full">
-        {isUploading ? 'Uploading...' : 'Save'}
-      </Button>
-    </form>
+        <Button disabled={isUploading} type="submit" className="w-full mt-6">
+          {isUploading ? 'Uploading...' : 'Save'}
+        </Button>
+      </form>
+    </Form>
   );
 };

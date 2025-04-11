@@ -13,11 +13,21 @@ import ContactMap from "@/components/ui/ContactMap";
 export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
   page,
 }) => {
-  const { title, content, children } = page;
+  const { title, content, metadata, children } = page;
   const mainContent = content || "";
+  // @ts-ignore
+  const jsonLD = JSON.parse(metadata).schemaData ;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
+    <>
+      <section>
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLD }} 
+        />
+      </section>
+      <main>
+        <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
       <div className="bg-background-tertiary py-12">
         <div className="container mx-auto px-4 max-w-5xl">
           {/* Page Title */}
@@ -78,6 +88,8 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
         </div>
       </div>
     </div>
+    </main>
+    </>
   );
 };
 

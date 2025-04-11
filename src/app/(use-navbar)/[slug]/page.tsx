@@ -12,7 +12,6 @@ const TEMPLATE_MAP: Record<string, any> = {
   "upsc-notes": UpscNotesTemplate,
   "article": ArticleTemplate,
   "general-studies": GeneralStudiesTemplate,
-  "study-material": ArticleTemplate, // Using ArticleTemplate as base for study material
   "current-affairs": CurrentAffairTemplate,
 };
 

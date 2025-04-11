@@ -16,15 +16,23 @@ interface GeneralStudiesContent {
 }
 
 export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
-  const { title, content, children, imageUrl } = page;
+  const { title, content, metadata, children, imageUrl } = page;
   const mainContent = content || '';
-  
+  // @ts-ignore
+  const jsonLD = JSON.parse(metadata).schemaData;
   // Default image if none is provided
   const pageImage = imageUrl || null;
-  console.log(children);
+  console.log("the children are ",children);
   
 
   return (
+    <>
+    <section>
+    <script 
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: jsonLD }} />
+    </section>
+    <main>
     <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -34,7 +42,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
             <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-10 transform transition-all hover:scale-[1.02]">
               <div className="relative w-full h-72 md:h-96">
                 <Image 
-                  src={`${pageImage}`} 
+                  src={`${pageImage || "/"}`} 
                   alt={title}
                   fill
                   className="object-cover"
@@ -160,6 +168,8 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
         </div>
       </div>
     </div>
+    </main>
+    </>
   );
 }
 

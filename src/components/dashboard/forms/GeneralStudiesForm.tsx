@@ -16,6 +16,20 @@ const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
   content: z.string().min(10, 'Content must be at least 10 characters'),
   imageUrl: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  metaKeywords: z.string().optional(),
+  robots: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
+  ogImage: z.string().url("OG Image must be a valid URL").optional(),
+  ogType: z.string().optional(),
+  twitterCard: z.string().optional(),
+  twitterTitle: z.string().optional(),
+  twitterDescription: z.string().optional(),
+  twitterImage: z.string().url("Twitter Image must be a valid URL").optional(),
+  canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
+  schemaData: z.string().optional(),
 });
 
 export type GeneralStudiesFormValues = z.infer<typeof formSchema>;
@@ -36,6 +50,20 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
       title: '',
       content: '',
       imageUrl: '',
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: '',
+      robots: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+      ogType: '',
+      twitterCard: '',
+      twitterTitle: '',
+      twitterDescription: '',
+      twitterImage: '',
+      canonicalUrl: '',
+      schemaData: '',
       ...defaultValues,
     },
   });
@@ -149,6 +177,205 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           )}
         />
 
+        {/* Metadata Fields */}
+        <FormField
+          control={form.control}
+          name="metaTitle"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Meta Title</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter meta title" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="metaDescription"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Meta Description</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter meta description" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="metaKeywords"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Meta Keywords</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter meta keywords" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ogTitle"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">OG Title</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter OG title" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ogDescription"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">OG Description</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter OG description" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ogImage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">OG Image URL</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter OG image URL" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="twitterTitle"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Twitter Title</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter Twitter title" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="twitterDescription"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Twitter Description</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter Twitter description" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="twitterImage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Twitter Image URL</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter Twitter image URL" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="canonicalUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Canonical URL</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter canonical URL" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="schemaData"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">Schema Data</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Enter schema data" 
+                  {...field} 
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Submit Button */}
         <div className="flex justify-end">
           <Button 
@@ -156,8 +383,8 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             type="submit" 
             className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-2 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-colors duration-200"
           >
-            {isUploading ? 'Uploading...' : 'Save'}
-          </Button>
+          {isUploading ? 'Uploading...' : 'Save'}
+        </Button>
         </div>
       </form>
     </Form>

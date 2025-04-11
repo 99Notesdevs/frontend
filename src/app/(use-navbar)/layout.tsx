@@ -19,8 +19,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  
-
   const navigation = await getNavigationTree();
   const footerSections = await getFooterLinks();
 

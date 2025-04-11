@@ -5,6 +5,7 @@ import { ArticleTemplate } from '@/components/templates/ArticleTemplate';
 import { GeneralStudiesTemplate } from '@/components/templates/GeneralStudiesTemplate';
 import { env } from '@/config/env';
 import { CurrentAffairTemplate } from '@/components/templates/CurrentAffairTemplate';
+import { Metadata } from 'next';
 
 // Map template IDs to components
 const TEMPLATE_MAP: Record<string, React.FC<any>> = {
@@ -35,22 +36,57 @@ async function getPage(slug: string, section: string[]): Promise<BaseTemplatePro
 
 type Params = Promise<{slug: string; section: string[]}>;
 
-export const generateMetadata = async ({ params }: {params: Params}) => {
+
+export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
   const { slug, section } = await params;
   const page = await getPage(slug, section);
 
-  if (!page) {
+  if (!page || !page.metadata) {
     return {
-      title: 'Page Not Found',
-      description: 'The requested page could not be found.',
+      title: "Page Not Found",
+      description: "The requested page could not be found.",
     };
   }
-
+  // @ts-ignore
+  const JSONMetaData = JSON.parse(page.metadata);
+  console.log("JSONMetaData", JSONMetaData.schemaData);
+  
   return {
-    title: page.title,
-    description: (page.metadata as { description?: string })?.description || `${page.title} - 99Notes`,
+    title: JSONMetaData.metaTitle || "Default Title",
+    description: JSONMetaData.metaDescription || "Default description",
+    keywords: JSONMetaData.metaKeywords || "Default keywords",
+    robots: JSONMetaData.robots || "index, follow",
+    openGraph: {
+      title: JSONMetaData.ogTitle || "Default OG Title",
+      description: JSONMetaData.ogDescription || "Default OG Description",
+      url: JSONMetaData.canonicalUrl || "https://example.com",
+      images: [
+        {
+          url: JSONMetaData.ogImage || "https://example.com/default-image.jpg",
+        },
+      ],
+      type: JSONMetaData.ogType || "website",
+    },
+    twitter: {
+      card: JSONMetaData.twitterCard || "summary_large_image",
+      title: JSONMetaData.twitterTitle || "Default Twitter Title",
+      description:
+        JSONMetaData.twitterDescription || "Default Twitter Description",
+      images: [
+        {
+          url:
+            JSONMetaData.twitterImage ||
+            "https://example.com/default-twitter-image.jpg",
+        },
+      ],
+    },
+    alternates: {
+      canonical:
+        JSONMetaData.canonicalUrl ||
+        "https://example.com/default-canonical-url",
+    },
   };
-};
+}
 
 export default async function Page({ params }: {params: Params}) {
   const { slug, section } = await params;

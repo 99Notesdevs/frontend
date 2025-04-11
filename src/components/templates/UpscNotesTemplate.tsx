@@ -6,7 +6,6 @@ import SidebarNavigation from "@/components/navigation/SidebarNavigation";
 import SocialMedia from "@/components/navigation/socialmedia";
 import { BaseTemplateProps } from "./types";
 import Ads from "../navigation/Ads";
-import { isGeneratorFunction } from "util/types";
 
 export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
@@ -20,47 +19,6 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
-      {/* <Head>
-        <title>{JSONMetaData?.metaTitle || "Default Title"}</title>
-        <meta
-          name="description"
-          content={JSONMetaData?.metaDescription || "Default description"}
-        />
-        <meta
-          name="keywords"
-          content={JSONMetaData?.metaKeywords || "Default keywords"}
-        />
-        <meta name="robots" content={JSONMetaData?.robots || "index, follow"} />
-        <meta
-          property="og:title"
-          content={JSONMetaData?.ogTitle || "Default OG Title"}
-        />
-        <meta
-          property="og:description"
-          content={JSONMetaData?.ogDescription || "Default OG Description"}
-        />
-        <meta
-          property="og:image"
-          content={
-            JSONMetaData?.ogImage || "https://example.com/default-image.jpg"
-          }
-        />
-        <meta property="og:type" content={JSONMetaData?.ogType || "website"} />
-        <meta
-          name="twitter:card"
-          content={JSONMetaData?.twitterCard || "summary_large_image"}
-        />
-        <meta
-          name="twitter:title"
-          content={JSONMetaData?.twitterTitle || "Default Twitter Title"}
-        />
-        <meta
-          name="twitter:description"
-          content={
-            JSONMetaData?.twitterDescription || "Default Twitter Description"
-          }
-        />
-      </Head> */}
       <main>
         <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
