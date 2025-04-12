@@ -117,7 +117,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const [htmlContent, setHtmlContent] = useState("");
   const [currentSize, setCurrentSize] = useState("Normal");
   const imageInputRef = React.useRef<HTMLInputElement>(null);
-  console.log(content);
+
   const addImage = () => {
     imageInputRef.current?.click();
   };
