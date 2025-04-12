@@ -10,7 +10,7 @@ import Ads from "../navigation/Ads";
 export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
   // @ts-ignore
-  const jsonLD = JSON.parse(metadata).schemaData;
+  const jsonLD = JSON.parse(metadata)?.schemaData || "";
 
   return (
     <>
