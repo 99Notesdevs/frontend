@@ -120,21 +120,39 @@ function PageList() {
       const pageData = {
         id: selectedPage.id,
         title: newTitle,
-        slug: selectedPage.title !== newTitle 
-          ? [...selectedPage.slug.split('/').slice(0, currentLevel - 1), newSlug].join('/') 
-          : selectedPage.slug,
+        slug:
+          selectedPage.title !== newTitle
+            ? [
+                ...selectedPage.slug.split("/").slice(0, currentLevel - 1),
+                newSlug,
+              ].join("/")
+            : selectedPage.slug,
         templateId: selectedPage.templateId,
         parentId: selectedPage.parentId || null,
         imageUrl: formData.imageUrl,
         content: formData.content,
-        metadata: selectedPage.metadata || {
+        metadata: {
           lastUpdated: new Date().toISOString(),
-          teamSize: 0
+          teamSize: formData.metadata?.teamSize || 0,
+          metaTitle: formData.metaTitle || "",
+          metaDescription: formData.metaDescription || "",
+          metaKeywords: formData.metaKeywords || "",
+          robots: formData.robots || "",
+          ogTitle: formData.ogTitle || "",
+          ogDescription: formData.ogDescription || "",
+          ogImage: formData.ogImage || "",
+          ogType: formData.ogType || "",
+          twitterCard: formData.twitterCard || "",
+          twitterTitle: formData.twitterTitle || "",
+          twitterDescription: formData.twitterDescription || "",
+          twitterImage: formData.twitterImage || "",
+          canonicalUrl: formData.canonicalUrl || "",
+          schemaData: formData.schemaData || "",
         },
         level: selectedPage.level || 0,
         showInNav: true,
         order: selectedPage.order || 0,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Prepare data for API submission with stringified content and metadata
@@ -165,39 +183,111 @@ function PageList() {
   };
 
   const getInitialFormData = (page: Page, templateId: string): any => {
-    const parsedContent = page.content;
+    const parsedContent = page.content || "";
+    // @ts-ignore
+    const metadata = JSON.parse(page.metadata || "{}");
     const parsedimage=page.imageUrl || undefined;
     switch (templateId) {
       case 'article':
         return {
-          title: page.title || '',
-          content: parsedContent || '',
+          title: page.title || "",
+          content: parsedContent || "",
           imageUrl: parsedimage || undefined,
+          metaTitle: metadata.metaTitle || "",
+          metaDescription: metadata.metaDescription || "",
+          metaKeywords: metadata.metaKeywords || "",
+          robots: metadata.robots || "",
+          ogTitle: metadata.ogTitle || "",
+          ogDescription: metadata.ogDescription || "",
+          ogImage: metadata.ogImage || "",
+          ogType: metadata.ogType || "",
+          twitterCard: metadata.twitterCard || "",
+          twitterTitle: metadata.twitterTitle || "",
+          twitterDescription: metadata.twitterDescription || "",
+          twitterImage: metadata.twitterImage || "",
+          canonicalUrl: metadata.canonicalUrl || "",
+          schemaData: metadata.schemaData || "",
         };
       
       case 'general-studies':
         return {
-          title: page.title || '',
-          content: parsedContent || '',
+          title: page.title || "",
+          content: parsedContent || "",
           imageUrl: parsedimage || undefined,
+          metaTitle: metadata.metaTitle || "",
+          metaDescription: metadata.metaDescription || "",
+          metaKeywords: metadata.metaKeywords || "",
+          robots: metadata.robots || "",
+          ogTitle: metadata.ogTitle || "",
+          ogDescription: metadata.ogDescription || "",
+          ogImage: metadata.ogImage || "",
+          ogType: metadata.ogType || "",
+          twitterCard: metadata.twitterCard || "",
+          twitterTitle: metadata.twitterTitle || "",
+          twitterDescription: metadata.twitterDescription || "",
+          twitterImage: metadata.twitterImage || "",
+          canonicalUrl: metadata.canonicalUrl || "",
+          schemaData: metadata.schemaData || "",
         };
       
       case 'current-affairs':
         return {
-          title: page.title || '',
-          content: parsedContent || '',
+          title: page.title || "",
+          content: parsedContent || "",
           imageUrl: parsedimage || undefined,
+          metaTitle: metadata.metaTitle || "",
+          metaDescription: metadata.metaDescription || "",
+          metaKeywords: metadata.metaKeywords || "",
+          robots: metadata.robots || "",
+          ogTitle: metadata.ogTitle || "",
+          ogDescription: metadata.ogDescription || "",
+          ogImage: metadata.ogImage || "",
+          ogType: metadata.ogType || "",
+          twitterCard: metadata.twitterCard || "",
+          twitterTitle: metadata.twitterTitle || "",
+          twitterDescription: metadata.twitterDescription || "",
+          twitterImage: metadata.twitterImage || "",
+          canonicalUrl: metadata.canonicalUrl || "",
+          schemaData: metadata.schemaData || "",
         };
       case 'upsc-notes':
         return {
-          title: page.title || '',
-          content: parsedContent || '',
+          title: page.title || "",
+          content: parsedContent || "",
+          metaTitle: metadata.metaTitle || "",
+          metaDescription: metadata.metaDescription || "",
+          metaKeywords: metadata.metaKeywords || "",
+          robots: metadata.robots || "",
+          ogTitle: metadata.ogTitle || "",
+          ogDescription: metadata.ogDescription || "",
+          ogImage: metadata.ogImage || "",
+          ogType: metadata.ogType || "",
+          twitterCard: metadata.twitterCard || "",
+          twitterTitle: metadata.twitterTitle || "",
+          twitterDescription: metadata.twitterDescription || "",
+          twitterImage: metadata.twitterImage || "",
+          canonicalUrl: metadata.canonicalUrl || "",
+          schemaData: metadata.schemaData || "",
         };
       default:
         return {
-          title: page.title || '',
-          content: parsedContent || '',
+          title: page.title || "",
+          content: parsedContent || "",
           imageUrl: parsedimage || undefined,
+          metaTitle: metadata.metaTitle || "",
+          metaDescription: metadata.metaDescription || "",
+          metaKeywords: metadata.metaKeywords || "",
+          robots: metadata.robots || "",
+          ogTitle: metadata.ogTitle || "",
+          ogDescription: metadata.ogDescription || "",
+          ogImage: metadata.ogImage || "",
+          ogType: metadata.ogType || "",
+          twitterCard: metadata.twitterCard || "",
+          twitterTitle: metadata.twitterTitle || "",
+          twitterDescription: metadata.twitterDescription || "",
+          twitterImage: metadata.twitterImage || "",
+          canonicalUrl: metadata.canonicalUrl || "",
+          schemaData: metadata.schemaData || "",
         };
     }
   };
