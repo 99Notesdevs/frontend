@@ -225,16 +225,15 @@ export default function Navbar({ navigation }: NavbarProps) {
       <nav className="fixed w-full top-0 z-50">
         {/* Top Bar - Hidden when scrolled */}
         <div
-          className={`hidden md:block bg-gradient-to-r from-orange-500 to-orange-600 w-full transition-all duration-300 ${
+          className={`hidden md:block bg-amber-500 w-full transition-all duration-300 ${
             isScrolled ? "h-0 overflow-hidden opacity-0" : "h-12"
           }`}
         >
           <div className="container mx-auto px-6 flex justify-between items-center h-12">
             <div className="mt-1.75">
               <Link href="/shop" passHref>
-                <span className="text-[13px] font-bold tracking-wide text-white hover:text-white/90
-                               bg-gradient-to-r from-orange-700 to-orange-600 hover:from-orange-600 hover:to-orange-500 
-                               px-4 py-1.5 rounded-full shadow-sm hover:shadow-md transition-all">
+                <span className="text-[12px] text-white font-bold tracking-wide text-primary hover:text-primary-active 
+                               bg-amber-500 border border-white px-4 py-1.5 shadow-sm hover:shadow-md transition-all">
                   Shop Now
                 </span>
               </Link>
@@ -271,7 +270,7 @@ export default function Navbar({ navigation }: NavbarProps) {
           <div className="container mx-auto px-4 lg:px-6">
             <div className="flex justify-between items-center h-[60px]">
               {/* Logo */}
-              <div className="flex-shrink-0 min-w-[35px]">
+              <div className="flex-shrink-0 min-w-[35px] mx-2">
                 <Link href="/" passHref>
                   <Image
                     src={logo}
@@ -310,10 +309,10 @@ export default function Navbar({ navigation }: NavbarProps) {
                 </Link>
               </div>
 
-              {/* Search Bar - Moved to rightmost */}
-              <div className="hidden lg:block ml-auto">
+              {/* Desktop search bar */}
+              <div className="hidden pr-40 md:block">
                 <SearchBar />
-              </div>
+              </div>  
 
               {/* Mobile menu button */}
               <div className="lg:hidden">
@@ -362,6 +361,9 @@ export default function Navbar({ navigation }: NavbarProps) {
           </div>
         </div>
 
+        {/* Yellow line below navbar */}
+        <div className="w-full h-[1px] bg-amber-500"></div>
+
         {/* Mobile menu */}
         <div
           className={`lg:hidden transform transition-all duration-300 ease-in-out ${
@@ -375,7 +377,6 @@ export default function Navbar({ navigation }: NavbarProps) {
             <div className="px-3 py-2">
               <SearchBar />
             </div>
-            
             {navigation.map((item) => (
               <div key={item.slug} className="py-1">
                 <div className="flex items-center justify-between">

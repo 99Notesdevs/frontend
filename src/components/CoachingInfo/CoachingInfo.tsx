@@ -8,7 +8,7 @@ const CoachingInfo = () => {
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-16">
           <span className="text-indigo-600 font-medium tracking-wider text-sm uppercase">Expert Guidance</span>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
+          <h2 className="text-4xl md:text-4xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
             BEST UPSC COACHING INSTITUTE IN DELHI
           </h2>
           <div className="w-24 h-1 bg-indigo-600 mx-auto mb-6"></div>

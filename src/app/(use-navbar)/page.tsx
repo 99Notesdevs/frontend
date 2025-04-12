@@ -26,7 +26,7 @@ export default async function Home() {
                 <span className="block leading-relaxed">Pioneers of Self-Study Ecosystem</span>
               </h1>
             </div>
-            <p className="text-base font-semibold md:text-base text-gray-800 leading-relaxed">
+            <p className="text-base font-semibold text-gray-800 flex leading-relaxed">
               Welcome to 99Notes. We are an organization dedicated to students who wish that educational material must not be restricted behind a pay-wall.
               We aim to build a sustainable self-study ecosystem by providing high-quality study material for Government examinations at almost free of cost.
             </p>

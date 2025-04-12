@@ -6,25 +6,19 @@ const SearchBar = () => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <div className="relative flex items-center w-full">
-      <div className={`relative w-full group ${
-        isFocused 
-          ? 'ring-2 ring-blue-400 shadow-lg bg-white' 
-          : 'hover:ring-1 hover:ring-orange-200 bg-orange-50/50 hover:bg-white'
-      } rounded-lg transition-colors duration-300`}>
+    <div className="relative flex items-center pr-15">
+      <div className={`relative w-28 group bg-white border border-black`}>
         <input
           type="text"
           placeholder="Search notes, subjects..."
-          className="w-full py-2 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 
-                    bg-transparent border-none rounded-lg outline-none transition-colors"
+          className="w-full py-1.5 pl-8 pr-3 text-sm text-gray-700 placeholder-gray-400 
+                    bg-transparent border-none outline-none"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3.5">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-2.5">
           <svg 
-            className={`w-5 h-5 transition-colors duration-300 ${
-              isFocused ? 'text-blue-500' : 'text-orange-400'
-            }`}
+            className="w-4 h-4 text-gray-400"
             fill="none" 
             strokeLinecap="round" 
             strokeLinejoin="round" 

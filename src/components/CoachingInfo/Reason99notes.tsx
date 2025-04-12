@@ -1,14 +1,50 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
+
+interface Reason {
+  title: string;
+  content: string;
+}
 
 const Reason99notes: React.FC = () => {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  const reasons: Reason[] = [
+    {
+      title: "Experienced Faculty",
+      content: "Our team of seasoned professionals has a deep understanding of the UPSC syllabus and examination pattern. We are committed to equipping students with the right strategies and techniques to ace the IAS exam."
+    },
+    {
+      title: "Comprehensive Study Material",
+      content: "Our study material is meticulously curated and regularly updated to include the latest developments and trends, ensuring our students are always ahead of the curve."
+    },
+    {
+      title: "Regular Mock Tests",
+      content: "Our IAS coaching program includes regular mock tests that mimic the UPSC exam pattern, providing students with a realistic experience of the exam."
+    },
+    {
+      title: "Personalized Guidance",
+      content: "We understand that every student is unique. Our faculty provides personalized guidance to each student, helping them overcome their weaknesses and build on their strengths."
+    },
+    {
+      title: "Affordable Education",
+      content: "We believe in making quality education accessible to all. Our IAS coaching program is competitively priced, ensuring that every aspiring IAS officer can benefit from our top-quality coaching."
+    },
+    {
+      title: "Proven Track Record",
+      content: "Join the leading UPSC coaching institute in Delhi with a consistent record of producing successful candidates. Our results speak for themselves."
+    }
+  ];
+
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <div className="relative inline-block">
-          <span className="text-slate-900 font-medium tracking-wider text-sm uppercase mb-4">Reason</span>
+            <span className="text-slate-900 font-medium tracking-wider text-sm uppercase mb-4">Reason</span>
             <h2 className="text-4xl font-bold text-gray-900 pt-2 mb-4">
-                Why 99Notes is the Best UPSC Coaching in Delhi
+              Why 99Notes is the Best UPSC Coaching in Delhi
             </h2>
             <div className="w-24 h-1 bg-slate-900 mx-auto mt-2"></div>
           </div>
@@ -17,52 +53,32 @@ const Reason99notes: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-10">
-          {[
-            {
-              title: "Experienced Faculty",
-              content: "Our team of seasoned professionals has a deep understanding of the UPSC syllabus and examination pattern. We are committed to equipping students with the right strategies and techniques to ace the IAS exam.",
-              icon: "👨‍🏫"
-            },
-            {
-              title: "Comprehensive Study Material",
-              content: "Our study material is meticulously curated and regularly updated to include the latest developments and trends, ensuring our students are always ahead of the curve.",
-              icon: "📚"
-            },
-            {
-              title: "Regular Mock Tests",
-              content: "Our IAS coaching program includes regular mock tests that mimic the UPSC exam pattern, providing students with a realistic experience of the exam.",
-              icon: "✍️"
-            },
-            {
-              title: "Personalized Guidance",
-              content: "We understand that every student is unique. Our faculty provides personalized guidance to each student, helping them overcome their weaknesses and build on their strengths.",
-              icon: "🎯"
-            },
-            {
-              title: "Affordable Education",
-              content: "We believe in making quality education accessible to all. Our IAS coaching program is competitively priced, ensuring that every aspiring IAS officer can benefit from our top-quality coaching.",
-              icon: "💰"
-            },
-            {
-              title: "Proven Track Record",
-              content: "Join the leading UPSC coaching institute in Delhi with a consistent record of producing successful candidates. Our results speak for themselves.",
-              icon: "🏆"
-            }
-          ].map((item, index) => (
-            <div 
-              key={index}
-              className="bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-100"
-            >
-              <div className="w-16 h-16 flex items-center justify-center mb-6 bg-blue-50 rounded-lg">
-                <span className="text-4xl">{item.icon}</span>
+        <div className="grid md:grid-cols-2 gap-8">
+          {reasons.map((reason, index) => (
+            <div key={index} className="border-b border-gray-200 pb-4 last:pb-0">
+              <button
+                onClick={() => setExpanded(expanded === index.toString() ? null : index.toString())}
+                className="flex items-center justify-between w-full text-left text-gray-900 hover:text-blue-600 transition-colors"
+              >
+                <h3 className="text-lg font-semibold">{reason.title}</h3>
+                <svg
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    expanded === index.toString() ? 'rotate-180' : ''
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div
+                className={`mt-2 overflow-hidden transition-all duration-300 ${
+                  expanded === index.toString() ? 'max-h-48' : 'max-h-0'
+                }`}
+              >
+                <p className="text-gray-600 text-sm">{reason.content}</p>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4 hover:text-blue-600 transition-colors duration-300">
-                {item.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {item.content}
-              </p>
             </div>
           ))}
         </div>

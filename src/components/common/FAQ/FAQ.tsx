@@ -96,7 +96,7 @@ const FAQ: React.FC = () => {
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-16">
           <span className="text-orange-500 font-medium tracking-wider text-sm uppercase">Common Questions</span>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
+          <h2 className="text-4xl md:text-4xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
             Frequently Asked Questions
           </h2>
           <div className="w-24 h-1 bg-orange-500 mx-auto mb-6"></div>
