@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import TiptapEditor  from '@/components/ui/tiptapeditor';
+import { GeneralStudiesForm } from '@/components/dashboard/forms';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
-import Image from 'next/image';
 import {uploadImageToS3} from '@/config/imageUploadS3';
+import { CurrentArticleForm, CurrentArticleFormValues } from '@/components/dashboard/forms/CurrentArticleForm';
 // Types for CurrentAffair models
 interface CurrentAffairType {
   id: number;
@@ -47,6 +47,7 @@ interface CurrentAffairArticleType {
   createdAt: Date;
   updatedAt: Date;
   parentSlug: string;
+  quizQuestions?: string;
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -77,8 +78,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
     fetchingAffairs: false,
     creatingAffair: false,
     creatingArticle: false,
-    uploadingImage: false
+    uploadingImage: false,
+    formSubmitting: false
   });
+  const [error, setError] = useState<string | null>(null);
 
   // Step 1: Type selection
   const [selectedType, setSelectedType] = useState<string>('daily');
@@ -92,22 +95,20 @@ export function PageForm({ editPage = null }: PageFormProps) {
     content: '',
     imageUrl: '',
     type: 'daily',
-    metadata: {
-      metaTitle: '',
-      metaDescription: '',
-      metaKeywords: '',
-      robots: '',
-      ogTitle: '',
-      ogDescription: '',
-      ogImage: '',
-      ogType: '',
-      twitterCard: '',
-      twitterTitle: '',
-      twitterDescription: '',
-      twitterImage: '',
-      canonicalUrl: '',
-      schemaData: ''
-    }
+    metaTitle: '',
+    metaDescription: '',
+    metaKeywords: '',
+    robots: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    ogType: '',
+    twitterCard: '',
+    twitterTitle: '',
+    twitterDescription: '',
+    twitterImage: '',
+    canonicalUrl: '',
+    schemaData: ''
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -115,8 +116,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [articleData, setArticleData] = useState({
     title: '',
     content: '',
-    author: '',
-    metadata: {
+    quizQuestions: '',
+    author: 'here',
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',
@@ -131,7 +132,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       twitterImage: '',
       canonicalUrl: '',
       schemaData: ''
-    }
+    
   });
   
   const token = Cookie.get('token');
@@ -262,31 +263,48 @@ export function PageForm({ editPage = null }: PageFormProps) {
       return doc.body.innerHTML; // ⬅️ Only return after finishing all images
     };
 
-  const handleCreateAffair = async () => {
+  const handleCreateAffair = async (data: any) => {
     try {
-      setIsLoading(prev => ({ ...prev, creatingAffair: true }));
-      if (!newAffairData.title) {
+      setError(null);
+      setIsLoading(prev => ({ ...prev, creatingAffair: true, formSubmitting: true }));
+      
+      if (!data.title) {
         throw new Error('Title is required');
       }
 
       // Create slug from title with current-affairs prefix
-      const baseSlug = newAffairData.title
+      const baseSlug = data.title
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
       const slug = `current-affairs/${baseSlug}`;
 
       // Ensure content is a string (even if empty)
-      const content = newAffairData.content || '';
+      const content = data.content || '';
       const updatedContent = await handleImageUpload(content);
 
       const affairData = {
-        title: newAffairData.title,
+        title: data.title,
         content: updatedContent,
-        imageUrl: newAffairData.imageUrl,
-        type: newAffairData.type,
+        imageUrl: data.imageUrl,
+        type: selectedType, // Use the type selected in step 1
         slug,
-        metadata: JSON.stringify(newAffairData.metadata)
+        metadata: JSON.stringify({
+          metaTitle: data.metaTitle,
+          metaDescription: data.metaDescription,
+          metaKeywords: data.metaKeywords,
+          robots: data.robots,
+          ogTitle: data.ogTitle,
+          ogDescription: data.ogDescription,
+          ogImage: data.ogImage,
+          ogType: data.ogType,
+          twitterCard: data.twitterCard,
+          twitterTitle: data.twitterTitle,
+          twitterDescription: data.twitterDescription,
+          twitterImage: data.twitterImage,
+          canonicalUrl: data.canonicalUrl,
+          schemaData: data.schemaData
+        })
       };
 
       const response = await fetch(`${env.API}/currentAffair`, {
@@ -303,33 +321,35 @@ export function PageForm({ editPage = null }: PageFormProps) {
         throw new Error(`Failed to create current affair: ${errorData.message || response.statusText}`);
       }
 
-      const { data } = await response.json();
-      setCurrentAffairs([...currentAffairs, data]);
-      setSelectedAffairId(data.id.toString());
+      const { data: newAffair } = await response.json();
+      setCurrentAffairs([...currentAffairs, newAffair]);
+      setSelectedAffairId(newAffair.id.toString());
       setCreateNewAffair(false);
       showToast('Current affair created successfully!', 'success');
     } catch (error) {
       console.error('Error creating current affair:', error);
-      showToast('Failed to create current affair. Please try again.', 'error');
+      setError(error instanceof Error ? error.message : 'Failed to create current affair. Please try again.');
+      showToast(error instanceof Error ? error.message : 'Failed to create current affair. Please try again.', 'error');
     } finally {
-      setIsLoading(prev => ({ ...prev, creatingAffair: false }));
-      setStep(1);
+      setIsLoading(prev => ({ ...prev, creatingAffair: false, formSubmitting: false }));
     }
   };
 
-  const handleCreateArticle = async () => {
+  const handleCreateArticle = async (data: any) => {
     try {
-      setIsLoading(prev => ({ ...prev, creatingArticle: true }));
+      setError(null);
+      setIsLoading(prev => ({ ...prev, creatingArticle: true, formSubmitting: true }));
+      
       // Validate all required fields
-      if (!articleData.title) {
+      if (!data.title) {
         throw new Error('Title is required');
       }
 
-      if (!articleData.content || articleData.content.length < 10) {
+      if (!data.content || data.content.length < 10) {
         throw new Error('Content must be at least 10 characters');
       }
 
-      if (!articleData.author) {
+      if (!data.author) {
         throw new Error('Author is required');
       }
 
@@ -346,97 +366,79 @@ export function PageForm({ editPage = null }: PageFormProps) {
       }
 
       // Create slug from title with current-affairs prefix
-      const articleBaseSlug = articleData.title
+      const articleBaseSlug = data.title
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
       const articleSlug = `${selectedAffair.slug}/${articleBaseSlug}`;
-      const content = await handleImageUpload(articleData.content);
+      const content = await handleImageUpload(data.content);
 
       const articlePayload = {
-        title: articleData.title,
+        title: data.title,
         content,
-        author: articleData.author,
+        author: data.author,
         slug: articleSlug,
         parentSlug: selectedAffair.slug,
-        metadata: JSON.stringify(articleData.metadata)
+        quizQuestions: data.quizQuestions,
+        type: selectedType, // Use the type selected in step 1
+        metadata: JSON.stringify({
+          metaTitle: data.metaTitle,
+          metaDescription: data.metaDescription,
+          metaKeywords: data.metaKeywords,
+          robots: data.robots,
+          ogTitle: data.ogTitle,
+          ogDescription: data.ogDescription,
+          ogImage: data.ogImage,
+          ogType: data.ogType,
+          twitterCard: data.twitterCard,
+          twitterTitle: data.twitterTitle,
+          twitterDescription: data.twitterDescription,
+          twitterImage: data.twitterImage,
+          canonicalUrl: data.canonicalUrl,
+          schemaData: data.schemaData
+        })
       };
 
       const response = await fetch(`${env.API}/currentArticle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(articlePayload)
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'No error details available' }));
-        throw new Error(`Failed to create article: ${errorData.message || response.statusText}`);
+        throw new Error('Failed to create article');
       }
 
-      showToast('Article created successfully!', 'success');
-      setStep(1);
-      setSelectedType('daily');
-      setSelectedAffairId('');
-      setCreateNewAffair(false);
-      setNewAffairData({
-        title: '',
-        content: '',
-        imageUrl: '',
-        type: 'daily',
-        metadata: {
-          metaTitle: '',
-          metaDescription: '',
-          metaKeywords: '',
-          robots: '',
-          ogTitle: '',
-          ogDescription: '',
-          ogImage: '',
-          ogType: '',
-          twitterCard: '',
-          twitterTitle: '',
-          twitterDescription: '',
-          twitterImage: '',
-          canonicalUrl: '',
-          schemaData: ''
-        }
-      });
-      setArticleData({
-        title: '',
-        content: '',
-        author: '',
-        metadata: {
-          metaTitle: '',
-          metaDescription: '',
-          metaKeywords: '',
-          robots: '',
-          ogTitle: '',
-          ogDescription: '',
-          ogImage: '',
-          ogType: '',
-          twitterCard: '',
-          twitterTitle: '',
-          twitterDescription: '',
-          twitterImage: '',
-          canonicalUrl: '',
-          schemaData: ''
-        }
-      });
+     
     } catch (error) {
       console.error('Error creating article:', error);
-      if (error instanceof Error) {
-        showToast(error.message, 'error');
-      } else {
-        showToast('Failed to create article. Please try again.', 'error');
-      }
+      setError(error instanceof Error ? error.message : 'An error occurred');
+      setToast({ message: 'Failed to create article', type: 'error' });
     } finally {
-      setStep(1);
+      setIsLoading(prev => ({ ...prev, creatingArticle: false, formSubmitting: false }));
     }
   };
 
   const renderStepContent = () => {
+    if (error) {
+      return (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mb-4">
+          <p>{error}</p>
+        </div>
+      );
+    }
+
+    if (isLoading.formSubmitting) {
+      return (
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      );
+    }
+
     switch (step) {
       case 1:
         return (
@@ -496,303 +498,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
                 {createNewAffair && (
                   <div className="mt-4 space-y-4 p-4 border border-slate-200 rounded-lg">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">
-                        Title
-                      </label>
-                      <Input
-                        value={newAffairData.title}
-                        onChange={(e) => setNewAffairData({ ...newAffairData, title: e.target.value })}
-                        placeholder="Enter title"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">
-                        Image
-                      </label>
-                      <div className="flex flex-col gap-2">
-                        {isLoading.uploadingImage && (
-                          <div className="flex items-center justify-center p-4">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                          </div>
-                        )}
-                        {imagePreview && (
-                          <div className="relative w-32 h-32">
-                            <Image
-                              src={imagePreview}
-                              alt="Preview"
-                              fill
-                              className="object-cover rounded"
-                            />
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          disabled={isLoading.uploadingImage}
-                          className="block w-full text-sm text-slate-500
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-full file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-blue-50 file:text-blue-700
-                                    hover:file:bg-blue-100
-                                    disabled:opacity-50 disabled:cursor-not-allowed"
-                        />
-                        {newAffairData.imageUrl && (
-                          <div className="mt-2">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">
-                              Image URL
-                            </label>
-                            <Input
-                              value={newAffairData.imageUrl}
-                              onChange={(e) => setNewAffairData({ ...newAffairData, imageUrl: e.target.value })}
-                              placeholder="Enter image URL"
-                              className="w-full"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">
-                        Content (Optional)
-                      </label>
-                      <TiptapEditor
-                        content={newAffairData.content}
-                        onChange={(html) => setNewAffairData({ ...newAffairData, content: html })}
-                      />
-                    </div>
-                    <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Metadata</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="metaTitle" className="block text-sm font-medium mb-1">
-                        Meta Title
-                      </label>
-                      <Input
-                        id="metaTitle"
-                        value={articleData.metadata?.metaTitle || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, metaTitle: e.target.value }
-                        }))}
-                        placeholder="Enter meta title"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="metaDescription" className="block text-sm font-medium mb-1">
-                        Meta Description
-                      </label>
-                      <Input
-                        id="metaDescription"
-                        value={articleData.metadata?.metaDescription || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, metaDescription: e.target.value }
-                        }))}
-                        placeholder="Enter meta description"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="metaKeywords" className="block text-sm font-medium mb-1">
-                        Meta Keywords
-                      </label>
-                      <Input
-                        id="metaKeywords"
-                        value={articleData.metadata?.metaKeywords || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, metaKeywords: e.target.value }
-                        }))}
-                        placeholder="Enter meta keywords (comma separated)"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="robots" className="block text-sm font-medium mb-1">
-                        Robots
-                      </label>
-                      <Input
-                        id="robots"
-                        value={articleData.metadata?.robots || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, robots: e.target.value }
-                        }))}
-                        placeholder="index, follow"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogTitle" className="block text-sm font-medium mb-1">
-                        OG Title
-                      </label>
-                      <Input
-                        id="ogTitle"
-                        value={articleData.metadata?.ogTitle || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogTitle: e.target.value }
-                        }))}
-                        placeholder="Enter OG title"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogDescription" className="block text-sm font-medium mb-1">
-                        OG Description
-                      </label>
-                      <Input
-                        id="ogDescription"
-                        value={articleData.metadata?.ogDescription || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogDescription: e.target.value }
-                        }))}
-                        placeholder="Enter OG description"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogImage" className="block text-sm font-medium mb-1">
-                        OG Image URL
-                      </label>
-                      <Input
-                        id="ogImage"
-                        value={articleData.metadata?.ogImage || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogImage: e.target.value }
-                        }))}
-                        placeholder="Enter OG image URL"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogType" className="block text-sm font-medium mb-1">
-                        OG Type
-                      </label>
-                      <Input
-                        id="ogType"
-                        value={articleData.metadata?.ogType || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogType: e.target.value }
-                        }))}
-                        placeholder="Enter OG type"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterCard" className="block text-sm font-medium mb-1">
-                        Twitter Card
-                      </label>
-                      <Input
-                        id="twitterCard"
-                        value={articleData.metadata?.twitterCard || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterCard: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter card type"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterTitle" className="block text-sm font-medium mb-1">
-                        Twitter Title
-                      </label>
-                      <Input
-                        id="twitterTitle"
-                        value={articleData.metadata?.twitterTitle || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterTitle: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter title"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterDescription" className="block text-sm font-medium mb-1">
-                        Twitter Description
-                      </label>
-                      <Input
-                        id="twitterDescription"
-                        value={articleData.metadata?.twitterDescription || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterDescription: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter description"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterImage" className="block text-sm font-medium mb-1">
-                        Twitter Image URL
-                      </label>
-                      <Input
-                        id="twitterImage"
-                        value={articleData.metadata?.twitterImage || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterImage: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter image URL"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="canonicalUrl" className="block text-sm font-medium mb-1">
-                        Canonical URL
-                      </label>
-                      <Input
-                        id="canonicalUrl"
-                        value={articleData.metadata?.canonicalUrl || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, canonicalUrl: e.target.value }
-                        }))}
-                        placeholder="Enter canonical URL"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="schemaData" className="block text-sm font-medium mb-1">
-                        Schema Data
-                      </label>
-                      <Input
-                        id="schemaData"
-                        value={articleData.metadata?.schemaData || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, schemaData: e.target.value }
-                        }))}
-                        placeholder="Enter schema data"
-                      />
-                    </div>
-                  </div>
-                </div>
-              
-                    <Button
-                      onClick={handleCreateAffair}
-                      className="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors duration-200"
-                      disabled={isLoading.creatingAffair}
-                    >
-                      {isLoading.creatingAffair ? (
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-                          Creating...
-                        </div>
-                      ) : (
-                        'Create Current Affair'
-                      )}
-                    </Button>
+                    <GeneralStudiesForm
+                      defaultValues={newAffairData}
+                      onSubmit={handleCreateAffair}
+                    />
                   </div>
                 )}
 
@@ -834,269 +543,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
               </div>
               
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Title
-                  </label>
-                  <Input
-                    value={articleData.title}
-                    onChange={(e) => setArticleData({ ...articleData, title: e.target.value })}
-                    placeholder="Enter article title"
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Content
-                  </label>
-                  <TiptapEditor
-                    content={articleData.content}
-                    onChange={(html) => setArticleData({ ...articleData, content: html })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Author
-                  </label>
-                  <Input
-                    value={articleData.author}
-                    onChange={(e) => setArticleData({ ...articleData, author: e.target.value })}
-                    placeholder="Enter author name"
-                    className="w-full"                  />
-                </div>
-                
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Metadata</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="metaTitle" className="block text-sm font-medium mb-1">
-                        Meta Title
-                      </label>
-                      <Input
-                        id="metaTitle"
-                        value={articleData.metadata?.metaTitle || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, metaTitle: e.target.value }
-                        }))}
-                        placeholder="Enter meta title"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="metaDescription" className="block text-sm font-medium mb-1">
-                        Meta Description
-                      </label>
-                      <Input
-                        id="metaDescription"
-                        value={articleData.metadata?.metaDescription || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, metaDescription: e.target.value }
-                        }))}
-                        placeholder="Enter meta description"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="metaKeywords" className="block text-sm font-medium mb-1">
-                        Meta Keywords
-                      </label>
-                      <Input
-                        id="metaKeywords"
-                        value={articleData.metadata?.metaKeywords || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, metaKeywords: e.target.value }
-                        }))}
-                        placeholder="Enter meta keywords (comma separated)"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="robots" className="block text-sm font-medium mb-1">
-                        Robots
-                      </label>
-                      <Input
-                        id="robots"
-                        value={articleData.metadata?.robots || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, robots: e.target.value }
-                        }))}
-                        placeholder="index, follow"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogTitle" className="block text-sm font-medium mb-1">
-                        OG Title
-                      </label>
-                      <Input
-                        id="ogTitle"
-                        value={articleData.metadata?.ogTitle || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogTitle: e.target.value }
-                        }))}
-                        placeholder="Enter OG title"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogDescription" className="block text-sm font-medium mb-1">
-                        OG Description
-                      </label>
-                      <Input
-                        id="ogDescription"
-                        value={articleData.metadata?.ogDescription || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogDescription: e.target.value }
-                        }))}
-                        placeholder="Enter OG description"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogImage" className="block text-sm font-medium mb-1">
-                        OG Image URL
-                      </label>
-                      <Input
-                        id="ogImage"
-                        value={articleData.metadata?.ogImage || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogImage: e.target.value }
-                        }))}
-                        placeholder="Enter OG image URL"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="ogType" className="block text-sm font-medium mb-1">
-                        OG Type
-                      </label>
-                      <Input
-                        id="ogType"
-                        value={articleData.metadata?.ogType || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, ogType: e.target.value }
-                        }))}
-                        placeholder="Enter OG type"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterCard" className="block text-sm font-medium mb-1">
-                        Twitter Card
-                      </label>
-                      <Input
-                        id="twitterCard"
-                        value={articleData.metadata?.twitterCard || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterCard: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter card type"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterTitle" className="block text-sm font-medium mb-1">
-                        Twitter Title
-                      </label>
-                      <Input
-                        id="twitterTitle"
-                        value={articleData.metadata?.twitterTitle || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterTitle: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter title"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterDescription" className="block text-sm font-medium mb-1">
-                        Twitter Description
-                      </label>
-                      <Input
-                        id="twitterDescription"
-                        value={articleData.metadata?.twitterDescription || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterDescription: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter description"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="twitterImage" className="block text-sm font-medium mb-1">
-                        Twitter Image URL
-                      </label>
-                      <Input
-                        id="twitterImage"
-                        value={articleData.metadata?.twitterImage || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, twitterImage: e.target.value }
-                        }))}
-                        placeholder="Enter Twitter image URL"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="canonicalUrl" className="block text-sm font-medium mb-1">
-                        Canonical URL
-                      </label>
-                      <Input
-                        id="canonicalUrl"
-                        value={articleData.metadata?.canonicalUrl || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, canonicalUrl: e.target.value }
-                        }))}
-                        placeholder="Enter canonical URL"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="schemaData" className="block text-sm font-medium mb-1">
-                        Schema Data
-                      </label>
-                      <Input
-                        id="schemaData"
-                        value={articleData.metadata?.schemaData || ''}
-                        onChange={(e) => setArticleData(prev => ({
-                          ...prev,
-                          metadata: { ...prev.metadata, schemaData: e.target.value }
-                        }))}
-                        placeholder="Enter schema data"
-                      />
-                    </div>
-                  </div>
-                </div>
-              
-                <div className="mt-6 flex justify-end">
-                  <Button
-                    onClick={handleCreateArticle}
-                    className="bg-slate-800 text-white px-8 py-2 rounded-lg hover:bg-slate-700 transition-colors duration-200"
-                    disabled={isLoading.creatingArticle}
-                  >
-                    {isLoading.creatingArticle ? (
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-                        Creating...
-                      </div>
-                    ) : (
-                      'Create Article'
-                    )}
-                  </Button>
-                </div>
+                <CurrentArticleForm
+                  defaultValues={articleData}
+                  onSubmit={handleCreateArticle}
+                />
               </div>
             </div>
           </div>
