@@ -5,6 +5,7 @@ import { TableOfContents } from "@/components/navigation/TableOfContents";
 import { X } from "lucide-react";
 import DraggableTocButton from "@/components/navigation/DraggableTocButton";
 import { Metadata } from "next";
+import QuizWrapper from "@/components/quiz/QuizWrapper";
 
 // Define types for the data
 interface CurrentAffairArticle {
@@ -280,6 +281,10 @@ const CurrentAffairArticlePage = async ({
             </Link>
           </div>
         )}
+        <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">Quiz Section</h2>
+        <QuizWrapper />
+      </div>
       </div>
     </div>
     </>
