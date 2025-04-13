@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 import {uploadImageToS3} from '@/config/imageUploadS3';
-
+import { CurrentArticleForm, CurrentArticleFormValues } from '@/components/dashboard/forms/CurrentArticleForm';
 // Types for CurrentAffair models
 interface CurrentAffairType {
   id: number;
@@ -47,6 +47,7 @@ interface CurrentAffairArticleType {
   createdAt: Date;
   updatedAt: Date;
   parentSlug: string;
+  quizQuestions?: string;
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -115,6 +116,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [articleData, setArticleData] = useState({
     title: '',
     content: '',
+    quizQuestions: '',
     author: 'here',
       metaTitle: '',
       metaDescription: '',
@@ -377,6 +379,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         author: data.author,
         slug: articleSlug,
         parentSlug: selectedAffair.slug,
+        quizQuestions: data.quizQuestions,
         type: selectedType, // Use the type selected in step 1
         metadata: JSON.stringify({
           metaTitle: data.metaTitle,
@@ -540,7 +543,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
               </div>
               
               <div className="space-y-4">
-                <GeneralStudiesForm
+                <CurrentArticleForm
                   defaultValues={articleData}
                   onSubmit={handleCreateArticle}
                 />
