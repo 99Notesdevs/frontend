@@ -5,7 +5,7 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import CurrentAffairsLayout from "@/components/CurrentAffairs/CurrentAffairsLayout";
 import { sectionConfig } from "@/config/currentAffairs";
 import { env } from "@/config/env";
-
+import { Metadata } from "next";
 // Define interfaces to match the database schema
 interface Article {
   id: number;
@@ -25,6 +25,7 @@ interface CurrentAffair {
   content: string;
   slug: string;
   type: string;
+  metadata?: string;
   createdAt: string;
   updatedAt: string;
   imageUrl?: string;
@@ -34,6 +35,76 @@ type Params = Promise<{
   category: string;
 }>;
 
+async function getPage(
+  slug: string
+): Promise<CurrentAffair | null> {
+  try {
+    const fullSlug = `current-affairs/${slug}`;
+    const modifiedSlug = fullSlug.replace(/\s+/g, ' ');
+    const response = await fetch(`${env.API}/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`);
+    const res = await response.json();
+    const page = res.data;
+
+    if (!page) {
+      return null;
+    }
+
+    return page as CurrentAffair;
+  } catch (error) {
+    console.error("Error fetching page:", error);
+    return null;
+  }
+}
+export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
+  const { category } = await params;
+  const page = await getPage(category);
+
+  if (!page || !page.metadata) {
+    return {
+      title: "Page Not Found",
+      description: "The requested page could not be found.",
+    };
+  }
+  // @ts-ignore
+  const JSONMetaData = JSON.parse(page.metadata);
+  console.log("JSONMetaData", JSONMetaData.schemaData);
+  
+  return {
+    title: JSONMetaData.metaTitle || "Default Title",
+    description: JSONMetaData.metaDescription || "Default description",
+    keywords: JSONMetaData.metaKeywords || "Default keywords",
+    robots: JSONMetaData.robots || "index, follow",
+    openGraph: {
+      title: JSONMetaData.ogTitle || "Default OG Title",
+      description: JSONMetaData.ogDescription || "Default OG Description",
+      url: JSONMetaData.canonicalUrl || "https://example.com",
+      images: [
+        {
+          url: JSONMetaData.ogImage || "https://example.com/default-image.jpg",
+        },
+      ],
+      type: JSONMetaData.ogType || "website",
+    },
+    twitter: {
+      card: JSONMetaData.twitterCard || "summary_large_image",
+      title: JSONMetaData.twitterTitle || "Default Twitter Title",
+      description:
+        JSONMetaData.twitterDescription || "Default Twitter Description",
+      images: [
+        {
+          url:
+            JSONMetaData.twitterImage ||
+            "https://example.com/default-twitter-image.jpg",
+        },
+      ],
+    },
+    alternates: {
+      canonical:
+        JSONMetaData.canonicalUrl ||
+        "https://example.com/default-canonical-url",
+    },
+  };
+}
 // Make the component async and properly handle the dynamic params
 const CurrentAffairsSectionPage = async ({
   params,
@@ -132,15 +203,6 @@ const CurrentAffairsSectionPage = async ({
     );
   }
 
-  // Get the section config for this category
-  
-  const sectionInfo = sectionConfig[category] || {
-    title: category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " "),
-    description: "Latest updates and analysis",
-    topics: ["General"],
-  };
-  
-
   // Sort articles by date (newest first)
   const sortedArticles = [...articles].sort((a, b) => {
     // Handle potentially undefined createdAt values
@@ -148,8 +210,15 @@ const CurrentAffairsSectionPage = async ({
     const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
     return dateB - dateA;
   });
-
+  // @ts-ignore
+  const jsonLD = JSON.parse(currentAffair?.metadata).schemaData || "";
   return (
+    <>
+    <section>
+      <script 
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: jsonLD }} />
+    </section>
     <CurrentAffairsLayout>
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-50 via-white to-blue-50 border-b">
@@ -355,6 +424,7 @@ const CurrentAffairsSectionPage = async ({
         ></div>
       </div>
     </CurrentAffairsLayout>
+    </>
   );
 };
 

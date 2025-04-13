@@ -1,191 +1,80 @@
-"use client";
+ "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import TiptapEditor from '@/components/ui/tiptapeditor';
+import { GeneralStudiesForm, type GeneralStudiesFormValues } from '@/components/dashboard/forms/GeneralStudiesForm';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
-import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 
-interface CurrentArticleType {
+import { PencilIcon, TrashIcon, EyeIcon, ArrowLeftIcon, CalendarIcon, CalendarDaysIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
+
+interface CurrentAffairType {
   id: number;
   title: string;
   content: string;
-  author: string;
   slug: string;
+  author: string;
+  parentSlug: string;
+  metadata?: string;
   createdAt: Date;
   updatedAt: Date;
-  parentSlug: string;
+  imageUrl: string | null;
 }
 
 export default function ArticlesPage() {
-  const [articles, setArticles] = useState<CurrentArticleType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedPage, setSelectedPage] = useState<CurrentAffairType | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [editingArticle, setEditingArticle] = useState<CurrentArticleType | null>(null);
-  const [showEditForm, setShowEditForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [pages, setPages] = useState<CurrentAffairType[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
   const token = Cookie.get('token');
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    reset,
-    watch,
-    getValues
-  } = useForm<CurrentArticleType>({
-    resolver: zodResolver(
-      z.object({
-        id: z.number(),
-        title: z.string().min(1, "Title is required"),
-        content: z.string().min(1, "Content is required"),
-        author: z.string().min(1, "Author is required"),
-        slug: z.string(),
-        createdAt: z.date(),
-        updatedAt: z.date(),
-        parentSlug: z.string()
-      })
-    ),
-    defaultValues: {
-      id: 0,
-      title: "",
-      content: "",
-      author: "",
-      slug: "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      parentSlug: ""
-    }
-  });
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const parentSlug = urlParams.get('parentPageName');
-    if (parentSlug) {
-      // Replace forward slashes with spaces
-      const encodedSlug = parentSlug.replace(/\//g, ' ');
-      fetchArticles(encodedSlug);
-    }
-  }, []);
-
-  const fetchArticles = async (parentSlug: string) => {
-    try {
-      // Replace forward slashes with spaces before encoding
-      console.log(parentSlug)
-      const response = await fetch(`${env.API}/currentArticle/parent/${parentSlug}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch articles');
-      }
-
-      const data = await response.json();
-      setArticles(data.data || []); 
-      setLoading(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      setLoading(false);
-    }
-  };
-
-  const handleEdit = (article: CurrentArticleType) => {
-    setEditingArticle(article);
-    setShowEditForm(true);
-    reset({
-      id: article.id,
-      title: article.title,
-      content: article.content,
-      author: article.author,
-      slug: article.slug,
-      createdAt: article.createdAt,
-      updatedAt: article.updatedAt,
-      parentSlug: article.parentSlug
-    });
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this article?')) return;
-
-    try {
-      const response = await fetch(`${env.API}/currentArticle/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete article');
-      }
-
-      setArticles(articles.filter(article => article.id !== id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete article');
-    }
-  };
-
-  const handleEditorChange = (content: string) => {
-    // Update the form value and trigger validation
-    setValue('content', content, { shouldValidate: true });
-    // Update the editingArticle state for immediate preview
-    if (editingArticle) {
-      console.log("ARtivle", editingArticle)
-      setEditingArticle(prev => ({
-        ...prev,
-        content,
-        // Ensure all required fields are present
-        id: prev?.id || 0,
-        title: prev?.title || '',
-        author: prev?.author || '',
-        slug: prev?.slug || '',
-        createdAt: prev?.createdAt || new Date(),
-        updatedAt: new Date(),
-        parentSlug: prev?.parentSlug || ''
-      }));
-    }
-  };
-
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = getValues();
-    console.log("Form submission started");
-    console.log("Form data:", formData);
-    
+  const handleEditSubmit = async (formData: GeneralStudiesFormValues) => {
     try {
       // Generate slug from title
-      const parentSlug = editingArticle?.parentSlug || 'current-affairs';
       const baseSlug = formData.title
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
-      const slug = `${parentSlug} ${baseSlug}`;
-      console.log(parentSlug);
-      console.log(baseSlug);
-      console.log(slug);
+      const slug = `current-affairs/${baseSlug}`;
 
       const updateData = {
         title: formData.title,
         content: formData.content,
         author: formData.author,
-        slug,
-        parentSlug,
-        updatedAt: new Date()
+        parentSlug: selectedPage?.parentSlug || '',
+        slug: selectedPage?.slug || '',
+        updatedAt: new Date(),
+        imageUrl: formData.imageUrl,
+        metadata: JSON.stringify({
+          metaTitle: formData.metaTitle,
+          metaDescription: formData.metaDescription,
+          metaKeywords: formData.metaKeywords,
+          robots: formData.robots,
+          ogTitle: formData.ogTitle,
+          ogDescription: formData.ogDescription,
+          ogImage: formData.ogImage,
+          ogType: formData.ogType,
+          twitterCard: formData.twitterCard,
+          twitterTitle: formData.twitterTitle,
+          twitterDescription: formData.twitterDescription,
+          twitterImage: formData.twitterImage,
+          canonicalUrl: formData.canonicalUrl,
+          schemaData: formData.schemaData
+        })
       };
-      console.log(updateData)
 
-      const response = await fetch(`${env.API}/currentArticle/${formData.id}`, {
+      if (!selectedPage) {
+        setError('No page selected');
+        return;
+      }
+      
+      const response = await fetch(`${env.API}/currentArticle/${selectedPage.id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(updateData)
       });
@@ -196,101 +85,236 @@ export default function ArticlesPage() {
       }
 
       const { data } = await response.json();
-      setArticles(prevArticles => 
-        prevArticles.map(article => 
-          article.id === formData.id ? { ...article, ...data } : article
-        )
-      );
-      setShowEditForm(false);
-      setEditingArticle(null);
+      setSelectedPage(data);
+      
+      // Refresh the page list
+      const urlParams = new URLSearchParams(window.location.search);
+      const parentSlug = urlParams.get('parentPageName');
+      if (parentSlug) {
+        fetchPages(parentSlug);
+      }
+      
+      // Refresh the page after successful submission
+      window.location.reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const parentSlug = urlParams.get('parentPageName');
+    if (parentSlug) {
+      fetchPages(parentSlug);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedPage) {
+      console.log('Selected page content:', selectedPage);
+      
+      // Parse metadata string into object if it exists
+      const parsedMetadata = selectedPage.metadata ? JSON.parse(selectedPage.metadata) : {};
+      
+      // Prepare default values for the form
+      const defaultValues = {
+        title: selectedPage.title,
+        content: selectedPage.content || '',
+        author: selectedPage.author || '',
+        imageUrl: selectedPage.imageUrl || '',
+        metaTitle: parsedMetadata.metaTitle || '',
+        metaDescription: parsedMetadata.metaDescription || '',
+        metaKeywords: parsedMetadata.metaKeywords || '',
+        robots: parsedMetadata.robots || '',
+        ogTitle: parsedMetadata.ogTitle || '',
+        ogDescription: parsedMetadata.ogDescription || '',
+        ogImage: parsedMetadata.ogImage || '',
+        ogType: parsedMetadata.ogType || '',
+        twitterCard: parsedMetadata.twitterCard || '',
+        twitterTitle: parsedMetadata.twitterTitle || '',
+        twitterDescription: parsedMetadata.twitterDescription || '',
+        twitterImage: parsedMetadata.twitterImage || '',
+        canonicalUrl: parsedMetadata.canonicalUrl || '',
+        schemaData: parsedMetadata.schemaData || ''
+      };
+
+      setImagePreview(selectedPage.imageUrl || null);
+    }
+  }, [selectedPage]);
+
+  const handleDelete = async (pageId: number) => {
+    if (!window.confirm('Are you sure you want to delete this page?')) return;
+
+    try {
+      const response = await fetch(`${env.API}/currentArticle/${pageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete page');
+      }
+
+      // Refresh the page list
+      const urlParams = new URLSearchParams(window.location.search);
+      const parentSlug = urlParams.get('parentPageName');
+      if (parentSlug) {
+        fetchPages(parentSlug);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
+  const fetchPages = async (parentSlug: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${env.API}/currentArticle/parent/${parentSlug}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch pages');
+      }
+
+      const { data } = await response.json();
+      setPages(data || []);
+    } catch (error) {
+      console.error('Error fetching current affairs:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : undefined,
+        type: error instanceof Error ? error.constructor.name : typeof error
+      });
+
+      setError(error instanceof Error ? error.message : 'Failed to fetch pages');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Current Articles</h1>
-      
-      <div className="space-y-4">
-        {articles.map((article) => (
-          <div key={article.id} className="p-4 border rounded-lg">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">{article.title}</h2>
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(article)}
-                >
-                  <PencilIcon className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(article.id)}
-                >
-                  <TrashIcon className="w-4 h-4" />
-                </Button>
-              </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <div className="bg-slate-800 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-white">
+              Edit Articles
+            </h1>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  (window.location.href = "/dashboard/editcurrent")
+                }
+                className="border-slate-700 text-white hover:bg-slate-700"
+              >
+                <ArrowLeftIcon className="w-4 h-4 mr-2" />
+                Back
+              </Button>
             </div>
-            <p className="text-gray-600">Author: {article.author}</p>
-            {article.content && (
-              <div className="mt-2" dangerouslySetInnerHTML={{ __html: article.content }} />
-            )}
           </div>
-        ))}
+        </div>
       </div>
 
-      {showEditForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
-            <h2 className="text-xl font-bold mb-4">Edit Article</h2>
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Title</label>
-                <Input
-                  {...register('title')}
-                  className="w-full"
-                />
-                {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
-              </div>
+      {loading && (
+        <div className="text-center py-8">
+          <p>Loading articles...</p>
+        </div>
+      )}
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Author</label>
-                <Input
-                  {...register('author')}
-                  className="w-full"
-                />
-                {errors.author && <p className="text-red-500 text-sm">{errors.author.message}</p>}
-              </div>
+      {error && <div className="text-red-500 mb-4">Error: {error}</div>}
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Content</label>
-                <TiptapEditor
-                  content={editingArticle?.content || ''}
-                  onChange={handleEditorChange}
-                />
-                {errors.content && <p className="text-red-500 text-sm">{errors.content.message}</p>}
-              </div>
+      {!loading && !error && pages.length === 0 && (
+        <div className="text-center py-8">
+          <p>No articles found</p>
+        </div>
+      )}
+
+      {!loading && !error && pages.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {pages.map((page) => (
+            <div
+              key={page.id}
+              className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+            >
+              <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
+                <div
+                  className="text-gray-600 text-sm mb-4 line-clamp-3"
+                  dangerouslySetInnerHTML={{
+                    __html: page.content ? (
+                      page.content.substring(0, 100)
+                    ) : (
+                      <p>No content Available</p>
+                    ),
+                  }}
+                ></div>
 
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    setShowEditForm(false);
-                    setEditingArticle(null);
-                    reset();
-                  }}
+                  size="sm"
+                  onClick={() => setSelectedPage(page)}
+                  className="border-slate-200 text-blue-600 hover:bg-blue-50"
                 >
-                  Cancel
+                  <PencilIcon className="w-4 h-4 mr-2 text-blue-500" />
+                  Edit
                 </Button>
-                <Button type="submit">Save Changes</Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(page.id)}
+                  className="border-slate-200 text-red-600 hover:bg-red-50"
+                >
+                  <TrashIcon className="w-4 h-4 mr-2 text-red-500" />
+                  Delete
+                </Button>
               </div>
-            </form>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selectedPage && (
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Edit Article
+              </h2>
+              <GeneralStudiesForm
+                onSubmit={handleEditSubmit}
+                defaultValues={{
+                  title: selectedPage.title,
+                  content: selectedPage.content || '',
+                  author: selectedPage.author || '',
+                  imageUrl: selectedPage.imageUrl || '',
+                  metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
+                  metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',
+                  metaKeywords: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaKeywords || '' : '',
+                  robots: selectedPage.metadata ? JSON.parse(selectedPage.metadata).robots || '' : '',
+                  ogTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogTitle || '' : '',
+                  ogDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogDescription || '' : '',
+                  ogImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogImage || '' : '',
+                  ogType: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogType || '' : '',
+                  twitterCard: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterCard || '' : '',
+                  twitterTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterTitle || '' : '',
+                  twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
+                  twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
+                  canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
+                  schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : ''
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

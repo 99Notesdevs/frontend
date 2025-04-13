@@ -15,6 +15,22 @@ interface CurrentAffairType {
   title: string;
   content: string;
   imageUrl: string;
+  metadata?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    robots?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    ogType?: string;
+    twitterCard?: string;
+    twitterTitle?: string;
+    twitterDescription?: string;
+    twitterImage?: string;
+    canonicalUrl?: string;
+    schemaData?: string;
+  };
   type: string; // daily, monthly, yearly
   slug: string;
   createdAt: Date;
@@ -31,6 +47,22 @@ interface CurrentAffairArticleType {
   createdAt: Date;
   updatedAt: Date;
   parentSlug: string;
+  metadata?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    robots?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    ogType?: string;
+    twitterCard?: string;
+    twitterTitle?: string;
+    twitterDescription?: string;
+    twitterImage?: string;
+    canonicalUrl?: string;
+    schemaData?: string;
+  };
 }
 
 interface PageFormProps {
@@ -59,7 +91,23 @@ export function PageForm({ editPage = null }: PageFormProps) {
     title: '',
     content: '',
     imageUrl: '',
-    type: 'daily'
+    type: 'daily',
+    metadata: {
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: '',
+      robots: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+      ogType: '',
+      twitterCard: '',
+      twitterTitle: '',
+      twitterDescription: '',
+      twitterImage: '',
+      canonicalUrl: '',
+      schemaData: ''
+    }
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -67,7 +115,23 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [articleData, setArticleData] = useState({
     title: '',
     content: '',
-    author: ''
+    author: '',
+    metadata: {
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: '',
+      robots: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+      ogType: '',
+      twitterCard: '',
+      twitterTitle: '',
+      twitterDescription: '',
+      twitterImage: '',
+      canonicalUrl: '',
+      schemaData: ''
+    }
   });
   
   const token = Cookie.get('token');
@@ -221,7 +285,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
         content: updatedContent,
         imageUrl: newAffairData.imageUrl,
         type: newAffairData.type,
-        slug
+        slug,
+        metadata: JSON.stringify(newAffairData.metadata)
       };
 
       const response = await fetch(`${env.API}/currentAffair`, {
@@ -293,7 +358,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
         content,
         author: articleData.author,
         slug: articleSlug,
-        parentSlug: selectedAffair.slug
+        parentSlug: selectedAffair.slug,
+        metadata: JSON.stringify(articleData.metadata)
       };
 
       const response = await fetch(`${env.API}/currentArticle`, {
@@ -319,12 +385,44 @@ export function PageForm({ editPage = null }: PageFormProps) {
         title: '',
         content: '',
         imageUrl: '',
-        type: 'daily'
+        type: 'daily',
+        metadata: {
+          metaTitle: '',
+          metaDescription: '',
+          metaKeywords: '',
+          robots: '',
+          ogTitle: '',
+          ogDescription: '',
+          ogImage: '',
+          ogType: '',
+          twitterCard: '',
+          twitterTitle: '',
+          twitterDescription: '',
+          twitterImage: '',
+          canonicalUrl: '',
+          schemaData: ''
+        }
       });
       setArticleData({
         title: '',
         content: '',
-        author: ''
+        author: '',
+        metadata: {
+          metaTitle: '',
+          metaDescription: '',
+          metaKeywords: '',
+          robots: '',
+          ogTitle: '',
+          ogDescription: '',
+          ogImage: '',
+          ogType: '',
+          twitterCard: '',
+          twitterTitle: '',
+          twitterDescription: '',
+          twitterImage: '',
+          canonicalUrl: '',
+          schemaData: ''
+        }
       });
     } catch (error) {
       console.error('Error creating article:', error);
@@ -465,6 +563,222 @@ export function PageForm({ editPage = null }: PageFormProps) {
                         onChange={(html) => setNewAffairData({ ...newAffairData, content: html })}
                       />
                     </div>
+                    <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Metadata</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="metaTitle" className="block text-sm font-medium mb-1">
+                        Meta Title
+                      </label>
+                      <Input
+                        id="metaTitle"
+                        value={articleData.metadata?.metaTitle || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, metaTitle: e.target.value }
+                        }))}
+                        placeholder="Enter meta title"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="metaDescription" className="block text-sm font-medium mb-1">
+                        Meta Description
+                      </label>
+                      <Input
+                        id="metaDescription"
+                        value={articleData.metadata?.metaDescription || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, metaDescription: e.target.value }
+                        }))}
+                        placeholder="Enter meta description"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="metaKeywords" className="block text-sm font-medium mb-1">
+                        Meta Keywords
+                      </label>
+                      <Input
+                        id="metaKeywords"
+                        value={articleData.metadata?.metaKeywords || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, metaKeywords: e.target.value }
+                        }))}
+                        placeholder="Enter meta keywords (comma separated)"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="robots" className="block text-sm font-medium mb-1">
+                        Robots
+                      </label>
+                      <Input
+                        id="robots"
+                        value={articleData.metadata?.robots || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, robots: e.target.value }
+                        }))}
+                        placeholder="index, follow"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogTitle" className="block text-sm font-medium mb-1">
+                        OG Title
+                      </label>
+                      <Input
+                        id="ogTitle"
+                        value={articleData.metadata?.ogTitle || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogTitle: e.target.value }
+                        }))}
+                        placeholder="Enter OG title"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogDescription" className="block text-sm font-medium mb-1">
+                        OG Description
+                      </label>
+                      <Input
+                        id="ogDescription"
+                        value={articleData.metadata?.ogDescription || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogDescription: e.target.value }
+                        }))}
+                        placeholder="Enter OG description"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogImage" className="block text-sm font-medium mb-1">
+                        OG Image URL
+                      </label>
+                      <Input
+                        id="ogImage"
+                        value={articleData.metadata?.ogImage || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogImage: e.target.value }
+                        }))}
+                        placeholder="Enter OG image URL"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogType" className="block text-sm font-medium mb-1">
+                        OG Type
+                      </label>
+                      <Input
+                        id="ogType"
+                        value={articleData.metadata?.ogType || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogType: e.target.value }
+                        }))}
+                        placeholder="Enter OG type"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterCard" className="block text-sm font-medium mb-1">
+                        Twitter Card
+                      </label>
+                      <Input
+                        id="twitterCard"
+                        value={articleData.metadata?.twitterCard || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterCard: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter card type"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterTitle" className="block text-sm font-medium mb-1">
+                        Twitter Title
+                      </label>
+                      <Input
+                        id="twitterTitle"
+                        value={articleData.metadata?.twitterTitle || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterTitle: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter title"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterDescription" className="block text-sm font-medium mb-1">
+                        Twitter Description
+                      </label>
+                      <Input
+                        id="twitterDescription"
+                        value={articleData.metadata?.twitterDescription || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterDescription: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter description"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterImage" className="block text-sm font-medium mb-1">
+                        Twitter Image URL
+                      </label>
+                      <Input
+                        id="twitterImage"
+                        value={articleData.metadata?.twitterImage || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterImage: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter image URL"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="canonicalUrl" className="block text-sm font-medium mb-1">
+                        Canonical URL
+                      </label>
+                      <Input
+                        id="canonicalUrl"
+                        value={articleData.metadata?.canonicalUrl || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, canonicalUrl: e.target.value }
+                        }))}
+                        placeholder="Enter canonical URL"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="schemaData" className="block text-sm font-medium mb-1">
+                        Schema Data
+                      </label>
+                      <Input
+                        id="schemaData"
+                        value={articleData.metadata?.schemaData || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, schemaData: e.target.value }
+                        }))}
+                        placeholder="Enter schema data"
+                      />
+                    </div>
+                  </div>
+                </div>
+              
                     <Button
                       onClick={handleCreateAffair}
                       className="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors duration-200"
@@ -550,6 +864,223 @@ export function PageForm({ editPage = null }: PageFormProps) {
                     placeholder="Enter author name"
                     className="w-full"                  />
                 </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Metadata</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="metaTitle" className="block text-sm font-medium mb-1">
+                        Meta Title
+                      </label>
+                      <Input
+                        id="metaTitle"
+                        value={articleData.metadata?.metaTitle || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, metaTitle: e.target.value }
+                        }))}
+                        placeholder="Enter meta title"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="metaDescription" className="block text-sm font-medium mb-1">
+                        Meta Description
+                      </label>
+                      <Input
+                        id="metaDescription"
+                        value={articleData.metadata?.metaDescription || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, metaDescription: e.target.value }
+                        }))}
+                        placeholder="Enter meta description"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="metaKeywords" className="block text-sm font-medium mb-1">
+                        Meta Keywords
+                      </label>
+                      <Input
+                        id="metaKeywords"
+                        value={articleData.metadata?.metaKeywords || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, metaKeywords: e.target.value }
+                        }))}
+                        placeholder="Enter meta keywords (comma separated)"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="robots" className="block text-sm font-medium mb-1">
+                        Robots
+                      </label>
+                      <Input
+                        id="robots"
+                        value={articleData.metadata?.robots || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, robots: e.target.value }
+                        }))}
+                        placeholder="index, follow"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogTitle" className="block text-sm font-medium mb-1">
+                        OG Title
+                      </label>
+                      <Input
+                        id="ogTitle"
+                        value={articleData.metadata?.ogTitle || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogTitle: e.target.value }
+                        }))}
+                        placeholder="Enter OG title"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogDescription" className="block text-sm font-medium mb-1">
+                        OG Description
+                      </label>
+                      <Input
+                        id="ogDescription"
+                        value={articleData.metadata?.ogDescription || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogDescription: e.target.value }
+                        }))}
+                        placeholder="Enter OG description"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogImage" className="block text-sm font-medium mb-1">
+                        OG Image URL
+                      </label>
+                      <Input
+                        id="ogImage"
+                        value={articleData.metadata?.ogImage || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogImage: e.target.value }
+                        }))}
+                        placeholder="Enter OG image URL"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="ogType" className="block text-sm font-medium mb-1">
+                        OG Type
+                      </label>
+                      <Input
+                        id="ogType"
+                        value={articleData.metadata?.ogType || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, ogType: e.target.value }
+                        }))}
+                        placeholder="Enter OG type"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterCard" className="block text-sm font-medium mb-1">
+                        Twitter Card
+                      </label>
+                      <Input
+                        id="twitterCard"
+                        value={articleData.metadata?.twitterCard || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterCard: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter card type"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterTitle" className="block text-sm font-medium mb-1">
+                        Twitter Title
+                      </label>
+                      <Input
+                        id="twitterTitle"
+                        value={articleData.metadata?.twitterTitle || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterTitle: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter title"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterDescription" className="block text-sm font-medium mb-1">
+                        Twitter Description
+                      </label>
+                      <Input
+                        id="twitterDescription"
+                        value={articleData.metadata?.twitterDescription || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterDescription: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter description"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="twitterImage" className="block text-sm font-medium mb-1">
+                        Twitter Image URL
+                      </label>
+                      <Input
+                        id="twitterImage"
+                        value={articleData.metadata?.twitterImage || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, twitterImage: e.target.value }
+                        }))}
+                        placeholder="Enter Twitter image URL"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="canonicalUrl" className="block text-sm font-medium mb-1">
+                        Canonical URL
+                      </label>
+                      <Input
+                        id="canonicalUrl"
+                        value={articleData.metadata?.canonicalUrl || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, canonicalUrl: e.target.value }
+                        }))}
+                        placeholder="Enter canonical URL"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="schemaData" className="block text-sm font-medium mb-1">
+                        Schema Data
+                      </label>
+                      <Input
+                        id="schemaData"
+                        value={articleData.metadata?.schemaData || ''}
+                        onChange={(e) => setArticleData(prev => ({
+                          ...prev,
+                          metadata: { ...prev.metadata, schemaData: e.target.value }
+                        }))}
+                        placeholder="Enter schema data"
+                      />
+                    </div>
+                  </div>
+                </div>
+              
                 <div className="mt-6 flex justify-end">
                   <Button
                     onClick={handleCreateArticle}

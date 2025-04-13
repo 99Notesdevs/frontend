@@ -19,11 +19,7 @@ interface Page {
   parentId?: number;
   level?: number;
   order?: number;
-  metadata?: {
-    keywords?: string[];
-    lastUpdated?: string;
-    teamSize?: number;
-  };
+  metadata?: string
 }
 
 function PageList() {

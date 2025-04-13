@@ -1,10 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import { env } from "@/config/env";
-import Head from "next/head";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import { X } from "lucide-react";
 import DraggableTocButton from "@/components/navigation/DraggableTocButton";
+import { Metadata } from "next";
 
 // Define types for the data
 interface CurrentAffairArticle {
@@ -13,6 +13,7 @@ interface CurrentAffairArticle {
   content?: string;
   slug: string;
   author?: string;
+  metadata?: string;
   createdAt?: string;
   updatedAt?: string;
   parentSlug?: string;
@@ -21,17 +22,54 @@ interface CurrentAffairArticle {
 
 type Params = Promise<{ category: string; section: string }>;
 
-// This function will be called at request time
-export async function generateMetadata({ params }: { params: Params }) {
-  // Await params to fix the Next.js error
+export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
   const { category, section } = await params;
-  
-  // Fetch the article to get its title
-  const article = await fetchArticle(category, section);
+  const page = await fetchArticle(category, section);
+
+  if (!page || !page.metadata) {
+    return {
+      title: "Page Not Found",
+      description: "The requested page could not be found.",
+    };
+  }
+  // @ts-ignore
+  const JSONMetaData = JSON.parse(page.metadata);
+  console.log("JSONMetaData", JSONMetaData.schemaData);
   
   return {
-    title: article ? `${article.title} - 99Notes` : "Article - 99Notes",
-    description: article ? article.content?.substring(0, 160) : "Current affairs article",
+    title: JSONMetaData.metaTitle || "Default Title",
+    description: JSONMetaData.metaDescription || "Default description",
+    keywords: JSONMetaData.metaKeywords || "Default keywords",
+    robots: JSONMetaData.robots || "index, follow",
+    openGraph: {
+      title: JSONMetaData.ogTitle || "Default OG Title",
+      description: JSONMetaData.ogDescription || "Default OG Description",
+      url: JSONMetaData.canonicalUrl || "https://example.com",
+      images: [
+        {
+          url: JSONMetaData.ogImage || "https://example.com/default-image.jpg",
+        },
+      ],
+      type: JSONMetaData.ogType || "website",
+    },
+    twitter: {
+      card: JSONMetaData.twitterCard || "summary_large_image",
+      title: JSONMetaData.twitterTitle || "Default Twitter Title",
+      description:
+        JSONMetaData.twitterDescription || "Default Twitter Description",
+      images: [
+        {
+          url:
+            JSONMetaData.twitterImage ||
+            "https://example.com/default-twitter-image.jpg",
+        },
+      ],
+    },
+    alternates: {
+      canonical:
+        JSONMetaData.canonicalUrl ||
+        "https://example.com/default-canonical-url",
+    },
   };
 }
 
@@ -47,17 +85,18 @@ const CurrentAffairArticlePage = async ({
   
   // Fetch the article
   const article = await fetchArticle(category, articleSlug);
+  // @ts-ignore
+  const jsonLD = JSON.parse(article?.metadata).schemaData || "";
 
   return (
+    <>
+    <section>
+      <script 
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: jsonLD }} />
+    </section>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 pt-5">
       <div className="container max-w-7xl mx-auto px-4 py-8">
-        <Head>
-          <title>{article?.title || "Article"} | 99Notes</title>
-          <meta
-            name="description"
-            content={article?.content?.substring(0, 160) || "Current affairs article"}
-          />
-        </Head>
 
         {/* TOC Container with checkbox hack for toggle */}
       <input type="checkbox" id="toc-toggle" className="hidden peer" />
@@ -244,6 +283,7 @@ const CurrentAffairArticlePage = async ({
         )}
       </div>
     </div>
+    </>
   );
 };
 

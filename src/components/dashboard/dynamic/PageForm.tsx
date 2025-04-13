@@ -46,54 +46,28 @@ interface PageFormProps {
   editPage?: PageWithRelations | null;
 }
 
-interface TeamMember {
-  name: string;
-  role: string;
-  bio: string;
-}
-
-interface AboutContent {
-  hero: {
-    title: string;
-    subtitle: string;
-  };
-  mission: string;
-  veterans: TeamMember[];
-  coreMembers: TeamMember[];
-}
-
-interface GeneralStudiesContent {
-  title: string;
-  paper: string;
-  topic: string;
-  subtopic: string;
-  content: string;
-  importanceLevel: "low" | "medium" | "high";
-  previousYearQuestions?: string;
-  keyPoints: string;
-  sources?: string;
-}
-
 interface PageFormData extends Record<string, any> {
   title?: string;
   hero?: {
     title: string;
-    subtitle: string;
   };
-  mission?: string;
-  veterans?: TeamMember[];
-  coreMembers?: TeamMember[];
-  paper?: string;
-  topic?: string;
-  subtopic?: string;
   content?: string;
-  subject?: string;
-  importanceLevel?: string;
-  previousYearQuestions?: string;
-  keyPoints?: string;
-  sources?: string;
+  imageUrl?: string;
   metadata?: {
-    teamSize?: number;
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    robots?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    ogType?: string;
+    twitterCard?: string;
+    twitterTitle?: string;
+    twitterDescription?: string;
+    twitterImage?: string;
+    canonicalUrl?: string;
+    schemaData?: string;
   };
 }
 
@@ -271,7 +245,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
         content: formData.content, // Directly use the HTML content
         metadata: {
           lastUpdated: new Date().toISOString(),
-          teamSize: formData.metadata?.teamSize || 0,
           metaTitle: formData.metaTitle || "",
           metaDescription: formData.metaDescription || "",
           metaKeywords: formData.metaKeywords || "",

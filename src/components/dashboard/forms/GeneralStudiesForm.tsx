@@ -30,6 +30,7 @@ const formSchema = z.object({
   twitterImage: z.string().url("Twitter Image must be a valid URL").optional(),
   canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
   schemaData: z.string().optional(),
+  author: z.string().optional(),
 });
 
 export type GeneralStudiesFormValues = z.infer<typeof formSchema>;
@@ -42,7 +43,6 @@ interface GeneralStudiesFormProps {
 export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
   const [isUploading, setIsUploading] = useState(false);
-  console.log(defaultValues)
 
   const form = useForm<GeneralStudiesFormValues>({
     resolver: zodResolver(formSchema),
@@ -64,6 +64,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
       twitterImage: '',
       canonicalUrl: '',
       schemaData: '',
+      author: '',
       ...defaultValues,
     },
   });
@@ -122,6 +123,27 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             </FormItem>
           )}
         />
+
+        {/* Author */}
+        {defaultValues?.author && (
+          <FormField
+            control={form.control}
+            name="author"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-500 font-medium">Author</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter author" 
+                    {...field} 
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Image Upload */}
         <FormField
