@@ -7,7 +7,7 @@ const SearchBar = () => {
 
   return (
     <div className="relative flex items-center pr-15">
-      <div className={`relative w-28 group bg-white border border-black`}>
+      <div className={`relative group bg-white border border-black w-full`}>
         <input
           type="text"
           placeholder="Search notes, subjects..."

@@ -10,10 +10,12 @@ interface TOCItem {
 
 interface TableOfContentsProps {
   content?: string; // Raw HTML content passed from the parent
+  onLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>, id: string) => void;
 }
 
 export const TableOfContents: React.FC<TableOfContentsProps> = ({
   content,
+  onLinkClick,
 }) => {
   const [headings, setHeadings] = useState<TOCItem[]>([]);
   const [activeId, setActiveId] = useState<string>("");
@@ -110,24 +112,28 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                 }`}
               onClick={(e) => {
                 e.preventDefault();
-                const target = document.getElementById(heading.id);
-                if (target) {
-                  // Close the TOC
-                  closeToc();
-                  
-                  // Calculate the offset for the navbar
-                  const navbar = document.querySelector('nav');
-                  const navbarHeight = navbar?.offsetHeight || 0;
-                  
-                  // Get the target's position relative to the viewport
-                  const targetRect = target.getBoundingClientRect();
-                  const offset = navbarHeight + 20;
-                  
-                  // Scroll to the target with smooth behavior
-                  window.scrollTo({
-                    top: targetRect.top + window.scrollY - offset,
-                    behavior: 'smooth'
-                  });
+                if (onLinkClick) {
+                  onLinkClick(e, heading.id);
+                } else {
+                  const target = document.getElementById(heading.id);
+                  if (target) {
+                    // Close the TOC
+                    closeToc();
+                    
+                    // Calculate the offset for the navbar
+                    const navbar = document.querySelector('nav');
+                    const navbarHeight = navbar?.offsetHeight || 0;
+                    
+                    // Get the target's position relative to the viewport
+                    const targetRect = target.getBoundingClientRect();
+                    const offset = navbarHeight + 20;
+                    
+                    // Scroll to the target with smooth behavior
+                    window.scrollTo({
+                      top: targetRect.top + window.scrollY - offset,
+                      behavior: 'smooth'
+                    });
+                  }
                 }
               }}
             >

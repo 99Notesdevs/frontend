@@ -310,7 +310,7 @@ export default function Navbar({ navigation }: NavbarProps) {
               </div>
 
               {/* Desktop search bar */}
-              <div className="hidden pr-40 md:block">
+              <div className="hidden pr-20 md:block">
                 <SearchBar />
               </div>  
 
