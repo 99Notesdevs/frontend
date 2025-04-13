@@ -9,7 +9,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import SocialMedia from "@/components/navigation/socialmedia";
 import ContactForm from "@/components/common/ContactForm/ContactForm";
-import DraggableTocButton from "@/components/navigation/DraggableTocButton";
+import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { Comments } from "@/components/ui/comments";
 import Ads from "../navigation/Ads";
 import { env } from "@/config/env";
@@ -111,48 +111,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
       </section>
       <main>
         <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative w-full overflow-x-hidden">
-          {/* TOC Container with checkbox hack for toggle */}
-          <input type="checkbox" id="toc-toggle" className="hidden peer" />
+          {/* Assistive Touch */}
+          <AssistiveTouch content={mainContentFinal} />
 
-          {/* Draggable TOC Button */}
-          <DraggableTocButton />
-
-          {/* TOC Sidebar */}
-          <div
-            className="fixed left-0 top-0 h-full w-[280px] sm:w-[320px] bg-white/95 
-        backdrop-blur-sm shadow-xl -translate-x-full peer-checked:translate-x-0 
-        transition-all duration-300 ease-in-out z-[90] border-r-2 border-gray-200"
-          >
-            {/* Close Button - Moved outside scrollable area */}
-            <label
-              htmlFor="toc-toggle"
-              className="absolute top-4 right-4 p-2 cursor-pointer rounded-full
-            hover:bg-gray-100 transition-colors duration-200 z-[100]
-            bg-white shadow-md border border-gray-200"
-            >
-              <X className="w-5 h-5 text-gray-600 hover:text-gray-900" />
-            </label>
-
-            {/* Left TOC Sidebar */}
-            <div className="p-6 h-full mt-[50px] pb-24 overflow-y-auto">
-              <div
-                className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200 
-            shadow-inner transition-all duration-300 hover:border-gray-300
-            sticky top-[100px]"
-              >
-                <h3
-                  className="text-lg font-semibold text-gray-800 mb-4 border-b-2 
-              border-gray-300 pb-2 flex items-center gap-2"
-                >
-                  <span className="text-gray-500">📑</span>
-                  <span>Table of Content</span>
-                </h3>
-                <div className="pr-2 space-y-1 max-h-[70vh] overflow-y-auto">
-                  <TableOfContents content={mainContentFinal} />
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Main Content with padding adjustment */}
           <div
@@ -183,13 +144,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
                   {/* Article Header */}
                   <div className="text-center mb-8 sm:mb-12">
-                    {/* <h1
-                    className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 
-                  relative inline-block bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text 
-                  text-transparent px-2"
-                  >
-                    {title}
-                  </h1> */}
                   </div>
 
                   <div
