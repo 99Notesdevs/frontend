@@ -4,49 +4,15 @@ interface Question {
   id: number;
   question: string;
   options: string[];
-  correctOption: number;
+  correctAnswer: number;
   explanation: string;
 }
 
-const sampleQuestions: Question[] = [
-  {
-    id: 1,
-    question: "What is the capital of France?",
-    options: ["London", "Paris", "Berlin", "Madrid"],
-    correctOption: 1,
-    explanation: "Paris is the capital of France. It's known as the 'City of Light' and is famous for its art, fashion, gastronomy, and culture."
-  },
-  {
-    id: 2,
-    question: "Which planet is known as the Red Planet?",
-    options: ["Jupiter", "Mars", "Venus", "Saturn"],
-    correctOption: 1,
-    explanation: "Mars is called the Red Planet due to its reddish appearance, which is due to iron oxide or rust on its surface."
-  },
-  {
-    id: 3,
-    question: "What is the chemical symbol for gold?",
-    options: ["Au", "Ag", "Cu", "Fe"],
-    correctOption: 0,
-    explanation: "Au is the chemical symbol for gold. It comes from the Latin word 'Aurum' which means 'shining dawn'."
-  },
-  {
-    id: 4,
-    question: "What is the largest organ in the human body?",
-    options: ["Brain", "Liver", "Skin", "Heart"],
-    correctOption: 2,
-    explanation: "The skin is the largest organ in the human body, covering about 20 square feet in adults."
-  },
-  {
-    id: 5,
-    question: "Which gas makes up the majority of Earth's atmosphere?",
-    options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Helium"],
-    correctOption: 2,
-    explanation: "Nitrogen makes up about 78% of Earth's atmosphere, while oxygen is about 21%."
-  }
-];
+interface QuizProps {
+  questions: Question[];
+}
 
-const Quiz: React.FC = () => {
+const Quiz: React.FC<QuizProps> = ({ questions }) => {
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
   const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
   const [showResults, setShowResults] = useState(false);
@@ -75,8 +41,8 @@ const Quiz: React.FC = () => {
   };
 
   const calculateScore = () => {
-    return sampleQuestions.reduce((score, question) => {
-      return score + (selectedOptions[question.id] === question.correctOption ? 1 : 0);
+    return questions.reduce((score, question) => {
+      return score + (selectedOptions[question.id] === question.correctAnswer ? 1 : 0);
     }, 0);
   };
 
@@ -90,7 +56,7 @@ const Quiz: React.FC = () => {
             <div className="flex flex-col items-center justify-center min-h-[200px]">
               <h2 className="text-xl font-bold mb-4">Quiz Results</h2>
               <div className="text-3xl font-bold text-green-600 mb-8">
-                Score: {calculateScore()} / {sampleQuestions.length}
+                Score: {calculateScore()} / {questions.length}
               </div>
               <button
                 onClick={resetQuiz}
@@ -103,7 +69,7 @@ const Quiz: React.FC = () => {
         ) : (
           <div className="space-y-8">
             <div className="max-h-[600px] overflow-y-auto">
-              {sampleQuestions.map((question) => (
+              {questions.map((question) => (
                 <div key={question.id} className="mb-8">
                   <div className="bg-white border-2 border-gray-400 rounded-lg p-6">
                     <h2 className="text-xl font-bold text-center mb-4">{question.question}</h2>
@@ -111,7 +77,7 @@ const Quiz: React.FC = () => {
                     <div className="space-y-3">
                       {question.options.map((option, index) => {
                         const isSelected = selectedOptions[question.id] === index;
-                        const isCorrect = index === question.correctOption;
+                        const isCorrect = index === question.correctAnswer;
                         const isShown = showExplanations[question.id];
                         let className = "flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors";
 
