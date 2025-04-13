@@ -34,7 +34,6 @@ export async function generateMetadata({params}: {params: Params}): Promise<Meta
   }
   // @ts-ignore
   const JSONMetaData = JSON.parse(page.metadata);
-  console.log("JSONMetaData", JSONMetaData.schemaData);
   
   return {
     title: JSONMetaData.metaTitle || "Default Title",
@@ -86,7 +85,7 @@ const CurrentAffairArticlePage = async ({
   // Fetch the article
   const article = await fetchArticle(category, articleSlug);
   // @ts-ignore
-  const jsonLD = JSON.parse(article?.metadata).schemaData || "";
+  const jsonLD = JSON.parse(article?.metadata).schemaData || "{}";
 
   return (
     <>

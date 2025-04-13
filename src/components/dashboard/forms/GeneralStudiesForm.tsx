@@ -113,9 +113,9 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             <FormItem>
               <FormLabel className="text-gray-500 font-medium">Title</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter title" 
-                  {...field} 
+                <Input
+                  placeholder="Enter title"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -131,11 +131,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             name="author"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">Author</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Author
+                </FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder="Enter author" 
-                    {...field} 
+                  <Input
+                    placeholder="Enter author"
+                    {...field}
                     className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                   />
                 </FormControl>
@@ -151,7 +153,9 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="imageUrl"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Featured Image</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Featured Image
+              </FormLabel>
               <FormControl>
                 <div className="space-y-4">
                   <Input
@@ -161,7 +165,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                     className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                     {...field}
                   />
-                  
+
                   {imagePreview && (
                     <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
                       <Image
@@ -185,12 +189,14 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Content</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Content
+              </FormLabel>
               <FormControl>
                 <div className="border border-blue-100 rounded-lg overflow-hidden">
                   <TiptapEditor
-                    content={form.getValues('content')}
-                    onChange={(html) => form.setValue('content', html)}
+                    content={form.getValues("content")}
+                    onChange={(html) => form.setValue("content", html)}
                   />
                 </div>
               </FormControl>
@@ -205,11 +211,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="metaTitle"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Meta Title</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Meta Title
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter meta title" 
-                  {...field} 
+                <Input
+                  placeholder="Enter meta title"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -223,11 +231,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="metaDescription"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Meta Description</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Meta Description
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter meta description" 
-                  {...field} 
+                <Input
+                  placeholder="Enter meta description"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -241,11 +251,33 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="metaKeywords"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Meta Keywords</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Meta Keywords
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter meta keywords" 
-                  {...field} 
+                <Input
+                  placeholder="Enter meta keywords"
+                  {...field}
+                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="robots"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-500 font-medium">
+                Robots
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="index, follow"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -259,11 +291,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="ogTitle"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">OG Title</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                OG Title
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter OG title" 
-                  {...field} 
+                <Input
+                  placeholder="Enter OG title"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -277,11 +311,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="ogDescription"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">OG Description</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                OG Description
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter OG description" 
-                  {...field} 
+                <Input
+                  placeholder="Enter OG description"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -295,11 +331,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="ogImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">OG Image URL</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                OG Image URL
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter OG image URL" 
-                  {...field} 
+                <Input
+                  placeholder="Enter OG image URL"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -313,11 +351,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="twitterTitle"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Twitter Title</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Twitter Title
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter Twitter title" 
-                  {...field} 
+                <Input
+                  placeholder="Enter Twitter title"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -331,11 +371,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="twitterDescription"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Twitter Description</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Twitter Description
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter Twitter description" 
-                  {...field} 
+                <Input
+                  placeholder="Enter Twitter description"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -349,11 +391,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="twitterImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Twitter Image URL</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Twitter Image URL
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter Twitter image URL" 
-                  {...field} 
+                <Input
+                  placeholder="Enter Twitter image URL"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -367,11 +411,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="canonicalUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Canonical URL</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Canonical URL
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter canonical URL" 
-                  {...field} 
+                <Input
+                  placeholder="Enter canonical URL"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -385,11 +431,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           name="schemaData"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Schema Data</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">
+                Schema Data
+              </FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter schema data" 
-                  {...field} 
+                <Input
+                  placeholder="Enter schema data"
+                  {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
@@ -400,13 +448,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
 
         {/* Submit Button */}
         <div className="flex justify-end">
-          <Button 
+          <Button
             disabled={isUploading}
-            type="submit" 
+            type="submit"
             className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-2 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-colors duration-200"
           >
-          {isUploading ? 'Uploading...' : 'Save'}
-        </Button>
+            {isUploading ? "Uploading..." : "Save"}
+          </Button>
         </div>
       </form>
     </Form>
