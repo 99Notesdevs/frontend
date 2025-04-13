@@ -8,6 +8,7 @@ import Cookie from 'js-cookie';
 
 import { PencilIcon, TrashIcon, EyeIcon, ArrowLeftIcon, CalendarIcon, CalendarDaysIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { CurrentAffairForm, CurrentArticleForm, CurrentArticleFormValues } from '@/components/dashboard/forms';
 
 interface CurrentAffairType {
   id: number;
@@ -20,6 +21,7 @@ interface CurrentAffairType {
   createdAt: Date;
   updatedAt: Date;
   imageUrl: string | null;
+  quizQuestions: string | null;
 }
 
 export default function ArticlesPage() {
@@ -30,7 +32,7 @@ export default function ArticlesPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
   const token = Cookie.get('token');
 
-  const handleEditSubmit = async (formData: GeneralStudiesFormValues) => {
+  const handleEditSubmit = async (formData: CurrentArticleFormValues) => {
     try {
       // Generate slug from title
       const baseSlug = formData.title
@@ -47,6 +49,7 @@ export default function ArticlesPage() {
         slug: selectedPage?.slug || '',
         updatedAt: new Date(),
         imageUrl: formData.imageUrl,
+        quizQuestions: formData.quizQuestions || '[]', // Ensure we have a valid string
         metadata: JSON.stringify({
           metaTitle: formData.metaTitle,
           metaDescription: formData.metaDescription,
@@ -95,7 +98,7 @@ export default function ArticlesPage() {
       }
       
       // Refresh the page after successful submission
-      window.location.reload();
+      // window.location.reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -135,7 +138,8 @@ export default function ArticlesPage() {
         twitterDescription: parsedMetadata.twitterDescription || '',
         twitterImage: parsedMetadata.twitterImage || '',
         canonicalUrl: parsedMetadata.canonicalUrl || '',
-        schemaData: parsedMetadata.schemaData || ''
+        schemaData: parsedMetadata.schemaData || '',
+        quizQuestions: selectedPage.quizQuestions || '[]', // Ensure we always have a valid JSON string
       };
 
       setImagePreview(selectedPage.imageUrl || null);
@@ -291,7 +295,7 @@ export default function ArticlesPage() {
               <h2 className="text-xl font-semibold text-slate-900">
                 Edit Article
               </h2>
-              <GeneralStudiesForm
+              <CurrentArticleForm
                 onSubmit={handleEditSubmit}
                 defaultValues={{
                   title: selectedPage.title,
@@ -311,7 +315,8 @@ export default function ArticlesPage() {
                   twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
                   twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
                   canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
-                  schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : ''
+                  schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
+                  quizQuestions: selectedPage.quizQuestions || '[]', // Ensure we always have a valid JSON string
                 }}
               />
             </div>

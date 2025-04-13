@@ -19,6 +19,7 @@ interface CurrentAffairArticle {
   updatedAt?: string;
   parentSlug?: string;
   parentId?: number;
+  quizQuestions?: string;
 }
 
 type Params = Promise<{ category: string; section: string }>;
@@ -85,6 +86,7 @@ const CurrentAffairArticlePage = async ({
   
   // Fetch the article
   const article = await fetchArticle(category, articleSlug);
+  const quizQuestions =  JSON.parse(article?.quizQuestions || "[]");
   // @ts-ignore
   const jsonLD = JSON.parse(article?.metadata).schemaData || "{}";
 
@@ -281,10 +283,12 @@ const CurrentAffairArticlePage = async ({
             </Link>
           </div>
         )}
-        <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6">Quiz Section</h2>
-        <QuizWrapper />
-      </div>
+        {quizQuestions.length > 0 && (
+          <div className="mt-8 bg-white rounded-lg shadow p-6">
+            <h2 className="text-2xl font-bold mb-4">Quiz</h2>
+            <QuizWrapper questions={quizQuestions} />
+          </div>
+        )}
       </div>
     </div>
     </>

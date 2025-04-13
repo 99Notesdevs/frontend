@@ -20,6 +20,7 @@ const formSchema = z.object({
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
+  quizQuestions: z.string().optional(),
   robots: z.string().optional(),
   ogTitle: z.string().optional(),
   ogDescription: z.string().optional(),
@@ -32,7 +33,6 @@ const formSchema = z.object({
   canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
   schemaData: z.string().optional(),
   author: z.string().optional(),
-  quizQuestions: z.string().optional(),
 });
 
 export type CurrentArticleFormValues = z.infer<typeof formSchema>;
@@ -55,6 +55,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',
+      quizQuestions: '',
       robots: '',
       ogTitle: '',
       ogDescription: '',
@@ -67,7 +68,6 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
       canonicalUrl: '',
       schemaData: '',
       author: '',
-      quizQuestions: '',
       ...defaultValues,
     },
   });

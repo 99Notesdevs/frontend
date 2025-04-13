@@ -15,7 +15,6 @@ import Ads from "../navigation/Ads";
 import { env } from "@/config/env";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Quiz from '@/components/quiz/quiz';
 
 const processContent = (content: string, isAuthorized: boolean) => {
   return content.replace(/<lock>(.*?)<\/lock>/g, (lockedContent) => {
@@ -259,7 +258,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
                 </div>
                 <Comments parentId={parentId} />
-                <Quiz />
+
               </main>
               {/* Right Sidebar */}
               <aside className="lg:col-span-4 xl:col-span-3 space-y-4 sm:space-y-6">
