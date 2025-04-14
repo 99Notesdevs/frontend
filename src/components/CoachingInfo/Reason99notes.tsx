@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 
 interface Reason {
   title: string;
@@ -8,8 +8,6 @@ interface Reason {
 }
 
 const Reason99notes: React.FC = () => {
-  const [expanded, setExpanded] = useState<string | null>(null);
-
   const reasons: Reason[] = [
     {
       title: "Experienced Faculty",
@@ -56,27 +54,10 @@ const Reason99notes: React.FC = () => {
         <div className="grid md:grid-cols-2 gap-8">
           {reasons.map((reason, index) => (
             <div key={index} className="border-b border-gray-200 pb-4 last:pb-0">
-              <button
-                onClick={() => setExpanded(expanded === index.toString() ? null : index.toString())}
-                className="flex items-center justify-between w-full text-left text-gray-900 hover:text-blue-600 transition-colors"
-              >
-                <h3 className="text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors font-opensans">{reason.title}</h3>
-                <svg
-                  className={`w-5 h-5 transform transition-transform duration-300 ${
-                    expanded === index.toString() ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div
-                className={`mt-2 overflow-hidden transition-all duration-300 ${
-                  expanded === index.toString() ? 'max-h-48' : 'max-h-0'
-                }`}
-              >
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-lg font-medium text-gray-900 font-opensans">{reason.title}</h3>
+              </div>
+              <div className="mt-2">
                 <p className="text-gray-600 text-sm font-normal font-opensans">{reason.content}</p>
               </div>
             </div>

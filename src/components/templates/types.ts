@@ -3,8 +3,10 @@ export interface Page {
   title: string;
   content: string;
   image: string;
-  metadata: Record<string, any>;
+  metadata: string;
   slug: string;
+  parentSlug: string;
+  createdAt: string;
   template: Template;
   parent: Page | null;
   children: Page[];

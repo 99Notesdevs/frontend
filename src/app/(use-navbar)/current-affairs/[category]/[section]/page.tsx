@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import DraggableTocButton from "@/components/navigation/DraggableTocButton";
 import { Metadata } from "next";
 import QuizWrapper from "@/components/quiz/QuizWrapper";
+import Whatsapp from "@/components/ui/whatsapp";
 
 // Define types for the data
 interface CurrentAffairArticle {
@@ -138,9 +139,9 @@ const CurrentAffairArticlePage = async ({
       </div>
         
         {article ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Main content column */}
-            <div className="lg:col-span-8 pt-[50px]">
+            <div className="lg:col-span-7 xl:col-start-2 xl:col-span-7 pt-[50px]">
               <div className="bg-white border rounded-xl shadow-lg p-4 hover:shadow-xl transition-all duration-300">
                 {/* Article Header */}
                 <div className="text-center mb-8 sm:mb-12"></div>
@@ -157,9 +158,19 @@ const CurrentAffairArticlePage = async ({
                     </div>
                   
                   {article?.metadata && (
+                    <>
                     <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
                       {JSON.parse(article.metadata).metaTitle}
                     </h1>
+                    <p className="text-sm text-gray-600">
+                      By {article.author} • {article.createdAt ? new Date(article.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      }).replace(/\//g, '/') : 'N/A'}
+                    </p>
+                    <Whatsapp />
+                    </>
                   )}
                 </div>
                 <div
