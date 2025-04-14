@@ -218,6 +218,7 @@ const CurrentAffairsSectionPage = async ({
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
+    <main>
     <CurrentAffairsLayout>
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-50 via-white to-blue-50 border-b">
@@ -423,6 +424,7 @@ const CurrentAffairsSectionPage = async ({
         ></div>
       </div>
     </CurrentAffairsLayout>
+    </main>
     </>
   );
 };

@@ -193,7 +193,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-5 flex flex-col md:flex-row gap-8">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-5 flex flex-col md:flex-row gap-8">
         {/* On mobile*/}
         <div className="flex flex-col md:hidden">
           <main className="flex-1">
@@ -204,7 +204,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
         </div>
 
         {/* Sidebar */}
-        <aside className="w-full md:w-[320px] lg:w-[380px] flex-shrink-0">
+        <aside className="w-full md:w-[280px] lg:w-[320px] flex-shrink-0">
           <nav className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl md:sticky md:top-8">
            {/* Navigation section */}
             {loading ? (
@@ -212,22 +212,22 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500" />
               </div>
             ) : (
-              <section className="p-6 space-y-6">
+              <section className="p-4 space-y-4">
                 {navSections.map((section, sectionIndex) => (
-                  <article key={sectionIndex} className="border-b border-gray-200 pb-4 last:border-b-0">
+                  <article key={sectionIndex} className="border-b border-gray-200 pb-3 last:border-b-0">
                     <button
                       onClick={() => memoizedToggleSection(section.title)}
-                      className="w-full flex items-center justify-between px-4 py-3 text-base font-semibold text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                      className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium 
+                        ${expandedSections[section.title] 
+                          ? 'bg-amber-500 text-white' 
+                          : 'text-gray-900 hover:bg-gray-50'}
+                        rounded-md transition-colors duration-200`}
                     >
-                      <span className="flex items-center gap-2">
-                        <span className="text-blue-500">
-                          {section.title === "Daily Current Affairs" ? "📅" :
-                           section.title === "Monthly Current Affairs" ? "📆" : "📊"}
-                        </span>
+                      <span className="flex items-center gap-1">
                         {section.title}
                       </span>
                       <svg
-                        className={`h-5 w-5 transform transition-transform duration-300 text-gray-500 ${expandedSections[section.title] ? 'rotate-180' : ''}`}
+                        className={`h-4 w-4 transform transition-transform duration-300 text-gray-500 ${expandedSections[section.title] ? 'rotate-180' : ''}`}
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
                         fill="currentColor"
@@ -243,17 +243,9 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
                         <Link
                           key={itemIndex}
                           href={item.path}
-                          className={`group flex items-center px-6 py-2.5 text-[15px] font-medium rounded-md transition-all duration-200 ${
-                            pathname === item.path
-                              ? "bg-blue-50 text-blue-700"
-                              : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          }`}
+                          className="group flex items-center px-4 py-1.5 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-3 ${
-                            pathname === item.path ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
-                          }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
+                          <span className="mr-1">•</span>
                           <span className="truncate">{item.title}</span>
                         </Link>
                       ))}
@@ -265,15 +257,18 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
             
             <footer className="border-t border-gray-200 bg-gray-50 p-6 space-y-8">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                  <span className="text-blue-600">📝</span>
-                  <span>Get in Touch</span>
+                <h3 className="text-xl font-semibold text-orange-500 flex items-center justify-center gap-2">
+                  Contact Us
                 </h3>
+                <div className="w-64 h-[4px] bg-amber-500 mx-auto my-2"></div>
                 <ContactForm />
               </div>
               
               <div className="space-y-4">
-                  <span className="text-black-600 font-bold text-2xl">🌐 Follow Us</span>
+              <h3 className="text-xl font-semibold text-orange-500 flex items-center justify-center gap-2">
+                  Connect with Us
+                </h3>
+                <div className="w-64 h-[4px] bg-amber-500 mx-auto my-2"></div>
                 <div className="flex flex-wrap gap-4 justify-center">
                   <SocialMedia />
               </div>
