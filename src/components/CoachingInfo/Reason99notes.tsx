@@ -42,13 +42,13 @@ const Reason99notes: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <div className="relative inline-block">
-            <span className="text-slate-900 font-medium tracking-wider text-sm uppercase mb-4">Reason</span>
-            <h2 className="text-4xl font-bold text-gray-900 pt-2 mb-4">
+            <span className="text-slate-900 font-medium tracking-wider text-sm uppercase mb-4 font-opensans">Reason</span>
+            <h2 className="text-3xl font-semibold text-gray-900 pt-2 mb-4 font-opensans">
               Why 99Notes is the Best UPSC Coaching in Delhi
             </h2>
             <div className="w-24 h-1 bg-slate-900 mx-auto mt-2"></div>
           </div>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+          <p className="text-gray-600 mt-4 max-w-2xl mx-auto font-normal font-opensans">
             Discover why thousands of UPSC aspirants choose us as their preferred coaching institute
           </p>
         </div>
@@ -60,7 +60,7 @@ const Reason99notes: React.FC = () => {
                 onClick={() => setExpanded(expanded === index.toString() ? null : index.toString())}
                 className="flex items-center justify-between w-full text-left text-gray-900 hover:text-blue-600 transition-colors"
               >
-                <h3 className="text-lg font-semibold">{reason.title}</h3>
+                <h3 className="text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors font-opensans">{reason.title}</h3>
                 <svg
                   className={`w-5 h-5 transform transition-transform duration-300 ${
                     expanded === index.toString() ? 'rotate-180' : ''
@@ -77,7 +77,7 @@ const Reason99notes: React.FC = () => {
                   expanded === index.toString() ? 'max-h-48' : 'max-h-0'
                 }`}
               >
-                <p className="text-gray-600 text-sm">{reason.content}</p>
+                <p className="text-gray-600 text-sm font-normal font-opensans">{reason.content}</p>
               </div>
             </div>
           ))}
@@ -85,9 +85,9 @@ const Reason99notes: React.FC = () => {
 
         <div className="mt-20">
           <div className="bg-gradient-to-r from-gray-100 to-indigo-50 p-10 rounded-3xl shadow-inner">
-            <p className="text-lg text-gray-700 text-center max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-gray-700 text-center max-w-3xl mx-auto leading-relaxed font-opensans">
               Choosing the right UPSC coaching in Delhi is crucial for your IAS journey. 
-              <span className="font-semibold text-blue-800"> At 99Notes</span>, we are committed to providing the best IAS coaching experience, 
+              <span className="font-medium text-blue-800"> At 99Notes</span>, we are committed to providing the best IAS coaching experience, 
               helping you navigate your path with confidence and ease.
             </p>
           </div>
