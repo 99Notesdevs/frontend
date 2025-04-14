@@ -7,12 +7,12 @@ const CoachingInfo = () => {
     <section className="py-16 bg-gradient-to-b from-white to-gray-50">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-16">
-          <span className="text-indigo-600 font-medium tracking-wider text-sm uppercase">Expert Guidance</span>
-          <h2 className="text-4xl md:text-4xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
+          <span className="text-indigo-600 font-medium tracking-wider text-sm uppercase font-opensans">Expert Guidance</span>
+          <h2 className="text-3xl font-semibold text-gray-900 mt-3 mb-4 leading-tight font-opensans">
             BEST UPSC COACHING INSTITUTE IN DELHI
           </h2>
           <div className="w-24 h-1 bg-indigo-600 mx-auto mb-6"></div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+          <p className="text-lg font-normal text-gray-600 max-w-3xl mx-auto font-opensans">
             With Affordable Course Fees & Finest Quality UPSC Notes
           </p>
         </div>
@@ -24,12 +24,12 @@ const CoachingInfo = () => {
               <div className="space-y-6">
                 <AccordionItem title="About 99notes IAS Institute">
                   <div className="text-gray-600 space-y-4 px-1">
-                    <p className="text-base leading-relaxed">
+                    <p className="text-base font-normal text-gray-600 leading-relaxed font-opensans">
                       99notes IAS Institute is one of the leading UPSC coaching institutes in Delhi, 
                       dedicated to providing quality education at affordable prices. Our institute 
                       focuses on a comprehensive approach to UPSC preparation.
                     </p>
-                    <p className="text-base leading-relaxed">
+                    <p className="text-base font-normal text-gray-600 leading-relaxed font-opensans">
                       We believe in making quality education accessible to all aspirants, 
                       regardless of their financial background. Our team of experienced 
                       faculty members ensures that every student receives personalized attention 
@@ -40,12 +40,12 @@ const CoachingInfo = () => {
 
                 <AccordionItem title="Best IAS Coaching in Delhi (Our Vision & Mission)">
                   <div className="text-gray-600 space-y-4 px-1">
-                    <p className="text-base leading-relaxed">
+                    <p className="text-base font-normal text-gray-600 leading-relaxed font-opensans">
                       Our vision is to become the most trusted name in UPSC preparation by 
                       providing high-quality education and comprehensive study materials at 
                       affordable prices.
                     </p>
-                    <h4 className="font-semibold text-gray-800 text-lg mt-5 mb-2">Our Mission:</h4>
+                    <h4 className="font-semibold text-gray-800 text-lg mt-5 mb-2 font-opensans">Our Mission:</h4>
                     <ul className="list-none pl-0 space-y-3">
                       {[
                         "Make quality UPSC coaching accessible to all",
@@ -60,7 +60,7 @@ const CoachingInfo = () => {
                               <path d="M13.3334 4L6.00008 11.3333L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                           </span>
-                          <span>{item}</span>
+                          <span className="font-opensans">{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -86,7 +86,7 @@ const CoachingInfo = () => {
                               <path d="M13.3334 4L6.00008 11.3333L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                           </span>
-                          <span>{item}</span>
+                          <span className="font-opensans">{item}</span>
                         </li>
                       ))}
                     </ul>
