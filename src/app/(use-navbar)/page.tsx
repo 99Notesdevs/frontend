@@ -21,12 +21,12 @@ export default async function Home() {
           {/* Left Column - Text Content */}
           <div className="space-y-7 max-w-xl md:pl-9">
             <div className="space-y-4 mt-4 md:mt-0">
-              <h1 className="text-4xl font-bold text-gray-800 ">
-                <span className="block leading-relaxed">The</span>
-                <span className="block leading-relaxed">Pioneers of Self-Study Ecosystem</span>
+              <h1 className="text-4xl font-semibold text-gray-800 leading-relaxed font-opensans">
+                <span className="block">The</span>
+                <span className="block">Pioneers of Self-Study Ecosystem</span>
               </h1>
             </div>
-            <p className="text-base font-semibold text-gray-800 flex leading-relaxed">
+            <p className="text-base font-normal text-gray-700 leading-relaxed font-opensans">
               Welcome to 99Notes. We are an organization dedicated to students who wish that educational material must not be restricted behind a pay-wall.
               We aim to build a sustainable self-study ecosystem by providing high-quality study material for Government examinations at almost free of cost.
             </p>

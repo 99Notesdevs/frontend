@@ -95,12 +95,12 @@ const FAQ: React.FC = () => {
     <section className="py-5 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-16">
-          <span className="text-orange-500 font-medium tracking-wider text-sm uppercase">Common Questions</span>
-          <h2 className="text-4xl md:text-4xl font-bold text-gray-900 mt-3 mb-4 leading-tight">
+          <span className="text-orange-500 font-medium tracking-wider text-sm uppercase font-opensans">Common Questions</span>
+          <h2 className="text-3xl font-semibold text-gray-900 mt-3 mb-4 leading-tight font-opensans">
             Frequently Asked Questions
           </h2>
           <div className="w-24 h-1 bg-orange-500 mx-auto mb-6"></div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+          <p className="text-lg font-normal text-gray-600 max-w-3xl mx-auto font-opensans">
             Everything you need to know about the best IAS coaching in Delhi
           </p>
         </div>

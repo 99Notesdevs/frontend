@@ -19,7 +19,7 @@ const CurrentAffairsCard: React.FC<CurrentAffairsCardProps> = ({ title, icon, li
     >
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+          <h3 className="text-xl font-medium text-gray-900 group-hover:text-blue-600 transition-colors font-opensans">
             {title}
           </h3>
           {typeof icon === 'object' && 'image' in icon ? (
@@ -30,7 +30,7 @@ const CurrentAffairsCard: React.FC<CurrentAffairsCardProps> = ({ title, icon, li
             <div className="text-2xl text-blue-600">{icon}</div>
           )}
         </div>
-        <p className="text-gray-600">
+        <p className="text-gray-600 font-normal font-opensans">
           Click to view the latest updates and analysis
         </p>
       </div>

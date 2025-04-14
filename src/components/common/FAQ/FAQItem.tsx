@@ -24,7 +24,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, number }) => {
               {number}
             </span>
           )}
-          <h3 className="text-lg font-medium text-gray-900 leading-tight">{question}</h3>
+          <h3 className="text-lg font-medium text-gray-900 leading-tight font-opensans">{question}</h3>
         </div>
         <div className="flex-shrink-0">
           <span className={`flex items-center justify-center h-8 w-8 rounded-full border border-gray-200 ${isOpen ? 'bg-orange-50 text-orange-600' : 'bg-gray-50 text-gray-400'} transition-colors duration-200`}>
@@ -52,7 +52,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, number }) => {
         }`}
       >
         <div className="p-6 pt-0 text-gray-700 border-t border-gray-100">
-          <div className="prose prose-sm sm:prose max-w-none">
+          <div className="prose prose-sm sm:prose max-w-none font-opensans">
             {typeof answer === 'string' ? <p>{answer}</p> : answer}
           </div>
         </div>
