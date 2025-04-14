@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Contributing Guidelines
 
-## Getting Started
+Thank you for considering contributing to this project! Follow the steps below to raise a Pull Request (PR):
 
-First, run the development server:
+## 🚀 Steps to Raise a Pull Request
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Stage your changes**  
+   Make sure you've made your changes, then stage them using:
+   ```bash
+   git add .
+   ```
+2. **Commit your changes**
+   Add a meaningful commit message:
+   ```bash
+   git commit -m "Your meaningful message here"
+   ```
+3. **Create a new branch**
+   ```bash
+   git checkout -b branch-name
+   ```
+4. **Sync with latest changes from master**
+  Only operate with master(not main)
+   ```bash
+   git pull origin master
+   ```
+5. **Push your branch to Github**
+   ```bash
+   git push origin branch-name
+   ```
+6. **Create a Pull Request**
+   - Go to github repository
+   - Click on *Compare and Pull Request*
+   - Change the *merging into...* branch from 'main' to 'master'
+   - Click *Create Pull Request*   
