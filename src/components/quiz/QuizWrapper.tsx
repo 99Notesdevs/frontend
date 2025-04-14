@@ -6,7 +6,7 @@ interface Question {
   id: number;
   question: string;
   options: string[];
-  correctOption: number;
+  correctAnswer: number;
   explanation: string;
 }
 
