@@ -193,11 +193,11 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-5 flex flex-col md:flex-row gap-8">
+      <section className="max-w-5xl mx-auto px-0 sm:px-0 lg:px-0 py-12 mt-5 flex flex-col md:flex-row gap-1">
         {/* On mobile*/}
         <div className="flex flex-col md:hidden">
           <main className="flex-1">
-            <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg p-6 md:p-8 transition-all duration-300 hover:shadow-xl">
+            <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
               {memoizedChildren}
             </article>
           </main>
@@ -281,7 +281,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
         {/* On tablet/desktop: Display main content second */}
         <div className="hidden md:flex flex-1">
           <main className="w-full">
-            <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg p-6 md:p-8 transition-all duration-300 hover:shadow-xl">
+            <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
               {memoizedChildren}
             </article>
           </main>
