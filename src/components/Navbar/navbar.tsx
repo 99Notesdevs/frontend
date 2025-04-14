@@ -362,7 +362,7 @@ export default function Navbar({ navigation }: NavbarProps) {
         </div>
 
         {/* Yellow line below navbar */}
-        <div className="w-full h-[1px] bg-amber-500"></div>
+        {/* <div className="w-full h-[1px] bg-amber-500"></div> */}
 
         {/* Mobile menu */}
         <div

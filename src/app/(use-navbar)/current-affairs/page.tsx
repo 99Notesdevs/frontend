@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -13,6 +12,13 @@ interface CurrentAffairPage {
   type: 'daily' | 'monthly' | 'yearly';
   slug: string;
 }
+
+const formatContent = (content: string) => {
+  // Remove HTML tags and extract first few lines
+  const text = content.replace(/<[^>]+>/g, '').trim();
+  const lines = text.split('\n').filter(line => line.trim());
+  return lines.slice(0, 3).join(' ').replace(/\s+/g, ' ');
+};
 
 const CurrentAffairsIndex = async () => {
   try {
@@ -41,40 +47,37 @@ const CurrentAffairsIndex = async () => {
           />
         </Head>
 
-        <div className="container mx-auto px-4 pt-12 max-w-5xl">
+        <div className="container mx-auto px-4 pt-12 max-w-4xl">
           {/* Daily Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                Daily Current Affairs
+              <h2 className="text-lg sm:text-xl font-medium text-gray-900 mb-3">
+                Daily Current Affairs Analysis UPSC With Short Notes Topic Wise
               </h2>
-              <div className="w-24 h-1 bg-yellow-400 rounded-full"></div>
+              <div className="w-80 h-1 bg-yellow-300 rounded-full"></div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {dailyPages.map((page) => (
                 <Link key={page.id} href={`/${page.slug}`} className="group">
-                  <div className="rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[400px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
+                  <div className="bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
-                      <div className="flex flex-col items-center mb-8">
-                        <span className="mb-6 group-hover:text-yellow-600 transition-colors">
+                      <div className="flex flex-col items-center mb-6">
+                        <span className="mb-4 group-hover:text-yellow-600 transition-colors">
                           <Image
                             src="/news.png"
                             alt="News"
-                            width={50}
-                            height={50}
+                            width={40}
+                            height={40}
                           />
                         </span>
-                        <h3 className="text-2xl font-semibold text-gray-900 group-hover:text-yellow-600 transition-colors text-center">
+                        <h3 className="text-lg font-medium text-gray-900 group-hover:text-yellow-600 transition-colors text-center">
                           {page.title}
                         </h3>
                       </div>
-                      <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
-                        <span className="block overflow-hidden text-ellipsis">
-                          <span
-                            dangerouslySetInnerHTML={{ __html: page.content }}
-                            className="block overflow-hidden text-ellipsis"
-                          ></span>
-                        </span>
+                      <div className="text-gray-600 text-sm leading-relaxed h-[100px] overflow-hidden">
+                        <p className="block overflow-hidden text-ellipsis">
+                          {formatContent(page.content)}
+                        </p>
                       </div>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
@@ -89,36 +92,33 @@ const CurrentAffairsIndex = async () => {
           {/* Monthly Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                Monthly Current Affairs
+              <h2 className="text-lg sm:text-xl font-medium text-gray-900 mb-3">
+                Monthly Current Affairs UPSC
               </h2>
-              <div className="w-24 h-1 bg-yellow-400 rounded-full"></div>
+              <div className="w-80 h-1 bg-yellow-300 rounded-full"></div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {monthlyPages.map((page) => (
                 <Link key={page.id} href={`/${page.slug}`} className="group">
-                  <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
+                  <div className="bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
-                      <div className="flex flex-col items-center mb-8">
-                        <span className="mb-6 group-hover:text-yellow-600 transition-colors">
+                      <div className="flex flex-col items-center mb-6">
+                        <span className="mb-4 group-hover:text-yellow-600 transition-colors">
                           <Image
                             src="/news.png"
                             alt="News"
-                            width={50}
-                            height={50}
+                            width={40}
+                            height={40}
                           />
                         </span>
-                        <h3 className="text-2xl font-semibold text-gray-800 group-hover:text-yellow-600 transition-colors text-center">
+                        <h3 className="text-lg font-medium text-gray-900 group-hover:text-yellow-600 transition-colors text-center">
                           {page.title}
                         </h3>
                       </div>
-                      <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
-                        <span className="block overflow-hidden text-ellipsis">
-                          <span
-                            dangerouslySetInnerHTML={{ __html: page.content }}
-                            className="block overflow-hidden text-ellipsis"
-                          ></span>
-                        </span>
+                      <div className="text-gray-600 text-sm leading-relaxed h-[100px] overflow-hidden">
+                        <p className="block overflow-hidden text-ellipsis">
+                          {formatContent(page.content)}
+                        </p>
                       </div>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
@@ -133,36 +133,33 @@ const CurrentAffairsIndex = async () => {
           {/* Yearly Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                Yearly Current Affairs
+              <h2 className="text-lg sm:text-xl font-medium text-gray-900 mb-3">
+                Yearly Current Affairs UPSC
               </h2>
-              <div className="w-24 h-1 bg-yellow-400 rounded-full"></div>
+              <div className="w-80 h-1 bg-yellow-300 rounded-full"></div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {yearlyPages.map((page) => (
                 <Link key={page.id} href={`/${page.slug}`} className="group">
-                  <div className="bg-gray-50 rounded-lg shadow-md p-8 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
+                  <div className="bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 h-[350px] flex flex-col justify-between transform hover:-translate-y-1 border border-gray-100">
                     <div>
-                      <div className="flex flex-col items-center mb-8">
-                        <span className="mb-6 group-hover:text-yellow-600 transition-colors">
+                      <div className="flex flex-col items-center mb-6">
+                        <span className="mb-4 group-hover:text-yellow-600 transition-colors">
                           <Image
                             src="/news.png"
                             alt="News"
-                            width={50}
-                            height={50}
+                            width={40}
+                            height={40}
                           />
                         </span>
-                        <h3 className="text-2xl font-semibold text-gray-800 group-hover:text-yellow-600 transition-colors text-center">
+                        <h3 className="text-lg font-medium text-gray-900 group-hover:text-yellow-600 transition-colors text-center">
                           {page.title}
                         </h3>
                       </div>
-                      <div className="text-gray-600 text-lg leading-relaxed h-[100px] overflow-hidden">
-                        <span className="block overflow-hidden text-ellipsis">
-                          <span
-                            dangerouslySetInnerHTML={{ __html: page.content }}
-                            className="block overflow-hidden text-ellipsis"
-                          ></span>
-                        </span>
+                      <div className="text-gray-600 text-sm leading-relaxed h-[100px] overflow-hidden">
+                        <p className="block overflow-hidden text-ellipsis">
+                          {formatContent(page.content)}
+                        </p>
                       </div>
                     </div>
                     <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center">
