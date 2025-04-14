@@ -2,12 +2,12 @@
 import { useRouter } from 'next/navigation';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { FaPlus, FaEdit } from 'react-icons/fa';
+import withAuth from '@/lib/withAuth';
 
 const inter = Inter({ subsets: ['latin'] });
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ['latin'] });
 
-
-export default function Dashboard() {
+function Dashboard() {
   const router = useRouter();
 
   return (
@@ -191,3 +191,6 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+export default withAuth(Dashboard);
