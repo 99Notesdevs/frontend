@@ -6,15 +6,18 @@ import CurrentAffairsLayout from "@/components/CurrentAffairs/CurrentAffairsLayo
 import { sectionConfig } from "@/config/currentAffairs";
 import { env } from "@/config/env";
 import { Metadata } from "next";
+import SearchBar from "@/components/Navbar/SearchBar";
 // Define interfaces to match the database schema
 interface Article {
   id: number;
   title: string;
   content?: string;
   slug: string;
+  imageUrl?: string;
   author?: string;
   createdAt?: string;
   updatedAt?: string;
+  metadata?: string;
   parentSlug?: string;
   parentId?: number;
 }
@@ -221,12 +224,13 @@ const CurrentAffairsSectionPage = async ({
     <main>
     <CurrentAffairsLayout>
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-blue-50 border-b">
-        <div className="container mx-auto px-4 sm:px-6 py-8">
-          <Breadcrumb />
-          {/*Image */}
+      <div className="px-4 py-6">
+        <div className="container mx-auto">
+        {/* <div className="container ">
+        <Breadcrumb /> */}
+          {/* Image */}
           {currentAffair?.imageUrl && (
-            <div className="relative aspect-video w-full mb-6 rounded-lg overflow-hidden">
+            <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden">
               <Image
                 src={currentAffair.imageUrl}
                 alt={currentAffair.title}
@@ -236,10 +240,25 @@ const CurrentAffairsSectionPage = async ({
               />
             </div>
           )}
-          <div className="max-w-4xl">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+          <div className="max-w-4xl mx-auto">
+            <div className="mt-4 mb-6">
+              <p className="text-xl font-bold text-center text-gray-800">
+                {currentAffair?.metadata ? 
+                  (() => {
+                    try {
+                      const parsed = JSON.parse(currentAffair.metadata);
+                      return parsed.metaTitle || 'Title Of page';
+                    } catch (e) {
+                      return 'Title Of page';
+                    }
+                  })()
+                  : 'Title Of page'}
+              </p>
+              <div className="w-full h-[3px] bg-amber-500 rounded-full mt-2"></div>
+            </div>
+            {/* <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight">
               {/* {currentAffair?.title || sectionInfo.title} */}
-            </h1>
+            {/* </h1>
             {/* <div dangerouslySetInnerHTML={{ __html: currentAffair?.content || '' }}></div> */}
             {/* <p className="text-lg text-gray-600 mb-6" } /> */}
 
@@ -253,87 +272,89 @@ const CurrentAffairsSectionPage = async ({
                 </span>
               ))}
             </div> */}
+            <div className="mt-2 mb-4">
+              <p className="text-sm text-gray-500">
+                {currentAffair?.metadata ? 
+                  (() => {
+                    try {
+                      const parsed = JSON.parse(currentAffair.metadata);
+                      return parsed.metaDescription || 'Description Of page';
+                    } catch (e) {
+                      return 'Description Of page';
+                    }
+                  })()
+                  : 'Description Of page'}
+              </p>
+
+            </div>
           </div>
         </div>
       </div>
 
       {/* Articles Section */}
       <div className="container mx-auto px-4 sm:px-6 py-8">
-        <div className="space-y-6">
+        {currentAffair?.type === 'daily' && (
+          <SearchBar />
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {sortedArticles.length > 0 ? (
             sortedArticles.map((article) => (
               <div
                 key={article.id}
-                className="group bg-white border border-gray-200 rounded-xl p-6 hover:border-blue-200 hover:shadow-lg transition-all duration-200"
+                className={`group ${
+                  currentAffair?.type === 'daily'
+                    ? 'bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-200 hover:shadow-lg transition-all duration-200'
+                    : 'bg-white border border-gray-200 rounded-xl p-6 hover:border-blue-200 hover:shadow-lg transition-all duration-200'
+                }`}
               >
-                <div className="sm:flex sm:items-center sm:justify-between mb-4 text-sm">
-                  <div className="flex items-center gap-4 text-gray-500 mb-2 sm:mb-0">
-                    <span className="flex items-center">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
-                      </svg>
-                      {article.author || "Unknown"}
-                    </span>
-                    <span className="hidden sm:flex items-center">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" />
-                      </svg>
-                      {article.createdAt
-                        ? new Date(article.createdAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )
-                        : "No date"}
-                    </span>
+                
+                {currentAffair?.type === 'daily' ? (
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {article.title}
+                      </h3>
+                    </div>
+                    <Link
+                      href={`/current-affairs/${category}/${article.slug.split("/").pop()}`}
+                      className="text-blue-600 font-medium hover:text-blue-800"
+                    >
+                      Read More
+                    </Link>
                   </div>
+                ) : (
+                  <>
+                <div className="flex flex-col items-center gap-4">
                   <Link
                     href={`/current-affairs/${category}/${article.slug
                       .split("/")
                       .pop()}`}
-                    className="inline-flex items-center text-blue-600 font-medium group-hover:translate-x-2 transition-transform"
+                    className="text-amber-500 hover:text-amber-600 transition-colors"
                   >
-                    Read Full Article
-                    <svg
-                      className="w-4 h-4 ml-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                    <h2 className="text-xl sm:text-2xl font-semibold">
+                      {article.title}
+                    </h2>
                   </Link>
+                  
+                  <div className="w-full">
+                    <p className="text-sm text-gray-500">
+                      {article.metadata ? 
+                        (() => {
+                          try {
+                            const parsed = JSON.parse(article.metadata);
+                            return parsed.description || 'In-depth analysis of important current events and their relevance for UPSC Civil Services Examination.';
+                          } catch (e) {
+                            return 'In-depth analysis of important current events and their relevance for UPSC Civil Services Examination.';
+                          }
+                        })()
+                        : 'In-depth analysis of important current events and their relevance for UPSC Civil Services Examination.'}
+                    </p>
+                    <div className="w-full h-[2px] bg-amber-500 rounded-full mt-2"></div>
+                  </div>
                 </div>
-
-                <Link
-                  href={`/current-affairs/${category}/${article.slug
-                    .split("/")
-                    .pop()}`}
-                  className="block group-hover:text-blue-600 transition-colors"
-                >
-                  <h2 className="text-xl sm:text-2xl font-semibold mb-3 text-gray-900">
-                    {article.title}
-                  </h2>
-                  <p className="text-gray-600 leading-relaxed">
-                    {article.content?.substring(0, 300)}...
-                  </p>
-                </Link>
+                
+                  </>
+                )}
               </div>
             ))
           ) : (
@@ -348,7 +369,7 @@ const CurrentAffairsSectionPage = async ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -420,7 +441,7 @@ const CurrentAffairsSectionPage = async ({
                 prose-ol:list-decimal
                 prose-ol:pl-4 sm:prose-ol:pl-6
                 [&>*]:w-full"
-              dangerouslySetInnerHTML={{ __html: currentAffair?.content || "" }}
+          dangerouslySetInnerHTML={{ __html: currentAffair?.content || "" }}
         ></div>
       </div>
     </CurrentAffairsLayout>

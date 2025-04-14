@@ -138,13 +138,6 @@ function NestedNavigation({
                                             href={`/${grandChild.slug}`}
                                             className="block px-2 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[13.5px] font-inter font-normal tracking-normal"
                                           >
-                                            <svg 
-                                              className="w-3 h-3 mr-2 fill-current"
-                                              viewBox="0 0 24 24"
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              <path d="M9.29289 18.7071C8.90237 18.3166 8.90237 17.6834 9.29289 17.2929L14.5858 12L9.29289 6.70711C8.90237 6.31658 8.90237 5.68342 9.29289 5.29289C9.68342 4.90237 10.3166 4.90237 10.7071 5.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L10.7071 18.7071C10.3166 19.0976 9.68342 19.0976 9.29289 18.7071Z"/>
-                                            </svg>
                                             {grandChild.title}
                                           </Link>
                                           {grandChild.children.length > 0 && (
@@ -447,23 +440,6 @@ export default function Navbar({ navigation }: NavbarProps) {
                                   >
                                     {grandChild.title}
                                   </Link>
-                                  {grandChild.children.length > 0 && (
-                                    <button
-                                      onClick={() => toggleMobileSubmenu(grandChild.slug)}
-                                      className="px-2 py-1 text-gray-500"
-                                    >
-                                      <svg
-                                        className={`h-4 w-4 transform transition-transform duration-200 ${
-                                          openMenus[grandChild.slug] ? 'rotate-180' : ''
-                                        }`}
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="currentColor"
-                                      >
-                                        <path d="M12.7071 15.2929L19.7071 8.29289C20.0976 7.90237 20.0976 7.2692 19.7071 6.87868C19.3166 6.48815 18.6834 6.48815 18.2929 6.87868L12 13.1716L5.70711 6.87868C5.31658 6.48815 4.68342 6.48815 4.29289 6.87868C3.90237 7.2692 3.90237 7.90237 4.29289 8.29289L11.2929 15.2929C11.6834 15.6834 12.3166 15.6834 12.7071 15.2929Z"/>
-                                      </svg>
-                                    </button>
-                                  )}
                                 </div>
                                 {openMenus[grandChild.slug] && grandChild.children.length > 0 && (
                                   <div className="pl-4 space-y-1 mt-1">
