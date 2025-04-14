@@ -38,19 +38,6 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         }
         const { data } = await response.json();
         
-        if (data.length === 0 && normalizedBasePath) {
-          const allPagesResponse = await fetch('/api/pages');
-          if (allPagesResponse.ok) {
-            const allData = await allPagesResponse.json();
-            if (allData.length > 0) {
-              const pagesWithChildren = buildPageHierarchy(allData);
-              setPages(pagesWithChildren);
-              setLoading(false);
-              return;
-            }
-          }
-        }
-        
         if (data.length > 0) {
           const pagesWithChildren = buildPageHierarchy(data);
           setPages(pagesWithChildren);
@@ -90,8 +77,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         rootPages.push(pageWithChildren);
       }
     });
-
-    return rootPages.sort((a, b) => a.title.localeCompare(b.title));
+  return rootPages;
   };
 
   const renderNavItem = (page: PageItem, level: number = 0) => {
