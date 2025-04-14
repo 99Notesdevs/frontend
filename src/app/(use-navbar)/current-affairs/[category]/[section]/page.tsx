@@ -19,6 +19,7 @@ interface CurrentAffairArticle {
   updatedAt?: string;
   parentSlug?: string;
   parentId?: number;
+
   quizQuestions?: string;
 }
 
@@ -98,7 +99,7 @@ const CurrentAffairArticlePage = async ({
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 pt-5">
-      <div className="container max-w-7xl mx-auto px-4 py-8">
+      <div className="container max-w-7xl mx-auto px-4 py-2">
 
         {/* TOC Container with checkbox hack for toggle */}
       <input type="checkbox" id="toc-toggle" className="hidden peer" />
@@ -127,7 +128,6 @@ const CurrentAffairArticlePage = async ({
           sticky top-[100px]">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b-2 
             border-gray-300 pb-2 flex items-center gap-2">
-              <span className="text-gray-500">📑</span>
               <span>Table of Content</span>
             </h3>
             <div className="pr-2 space-y-1 max-h-[70vh] overflow-y-auto">
@@ -138,139 +138,122 @@ const CurrentAffairArticlePage = async ({
       </div>
         
         {article ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
             {/* Main content column */}
-            <div className="lg:col-span-8">
-              <div className="max-w-3xl">
-                {/* Back button - Enhanced */}
-                <div className="mb-8">
-                  <Link
-                    href={`/current-affairs/${category}`}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                    bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700
-                    hover:bg-white hover:border-gray-300 transition duration-200
-                    shadow-sm hover:shadow-md"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back to {category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ")}
-                  </Link>
+            <div className="lg:col-span-8 pt-[50px]">
+              <div className="bg-white border rounded-xl shadow-lg p-4 hover:shadow-xl transition-all duration-300">
+                {/* Article Header */}
+                <div className="text-center mb-8 sm:mb-12"></div>
+                {/* Article Header */}
+                <div className="text-center mb-8 sm:mb-12">
+                  
+                    <div className="mb-4">
+                      <Link
+                        href={`/current-affairs/${category}`}
+                        className="text-amber-500 hover:text-blue-800 font-medium text-sm"
+                      >
+                        {category}
+                      </Link>
+                    </div>
+                  
+                  {article?.metadata && (
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
+                      {JSON.parse(article.metadata).metaTitle}
+                    </h1>
+                  )}
                 </div>
-
-                {/* Article Card - Enhanced */}
-                <article className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl 
-                overflow-hidden border border-gray-200 transition-all duration-300
-                hover:shadow-2xl">
-                  <div className="p-8 md:p-10">
-                    {/* Article Header - Enhanced */}
-                    <header className="mb-10 border-b border-gray-200/80 pb-8">
-                      {/* <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900
-                      leading-tight gradient-text">{article.title}</h1> */}
-                      
-                      {/* Metadata - Enhanced */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm">
-                        {article.author && (
-                          <div className="flex items-center gap-2 bg-blue-50/50 
-                          px-3 py-1.5 rounded-full border border-blue-100/50
-                          hover:bg-blue-50 transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            <span>{article.author}</span>
-                          </div>
-                        )}
-                        {article.createdAt && (
-                          <div className="flex items-center gap-2 bg-blue-50/50 
-                          px-3 py-1.5 rounded-full border border-blue-100/50
-                          hover:bg-blue-50 transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <time dateTime={article.createdAt}>
-                              {new Date(article.createdAt).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </time>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 bg-blue-50/50 
-                        px-3 py-1.5 rounded-full border border-blue-100/50
-                        hover:bg-blue-50 transition-colors duration-200">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                          </svg>
-                          <span>{category.replace(/-/g, " ")}</span>
-                        </div>
-                      </div>
-                    </header>
-
-                    {/* Article Content - Enhanced */}
-                    <div className="prose prose-lg max-w-none prose-headings:text-gray-900
-                    prose-p:text-gray-700 prose-a:text-blue-600 prose-a:no-underline
-                    hover:prose-a:underline prose-img:rounded-xl prose-strong:text-gray-900
-                    prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50/50
-                    prose-blockquote:rounded-r-lg prose-blockquote:py-2">
-                      {article.content ? (
-                        <>
-                          <div dangerouslySetInnerHTML={{ __html: article.content }} />
-                          {/* Debug info - remove in production */}
-                          <div className="mt-8 p-4 bg-gray-100 rounded text-sm">
-                            <h4 className="font-bold mb-2">Debug Info (remove in production):</h4>
-                            <p>Content length: {article.content.length} characters</p>
-                            <p>Content type: {typeof article.content}</p>
-                            <p>Raw content preview: {article.content.substring(0, 100)}...</p>
-                          </div>
-                        </>
-                      ) : (
-                        <p>No content available for this article.</p>
-                      )}
-                    </div>
-
-                    {/* Related Topics - Enhanced */}
-                    <div className="mt-12 pt-6 border-t border-gray-200/80">
-                      <h3 className="font-semibold text-xl mb-4 text-gray-900">Related Topics</h3>
-                      <div className="flex flex-wrap gap-3">
-                        <span className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 
-                        text-blue-800 px-4 py-2 rounded-full text-sm font-medium
-                        border border-blue-100 hover:shadow-md transition-all duration-200">
-                          Current Affairs
-                        </span>
-                        <span className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 
-                        text-blue-800 px-4 py-2 rounded-full text-sm font-medium
-                        border border-blue-100 hover:shadow-md transition-all duration-200">
-                          {category.replace(/-/g, " ")}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </article>
+                <div
+                  className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
+                  prose-headings:font-semibold
+                  prose-headings:tracking-normal
+                  prose-headings:text-left
+                  prose-headings:relative
+                  prose-headings:mb-6
+                  
+                  prose-h1:text-3xl sm:prose-h1:text-4xl
+                  prose-h1:font-bold
+                  prose-h1:text-gray-800
+                  prose-h1:leading-tight
+                  
+                  prose-h2:text-2xl sm:prose-h2:text-3xl
+                  prose-h2:text-gray-700
+                  prose-h2:pb-2
+                  prose-h2:after:content-['']
+                  prose-h2:after:block
+                  prose-h2:after:w-16
+                  prose-h2:after:h-[2px]
+                  prose-h2:after:mt-2
+                  prose-h2:after:bg-yellow-500
+                  prose-h2:after:rounded-full
+                  
+                  prose-h3:text-xl sm:prose-h3:text-2xl
+                  prose-h3:text-gray-600
+                  prose-h3:font-medium
+                  prose-h3:pl-3
+                  
+                  prose-h4:text-lg sm:prose-h4:text-xl
+                  prose-h4:text-gray-600
+                  prose-h4:font-medium
+                  prose-h4:before:content-['§']
+                  prose-h4:before:text-yellow-500
+                  prose-h4:before:mr-2
+                  prose-h4:before:opacity-70
+                  
+                  prose-p:text-gray-600
+                  prose-p:leading-relaxed
+                  prose-p:tracking-wide
+                  prose-strong:text-gray-800
+                  prose-a:text-blue-600
+                  prose-a:no-underline
+                  prose-a:border-b-2
+                  prose-a:border-blue-200
+                  prose-a:transition-colors
+                  prose-a:hover:border-blue-500
+                  prose-blockquote:border-l-blue-500
+                  prose-blockquote:bg-blue-50
+                  prose-blockquote:p-3 sm:prose-blockquote:p-4
+                  prose-blockquote:rounded-r-lg
+                  prose-pre:bg-gray-50
+                  prose-pre:rounded-lg
+                  prose-pre:p-3 sm:prose-pre:p-4
+                  prose-img:rounded-lg
+                  prose-img:shadow-md
+                  prose-ul:list-disc
+                  prose-ul:pl-4 sm:prose-ul:pl-6
+                  prose-ol:list-decimal
+                  prose-ol:pl-4 sm:prose-ol:pl-6
+                  [&>*]:w-full"
+                >
+                  {article.content ? (
+                    <div dangerouslySetInnerHTML={{ __html: article.content }} />
+                  ) : (
+                    <p>No content available for this article.</p>
+                  )}
+                </div>
               </div>
             </div>
+
             {/* Right Sidebar */}
             <div className="lg:col-span-4 hidden lg:block space-y-4 sm:space-y-6 mt-12">
               {/* Sticky Container */}
               <div className="relative">
                 {/* TOC Section */}
-                <div className="sticky top-8 space-y-4 sm:space-y-6">
-                  <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
+              <div className="sticky top-8 space-y-4 sm:space-y-6">
+                <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
                   transition-all duration-300 hover:shadow-xl">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
-                      📑 Table of Contents
-                    </h3>
-                    <div className="pr-2">
-                      <TableOfContents content={article?.content} />
-                    </div>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
+                    Table of Contents
+                  </h3>
+                  <div className="pr-2">
+                    <TableOfContents content={article?.content} />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        ) : (
+          </div>        ) : (
           <div className="text-center py-16 bg-white/80 backdrop-blur-sm rounded-2xl
-          shadow-xl max-w-2xl mx-auto border border-gray-200">
+            shadow-xl max-w-2xl mx-auto border border-gray-200">
             <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
             <p className="text-gray-500 mb-6">
               The article you're looking for could not be found.
