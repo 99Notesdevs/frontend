@@ -188,7 +188,7 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
 
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
-                {showComponent === 'toc' ? '📑 Table of Contents' : '🗄️ Navigation'}
+                {showComponent === 'toc' ? 'Table of Contents' : 'Navigation'}
               </h3>
 
               <div className="space-y-4 max-h-[70vh] overflow-y-auto">

@@ -235,7 +235,7 @@ export default function PageListCurrent() {
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  (window.location.href = "/dashboard/current-affair")
+                  (window.location.href = "/dashboard")
                 }
                 className="border-slate-700 text-white hover:bg-slate-700"
               >
