@@ -69,7 +69,7 @@ function NestedNavigation({
                     item.children.map((child) => (
                       <div key={child.slug} className="space-y-2">
                         <div className="space-y-1">
-                          <h3 className="text-[14px] font-medium text-primary pb-2 border-b border-gray-100 font-inter w-full">
+                          <h3 className="text-[14px] font-normal text-primary pb-2 border-b border-gray-100 font-opensans w-full">
                             {child.title}
                           </h3>
                           {child.children.length > 0 && (
@@ -78,7 +78,7 @@ function NestedNavigation({
                                 <Link
                                   key={grandChild.slug}
                                   href={`/${grandChild.slug}`}
-                                  className="block w-full py-1.5 text-[13px] text-secondary hover:text-primary transition-colors duration-150 hover:bg-background-secondary rounded px-3 flex items-center font-inter font-normal tracking-normal"
+                                  className="block px-2 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[14px] font-normal flex items-center font-opensans"
                                 >
                                   <svg 
                                     className="w-3 h-3 mr-2 fill-current opacity-80"
@@ -136,7 +136,7 @@ function NestedNavigation({
                                         <div key={grandChild.slug} className="mb-2">
                                           <Link
                                             href={`/${grandChild.slug}`}
-                                            className="block px-2 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[13.5px] font-inter font-normal tracking-normal"
+                                            className="block px-3 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[14px] font-normal items-center flex font-opensans"
                                           >
                                             {grandChild.title}
                                           </Link>
