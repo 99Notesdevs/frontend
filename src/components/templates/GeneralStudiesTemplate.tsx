@@ -62,6 +62,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                   <h2 className="text-2xl font-medium text-primary mb-1 text-center">
                     {JSON.parse(metadata).metaTitle || 'Related Topics'}
                   </h2>
+                  <p className="text-gray-600 text-sm mb-1 text-center">
+                    {JSON.parse(metadata).metaDescription || 'Explore related topics to gain a deeper understanding of the subject.'}
+                  </p>
                   <div className="w-full h-1 bg-yellow-300 rounded-full"></div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -98,10 +101,18 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                           </div>
                           <div className="p-6">
                             <h3 className="text-lg font-semibold mb-2 text-primary">{child.title}</h3>
-                            <p className="text-gray-600 text-sm line-clamp-2">{JSON.parse(child.metadata).metaDescription}</p>
+                            <p className="text-gray-600 text-sm line-clamp-2">
+                              {child.content
+                                ? child.content
+                                    .replace(/<[^>]*>/g, '') // Remove HTML tags
+                                    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+                                    .slice(0, 100) // Get first 100 characters
+                                    .trim() + (child.content.length > 100 ? '...' : '')
+                                : 'No content available'}
+                            </p>
                           </div>
                         </Card>
-                      </Link>
+                      </Link>                                                                                                                                                
                     );
                   })}
                 </div>
