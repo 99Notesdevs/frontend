@@ -32,9 +32,9 @@ interface Page {
 
 // Fetch pages from the API with parent-child relationships
 const fetchPages = async (): Promise<Page[]> => {
-  const res = await fetch(`${env.API}/page/order`);
+  const res = await fetch(`${env.API}/page/order`)
   if (!res.ok) {
-    throw new Error("Failed to fetch pages");
+    throw new Error("Failed to fetch pages")
   }
   const { data } = await res.json();
   return buildHierarchy(data);
@@ -78,7 +78,6 @@ const buildHierarchy = (pages: Page[]): Page[] => {
 const SortableItem = ({ page }: { page: Page }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: page.id });
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -136,7 +135,7 @@ const ArticleList = () => {
         setPages(pagesData);
         setFlattenedPages(flattenHierarchy(pagesData));
       } catch (error) {
-        console.error("Error fetching pages:", error);
+        console.error("Error fetching pages:", error)
       }
     };
     getPages();
@@ -284,7 +283,7 @@ const ArticleList = () => {
         </DndContext>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ArticleList;
+export default ArticleList

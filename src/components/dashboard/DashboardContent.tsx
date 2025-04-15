@@ -8,8 +8,7 @@ import { PageForm as DefaultPageForm } from './dynamic/PageForm';
 
 // Static imports
 import { PageForm as CurrentAffairPageForm } from './static/current-affair/PageForm';
-
-
+import BlogsPageForm from './static/blogs/PageForm';
 
 // Define a more generic type for the PageForm component
 type AnyPageForm = React.ComponentType<any>;
@@ -22,6 +21,8 @@ export function DashboardContent() {
     // Determine which components to use based on the current path
     if (pathname?.includes('/current-affair')) {
       setPageForm(() => CurrentAffairPageForm);
+    } else if (pathname?.includes('/blogs')) {
+      setPageForm(() => BlogsPageForm);
     } else {
       // Default components
       setPageForm(() => DefaultPageForm);
