@@ -332,6 +332,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       showToast(error instanceof Error ? error.message : 'Failed to create current affair. Please try again.', 'error');
     } finally {
       setIsLoading(prev => ({ ...prev, creatingAffair: false, formSubmitting: false }));
+      setStep(1);
     }
   };
 
@@ -419,6 +420,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setToast({ message: 'Failed to create article', type: 'error' });
     } finally {
       setIsLoading(prev => ({ ...prev, creatingArticle: false, formSubmitting: false }));
+      setStep(1);
     }
   };
 
