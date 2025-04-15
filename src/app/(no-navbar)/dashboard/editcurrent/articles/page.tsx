@@ -98,7 +98,7 @@ export default function ArticlesPage() {
       }
       
       // Refresh the page after successful submission
-      // window.location.reload();
+      window.location.reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
