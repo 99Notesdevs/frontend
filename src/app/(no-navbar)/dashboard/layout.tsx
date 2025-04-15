@@ -79,6 +79,20 @@ export default function DashboardLayout({
                 <FaEdit className="w-5 h-5" />
                 Manage Forms
               </button>
+              <button
+                onClick={() => router.push("/dashboard/blogs")}
+                className="flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <FaPlus className="w-5 h-5" />
+                Add Blogs
+              </button>
+              <button
+                onClick={() => router.push("/dashboard/editblogs")}
+                className="flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <FaEdit className="w-5 h-5" />
+                Manage Blogs
+              </button>
             </nav>
           </div>
           {/* Main Content */}
