@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BaseTemplateProps } from './types';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,9 +34,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
     <main>
     <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-7">
           {/* Left Column - Main Image and Content */}
-          <div className="lg:col-span-8 xl:col-span-9">
+          <div className="lg:col-span-6 xl:col-start-2 xl:col-span-7">
             {/* Main Topic Image */}
             <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-10 transform transition-all hover:scale-[1.02]">
               <div className="relative w-full h-72 md:h-96">
@@ -59,9 +58,15 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
             {/* Related Topics Section */}
             {page.children && page.children.length > 0 && (
               <div className="mb-10">
-                <h2 className="text-2xl font-bold text-primary mb-8 text-center border-b-2 border-primary pb-2 inline-block">
-                  Related Topics
-                </h2>
+                <div className="flex flex-col items-center mb-8">
+                  <h2 className="text-2xl font-medium text-primary mb-1 text-center">
+                    {JSON.parse(metadata).metaTitle || 'Related Topics'}
+                  </h2>
+                  <p className="text-gray-600 text-sm mb-1 text-center">
+                    {JSON.parse(metadata).metaDescription || 'Explore related topics to gain a deeper understanding of the subject.'}
+                  </p>
+                  <div className="w-full h-1 bg-yellow-300 rounded-full"></div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {page.children.map((child: any) => {
                     let childContent;
@@ -84,25 +89,30 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                         key={child.id}
                         className="group transform transition-all hover:-translate-y-1"
                       >
-                        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full bg-white/90">
-                          <div className="relative w-full h-48">
+                        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/90">
+                          <div className="relative w-full h-48 ">
                             <Image 
                               src={childImage} 
                               alt={child.title}
                               fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-500"
+                              className="object-cover"
                               sizes="(max-width: 768px) 100vw, 33vw"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-                              <div className="p-6">
-                                <h3 className="text-xl font-semibold text-primary group-hover:text-accent-color transition-colors">
-                                  {child.title}
-                                </h3>
-                              </div>
-                            </div>
+                          </div>
+                          <div className="p-6">
+                            <h3 className="text-lg font-semibold mb-2 text-primary">{child.title}</h3>
+                            <p className="text-gray-600 text-sm line-clamp-2">
+                              {child.content
+                                ? child.content
+                                    .replace(/<[^>]*>/g, '') // Remove HTML tags
+                                    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+                                    .slice(0, 100) // Get first 100 characters
+                                    .trim() + (child.content.length > 100 ? '...' : '')
+                                : 'No content available'}
+                            </p>
                           </div>
                         </Card>
-                      </Link>
+                      </Link>                                                                                                                                                
                     );
                   })}
                 </div>

@@ -22,11 +22,11 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
       <main>
         <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <Breadcrumb />
+            {/* <Breadcrumb /> */}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 mt-8">
               {/* Left Sidebar with increased width */}
-              <aside className="lg:col-span-5 xl:col-span-4 order-2 lg:order-1">
+              <aside className="lg:col-span-5 xl:col-span-3 xl:col-start-2 order-2 lg:order-1">
                 {/* Sticky Container */}
                 <div className="relative">
                   <div className="sticky top-8 space-y-6">
@@ -73,7 +73,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
               </aside>
 
               {/* Main Content with reduced width */}
-              <main className="lg:col-span-7 xl:col-span-8 order-1 lg:order-2">
+              <main className="lg:col-span-7 xl:col-span-7 order-1 lg:order-2">
                 <article className="bg-white border border-background-secondary rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
                   {/* <h1 className="text-4xl sm:text-4xl font-bold mb-8 text-center">
                 <span className="text-primary border-b-2 border-accent-color pb-2">
@@ -81,7 +81,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 </span>
               </h1> */}
 
-                  <div className="flex flex-wrap gap-2 mb-8 justify-center">
+                  {/* <div className="flex flex-wrap gap-2 mb-8 justify-center">
                     {Array.isArray(page.metadata?.keywords)
                       ? page.metadata.keywords.map(
                           (keyword: string, index: number) => (
@@ -95,7 +95,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                           )
                         )
                       : null}
-                  </div>
+                  </div> */}
 
                   <div
                     className="prose prose-lg max-w-none

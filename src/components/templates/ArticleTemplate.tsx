@@ -15,7 +15,7 @@ import Ads from "../navigation/Ads";
 import { env } from "@/config/env";
 import axios from "axios";
 import Cookies from "js-cookie";
-
+import WhatsApp from '@/components/ui/whatsapp';
 const processContent = (content: string, isAuthorized: boolean) => {
   return content.replace(/<lock>(.*?)<\/lock>/g, (lockedContent) => {
     return isAuthorized
@@ -29,11 +29,13 @@ const processContent = (content: string, isAuthorized: boolean) => {
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
+  const parsedMetadata = typeof metadata === 'string' ? JSON.parse(metadata) : metadata || {};
+
   const [isAuthorized, setIsAuthorized] = useState<null | boolean>(null);
   const [mainContentFinal, setMainContentFinal] = useState(content || "");
   const token = Cookies.get("token");
   // @ts-ignore
-  const jsonLD = JSON.parse(metadata).schemaData;
+  const jsonLD = parsedMetadata.schemaData;
 
   useEffect(() => {
     const checkAuthorization = async () => {
@@ -75,26 +77,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // @ts-ignore
   const parentId = page.slug;
 
-  const { tags, date, readTime, coverImage } =
-    (metadata as {
-      tags?: string[];
-      date?: string;
-      readTime?: string;
-      coverImage?: string;
-      metaTitle?: string;
-      metaDescription?: string;
-      metaKeywords?: string;
-      robots?: string;
-      ogTitle?: string;
-      ogDescription?: string;
-      ogImage?: string;
-      ogType?: string;
-      twitterCard?: string;
-      twitterTitle?: string;
-      twitterDescription?: string;
-      twitterImage?: string;
-      canonicalUrl?: string;
-    }) || {};
+  const { tags, coverImage } =
+    parsedMetadata || {};
 
   // Use either the content image or the metadata coverImage
   // @ts-ignore
@@ -120,11 +104,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-12 
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
           >
-            <Breadcrumb />
+            {/* <Breadcrumb /> */}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 mt-12">
               {/* Main Content Column */}
-              <main className="lg:col-span-8 xl:col-span-9 space-y-4 sm:space-y-8">
+              <main className="lg:col-start-1 lg:col-span-6 xl:col-start-2 xl:col-span-7 space-y-4 sm:space-y-8">
                 {/* Featured Image */}
                 {displayImage && (
                   <div className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
@@ -143,6 +127,28 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 {/* Article Content */}
                 <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
                   {/* Article Header */}
+                  <div className="text-center mb-6">
+                    {page.parent && (
+                      <div className="mb-4">
+                        <a 
+                          href={`/${page.parent.slug}`} 
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          {page.parent.title}
+                        </a>
+                      </div>
+                    )}
+                    
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                      {parsedMetadata.metaTitle || 'Untitled Article'}
+                    </h1>
+                  </div>
+
+                  <div className="text-xs text-gray-500 mb-4">
+                    Created: {page.createdAt ? new Date(page.createdAt).toLocaleDateString() : 'N/A'}
+                  </div>
+
+                  <WhatsApp />
                   <div className="text-center mb-8 sm:mb-12">
                   </div>
 
@@ -215,7 +221,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
               </main>
               {/* Right Sidebar */}
-              <aside className="lg:col-span-4 xl:col-span-3 space-y-4 sm:space-y-6">
+              <aside className="lg:col-start-7 xl:col-start-9 lg:col-span-3 xl:col-span-3 space-y-4 sm:space-y-6">
                 {/* Search Bar - Always visible at top */}
                 <div
                   className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
@@ -233,7 +239,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   transition-all duration-300 hover:shadow-xl"
                     >
                       <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
-                        📑 Table of Contents
+                         Table of Contents
                       </h3>
                       <div className="pr-2">
                         <TableOfContents content={mainContentFinal} />
@@ -270,7 +276,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                           🏷 Tags
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          {tags.map((tag) => (
+                          {tags.map((tag: string) => (
                             <Badge
                               key={tag}
                               variant="secondary"
