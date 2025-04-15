@@ -49,12 +49,12 @@ const CurrentAffairsIndex = async () => {
 
         <div className="container mx-auto px-4 pt-12 max-w-4xl">
           {/* Daily Current Affairs */}
-          <div className="mb-16">
+          <div className="mb-16 mt-14">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-lg sm:text-xl font-medium text-gray-900 mb-3">
+              <h2 className="text-1xl sm:text-2xl font-medium text-gray-900 mb-3">
                 Daily Current Affairs Analysis UPSC With Short Notes Topic Wise
               </h2>
-              <div className="w-80 h-1 bg-yellow-300 rounded-full"></div>
+              <div className="w-96 h-1 bg-yellow-600 rounded-full"></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {dailyPages.map((page) => (
@@ -92,10 +92,10 @@ const CurrentAffairsIndex = async () => {
           {/* Monthly Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-lg sm:text-xl font-medium text-gray-900 mb-3">
+              <h2 className="text-1xl sm:text-2xl font-medium text-gray-900 mb-3">
                 Monthly Current Affairs UPSC
               </h2>
-              <div className="w-80 h-1 bg-yellow-300 rounded-full"></div>
+              <div className="w-80 h-1 bg-yellow-600 rounded-full"></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {monthlyPages.map((page) => (
@@ -133,10 +133,10 @@ const CurrentAffairsIndex = async () => {
           {/* Yearly Current Affairs */}
           <div className="mb-16">
             <div className="flex flex-col items-center mb-10">
-              <h2 className="text-lg sm:text-xl font-medium text-gray-900 mb-3">
+              <h2 className="text-1xl sm:text-2xl font-medium text-gray-900 mb-3">
                 Yearly Current Affairs UPSC
               </h2>
-              <div className="w-80 h-1 bg-yellow-300 rounded-full"></div>
+              <div className="w-80 h-1 bg-yellow-600 rounded-full"></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {yearlyPages.map((page) => (
