@@ -1,13 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { env } from '@/config/env';
-import Cookie from 'js-cookie';
+import React, { useEffect, useState } from "react";
+import { env } from "@/config/env";
+import Cookie from "js-cookie";
 
-import { PencilIcon, TrashIcon, EyeIcon, ArrowLeftIcon, CalendarIcon, CalendarDaysIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
-import { BlogForm } from '@/components/dashboard/forms';
-import { BlogFormValues } from '@/components/dashboard/forms/BlogForm';
+import {
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  ArrowLeftIcon,
+  CalendarIcon,
+  CalendarDaysIcon,
+  XMarkIcon,
+  CheckIcon,
+} from "@heroicons/react/24/outline";
+import Image from "next/image";
+import { BlogForm } from "@/components/dashboard/forms";
+import { BlogFormValues } from "@/components/dashboard/forms/BlogForm";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
 interface BlogType {
   id: number;
   title: string;
@@ -29,34 +39,40 @@ export default function ArticlesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredPages, setFilteredPages] = useState<BlogType[]>([]);
-  const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    selectedPage?.imageUrl || null
+  );
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const itemsPerPage = 2;
-  const token = Cookie.get('token');
+  const token = Cookie.get("token");
 
   const fetchPages = async (parentSlug?: string, searchTerm = "") => {
     try {
       setError(null);
       setLoading(true);
-      
+
       const skip = (currentPage - 1) * itemsPerPage;
-      const url = searchTerm 
-        ? `${env.API}/blog/search?skip=${skip}&take=${itemsPerPage}&query=${encodeURIComponent(searchTerm)}`
+      const url = searchTerm
+        ? `${
+            env.API
+          }/blog/search?skip=${skip}&take=${itemsPerPage}&query=${encodeURIComponent(
+            searchTerm
+          )}`
         : `${env.API}/blog?skip=${skip}&take=${itemsPerPage}`;
 
       const response = await fetch(url);
-      
+
       if (!response.ok) {
-        throw new Error('Failed to fetch pages');
+        throw new Error("Failed to fetch pages");
       }
 
       const data = await response.json();
       const pagesData = data.data || [];
-      
+
       // Get total count for pagination
       const countResponse = await fetch(`${env.API}/blog/count`);
       if (!countResponse.ok) {
-        throw new Error('Failed to fetch pages count');
+        throw new Error("Failed to fetch pages count");
       }
       const countData = await countResponse.json();
       const totalItems = countData.data || 0;
@@ -65,8 +81,8 @@ export default function ArticlesPage() {
       setFilteredPages(pagesData);
       setTotalPages(Math.ceil(totalItems / itemsPerPage));
     } catch (err) {
-      console.error('Error fetching pages:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error("Error fetching pages:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -101,20 +117,54 @@ export default function ArticlesPage() {
     setImagePreview(page.imageUrl || null);
   };
 
+  const handleImageUpload = async (content: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+    const imgTags = doc.querySelectorAll("img");
+
+    for (const img of imgTags) {
+      const src = img.getAttribute("src");
+      if (!src) continue;
+      console.log("I was here");
+      const isBlob = src.startsWith("blob:");
+      const isBase64 = src.startsWith("data:image");
+
+      if (isBlob || isBase64) {
+        try {
+          const response = await fetch(src);
+          const blob = await response.blob();
+
+          const formData = new FormData();
+          formData.append("imageUrl", blob, "image.png");
+
+          const url = (await uploadImageToS3(formData)) || "error";
+          img.setAttribute("src", url);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error("Error uploading image:", error.message);
+          }
+        }
+      }
+    }
+
+    return doc.body.innerHTML;
+  };
+
   const handleEditSubmit = async (formData: BlogFormValues) => {
     try {
       if (!token) {
-        setError('Authentication required');
+        setError("Authentication required");
         return;
       }
 
       // Generate slug from title
       const baseSlug = formData.title
         .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
       const slug = `blog/${baseSlug}`;
 
+      formData.content = await handleImageUpload(formData.content);
       const updateData = {
         title: formData.title,
         content: formData.content,
@@ -135,60 +185,64 @@ export default function ArticlesPage() {
           twitterDescription: formData.twitterDescription,
           twitterImage: formData.twitterImage,
           canonicalUrl: formData.canonicalUrl,
-          schemaData: formData.schemaData
-        })
+          schemaData: formData.schemaData,
+        }),
       };
 
       if (!selectedPage) {
-        setError('No page selected');
+        setError("No page selected");
         return;
       }
-      
+
       const response = await fetch(`${env.API}/blog/${selectedPage.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update blog');
+        throw new Error(errorData.message || "Failed to update blog");
       }
 
       const { data } = await response.json();
       setSelectedPage(data);
-      
+
       // Refresh the page list
       fetchPages();
 
       // Clear error if any
       setError(null);
     } catch (err) {
-      console.error('Error updating blog:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred while updating the blog');
+      console.error("Error updating blog:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while updating the blog"
+      );
     }
   };
 
   const handleDelete = async (id: number) => {
     if (!token) {
-      setError('Authentication required');
+      setError("Authentication required");
       return;
     }
 
     try {
       const response = await fetch(`${env.API}/blog/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete blog');
+        throw new Error(errorData.message || "Failed to delete blog");
       }
 
       // Refresh the page list
@@ -197,8 +251,12 @@ export default function ArticlesPage() {
       setDeleteConfirm(null);
       setError(null);
     } catch (err) {
-      console.error('Error deleting blog:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred while deleting the blog');
+      console.error("Error deleting blog:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while deleting the blog"
+      );
     }
   };
 
@@ -318,19 +376,21 @@ export default function ArticlesPage() {
               >
                 Previous
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`px-4 py-2 rounded ${
-                    page === currentPage
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-4 py-2 rounded ${
+                      page === currentPage
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
 
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
@@ -352,20 +412,48 @@ export default function ArticlesPage() {
               defaultValues={{
                 title: selectedPage.title,
                 content: selectedPage.content,
-                metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
-                metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',
-                metaKeywords: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaKeywords || '' : '',
-                robots: selectedPage.metadata ? JSON.parse(selectedPage.metadata).robots || '' : '',
-                ogTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogTitle || '' : '',
-                ogDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogDescription || '' : '',
-                ogImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogImage || '' : '',
-                ogType: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogType || '' : '',
-                twitterCard: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterCard || '' : '',
-                twitterTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterTitle || '' : '',
-                twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
-                twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
-                canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
-                schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
+                metaTitle: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).metaTitle || ""
+                  : "",
+                metaDescription: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).metaDescription || ""
+                  : "",
+                metaKeywords: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).metaKeywords || ""
+                  : "",
+                robots: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).robots || ""
+                  : "",
+                ogTitle: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).ogTitle || ""
+                  : "",
+                ogDescription: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).ogDescription || ""
+                  : "",
+                ogImage: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).ogImage || ""
+                  : "",
+                ogType: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).ogType || ""
+                  : "",
+                twitterCard: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).twitterCard || ""
+                  : "",
+                twitterTitle: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).twitterTitle || ""
+                  : "",
+                twitterDescription: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).twitterDescription || ""
+                  : "",
+                twitterImage: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).twitterImage || ""
+                  : "",
+                canonicalUrl: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).canonicalUrl || ""
+                  : "",
+                schemaData: selectedPage.metadata
+                  ? JSON.parse(selectedPage.metadata).schemaData || ""
+                  : "",
               }}
             />
           ) : (

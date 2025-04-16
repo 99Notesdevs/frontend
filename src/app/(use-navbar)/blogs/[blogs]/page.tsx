@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { env } from "@/config/env";
 import { BaseTemplateProps } from "@/components/templates/types";
