@@ -1,8 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import BlogCard from "@/components/Blogs/BlogCard";
-import Pagination from "@/components/Blogs/Pagination";
-import Head from "next/head";
 import Link from "next/link";
 import { env } from "@/config/env";
 
@@ -47,7 +44,7 @@ const BlogsPage: React.FC = () => {
       // Get total count for pagination
       const countResponse = await fetch(`${env.API}/blog/count`);
       if (!countResponse.ok) {
-        throw new Error('Failed to fetch blogs count');
+        throw new Error('No blogs available');
       }
       const countData = await countResponse.json();
       const totalItems = countData.data || 0;

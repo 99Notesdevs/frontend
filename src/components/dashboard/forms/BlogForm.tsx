@@ -346,6 +346,35 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           />
         </div>
 
+        {/* Canonical URL */}
+        <FormField
+          control={form.control}
+          name="canonicalUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Canonical URL</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter canonical URL" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Schema Data */}
+        <FormField
+          control={form.control}
+          name="schemaData"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Schema Data</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter schema data" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" disabled={isUploading}>
           {isUploading ? "Uploading..." : "Save Blog"}

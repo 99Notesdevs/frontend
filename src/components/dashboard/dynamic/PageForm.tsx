@@ -197,7 +197,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       }
     }
 
-    return doc.body.innerHTML; // ⬅️ Only return after finishing all images
+    return doc.body.innerHTML;
   };
 
   const handleSubmit = async (formData: PageFormData) => {
