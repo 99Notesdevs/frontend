@@ -34,7 +34,7 @@ export default function ArticlesPage() {
   const itemsPerPage = 2;
   const token = Cookie.get('token');
 
-  const fetchPages = async (parentSlug?: string, searchTerm = "") => {
+  const fetchPages = async ( searchTerm = "") => {
     try {
       setError(null);
       setLoading(true);
@@ -93,7 +93,7 @@ export default function ArticlesPage() {
     const query = e.target.value;
     setSearchQuery(query);
     setCurrentPage(1); // Reset to first page when searching
-    fetchPages(undefined, query);
+    fetchPages(query);
   };
 
   const handleEdit = (page: BlogType) => {
@@ -107,37 +107,49 @@ export default function ArticlesPage() {
         setError('Authentication required');
         return;
       }
+      
+      // Log the raw form data
+      console.log('Raw form data:', formData);
 
       // Generate slug from title
       const baseSlug = formData.title
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
-      const slug = `blog/${baseSlug}`;
+      const slug = `${baseSlug}`;
+
+      // Create metadata object
+      const metadata = {
+        metaTitle: formData.metaTitle || '',
+        metaDescription: formData.metaDescription || '',
+        metaKeywords: formData.metaKeywords || '',
+        robots: formData.robots || '',
+        ogTitle: formData.ogTitle || '',
+        ogDescription: formData.ogDescription || '',
+        ogImage: formData.ogImage || '',
+        ogType: formData.ogType || '',
+        twitterCard: formData.twitterCard || '',
+        twitterTitle: formData.twitterTitle || '',
+        twitterDescription: formData.twitterDescription || '',
+        twitterImage: formData.twitterImage || '',
+        canonicalUrl: formData.canonicalUrl || '',
+        schemaData: formData.schemaData || ''
+      };
+
+      // Log the metadata object
+      console.log('Metadata object:', metadata);
 
       const updateData = {
         title: formData.title,
         content: formData.content,
         slug: slug,
         updatedAt: new Date(),
-        imageUrl: formData.imageUrl,
-        metadata: JSON.stringify({
-          metaTitle: formData.metaTitle,
-          metaDescription: formData.metaDescription,
-          metaKeywords: formData.metaKeywords,
-          robots: formData.robots,
-          ogTitle: formData.ogTitle,
-          ogDescription: formData.ogDescription,
-          ogImage: formData.ogImage,
-          ogType: formData.ogType,
-          twitterCard: formData.twitterCard,
-          twitterTitle: formData.twitterTitle,
-          twitterDescription: formData.twitterDescription,
-          twitterImage: formData.twitterImage,
-          canonicalUrl: formData.canonicalUrl,
-          schemaData: formData.schemaData
-        })
+        imageUrl: formData.imageUrl || '',
+        metadata: JSON.stringify(metadata)
       };
+
+      // Log the final update data that will be sent
+      console.log('Final update data to be sent:', updateData);
 
       if (!selectedPage) {
         setError('No page selected');
@@ -161,8 +173,8 @@ export default function ArticlesPage() {
       const { data } = await response.json();
       setSelectedPage(data);
       
-      // Refresh the page list
-      fetchPages();
+      // Refresh the page after successful update
+      window.location.href = window.location.pathname;
 
       // Clear error if any
       setError(null);
@@ -191,8 +203,9 @@ export default function ArticlesPage() {
         throw new Error(errorData.message || 'Failed to delete blog');
       }
 
-      // Refresh the page list
-      fetchPages();
+      // Refresh the page after successful update
+      window.location.href = window.location.pathname;
+
       setSelectedPage(null);
       setDeleteConfirm(null);
       setError(null);
@@ -227,8 +240,8 @@ export default function ArticlesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="space-y-6">
+    <div className="container mx-auto p-6">
+      <div className="flex flex-col gap-6">
         {/* Blog List */}
         <div className="bg-white p-6 rounded-xl shadow-md">
           <div className="flex justify-between items-center mb-6">
@@ -347,25 +360,29 @@ export default function ArticlesPage() {
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-bold mb-4">Edit Blog</h2>
           {selectedPage ? (
+          
             <BlogForm
               onSubmit={handleEditSubmit}
               defaultValues={{
-                title: selectedPage.title,
-                content: selectedPage.content,
-                metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
-                metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',
-                metaKeywords: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaKeywords || '' : '',
-                robots: selectedPage.metadata ? JSON.parse(selectedPage.metadata).robots || '' : '',
-                ogTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogTitle || '' : '',
-                ogDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogDescription || '' : '',
-                ogImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogImage || '' : '',
-                ogType: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogType || '' : '',
-                twitterCard: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterCard || '' : '',
-                twitterTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterTitle || '' : '',
-                twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
-                twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
-                canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
-                schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
+                title: selectedPage?.title || '',
+                content: selectedPage?.content || '',
+                slug: selectedPage?.slug || '',
+                order: selectedPage?.order || 0,
+                imageUrl: selectedPage?.imageUrl || '',
+                metaTitle: JSON.parse(selectedPage.metadata || '')?.metaTitle,
+                metaDescription: JSON.parse(selectedPage.metadata || '')?.metaDescription,
+                metaKeywords: JSON.parse(selectedPage.metadata || '').metaKeywords,
+                robots: JSON.parse(selectedPage.metadata || '').robots,
+                ogTitle: JSON.parse(selectedPage.metadata || '')?.ogTitle,
+                ogDescription: JSON.parse(selectedPage.metadata || '')?.ogDescription,
+                ogImage: JSON.parse(selectedPage.metadata || '')?.ogImage,
+                ogType: JSON.parse(selectedPage.metadata || '')?.ogType,
+                twitterCard: JSON.parse(selectedPage.metadata || '')?.twitterCard,
+                twitterTitle: JSON.parse(selectedPage.metadata || '')?.twitterTitle,
+                twitterDescription: JSON.parse(selectedPage.metadata || '')?.twitterDescription,
+                twitterImage: JSON.parse(selectedPage.metadata || '')?.twitterImage,
+                canonicalUrl: JSON.parse(selectedPage.metadata || '')?.canonicalUrl,
+                schemaData: JSON.parse(selectedPage.metadata || '')?.schemaData,
               }}
             />
           ) : (
