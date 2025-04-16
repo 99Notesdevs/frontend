@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
-import {ArticleForm, UpscNotesForm, GeneralStudiesForm , CurrentAffairForm} from '@/components/dashboard/forms';
+import {ArticleForm, UpscNotesForm, GeneralStudiesForm , CurrentAffairForm, BlogForm} from '@/components/dashboard/forms';
 import Cookie from 'js-cookie';
 import { env } from '@/config/env';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
@@ -13,6 +13,7 @@ interface Page {
   slug: string;
   title: string;
   templateId: string;
+  showInNav: boolean;
   updatedAt: string;
   content: string;
   imageUrl: string | null;
@@ -128,8 +129,6 @@ function PageList() {
         imageUrl: formData.imageUrl,
         content: formData.content,
         metadata: {
-          lastUpdated: new Date().toISOString(),
-          teamSize: formData.metadata?.teamSize || 0,
           metaTitle: formData.metaTitle || "",
           metaDescription: formData.metaDescription || "",
           metaKeywords: formData.metaKeywords || "",
@@ -146,7 +145,7 @@ function PageList() {
           schemaData: formData.schemaData || "",
         },
         level: selectedPage.level || 0,
-        showInNav: true,
+        showInNav: formData.showInNav || false,
         order: selectedPage.order || 0,
         updatedAt: new Date().toISOString(),
       };
@@ -188,6 +187,7 @@ function PageList() {
         return {
           title: page.title || "",
           content: parsedContent || "",
+          showInNav: page.showInNav || false,
           imageUrl: parsedimage || undefined,
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
@@ -209,6 +209,7 @@ function PageList() {
         return {
           title: page.title || "",
           content: parsedContent || "",
+          showInNav: page.showInNav || false,
           imageUrl: parsedimage || undefined,
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
@@ -230,6 +231,7 @@ function PageList() {
         return {
           title: page.title || "",
           content: parsedContent || "",
+          showInNav: page.showInNav || false,
           imageUrl: parsedimage || undefined,
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
@@ -250,6 +252,7 @@ function PageList() {
         return {
           title: page.title || "",
           content: parsedContent || "",
+          showInNav: page.showInNav || false,
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
           metaKeywords: metadata.metaKeywords || "",
@@ -265,10 +268,11 @@ function PageList() {
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
         };
-      default:
+      case 'blog':
         return {
           title: page.title || "",
           content: parsedContent || "",
+          showInNav: false,
           imageUrl: parsedimage || undefined,
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
@@ -462,6 +466,15 @@ function PageList() {
               )}
               {selectedPage.templateId === "current-affairs" && (
                 <CurrentAffairForm
+                  onSubmit={saveEdit}
+                  defaultValues={getInitialFormData(
+                    selectedPage,
+                    selectedPage.templateId
+                  )}
+                />
+              )}
+              {selectedPage.templateId === "blog" && (
+                <BlogForm
                   onSubmit={saveEdit}
                   defaultValues={getInitialFormData(
                     selectedPage,

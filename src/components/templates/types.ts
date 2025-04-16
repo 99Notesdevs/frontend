@@ -28,7 +28,8 @@ export interface TemplateContent {
 export interface BaseTemplateProps {
   page: Page & {
     content: TemplateContent;
-    imageUrl?: String
+    imageUrl?: string;
+    templateId: string;
   };
 }
 
@@ -36,3 +37,4 @@ export interface ArticleTemplateProps extends BaseTemplateProps {}
 export interface CurrentAffairTemplateProps extends BaseTemplateProps {}
 export interface GeneralStudiesTemplateProps extends BaseTemplateProps {}
 export interface UpscNotesTemplateProps extends BaseTemplateProps {}
+export interface BlogTemplateProps extends BaseTemplateProps {}

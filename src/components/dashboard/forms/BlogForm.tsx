@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -29,8 +30,6 @@ const formSchema = z.object({
   twitterImage: z.string().url("Twitter Image must be a valid URL").optional(),
   canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
   schemaData: z.string().optional(),
-  slug: z.string().min(2, 'Slug must be at least 2 characters'),
-  order: z.number().min(0, 'Order must be a positive number').optional(),
 });
 
 export type BlogFormValues = z.infer<typeof formSchema>;
@@ -52,8 +51,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     defaultValues: defaultValues || {
       title: '',
       content: '',
-      slug: '',
-      order: 0,
       imageUrl: '',
       metaTitle: '',
       metaDescription: '',
@@ -71,34 +68,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       schemaData: '',
     },
   });
-
-  // Watch for metaTitle changes
-  const metaTitle = form.watch('metaTitle');
-  useEffect(() => {
-    console.log('Meta title changed:', metaTitle);
-  }, [metaTitle]);
-
-  // Function to generate slug from title
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .trim() // Remove whitespace from start and end
-      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphen
-      .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-      .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
-  };
-
-  // Watch title changes and update slug
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'title' && value.title) {
-        const newSlug = generateSlug(value.title);
-        form.setValue('slug', newSlug, { shouldValidate: true });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,62 +99,9 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       reader.readAsDataURL(file);
     }
   };
-
-  const handleSubmit = async (data: BlogFormValues) => {
-    console.log('Form submission started');
-    console.log('Form data:', data);
-    
-    try {
-      // Normalize the slug by replacing spaces with hyphens
-      const normalizedSlug = data.slug.replace(/\s+/g, '-');
-      
-      // Update the form data with the normalized slug
-      const formData = {
-        ...data,
-        slug: normalizedSlug,
-        metadata: JSON.stringify({
-          metaTitle: data.metaTitle,
-          metaDescription: data.metaDescription,
-          metaKeywords: data.metaKeywords,
-          robots: data.robots,
-          ogTitle: data.ogTitle,
-          ogDescription: data.ogDescription,
-          ogImage: data.ogImage,
-          ogType: data.ogType,
-          twitterCard: data.twitterCard,
-          twitterTitle: data.twitterTitle,
-          twitterDescription: data.twitterDescription,
-          twitterImage: data.twitterImage,
-          canonicalUrl: data.canonicalUrl,
-          schemaData: data.schemaData
-        })
-      };
-
-      console.log('Normalized form data:', formData);
-      
-      try {
-        await onSubmit(formData);
-        setIsSuccess(true);
-        setSuccessMessage('Blog updated successfully!');
-        
-        // Reset success state after 3 seconds
-        setTimeout(() => {
-          setIsSuccess(false);
-          setSuccessMessage('');
-        }, 3000);
-      } catch (error) {
-        console.error('Error in onSubmit:', error);
-        throw error;
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      throw error;
-    }
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Show success message */}
         {isSuccess && (
           <div className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
@@ -455,7 +371,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               </FormItem>
             )}
           />
-  
 
         <Button type="submit" disabled={isUploading || form.formState.isSubmitting}>
           {isUploading || form.formState.isSubmitting ? "Processing..." : "Save Blog"}

@@ -106,95 +106,97 @@ export default async function Page({ params }: { params: Params }) {
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-12">
               {/* Main Content Column */}
-              <main className="lg:col-start-1 lg:col-span-8 xl:col-span-8 space-y-4 sm:space-y-8">
-                {/* Featured Image */}
-                {displayImage && (
-                  <div className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-0">
-                    <div className="relative w-full h-[400px]">
-                      <Image
-                        src={`${displayImage}`}
-                        alt={title}
-                        fill
-                        className="object-cover"
-                        priority
-                      />
+              <main className="lg:col-start-1 lg:col-span-8 xl:col-span-8 space-y-0 sm:space-y-0">
+                <div className="bg-white border shadow-lg">
+                  {/* Featured Image */}
+                  {displayImage && (
+                    <div className="w-full">
+                      <div className="relative w-full h-[400px]">
+                        <Image
+                          src={`${displayImage}`}
+                          alt={title}
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Article Content */}
-                <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-0">
-                    {parsedMetadata.metaTitle || title}
-                  </h1>
+                  {/* Article Content */}
+                  <div className="p-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-0">
+                      {title}
+                    </h1>
 
-                  <div className="text-xs text-gray-500 mb-4">
-                    Created: {new Date(page.createdAt).toLocaleDateString()}
-                  </div>
+                    <div className="text-xs text-gray-500 mb-4">
+                      By 99Notes . Created: {new Date(page.createdAt).toLocaleDateString()}
+                    </div>
 
-                  <div
-                    className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
-                  prose-headings:font-semibold
-                  prose-headings:tracking-normal
-                  prose-headings:text-left
-                  prose-headings:relative
-                  prose-headings:mb-6
-                  
-                  prose-h1:text-3xl sm:prose-h1:text-4xl
-                  prose-h1:font-bold
-                  prose-h1:text-gray-800
-                  prose-h1:leading-tight
-                  
-                  prose-h2:text-2xl sm:prose-h2:text-3xl
-                  prose-h2:text-gray-700
-                  prose-h2:pb-2
-                  prose-h2:after:content-['']
-                  prose-h2:after:block
-                  prose-h2:after:w-16
-                  prose-h2:after:h-[2px]
-                  prose-h2:after:mt-2
-                  prose-h2:after:bg-yellow-500
-                  prose-h2:after:rounded-full
-                  
-                  prose-h3:text-xl sm:prose-h3:text-2xl
-                  prose-h3:text-gray-600
-                  prose-h3:font-medium
-                  prose-h3:pl-3
-                  
-                  prose-h4:text-lg sm:prose-h4:text-xl
-                  prose-h4:text-gray-600
-                  prose-h4:font-medium
-                  prose-h4:before:content-['§']
-                  prose-h4:before:text-yellow-500
-                  prose-h4:before:mr-2
-                  prose-h4:before:opacity-70
-                  
-                  prose-p:text-gray-600
-                  prose-p:leading-relaxed
-                  prose-p:tracking-wide
-                  prose-strong:text-gray-800
-                  prose-a:text-blue-600
-                  prose-a:no-underline
-                  prose-a:border-b-2
-                  prose-a:border-blue-200
-                  prose-a:transition-colors
-                  prose-a:hover:border-blue-500
-                  prose-blockquote:border-l-blue-500
-                  prose-blockquote:bg-blue-50
-                  prose-blockquote:p-3 sm:prose-blockquote:p-4
-                  prose-blockquote:rounded-r-lg
-                  prose-pre:bg-gray-50
-                  prose-pre:rounded-lg
-                  prose-pre:p-3 sm:prose-pre:p-4
-                  prose-img:rounded-lg
-                  prose-img:shadow-md
-                  prose-ul:list-disc
-                  prose-ul:pl-4 sm:prose-ul:pl-6
-                  prose-ol:list-decimal
-                  prose-ol:pl-4 sm:prose-ol:pl-6
-                  [&>*]:w-full"
-                  >
-                    <div dangerouslySetInnerHTML={{ __html: content || '' }}></div>
+                    <div
+                      className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
+                      prose-headings:font-semibold
+                      prose-headings:tracking-normal
+                      prose-headings:text-left
+                      prose-headings:relative
+                      prose-headings:mb-6
+                      
+                      prose-h1:text-3xl sm:prose-h1:text-4xl
+                      prose-h1:font-bold
+                      prose-h1:text-gray-800
+                      prose-h1:leading-tight
+                      
+                      prose-h2:text-2xl sm:prose-h2:text-3xl
+                      prose-h2:text-gray-700
+                      prose-h2:pb-2
+                      prose-h2:after:content-['']
+                      prose-h2:after:block
+                      prose-h2:after:w-16
+                      prose-h2:after:h-[2px]
+                      prose-h2:after:mt-2
+                      prose-h2:after:bg-yellow-500
+                      prose-h2:after:rounded-full
+                      
+                      prose-h3:text-xl sm:prose-h3:text-2xl
+                      prose-h3:text-gray-600
+                      prose-h3:font-medium
+                      prose-h3:pl-3
+                      
+                      prose-h4:text-lg sm:prose-h4:text-xl
+                      prose-h4:text-gray-600
+                      prose-h4:font-medium
+                      prose-h4:before:content-['§']
+                      prose-h4:before:text-yellow-500
+                      prose-h4:before:mr-2
+                      prose-h4:before:opacity-70
+                      
+                      prose-p:text-gray-600
+                      prose-p:leading-relaxed
+                      prose-p:tracking-wide
+                      prose-strong:text-gray-800
+                      prose-a:text-blue-600
+                      prose-a:no-underline
+                      prose-a:border-b-2
+                      prose-a:border-blue-200
+                      prose-a:transition-colors
+                      prose-a:hover:border-blue-500
+                      prose-blockquote:border-l-blue-500
+                      prose-blockquote:bg-blue-50
+                      prose-blockquote:p-3 sm:prose-blockquote:p-4
+                      prose-blockquote:rounded-r-lg
+                      prose-pre:bg-gray-50
+                      prose-pre:rounded-lg
+                      prose-pre:p-3 sm:prose-pre:p-4
+                      prose-img:rounded-lg
+                      prose-img:shadow-md
+                      prose-ul:list-disc
+                      prose-ul:pl-4 sm:prose-ul:pl-6
+                      prose-ol:list-decimal
+                      prose-ol:pl-4 sm:prose-ol:pl-6
+                      [&>*]:w-full"
+                    >
+                      <div dangerouslySetInnerHTML={{ __html: content || '' }}></div>
+                    </div>
                   </div>
                 </div>
               </main>

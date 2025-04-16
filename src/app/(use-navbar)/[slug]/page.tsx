@@ -6,29 +6,48 @@ import { GeneralStudiesTemplate } from "@/components/templates/GeneralStudiesTem
 import { CurrentAffairTemplate } from "@/components/templates/CurrentAffairTemplate";
 import { env } from "@/config/env";
 import { Metadata } from "next";
+import { BlogTemplate } from "@/components/templates/BlogTemplate";
 
 // Map template IDs to components
-const TEMPLATE_MAP: Record<string, any> = {
+const TEMPLATE_MAP: Record<string, React.ComponentType<BaseTemplateProps>> = {
   "upsc-notes": UpscNotesTemplate,
   "article": ArticleTemplate,
   "general-studies": GeneralStudiesTemplate,
   "current-affairs": CurrentAffairTemplate,
+  "blog": BlogTemplate,
 };
 
 async function getPage(
   slug: string
 ): Promise<BaseTemplateProps["page"] | null> {
   try {
-
     const response = await fetch(`${env.API}/page/slug/${slug}`);
     const res = await response.json();
+    
+    if (!response.ok) {
+      console.error("API Error:", res);
+      return null;
+    }
+
     const page = res.data;
 
     if (!page) {
       return null;
     }
 
-    return page as BaseTemplateProps["page"];
+    // Ensure template ID is properly set
+    const templateId = page.template?.id || "";
+    const template = {
+      id: templateId,
+      name: page.template?.name || "",
+      description: page.template?.description || ""
+    };
+
+    return {
+      ...page,
+      template,
+      templateId: templateId
+    } as BaseTemplateProps["page"];
   } catch (error) {
     console.error("Error fetching page:", error);
     return null;
@@ -99,11 +118,11 @@ export default async function Page({ params }: { params: Params }) {
   }
 
   // Get the correct template component using template ID
-  const Template = TEMPLATE_MAP[page.template.id];
+  const Template = TEMPLATE_MAP[page.templateId];
 
   if (!Template) {
-    console.error(`Template ${page.template.id} not found in TEMPLATE_MAP`);
-    throw new Error(`Template ${page.template.id} not found`);
+    console.error(`Template ${page.templateId} not found in TEMPLATE_MAP`);
+    throw new Error(`Template ${page.templateId} not found`);
   }
 
   return <Template page={page} />;
