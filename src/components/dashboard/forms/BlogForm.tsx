@@ -41,8 +41,11 @@ interface BlogFormProps {
 }
 
 export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
+  console.log(defaultValues);
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const form = useForm<BlogFormValues>({
     resolver: zodResolver(formSchema),
@@ -51,44 +54,29 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       content: '',
       slug: '',
       order: 0,
+      imageUrl: '',
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: '',
+      robots: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+      ogType: '',
+      twitterCard: '',
+      twitterTitle: '',
+      twitterDescription: '',
+      twitterImage: '',
+      canonicalUrl: '',
+      schemaData: '',
     },
   });
 
-  const handleSubmit = async (data: BlogFormValues) => {
-    try {
-      // Normalize the slug by replacing spaces with hyphens
-      const normalizedSlug = data.slug.replace(/\s+/g, '-');
-      
-      // Update the form data with the normalized slug
-      const formData = {
-        ...data,
-        slug: normalizedSlug,
-        metadata: JSON.stringify({
-          metaTitle: data.metaTitle,
-          metaDescription: data.metaDescription,
-          metaKeywords: data.metaKeywords,
-          robots: data.robots,
-          ogTitle: data.ogTitle,
-          ogDescription: data.ogDescription,
-          ogImage: data.ogImage,
-          ogType: data.ogType,
-          twitterCard: data.twitterCard,
-          twitterTitle: data.twitterTitle,
-          twitterDescription: data.twitterDescription,
-          twitterImage: data.twitterImage,
-          canonicalUrl: data.canonicalUrl,
-          schemaData: data.schemaData
-        })
-      };
-
-      await onSubmit(formData);
-      
-      // Don't reload the page here, let the parent component handle it
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      throw error; // Let the parent component handle the error
-    }
-  };
+  // Watch for metaTitle changes
+  const metaTitle = form.watch('metaTitle');
+  useEffect(() => {
+    console.log('Meta title changed:', metaTitle);
+  }, [metaTitle]);
 
   // Function to generate slug from title
   const generateSlug = (title: string): string => {
@@ -143,9 +131,68 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     }
   };
 
+  const handleSubmit = async (data: BlogFormValues) => {
+    console.log('Form submission started');
+    console.log('Form data:', data);
+    
+    try {
+      // Normalize the slug by replacing spaces with hyphens
+      const normalizedSlug = data.slug.replace(/\s+/g, '-');
+      
+      // Update the form data with the normalized slug
+      const formData = {
+        ...data,
+        slug: normalizedSlug,
+        metadata: JSON.stringify({
+          metaTitle: data.metaTitle,
+          metaDescription: data.metaDescription,
+          metaKeywords: data.metaKeywords,
+          robots: data.robots,
+          ogTitle: data.ogTitle,
+          ogDescription: data.ogDescription,
+          ogImage: data.ogImage,
+          ogType: data.ogType,
+          twitterCard: data.twitterCard,
+          twitterTitle: data.twitterTitle,
+          twitterDescription: data.twitterDescription,
+          twitterImage: data.twitterImage,
+          canonicalUrl: data.canonicalUrl,
+          schemaData: data.schemaData
+        })
+      };
+
+      console.log('Normalized form data:', formData);
+      
+      try {
+        await onSubmit(formData);
+        setIsSuccess(true);
+        setSuccessMessage('Blog updated successfully!');
+        
+        // Reset success state after 3 seconds
+        setTimeout(() => {
+          setIsSuccess(false);
+          setSuccessMessage('');
+        }, 3000);
+      } catch (error) {
+        console.error('Error in onSubmit:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      throw error;
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Show success message */}
+        {isSuccess && (
+          <div className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
+            {successMessage}
+          </div>
+        )}
+        
         <FormField
           control={form.control}
           name="title"
@@ -186,18 +233,23 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                     <div className="relative h-48 w-full">
                       <Image
                         src={imagePreview}
-                        alt="Preview"
+                        alt="Blog image preview"
                         fill
                         className="object-cover rounded-lg"
+                        priority
                       />
                     </div>
                   )}
-                  <Input
+                  <input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     disabled={isUploading}
                   />
+                  {isUploading && (
+                    <div className="text-sm text-blue-500 mt-2">Uploading image...</div>
+                  )}
                 </div>
               </FormControl>
               <FormMessage />
@@ -205,9 +257,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           )}
         />
 
-        {/* Metadata Fields */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Metadata</h3>
           
           <FormField
             control={form.control}
@@ -250,11 +299,22 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               </FormItem>
             )}
           />
-        </div>
+          <FormField
+            control={form.control}
+            name="robots"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Robots</FormLabel>
+                <FormControl>
+                  <Input placeholder="index,follow" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+       
 
-        {/* Open Graph Fields */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Open Graph</h3>
+         
           
           <FormField
             control={form.control}
@@ -297,11 +357,34 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               </FormItem>
             )}
           />
-        </div>
+          <FormField
+            control={form.control}
+            name="ogType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Type</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter OG Type" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+       
 
-        {/* Twitter Fields */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Twitter Card</h3>
+        <FormField
+            control={form.control}
+            name="twitterCard"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Card</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Twitter Card" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           
           <FormField
             control={form.control}
@@ -344,40 +427,38 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               </FormItem>
             )}
           />
-        </div>
-
-        {/* Canonical URL */}
+      
         <FormField
-          control={form.control}
-          name="canonicalUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Canonical URL</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter canonical URL" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            control={form.control}
+            name="canonicalUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Canonical URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter canonical URL" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Schema Data */}
         <FormField
-          control={form.control}
-          name="schemaData"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Schema Data</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter schema data" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            control={form.control}
+            name="schemaData"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Schema Data</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter schema data" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+  
 
-        <Button type="submit" disabled={isUploading}>
-          {isUploading ? "Uploading..." : "Save Blog"}
+        <Button type="submit" disabled={isUploading || form.formState.isSubmitting}>
+          {isUploading || form.formState.isSubmitting ? "Processing..." : "Save Blog"}
         </Button>
       </form>
     </Form>
