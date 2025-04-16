@@ -6,6 +6,7 @@ import {
   GeneralStudiesForm,
   UpscNotesForm,
   CurrentAffairForm,
+  BlogForm,
 } from "../forms";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,9 @@ import {
 import { env } from "@/config/env";
 import Cookie from "js-cookie";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
+import {
+  Checkbox,
+} from "@/components/ui/Checkbox";
 
 interface TemplateType {
   id: string;
@@ -29,15 +33,16 @@ interface TemplateType {
 }
 
 interface Page {
-  id: string;
-  title: string;
-  slug: string;
-  level: number;
-  parentId?: string | null;
+    id: string;
+    title: string;
+    slug: string;
+    level: number;
+    showInNav: boolean;
+    parentId?: string | null;
 }
 
 interface PageWithRelations extends Page {
-  parent: PageWithRelations | null;
+    parent: PageWithRelations | null;
   children: PageWithRelations[];
   data?: any;
 }
@@ -53,6 +58,7 @@ interface PageFormData extends Record<string, any> {
   };
   content?: string;
   imageUrl?: string;
+  
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -261,8 +267,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
           schemaData: formData.schemaData || "",
         },
         imageUrl: formData.imageUrl,
-        level: pathLevel, // Use the path depth as the level
-        showInNav: true,
+        level: pathLevel || 0, // Use the path depth as the level
+        showInNav: formData.showInNav,
         order: 0,
       };
 
@@ -353,6 +359,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       article: ArticleForm,
       "general-studies": GeneralStudiesForm,
       "upsc-notes": UpscNotesForm,
+      "blog": BlogForm,
       "current-affairs": CurrentAffairForm,
     };
 

@@ -13,10 +13,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Label } from "@radix-ui/react-label";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
+  showInNav: z.boolean().default(false),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -49,6 +52,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     defaultValues: initialData || {
       title: "",
       content: "",
+      showInNav: false,
       metaTitle: "",
       metaDescription: "",
       metaKeywords: "",
@@ -316,6 +320,21 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             </FormItem>
           )}
         />
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="showInNav">Show in Navigation</Label>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="showInNav"
+                checked={!!form.watch("showInNav")}
+                onCheckedChange={(checked: boolean) => {
+                  form.setValue("showInNav", !!checked);
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
         <Button type="submit" className="w-full">
           Save

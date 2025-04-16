@@ -7,6 +7,7 @@ import TiptapEditor from "@/components/ui/tiptapeditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/Checkbox";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 import {
@@ -36,6 +37,7 @@ const articleSchema = z.object({
   twitterImage: z.string().url("Twitter Image must be a valid URL").optional(),
   canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
   schemaData: z.string().optional(),
+  showInNav: z.boolean().default(false),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -74,6 +76,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       twitterImage: "",
       canonicalUrl: "",
       schemaData: "",
+      showInNav: false,
     },
   });
 
@@ -129,7 +132,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       twitterDescription: data.twitterDescription,
       twitterImage: data.twitterImage,
       canonicalUrl: data.canonicalUrl,
-      schemaData: data.schemaData
+      schemaData: data.schemaData,
+      showInNav: data.showInNav,
     };
     onSubmit(transformedData);
   };
@@ -398,6 +402,22 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
               </FormItem>
             )}
           />
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="showInNav">Show in Navigation</Label>
+              <div className="flex items-center space-x-2">
+              <Checkbox
+                id="showInNav"
+                checked={!!form.watch("showInNav")}
+                onCheckedChange={(checked: boolean) => {
+                  form.setValue("showInNav", !!checked);
+                }}
+              />
+
+              </div>
+            </div>
+          </div>
         </div>
 
         <Button disabled={isUploading} type="submit" className="w-full mt-6">

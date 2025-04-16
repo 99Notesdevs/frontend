@@ -10,11 +10,12 @@ import TiptapEditor from '@/components/ui/tiptapeditor';
 import { useState } from 'react';
 import Image from 'next/image';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
-import { set } from 'date-fns';
-
+import { Label } from '@radix-ui/react-label';
+import { Checkbox } from "@/components/ui/Checkbox";
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
   content: z.string().min(10, 'Content must be at least 10 characters'),
+  showInNav: z.boolean().default(false),
   imageUrl: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -49,6 +50,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
     defaultValues: {
       title: '',
       content: '',
+      showInNav: false,
       imageUrl: '',
       metaTitle: '',
       metaDescription: '',
@@ -445,6 +447,21 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             </FormItem>
           )}
         />
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="showInNav">Show in Navigation</Label>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="showInNav"
+                checked={!!form.watch("showInNav")}
+                onCheckedChange={(checked: boolean) => {
+                  form.setValue("showInNav", !!checked);
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Submit Button */}
         <div className="flex justify-end">
