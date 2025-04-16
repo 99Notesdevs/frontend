@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { env } from "@/config/env";
+import BlogCard from "@/components/Blogs/BlogCard";
 
 interface Blog {
   id: string;
   title: string;
-  excerpt: string;
-  publishedDate: string;
+  imageUrl: string;
+  metadata: string;
+  createdAt: string;
   content: string;
   slug: string;
 }
@@ -20,7 +22,7 @@ const BlogsPage: React.FC = () => {
   const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const itemsPerPage = 2;
+  const itemsPerPage = 10;
 
   const fetchBlogs = async (searchTerm: string = "") => {
     try {
@@ -73,8 +75,8 @@ const BlogsPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${env.API}/blog/${searchQuery}`);
-      
+      const response = await fetch(`${env.API}/blog/slug/${searchQuery}`);
+      console.log(response);
       if (!response.ok) {
         throw new Error('Failed to search blogs');
       }
@@ -100,19 +102,19 @@ const BlogsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-        <p className="text-red-600">{error}</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <p className="text-red-500 mb-4">{error}</p>
         <button
           onClick={() => fetchBlogs()}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Try Again
         </button>
@@ -121,120 +123,60 @@ const BlogsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center">
-      <div className="container mx-auto px-4 py-8 bg-gray-100 rounded-xl shadow-lg my-8 max-w-7xl">
-        <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 py-5">
-          Blogs
-        </h1>
-        <div className="flex flex-col md:flex-row justify-center gap-6">
-          <div className="w-full md:w-1/4">
-            <div className="mb-4 p-6 rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-300">
-              <form onSubmit={handleSearch}>
-                <input
-                  type="text"
-                  placeholder="Search blogs..."
-                  className="border border-gray-200 p-3 rounded-lg w-full mb-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white p-3 rounded-lg w-full hover:bg-blue-700 transition-all duration-300 mb-4 font-medium shadow-sm hover:shadow-md"
-                  disabled={loading}
-                >
-                  {loading ? 'Loading...' : 'Search'}
-                </button>
-              </form>
-            </div>
-          </div>
-          <div className="w-full md:w-3/4">
-            <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
-              {filteredBlogs.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  {searchQuery ? 'No blogs found' : 'No blogs available'}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {filteredBlogs.map((blog) => (
-                    <div
-                      key={blog.id}
-                      className="rounded-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                    >
-                      <Link
-                        href={`/blogs/${blog.slug}`}
-                        className="block"
-                      >
-                        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6">
-                          <h3 className="text-xl font-semibold text-gray-800 mb-2">{blog.title}</h3>
-                          <p className="text-gray-600 mb-4">{blog.excerpt}</p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500">{new Date(blog.publishedDate).toLocaleDateString()}</span>
-                            <span className="text-blue-600 hover:text-blue-800 font-medium">Read More</span>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {filteredBlogs.length > 0 && (
-                <div className="mt-8 flex justify-center">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-                    
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`px-4 py-2 rounded ${
-                          page === currentPage
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <h1 className="text-3xl font-bold mb-8">Blogs</h1>
 
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+      <form onSubmit={handleSearch} className="mb-8">
+        <div className="flex gap-4">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search blogs..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Search
+          </button>
         </div>
+      </form>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {filteredBlogs.map((blog) => (
+          <BlogCard
+            key={blog.id}
+            blog={{
+              id: blog.id,
+              title: blog.title,
+              createdAt: new Date(blog.createdAt),
+              slug: blog.slug,
+              metadata: blog.metadata,
+              imageUrl: blog.imageUrl
+            }}
+          />
+        ))}
       </div>
-      <style jsx>{`
-        @media (min-width: 1024px) and (max-width: 1550px) {
-          .container {
-            padding: 2.5rem;
-          }
-          .text-4xl {
-            font-size: 2.5rem;
-          }
-          .grid-cols-1 {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .md:w-1/4 {
-            width: 30%;
-          }
-          .md:w-3/4 {
-            width: 70%;
-          }
-        }
-      `}</style>
+
+      <div className="flex justify-center items-center mt-8">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 mx-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <span className="mx-4">Page {currentPage} of {totalPages}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 mx-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
