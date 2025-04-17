@@ -7,6 +7,7 @@ interface Blog {
   title: string;
   createdAt: Date;
   slug: string;
+  content: string;
   metadata: string;
   imageUrl: string;
 }
@@ -17,9 +18,8 @@ interface BlogCardProps {
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
   return (
-    <Link href={`/blogs/${blog.slug}`}>
-    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 h-[360px] flex flex-col">
-      <div className="relative h-[160px] w-full overflow-hidden">
+    <Link href={`/blogs/${blog.slug}`} className="h-[400px] w-full md:w-[275px] lg:w-[275px] xl:w-[275px] bg-white rounded-2xl transition-all duration-300 overflow-hidden">
+      <div className="relative h-[180px] w-full overflow-hidden rounded-xl">
         <Image
           src={blog.imageUrl}
           alt={blog.title}
@@ -28,26 +28,27 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
       </div>
-      <div className="p-4 flex flex-col flex-grow">
-        
-        <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2 h-[32px]">
-          {blog.title}
-        
-        </h3>
-        
-        <div className="flex items-center justify-between flex-grow">
-          <span className="text-sm text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}
+      <div className=" pt-4 flex-1">
+        <div className="space-y-3 ">
+          <h3 className="text-lg font-normal text-gray-800 line-clamp-3">
+            {blog.title}
+          </h3>
+          <span className="text-sm text-gray-500">
+            {new Date(blog.createdAt).toLocaleDateString()}
           </span>
-          
-          <div className="line-clamp-2 h-[32px]">
-            {JSON.parse(blog.metadata)?.metaDescription}
-          </div>
+          <p className="text-gray-600 text-sm line-clamp-4">
+            {blog.content
+              ? blog.content
+                  .replace(/<[^>]*>/g, '')
+                  .replace(/&nbsp;/g, ' ')
+                  .slice(0, 150)
+                  .trim() + (blog.content.length > 150 ? '...' : '')
+              : 'No content available'}
+          </p>
         </div>
       </div>
-    </div>
-  </Link>
+    </Link>
   );
 };
-
 
 export default BlogCard;

@@ -22,7 +22,7 @@ const processContent = (content: string, isAuthorized: boolean) => {
       ? lockedContent
       : `<div class="locked-content">
            <p>${lockedContent}</p>
-           <a href="/users/login" class="login-link">Log in to view</a>
+           <a href="/subscription" class="login-link">Subscribe</a>
          </div>`;
   });
 };

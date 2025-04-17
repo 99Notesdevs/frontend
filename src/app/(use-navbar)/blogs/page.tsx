@@ -123,7 +123,7 @@ const BlogsPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl bg-white rounded-2xl shadow-md">
       <h1 className="text-3xl font-bold mb-8">Blogs</h1>
 
       <form onSubmit={handleSearch} className="mb-8">
@@ -144,7 +144,7 @@ const BlogsPage: React.FC = () => {
         </div>
       </form>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4">
         {filteredBlogs.map((blog) => (
           <BlogCard
             key={blog.id}
@@ -153,6 +153,7 @@ const BlogsPage: React.FC = () => {
               title: blog.title,
               createdAt: new Date(blog.createdAt),
               slug: blog.slug,
+              content: blog.content,
               metadata: blog.metadata,
               imageUrl: blog.imageUrl
             }}
