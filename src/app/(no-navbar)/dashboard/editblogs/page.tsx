@@ -426,7 +426,7 @@ export default function ArticlesPage() {
               defaultValues={{
                 title: selectedPage?.title || '',
                 content: selectedPage?.content || '',
-                slug: selectedPage?.slug || '',
+                // slug: selectedPage?.slug || '',
                 order: selectedPage?.order || 0,
                 imageUrl: selectedPage?.imageUrl || '',
                 metaTitle: JSON.parse(selectedPage.metadata || '')?.metaTitle,

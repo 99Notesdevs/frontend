@@ -30,6 +30,7 @@ const formSchema = z.object({
   twitterImage: z.string().url("Twitter Image must be a valid URL").optional(),
   canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
   schemaData: z.string().optional(),
+  order: z.number().optional(),
 });
 
 export type BlogFormValues = z.infer<typeof formSchema>;

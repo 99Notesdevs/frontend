@@ -51,7 +51,7 @@ interface BlogFormValues {
   twitterImage?: string;
   canonicalUrl?: string;
   schemaData?: string;
-  slug: string;
+  // slug: string;
   order?: number;
 }
 
@@ -98,7 +98,7 @@ export default function PageForm({ editPage = null }: PageFormProps) {
   const handleSubmit = async (data: BlogFormValues) => {
     try {
       // Normalize the slug by replacing spaces with hyphens
-      const normalizedSlug = data.slug.replace(/\s+/g, '-');
+      const normalizedSlug = data.title.replace(/\s+/g, '-').toLowerCase();
       
       // Create metadata object from individual fields
       const metadata = {
