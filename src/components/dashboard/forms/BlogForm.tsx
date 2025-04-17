@@ -30,6 +30,7 @@ const formSchema = z.object({
   twitterImage: z.string().url("Twitter Image must be a valid URL").optional(),
   canonicalUrl: z.string().url("Canonical URL must be a valid URL").optional(),
   schemaData: z.string().optional(),
+  slug: z.string(),
   order: z.number().optional(),
 });
 
@@ -53,11 +54,12 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       title: '',
       content: '',
       imageUrl: '',
+      slug: '',
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',
       robots: '',
-      ogTitle: '',
+      ogTitle: '',  
       ogDescription: '',
       ogImage: '',
       ogType: '',
@@ -174,7 +176,19 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           )}
         />
 
-          
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter slug" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="metaTitle"

@@ -280,22 +280,14 @@ export default function Navbar({ navigation }: NavbarProps) {
                 <NestedNavigation items={navigation} />
                 <Link href="/about" passHref>
                   <span
-                    className={`text-[14px] whitespace-nowrap font-bold tracking-wide py-6 px-2 xl:px-3 transition-colors duration-300 ${
-                      isScrolled
-                        ? "text-gray-800 hover:text-blue-700"
-                        : "text-gray-700 hover:text-blue-600"
-                    }`}
+                    className={`px-3 py-2 text-primary hover:text-primary-active rounded-md text-sm font-inter font-medium tracking-tight transition-colors duration-200 flex items-center`}
                   >
                     About 99Notes
                   </span>
                 </Link>
                 <Link href="/blogs" passHref>
                   <span
-                    className={`text-[14px] whitespace-nowrap font-bold tracking-wide py-6 px-2 xl:px-3 transition-colors duration-300 ${
-                      isScrolled
-                        ? "text-black hover:text-gray-800"
-                        : "text-gray-800 hover:text-blue-700"
-                    }`}
+                    className={`px-3 py-2 text-primary hover:text-primary-active rounded-md text-sm font-inter font-medium tracking-tight transition-colors duration-200 flex items-center`}
                   >
                     Blogs
                   </span>

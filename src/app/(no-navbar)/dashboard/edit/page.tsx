@@ -117,13 +117,14 @@ function PageList() {
       const pageData = {
         id: selectedPage.id,
         title: newTitle,
-        slug:
+        slug: selectedPage.templateId === 'blog' ? formData.slug : (
           selectedPage.title !== newTitle
             ? [
                 ...selectedPage.slug.split("/").slice(0, currentLevel - 1),
                 newSlug,
               ].join("/")
-            : selectedPage.slug,
+            : selectedPage.slug
+        ),
         templateId: selectedPage.templateId,
         parentId: selectedPage.parentId || null,
         imageUrl: formData.imageUrl,
@@ -274,6 +275,7 @@ function PageList() {
           content: parsedContent || "",
           showInNav: false,
           imageUrl: parsedimage || undefined,
+          slug: page.slug || "",
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
           metaKeywords: metadata.metaKeywords || "",

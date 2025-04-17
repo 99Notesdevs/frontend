@@ -161,11 +161,11 @@ export default function ArticlesPage() {
       console.log('Raw form data:', formData);
 
       // Generate slug from title
-      const baseSlug = formData.title
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-      const slug = `${baseSlug}`;
+      // const baseSlug = formData.title
+      //   .toLowerCase()
+      //   .replace(/\s+/g, '-')
+      //   .replace(/[^a-z0-9-]/g, '');
+      // const slug = `${baseSlug}`;
 
       // Create metadata object
       const metadata = {
@@ -192,7 +192,7 @@ export default function ArticlesPage() {
       const updateData = {
         title: formData.title,
         content: formData.content,
-        slug: slug,
+        slug: formData.slug,
         updatedAt: new Date(),
         imageUrl: formData.imageUrl || '',
         metadata: JSON.stringify(metadata)
@@ -426,7 +426,7 @@ export default function ArticlesPage() {
               defaultValues={{
                 title: selectedPage?.title || '',
                 content: selectedPage?.content || '',
-                // slug: selectedPage?.slug || '',
+                slug: selectedPage?.slug || '',
                 order: selectedPage?.order || 0,
                 imageUrl: selectedPage?.imageUrl || '',
                 metaTitle: JSON.parse(selectedPage.metadata || '')?.metaTitle,
