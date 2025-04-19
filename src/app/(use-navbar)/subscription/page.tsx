@@ -86,7 +86,7 @@ export default function SubscriptionPage() {
               >
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl font-bold mb-2">{plan.title}</CardTitle>
-                  <p className="text-3xl font-bold text-primary">{`Rs. ${plan.amount}/${plan.validity} Days`}</p>
+                  <p className="text-3xl font-bold text-primary">{`₹${plan.amount}/${plan.validity} Days`}</p>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-gray-600">

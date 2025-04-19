@@ -48,6 +48,12 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
 
   const navSections = [
     {
+      title: 'Transactions',
+      items: [
+        { name: 'Transactions', path: '/transactions' },
+      ]
+    },
+    {
       title: 'Main',
       items: [
         { name: 'Dashboard', path: '/dashboard' },
