@@ -1,76 +1,70 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { env } from '@/config/env';
 
 export default function SubscriptionPage() {
+  const [plans, setPlans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedSection, setSelectedSection] = useState<'Articles' | 'Books' | 'Notes'>('Articles');
 
-  const plans = [
-    {
-      title: 'Experimentor Pack',
-      price: 'Rs. 9/Day',
-      features: [
-        'Get Access to this article',
-        'Access Lasts upto 48 hours'
-      ],
-      buttonText: 'Buy Now',
-      buttonLink: '#',
-      id: '78645'
-    },
-    {
-      title: 'Refreshment Pack',
-      price: 'Rs. 99/Month',
-      features: [
-        'Get Access to all articles',
-        'Access Lasts upto 30 Days'
-      ],
-      buttonText: 'Buy Now',
-      buttonLink: '#',
-      id: '78646'
-    },
-    {
-      title: 'UPSC Special Pack',
-      price: 'Rs. 999/Year',
-      features: [
-        'Get Access to all articles',
-        'Access upto 365 Days'
-      ],
-      buttonText: 'Buy Now',
-      buttonLink: '#',
-      id: '78647'
-    },
-    {
-      title: 'UPSC Ranker Pack',
-      price: 'Rs. 1999/Day',
-      features: [
-        'Get Access to this article',
-        'Access Lasts upto 3 Years'
-      ],
-      buttonText: 'Buy Now',
-      buttonLink: '#',
-      id: '78648'
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await fetch(`${env.API}/orders/type/Articles`);
+        if (!response.ok) throw new Error('Failed to fetch plans');
+        const { data } = await response.json();
+        setPlans(data);
+      } catch (error) {
+        console.error('Error fetching plans:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  const handleBuyClick = (plan: any) => {
+    // implement buy click logic here
+  };
+
+  const extractFeatures = (description: string) => {
+    const features = [];
+    const lines = description.split('\n');
+    for (const line of lines) {
+      // Match lines that start with numbers followed by a period or dot
+      const match = line.match(/^(\d+\.\s+)(.+)/);
+      if (match) {
+        features.push(match[2].trim());
+      }
     }
-  ];
+    return features.slice(0, 3); // Return only the first 3 features
+  };
 
   const renderContent = () => {
+    if (loading) {
+      return <div>Loading...</div>;
+    }
+
     switch (selectedSection) {
       case 'Articles':
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {plans.map((plan, index) => (
+            {plans.map((plan) => (
               <Card 
-                key={index}
+                key={plan.id}
                 className="border-2 border-amber-500 hover:border-amber-600 hover:border-primary transition-all duration-300"
               >
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl font-bold mb-2">{plan.title}</CardTitle>
-                  <p className="text-3xl font-bold text-primary">{plan.price}</p>
+                  <p className="text-3xl font-bold text-primary">{`Rs. ${plan.amount}/${plan.validity} Days`}</p>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-gray-600">
-                    {plan.features.map((feature, idx) => (
+                    {extractFeatures(plan.description).map((feature, idx) => (
                       <li key={idx} className="flex items-center">
                         <svg
                           className="w-4 h-4 text-green-500 mr-2"
@@ -92,11 +86,9 @@ export default function SubscriptionPage() {
                   <div className="mt-6">
                     <Button
                       className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3"
-                      asChild
+                      onClick={() => handleBuyClick(plan)}
                     >
-                      <a href={`${plan.buttonLink}?add-to-cart=${plan.id}&quantity=1`}>
-                        {plan.buttonText}
-                      </a>
+                      Buy Now
                     </Button>
                   </div>
                 </CardContent>
