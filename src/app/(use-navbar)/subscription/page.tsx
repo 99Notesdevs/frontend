@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { env } from '@/config/env';
+import Cookies from 'js-cookie';
 
 export default function SubscriptionPage() {
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSection, setSelectedSection] = useState<'Articles' | 'Books' | 'Notes'>('Articles');
+  const token = Cookies.get('token');
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -27,8 +29,32 @@ export default function SubscriptionPage() {
     fetchPlans();
   }, []);
 
-  const handleBuyClick = (plan: any) => {
+  const handleBuyClick = async (plan: any) => {
     // implement buy click logic here
+    const data = {
+      name: "test",
+      mobileNumber: "test",
+      orderId: plan.id,
+      amount: plan.amount,
+      validity: plan.validity,
+    }
+    console.log(data);
+    const response = await fetch(`${env.API}/payment/create-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    if (response.status === 401) {
+      alert('Please login to continue');
+      window.location.href = '/users/login';
+      return;
+    }
+    const responseData = await response.json();
+    window.location.href = responseData.data;
+    console.log(responseData);
   };
 
   const extractFeatures = (description: string) => {
