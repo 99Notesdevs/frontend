@@ -29,6 +29,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React, { useState, useEffect } from "react";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+
 
 const lowlight = createLowlight(common);
 
@@ -144,39 +149,29 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        codeBlock: false, // Disable codeBlock from StarterKit
-        heading: false,   // Disable heading from StarterKit
+        bulletList: { keepMarks: true, keepAttributes: false },
+        orderedList: { keepMarks: true, keepAttributes: false },
+        codeBlock: false,
+        heading: false,
       }),
-      Heading.configure({
-        levels: [1, 2, 3, 4, 5, 6],
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
-      }),
-      Link.configure({
-        openOnClick: false,
-      }),
+      Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
+      CodeBlockLowlight.configure({ lowlight }),
+      Link.configure({ openOnClick: false }),
       Image,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
       Color,
       TextStyle,
       FontSize,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableCell,
+      TableHeader,
     ],
     content: content,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       if (html !== content) {
-        onChange(html);
+        onChange(html); // Ensure the updated content is passed to the parent
       }
     },
     editorProps: {
@@ -189,9 +184,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
 
   useEffect(() => {
     if (editor && content) {
-      // Only update content if it's different
       if (editor.getHTML() !== content) {
-        editor.commands.setContent(content, false); // false to prevent focusing
+        editor.commands.setContent(content, false); // Prevent focusing
       }
     }
   }, [editor, content]);
@@ -238,6 +232,30 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     }
   };
 
+  const addTable = () => {
+    if (!editor) return;
+    editor
+      .chain()
+      .focus()
+      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+      .run();
+  };
+
+  const addRow = () => {
+    if (!editor) return;
+    editor.chain().focus().addRowAfter().run();
+  };
+
+  const addColumn = () => {
+    if (!editor) return;
+    editor.chain().focus().addColumnAfter().run();
+  };
+
+  const deleteTable = () => {
+    if (!editor) return;
+    editor.chain().focus().deleteTable().run();
+  };
+
   if (!editor) {
     return null;
   }
@@ -262,12 +280,16 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
           <>
             <select
               className="h-8 rounded border border-input bg-transparent px-2 text-sm"
-              value={editor.isActive('heading') ? `h${editor.getAttributes('heading').level}` : ''}
+              value={
+                editor.isActive("heading")
+                  ? `h${editor.getAttributes("heading").level}`
+                  : ""
+              }
               onChange={(e) => {
-                if (e.target.value === '') {
+                if (e.target.value === "") {
                   editor.chain().focus().setParagraph().run();
                 } else {
-                  const level = parseInt(e.target.value.replace('h', ''));
+                  const level = parseInt(e.target.value.replace("h", ""));
                   setHeading(level);
                 }
               }}
@@ -321,6 +343,26 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               icon={<Code className="w-5 h-5" />}
               label="Code Block"
               isActive={editor.isActive("codeBlock")}
+            />
+            <ToolbarButton
+              onClick={addTable}
+              icon={<span className="w-5 h-5">📋</span>}
+              label="Add Table"
+            />
+            <ToolbarButton
+              onClick={addRow}
+              icon={<span className="w-5 h-5"> Row</span>}
+              label="Add Row"
+            />
+            <ToolbarButton
+              onClick={addColumn}
+              icon={<span className="w-5 h-5"> Col</span>}
+              label="Add Column"
+            />
+            <ToolbarButton
+              onClick={deleteTable}
+              icon={<span className="w-5 h-5"> Table</span>}
+              label="Delete Table"
             />
             <input
               type="color"
@@ -394,7 +436,10 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
           }}
         />
       ) : (
-        <EditorContent editor={editor} className="prose prose-slate max-w-none p-4" />
+        <EditorContent
+          editor={editor}
+          className="prose prose-slate max-w-none p-4"
+        />
       )}
     </div>
   );
