@@ -285,7 +285,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                     About 99Notes
                   </span>
                 </Link>
-                <Link href="/blogs" passHref>
+                <Link href="/blog" passHref>
                   <span
                     className={`px-3 py-2 text-primary hover:text-primary-active rounded-md text-sm font-inter font-medium tracking-tight transition-colors duration-200 flex items-center`}
                   >

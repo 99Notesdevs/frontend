@@ -18,7 +18,7 @@ interface BlogCardProps {
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
   return (
-    <Link href={`/blogs/${blog.slug}`} className="h-[400px] w-full md:w-[275px] lg:w-[275px] xl:w-[275px] bg-white rounded-2xl transition-all duration-300 overflow-hidden">
+    <Link href={`/blog/${blog.slug}`} className="h-[400px] w-full md:w-[275px] lg:w-[275px] xl:w-[275px] bg-white rounded-2xl transition-all duration-300 overflow-hidden">
       <div className="relative h-[180px] w-full overflow-hidden rounded-xl">
         <Image
           src={blog.imageUrl}
