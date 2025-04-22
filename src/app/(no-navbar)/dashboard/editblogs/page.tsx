@@ -7,12 +7,7 @@ import Cookie from "js-cookie";
 import {
   PencilIcon,
   TrashIcon,
-  EyeIcon,
-  ArrowLeftIcon,
-  CalendarIcon,
-  CalendarDaysIcon,
-  XMarkIcon,
-  CheckIcon,
+ 
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { BlogForm } from "@/components/dashboard/forms";
