@@ -148,15 +148,18 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const getPagesForLevel = (level: number): PageWithRelations[] => {
     // For level 0, return only root pages (no parent)
     if (level === 0) {
-      return pages.filter((page) => !page.parent);
+      return pages.filter((page) => !page.parent && page.showInNav);
     }
 
     const parentId = selectedLevels[level - 1];
     if (!parentId) return [];
 
-    // Filter by both parent ID and level to prevent duplicate levels
+    // Filter by both parent ID, level, and showInNav to prevent duplicate levels
     return pages.filter(
-      (page) => page.parent?.id === parentId && page.level === level + 1
+      (page) => 
+        page.parent?.id === parentId && 
+        page.level === level + 1 && 
+        page.showInNav
     );
   };
 
