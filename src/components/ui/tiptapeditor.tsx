@@ -260,6 +260,10 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     return null;
   }
 
+  const formatHTML = (html: string) => {
+    return html.replace(/></g, ">\n<");
+  }
+
   return (
     <div className="border border-input rounded-lg">
       <input
@@ -425,7 +429,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       {isHtmlMode ? (
         <textarea
           className="w-full min-h-[500px] p-4 font-mono text-sm focus:outline-none resize-none"
-          value={htmlContent}
+          value={formatHTML(htmlContent)}
           onChange={(e) => {
             const newContent = e.target.value;
             setHtmlContent(newContent);
