@@ -32,11 +32,11 @@ export default function LoginPage() {
         Cookies.set('token', response.data.data.token, { expires: 5 });
         router.push('/dashboard/manageemployees');
       } else {
-        setError('Invalid credentials');
+        setError('wrong-password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('An error occurred during login. Please try again.');
+      setError('wrong-password');
     } finally {
       setLoading(false);
     }
@@ -57,11 +57,11 @@ export default function LoginPage() {
         Cookies.set('token', response.data.data, { expires: 5 });
         router.push('/dashboard/edit');
       } else {
-        setError('Invalid credentials');
+        setError('wrong-password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('An error occurred during login. Please try again.');
+      setError('wrong-password');
     } finally {
       setLoading(false);
     }
@@ -82,56 +82,54 @@ export default function LoginPage() {
         Cookies.set('token', response.data.data, { expires: 5 });
         router.push('/dashboard/add');
       } else {
-        setError('Invalid credentials');
+        setError('wrong-password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('An error occurred during login. Please try again.');
+      setError('wrong-password');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 shadow-xl rounded-2xl bg-white/80 backdrop-blur-md border border-gray-200 p-8">
+        <div className="flex flex-col items-center">
+          <h2 className="mt-2 text-center text-4xl font-bold tracking-tight text-slate-900 font-sans">
+            Welcome Back
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Choose your role to continue
+          <p className="mt-2 text-center text-base text-slate-500 font-medium">
+            Please select your role to sign in
           </p>
         </div>
-
         {!showAdminForm && !showEditorForm && !showAuthorForm && (
           <div className="mt-8 space-y-4">
             <button
               onClick={() => setShowAdminForm(true)}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className="group relative w-full flex justify-center py-3 px-4 border border-gray-200 text-base font-semibold rounded-lg text-white bg-slate-700 shadow-sm hover:bg-slate-500 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400"
             >
               Sign in as Admin
             </button>
             <button
               onClick={() => setShowEditorForm(true)}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-3 px-4 border border-slate-400 text-base font-semibold rounded-lg text-slate-900 bg-white shadow-sm hover:bg-slate-500 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
             >
               Sign in as Editor
             </button>
             <button
               onClick={() => setShowAuthorForm(true)}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="group relative w-full flex justify-center py-3 px-4 border border-gray-200 text-base font-semibold rounded-lg text-white bg-slate-700 shadow-sm hover:bg-slate-500 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400"
             >
               Sign in as Author
             </button>
           </div>
         )}
-
         {showAdminForm && (
-          <form className="mt-8 space-y-6" onSubmit={handleAdminLogin}>
-            <div className="rounded-md shadow-sm -space-y-px">
+          <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleAdminLogin}>
+            <div className="rounded-lg shadow-sm space-y-4 bg-gray-50/60 p-6">
               <div>
-                <label htmlFor="email-address" className="sr-only">
+                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
                   Email address
                 </label>
                 <input
@@ -142,12 +140,12 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-red-400 sm:text-sm transition-all duration-150"
                   placeholder="Email address"
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
                 <input
@@ -158,12 +156,12 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-red-400 sm:text-sm transition-all duration-150"
                   placeholder="Password"
                 />
               </div>
               <div>
-                <label htmlFor="secret" className="sr-only">
+                <label htmlFor="secret" className="block text-sm font-medium text-gray-700 mb-1">
                   Secret Key
                 </label>
                 <input
@@ -173,35 +171,32 @@ export default function LoginPage() {
                   required
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-red-400 sm:text-sm transition-all duration-150"
                   placeholder="Secret Key"
                 />
               </div>
             </div>
-
-            {error && (
-              <div className="text-red-500 text-sm mt-2">
-                {error}
+            {error === 'wrong-password' && (
+              <div className="text-red-500 text-sm mt-2 text-center animate-shake">
+                Wrong password. Please try again.
               </div>
             )}
-
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-semibold rounded-lg text-white bg-slate-700 shadow-sm hover:bg-slate-500 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 disabled:opacity-70"
               >
                 {loading ? 'Logging in...' : 'Sign in'}
               </button>
             </div>
           </form>
         )}
-
         {showEditorForm && (
-          <form className="mt-8 space-y-6" onSubmit={handleEditorLogin}>
-            <div className="rounded-md shadow-sm -space-y-px">
+          <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleEditorLogin}>
+            <div className="rounded-lg shadow-sm space-y-4 bg-gray-50/60 p-6">
               <div>
-                <label htmlFor="email-address" className="sr-only">
+                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
                   Email address
                 </label>
                 <input
@@ -212,12 +207,12 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 sm:text-sm transition-all duration-150"
                   placeholder="Email address"
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
                 <input
@@ -228,35 +223,32 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 sm:text-sm transition-all duration-150"
                   placeholder="Password"
                 />
               </div>
             </div>
-
-            {error && (
-              <div className="text-red-500 text-sm mt-2">
-                {error}
+            {error === 'wrong-password' && (
+              <div className="text-red-500 text-sm mt-2 text-center animate-shake">
+                Wrong password. Please try again.
               </div>
             )}
-
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-semibold rounded-lg text-white bg-slate-700 shadow-sm hover:bg-slate-500 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 disabled:opacity-70"
               >
                 {loading ? 'Logging in...' : 'Sign in'}
               </button>
             </div>
           </form>
         )}
-
         {showAuthorForm && (
-          <form className="mt-8 space-y-6" onSubmit={handleAuthorLogin}>
-            <div className="rounded-md shadow-sm -space-y-px">
+          <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleAuthorLogin}>
+            <div className="rounded-lg shadow-sm space-y-4 bg-gray-50/60 p-6">
               <div>
-                <label htmlFor="email-address" className="sr-only">
+                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
                   Email address
                 </label>
                 <input
@@ -267,12 +259,12 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 sm:text-sm transition-all duration-150"
                   placeholder="Email address"
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
                 <input
@@ -283,30 +275,27 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 sm:text-sm transition-all duration-150"
                   placeholder="Password"
                 />
               </div>
             </div>
-
-            {error && (
-              <div className="text-red-500 text-sm mt-2">
-                {error}
+            {error === 'wrong-password' && (
+              <div className="text-red-500 text-sm mt-2 text-center animate-shake">
+                Wrong password. Please try again.
               </div>
             )}
-
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-semibold rounded-lg text-white bg-slate-700 shadow-sm hover:bg-slate-500 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 disabled:opacity-70"
               >
                 {loading ? 'Logging in...' : 'Sign in'}
               </button>
             </div>
           </form>
         )}
-
         {(showAdminForm || showEditorForm || showAuthorForm) && (
           <button
             onClick={() => {
@@ -314,7 +303,7 @@ export default function LoginPage() {
               setShowEditorForm(false);
               setShowAuthorForm(false);
             }}
-            className="mt-4 text-sm text-gray-600 hover:text-gray-900"
+            className="mt-6 w-full text-base text-gray-500 hover:text-gray-800 font-medium transition-all duration-150 underline underline-offset-2"
           >
             Back to role selection
           </button>

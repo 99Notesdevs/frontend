@@ -261,27 +261,31 @@ const ArticleList = () => {
   };
 
   return (
-    <div className="article-list-container container mx-auto px-4 py-6 max-w-4xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Sort Pages</h1>
-      {flattenedPages.length === 0 ? (
-        <p className="text-gray-500">No pages found.</p>
-      ) : (
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={flattenedPages.map((page) => page.id)}
-            strategy={verticalListSortingStrategy}
+    <div className="container mx-auto px-2 sm:px-4 py-8 max-w-2xl">
+      <div className="bg-white/90 shadow-xl rounded-2xl border border-slate-100 p-6">
+        <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">Sort Pages</h1>
+        {flattenedPages.length === 0 ? (
+          <p className="text-slate-500 text-center">No pages found.</p>
+        ) : (
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <div className="article-list space-y-4">
-              {flattenedPages.map((page) => (
-                <SortableItem key={page.id} page={page} />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      )}
+            <SortableContext
+              items={flattenedPages.map((page) => page.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {flattenedPages.map((page) => (
+                  <div key={page.id} className="bg-slate-50 rounded-lg shadow flex items-center px-4 py-3 border border-slate-200 hover:bg-slate-100 transition-all">
+                    <SortableItem page={page} />
+                  </div>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
+      </div>
     </div>
   )
 }

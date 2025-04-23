@@ -267,11 +267,13 @@ export default function ManageEmployees() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className={`${plusJakarta.className} text-2xl font-bold`}>Manage Employees</h1>
+      <div className="flex justify-between items-center mb-6 mt-14 sm:mt-0">
+        <h1 className={`${plusJakarta.className} text-2xl font-bold`}>
+          Manage Employees
+        </h1>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition-colors"
         >
           <FaPlus /> Add Employee
         </button>
@@ -333,7 +335,7 @@ export default function ManageEmployees() {
             <div className="flex gap-3">
               <button
                 onClick={handleAddEmployee}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition-colors"
               >
                 Add Employee
               </button>

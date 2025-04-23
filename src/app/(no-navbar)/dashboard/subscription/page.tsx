@@ -105,181 +105,155 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Manage Orders</h1>
-      
-      <div className="mb-6">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Title</label>
-          <input
-            type="text"
-            value={newOrderTitle}
-            onChange={(e) => setNewOrderTitle(e.target.value)}
-            placeholder="Enter order title"
-            className="border rounded p-2"
-          />
+    <div className="container mx-auto max-w-5xl px-2 sm:px-6 py-8">
+      <div className="bg-white/90 shadow-xl rounded-2xl border border-slate-100 p-6">
+        <h1 className="text-2xl font-bold text-slate-800 mb-8 text-center">Manage Article Subscriptions</h1>
+        {/* Create Order Form */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              placeholder="Title"
+              value={newOrderTitle}
+              onChange={e => setNewOrderTitle(e.target.value)}
+            />
+            <input
+              className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              placeholder="Description"
+              value={newOrderDescription}
+              onChange={e => setNewOrderDescription(e.target.value)}
+            />
+            <input
+              type="number"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              placeholder="Amount (Rs.)"
+              value={newOrderAmount}
+              onChange={e => setNewOrderAmount(Number(e.target.value))}
+            />
+            <input
+              type="number"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              placeholder="Validity (Days)"
+              value={newOrderValidity}
+              onChange={e => setNewOrderValidity(Number(e.target.value))}
+            />
+          </div>
+          <button
+            className="mt-4 w-full sm:w-auto px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 text-white font-semibold shadow transition"
+            onClick={createOrder}
+          >
+            Create Order
+          </button>
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Description</label>
-          <input
-            type="text"
-            value={newOrderDescription}
-            onChange={(e) => setNewOrderDescription(e.target.value)}
-            placeholder="Enter order description"
-            className="border rounded p-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Amount (Rs.)</label>
-          <input
-            type="number"
-            value={newOrderAmount}
-            onChange={(e) => setNewOrderAmount(Number(e.target.value))}
-            placeholder="Enter amount"
-            className="border rounded p-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Validity (Days)</label>
-          <input
-            type="number"
-            value={newOrderValidity}
-            onChange={(e) => setNewOrderValidity(Number(e.target.value))}
-            placeholder="Enter validity"
-            className="border rounded p-2"
-          />
-        </div>
-
-        <button
-          onClick={createOrder}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Create Order
-        </button>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Title</th>
-              <th className="border p-2">Description</th>
-              <th className="border p-2">Amount (Rs.)</th>
-              <th className="border p-2">Validity (Days)</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="border p-2">{order.title}</td>
-                <td className="border p-2">{order.description}</td>
-                <td className="border p-2">{order.amount}</td>
-                <td className="border p-2">{order.validity}</td>
-                <td className="border p-2">
-                  <button
-                    onClick={() => setEditingOrder(order)}
-                    className="bg-green-500 text-white px-2 py-1 rounded mr-2 hover:bg-green-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteOrder(order.id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
+        {/* Orders Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-slate-100">
+                <th className="border-b p-3 text-slate-700 font-semibold uppercase">Title</th>
+                <th className="border-b p-3 text-slate-700 font-semibold uppercase">Description</th>
+                <th className="border-b p-3 text-slate-700 font-semibold uppercase">Amount (Rs.)</th>
+                <th className="border-b p-3 text-slate-700 font-semibold uppercase">Validity (Days)</th>
+                <th className="border-b p-3 text-slate-700 font-semibold uppercase">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {editingOrder && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Edit Order</h2>
-          
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Title</label>
-            <input
-              type="text"
-              value={editingOrder.title}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  title: e.target.value
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Description</label>
-            <input
-              type="text"
-              value={editingOrder.description}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  description: e.target.value
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Amount (Rs.)</label>
-            <input
-              type="number"
-              value={editingOrder.amount}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  amount: Number(e.target.value)
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Validity (Days)</label>
-            <input
-              type="number"
-              value={editingOrder.validity}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  validity: Number(e.target.value)
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex space-x-2">
-            <button
-              onClick={() => updateOrder(editingOrder)}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-            >
-              Save Changes
-            </button>
-            <button
-              onClick={() => setEditingOrder(null)}
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-            >
-              Cancel
-            </button>
-          </div>
+            </thead>
+            <tbody>
+              {orders.map(order => (
+                <tr key={order.id} className="even:bg-slate-50 hover:bg-slate-100 transition">
+                  <td className="p-3 text-slate-900 font-medium">{order.title}</td>
+                  <td className="p-3 text-slate-700">{order.description}</td>
+                  <td className="p-3 text-slate-700">₹{order.amount}</td>
+                  <td className="p-3 text-slate-700">{order.validity}</td>
+                  <td className="p-3">
+                    <button className="px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white mr-2 text-xs font-semibold transition" onClick={() => setEditingOrder(order)}>Edit</button>
+                    <button className="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition" onClick={() => deleteOrder(order.id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
+        {editingOrder && (
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Edit Order</h2>
+            
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Title</label>
+              <input
+                type="text"
+                value={editingOrder.title}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    title: e.target.value
+                  });
+                }}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Description</label>
+              <input
+                type="text"
+                value={editingOrder.description}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    description: e.target.value
+                  });
+                }}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Amount (Rs.)</label>
+              <input
+                type="number"
+                value={editingOrder.amount}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    amount: Number(e.target.value)
+                  });
+                }}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Validity (Days)</label>
+              <input
+                type="number"
+                value={editingOrder.validity}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    validity: Number(e.target.value)
+                  });
+                }}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              />
+            </div>
+
+            <div className="flex space-x-2">
+              <button
+                className="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow transition"
+                onClick={() => updateOrder(editingOrder)}
+              >
+                Save Changes
+              </button>
+              <button
+                className="px-6 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white font-semibold shadow transition"
+                onClick={() => setEditingOrder(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-      

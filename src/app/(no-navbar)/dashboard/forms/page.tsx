@@ -123,73 +123,62 @@ const FormsPage = () => {
                  variant="destructive"
                  onClick={handleDeleteSelected}
                  disabled={selectedFormIds.length === 0}
+                 className="bg-red-600 hover:bg-red-700 border-red-700"
                >
-                 <Trash className="h-4 w-4 mr-2" />
-                 Delete Selected
+                 <Trash className="h-4 w-4 mr-2 text-white" />
+                 <div className="text-white">Delete Selected</div>
                </Button>
              </div>
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <table className="min-w-full">
-              <thead className="bg-slate-100">
-                <tr>
-                  <th className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedFormIds.length === forms.length}
-                      onChange={handleSelectAll}
-                    />
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-slate-900">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-slate-900">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-slate-900">
-                    Mobile
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-slate-900">
-                    Message
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-slate-900">
-                    Submitted At
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {forms.map((form) => (
-                  <tr key={form.id} className="border-t">
-                    <td className="px-4 py-4">
+          <div className="bg-white shadow-md rounded-lg overflow-hidden border border-slate-200 sm:mx-0 mx-[-1.5rem] sm:mt-0 mt-4">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-100 text-sm">
+                <thead className="bg-slate-100">
+                  <tr>
+                    <th className="px-4 py-3">
                       <input
                         type="checkbox"
-                        checked={selectedFormIds.includes(form.id)}
-                        onChange={() => handleSelectForm(form.id)}
+                        checked={selectedFormIds.length === forms.length}
+                        onChange={handleSelectAll}
+                        className="accent-indigo-500 w-4 h-4 rounded border-slate-300 focus:ring-2 focus:ring-indigo-400"
                       />
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      {form.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      <a
-                        href={`mailto:${form.email}`}
-                        className="text-blue-500 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {form.email}
-                      </a>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      {form.phone}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">{form.message}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(form.createdAt).toLocaleString()}
-                    </td>
+                    </th>
+                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Name</th>
+                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Email</th>
+                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Mobile</th>
+                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Message</th>
+                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Submitted At</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {forms.map((form, idx) => (
+                    <tr key={form.id} className={`transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'} hover:bg-slate-100`}>
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedFormIds.includes(form.id)}
+                          onChange={() => handleSelectForm(form.id)}
+                          className="accent-indigo-500 w-4 h-4 rounded border-slate-300 focus:ring-2 focus:ring-indigo-400"
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-slate-900 font-medium">{form.name}</td>
+                      <td className="px-6 py-4 text-slate-700">
+                        <a
+                          href={`mailto:${form.email}`}
+                          className="text-indigo-600 hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {form.email}
+                        </a>
+                      </td>
+                      <td className="px-6 py-4 text-slate-700">{form.phone}</td>
+                      <td className="px-6 py-4 text-slate-700 max-w-xs break-words">{form.message}</td>
+                      <td className="px-6 py-4 text-slate-500 text-xs">{new Date(form.createdAt).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           </>
         )}
