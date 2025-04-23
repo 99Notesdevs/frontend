@@ -1,7 +1,21 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* Import Tailwind CSS */
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+/* Set default font family */
+@layer base {
+  html {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6, p, span, div, a {
+    font-family: 'Poppins', sans-serif;
+  }
+}
 
 /* Yellow icon styling */
 .yellow-icon {

@@ -18,116 +18,66 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
-// Navigation items organized by role
+// Navigation items organized by role and category
 const navigationItems = {
   admin: [
-    // Employee Management
-    { 
-      icon: FaEdit, 
-      text: "Manage Employees", 
-      path: "/dashboard/manageemployees" 
+    {
+      category: "Employee Management",
+      items: [
+        { icon: FaEdit, text: "Manage Employees", path: "/dashboard/manageemployees" },
+        { icon: FaPlus, text: "Add Admin", path: "/dashboard/addadmin" }
+      ]
     },
-    { 
-      icon: FaPlus, 
-      text: "Add Admin", 
-      path: "/dashboard/addadmin" 
+    {
+      category: "Content Management",
+      items: [
+        { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
+        { icon: FaEdit, text: "Edit Articles", path: "/dashboard/edit" },
+        { icon: FaPlus, text: "Add Current Affair", path: "/dashboard/current-affair" },
+        { icon: FaEdit, text: "Edit Current Affairs", path: "/dashboard/editcurrent" },
+        { icon: FaPlus, text: "Add Blogs", path: "/dashboard/blogs" },
+        { icon: FaEdit, text: "Manage Blogs", path: "/dashboard/editblogs" }
+      ]
     },
-    // Content Management
-    { 
-      icon: FaPlus, 
-      text: "Add Article", 
-      path: "/dashboard/add" 
+    {
+      category: "Site Management",
+      items: [
+        { icon: FaEdit, text: "Edit About99", path: "/dashboard/update-about" },
+        { icon: FaEdit, text: "Manage Forms", path: "/dashboard/forms" }
+      ]
     },
-    { 
-      icon: FaEdit, 
-      text: "Edit Articles", 
-      path: "/dashboard/edit" 
+    {
+      category: "Content Organization",
+      items: [
+        { icon: FaEdit, text: "Sort Articles", path: "/dashboard/sort" },
+        { icon: FaEdit, text: "Sort Current Affairs", path: "/dashboard/sortCurrent" }
+      ]
     },
-    { 
-      icon: FaPlus, 
-      text: "Add Current Affair", 
-      path: "/dashboard/current-affair" 
-    },
-    { 
-      icon: FaEdit, 
-      text: "Edit Current Affairs", 
-      path: "/dashboard/editcurrent" 
-    },
-    { 
-      icon: FaPlus, 
-      text: "Add Blogs", 
-      path: "/dashboard/blogs" 
-    },
-    { 
-      icon: FaEdit, 
-      text: "Manage Blogs", 
-      path: "/dashboard/editblogs" 
-    },
-
-    // Site Management
-    { 
-      icon: FaEdit, 
-      text: "Edit About99", 
-      path: "/dashboard/update-about" 
-    },
-    { 
-      icon: FaEdit, 
-      text: "Manage Forms", 
-      path: "/dashboard/forms" 
-    },
-
-    // Sorting
-    { 
-      icon: FaEdit, 
-      text: "Sort", 
-      path: "/dashboard/sort" 
-    },
-    { 
-      icon: FaEdit, 
-      text: "Sort Current Affairs", 
-      path: "/dashboard/sortCurrent" 
-    },
-
-    // Subscription Management
-    { 
-      icon: FaEdit, 
-      text: "Manage Subscriptions", 
-      path: "/dashboard/subscription" 
+    {
+      category: "Subscription",
+      items: [
+        { icon: FaEdit, text: "Manage Subscriptions", path: "/dashboard/subscription" }
+      ]
     }
   ],
   author: [
-    { 
-      icon: FaPlus, 
-      text: "Add Article", 
-      path: "/dashboard/add" 
-    },
-    { 
-      icon: FaPlus, 
-      text: "Add Current Affair", 
-      path: "/dashboard/current-affair" 
-    },
-    { 
-      icon: FaPlus, 
-      text: "Add Blogs", 
-      path: "/dashboard/blogs" 
-    },
-
+    {
+      category: "Content Creation",
+      items: [
+        { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
+        { icon: FaPlus, text: "Add Current Affair", path: "/dashboard/current-affair" },
+        { icon: FaPlus, text: "Add Blogs", path: "/dashboard/blogs" }
+      ]
+    }
   ],
   editor: [
-    { 
-      icon: FaEdit, 
-      text: "Edit Articles", 
-      path: "/dashboard/edit" 
-    },
     {
-      icon: FaEdit, 
-      text: "Manage Blogs", 
-      path: "/dashboard/editblogs" 
-    },
-    { 
-      icon: FaEdit, 
-      text: "Edit Current Affairs", 
-      path: "/dashboard/editcurrent" 
+      category: "Content Management",
+      items: [
+        { icon: FaEdit, text: "Edit Articles", path: "/dashboard/edit" },
+        { icon: FaEdit, text: "Manage Blogs", path: "/dashboard/editblogs" },
+        { icon: FaEdit, text: "Edit Current Affairs", path: "/dashboard/editcurrent" }
+      ]
     }
   ]
 };
@@ -213,24 +163,38 @@ export default function DashboardLayout({
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-          {navigation.map((item, idx) => {
-            const isActive = pathname === item.path;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.path}
-                onClick={() => { router.push(item.path); setSidebarOpen(false); }}
-                className={`group flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-150 text-left text-base font-medium
-                  ${isActive ? "bg-slate-700 text-white border-l-4 border-indigo-500" : "text-slate-300 hover:bg-slate-700 hover:text-white"}
-                `}
-                style={{ outline: "none" }}
-              >
-                <Icon className="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" />
-                <span className="truncate">{item.text}</span>
-              </button>
-            );
-          })}
+        <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
+          {navigation.map((section, sectionIdx) => (
+            <div key={section.category} className="mb-4">
+              <h3 className="px-4 mb-2 text-xs font-semibold text-white uppercase tracking-wider">
+                {section.category}
+              </h3>
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = pathname === item.path;
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.path}
+                      onClick={() => { router.push(item.path); setSidebarOpen(false); }}
+                      className={`group relative flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-150 text-left text-base font-medium
+                        ${isActive 
+                          ? "bg-white/10 text-white border-l-4 border-white" 
+                          : "text-slate-300 hover:bg-slate-700/50 hover:text-white"}
+                      `}
+                      title={item.text}
+                    >
+                      <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+                      <span className="truncate">{item.text}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {sectionIdx < navigation.length - 1 && (
+                <div className="my-4 border-t border-slate-700/50" />
+              )}
+            </div>
+          ))}
         </nav>
       </aside>
       {/* Sidebar toggle button for mobile */}
