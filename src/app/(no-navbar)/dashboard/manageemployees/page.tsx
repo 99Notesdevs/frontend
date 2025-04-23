@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { env } from '@/config/env';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaExclamationTriangle } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -41,6 +41,11 @@ export default function ManageEmployees() {
   });
 
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+
+  const [showEditPassword, setShowEditPassword] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteEmployeeId, setDeleteEmployeeId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEmployees();
@@ -182,10 +187,6 @@ export default function ManageEmployees() {
   };
 
   const handleDeleteEmployee = async (id: string, role: 'editor' | 'author') => {
-    if (!window.confirm('Are you sure you want to delete this employee?')) {
-      return;
-    }
-
     try {
       const token = Cookies.get('token');
       if (!token) {
@@ -257,6 +258,18 @@ export default function ManageEmployees() {
     setEditingEmployee(null);
   };
 
+  const handleDeleteClick = (id: string) => {
+    setDeleteEmployeeId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteEmployee = async () => {
+    if (!deleteEmployeeId) return;
+    await handleDeleteEmployee(deleteEmployeeId, 'editor');
+    setShowDeleteModal(false);
+    setDeleteEmployeeId(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -267,13 +280,11 @@ export default function ManageEmployees() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6 mt-14 sm:mt-0">
-        <h1 className={`${plusJakarta.className} text-2xl font-bold`}>
-          Manage Employees
-        </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className={`${plusJakarta.className} text-2xl font-bold`}>Manage Employees</h1>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
         >
           <FaPlus /> Add Employee
         </button>
@@ -335,7 +346,7 @@ export default function ManageEmployees() {
             <div className="flex gap-3">
               <button
                 onClick={handleAddEmployee}
-                className="px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
               >
                 Add Employee
               </button>
@@ -384,7 +395,7 @@ export default function ManageEmployees() {
                         <FaEdit />
                       </button>
                       <button
-                        onClick={() => handleDeleteEmployee(employee.id, 'editor')}
+                        onClick={() => handleDeleteClick(employee.id)}
                         className="text-red-600 hover:text-red-800"
                       >
                         <FaTrash />
@@ -433,7 +444,7 @@ export default function ManageEmployees() {
                         <FaEdit />
                       </button>
                       <button
-                        onClick={() => handleDeleteEmployee(employee.id, 'author')}
+                        onClick={() => handleDeleteClick(employee.id)}
                         className="text-red-600 hover:text-red-800"
                       >
                         <FaTrash />
@@ -448,61 +459,98 @@ export default function ManageEmployees() {
 
       {editingEmployee && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full relative">
+          <div className="bg-white rounded-lg p-10 max-w-md w-full relative shadow-lg">
             <button
               onClick={handleCancelEdit}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
               ×
             </button>
-            <h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
+            <h2 className="text-xl font-semibold mb-6">Edit Employee</h2>
             <form onSubmit={handleUpdateEmployee}>
               {editingEmployee.role === 'author' && (
-                <div>
+                <div className="mb-4">
                   <label className="block text-sm font-medium mb-1">Name</label>
                   <input
                     type="text"
                     value={newEmployee.name}
                     onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
                     required
                   />
                 </div>
               )}
-              <div>
+              <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Email</label>
                 <input
                   type="email"
                   value={newEmployee.email}
                   onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
                   required
                 />
               </div>
-              <div>
+              <div className="mb-6">
                 <label className="block text-sm font-medium mb-1">Password</label>
-                <input
-                  type="password"
-                  value={newEmployee.password}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showEditPassword ? "text" : "password"}
+                    value={newEmployee.password}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
+                    className="w-full border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                    onClick={() => setShowEditPassword((prev) => !prev)}
+                    tabIndex={-1}
+                  >
+                    {showEditPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </div>
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
                 >
                   Save Changes
                 </button>
                 <button
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 transition-colors"
+                  className="px-4 py-2 bg-white text-slate-700 rounded-md hover:bg-slate-100 transition-colors"
+                  type="button"
                 >
                   Cancel
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full relative">
+            <div className="flex flex-col items-center">
+              <FaExclamationTriangle className="text-yellow-500 text-4xl mb-3" />
+              <h2 className="text-lg font-bold text-slate-800 mb-2">Confirm Deletion</h2>
+              <p className="text-slate-600 mb-6 text-center">Are you sure you want to delete this employee? This action cannot be undone.</p>
+              <div className="flex gap-4 w-full justify-center">
+                <button
+                  className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white font-semibold"
+                  onClick={confirmDeleteEmployee}
+                >
+                  Delete
+                </button>
+                <button
+                  className="px-4 py-2 rounded bg-slate-200 text-slate-700 hover:bg-slate-300 font-semibold"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
