@@ -77,7 +77,7 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
           {getCurrentSlideImages().map((image, idx) => (
             image.src && (
               <div key={idx} className="relative aspect-[4/3] group overflow-hidden rounded-xl">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-amber-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
                 <div className="w-full h-full relative">
                   <Image 
                     src={image.src} 
@@ -127,7 +127,7 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
             onClick={() => handleDotClick(index)}
             className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
               index === currentIndex 
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 w-4 sm:w-5'
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 w-4 sm:w-5'
                 : 'bg-gray-300 hover:bg-gray-400'
             }`}
             aria-label={`Go to slide ${index + 1}`}
