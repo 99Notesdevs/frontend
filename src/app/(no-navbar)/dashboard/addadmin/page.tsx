@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { env } from '@/config/env';
 import Cookies from 'js-cookie';
+import { FaEnvelope, FaLock, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -18,6 +19,8 @@ export default function AddAdmin() {
     secretKey: ""
   });
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSecret, setShowSecret] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -46,65 +49,75 @@ export default function AddAdmin() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6">Create Admin</h1>
-        
-        {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-[80vh] bg-transparent">
+      <div className="w-full max-w-lg bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-10 border border-slate-100">
+        <h1 className={`${plusJakarta.className} text-2xl font-bold text-slate-800 mb-8 text-center`}>Add New Admin</h1>
+        {error && <div className="mb-4 text-center text-red-600 bg-red-50 border border-red-200 rounded p-2">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-7">
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={adminData.email}
-              onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
+            <label className="block text-slate-700 mb-1 font-medium">Email</label>
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400"><FaEnvelope /></span>
+              <input
+                type="email"
+                required
+                value={adminData.email}
+                onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
+                className="w-full pl-9 border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400"
+                placeholder="admin@email.com"
+              />
+            </div>
           </div>
-
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              value={adminData.password}
-              onChange={(e) => setAdminData({ ...adminData, password: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
+            <label className="block text-slate-700 mb-1 font-medium">Password</label>
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400"><FaLock /></span>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={adminData.password}
+                onChange={(e) => setAdminData({ ...adminData, password: e.target.value })}
+                className="w-full pl-9 pr-10 border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400"
+                placeholder="Password"
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                onClick={() => setShowPassword((prev) => !prev)}
+                tabIndex={-1}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
-
           <div>
-            <label className="block text-sm font-medium mb-1">Secret Key</label>
-            <input
-              type="text"
-              value={adminData.secretKey}
-              onChange={(e) => setAdminData({ ...adminData, secretKey: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
+            <label className="block text-slate-700 mb-1 font-medium">Secret Key</label>
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400"><FaKey /></span>
+              <input
+                type={showSecret ? 'text' : 'password'}
+                required
+                value={adminData.secretKey}
+                onChange={(e) => setAdminData({ ...adminData, secretKey: e.target.value })}
+                className="w-full pl-9 pr-10 border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400"
+                placeholder="Secret Key"
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                onClick={() => setShowSecret((prev) => !prev)}
+                tabIndex={-1}
+              >
+                {showSecret ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
-
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              Create Admin
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-2/3 mx-auto block py-2 rounded-md bg-yellow-500 hover:bg-yellow-600 text-white font-semibold transition-colors shadow-sm mt-2"
+          >
+            Add Admin
+          </button>
         </form>
       </div>
     </div>

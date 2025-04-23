@@ -3,6 +3,7 @@
 import { env } from "@/config/env";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const token = Cookies.get("token");
 
@@ -25,6 +26,8 @@ export default function OrdersPage() {
   const [newOrderAmount, setNewOrderAmount] = useState<number>(0);
   const [newOrderValidity, setNewOrderValidity] = useState<number>(0);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteOrderId, setDeleteOrderId] = useState<string | null>(null);
 
   const fetchOrders = async () => {
     const response = await fetch(`${env.API}/orders/type/Articles`, {
@@ -91,195 +94,199 @@ export default function OrdersPage() {
     }
   };
 
-  const deleteOrder = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this order?')) return;
-    
-    const response = await fetch(`${env.API}/orders/${id}`, {
+  const handleDeleteClick = (id: string) => {
+    setDeleteOrderId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteOrder = async () => {
+    if (!deleteOrderId) return;
+    const response = await fetch(`${env.API}/orders/${deleteOrderId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
     });
-    
     if (response.ok) {
       await fetchOrders();
     }
+    setShowDeleteModal(false);
+    setDeleteOrderId(null);
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Manage Orders</h1>
-      
-      <div className="mb-6">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Title</label>
-          <input
-            type="text"
-            value={newOrderTitle}
-            onChange={(e) => setNewOrderTitle(e.target.value)}
-            placeholder="Enter order title"
-            className="border rounded p-2"
-          />
+    <div className="container mx-auto max-w-5xl px-2 sm:px-6 py-8">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-800 mb-8 text-center">Manage Article Subscriptions</h1>
+        {/* Create Order Form */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              placeholder="Title"
+              value={newOrderTitle}
+              onChange={e => setNewOrderTitle(e.target.value)}
+            />
+            <input
+              className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              placeholder="Description"
+              value={newOrderDescription}
+              onChange={e => setNewOrderDescription(e.target.value)}
+            />
+            <input
+              type="number"
+              className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              placeholder="Amount (Rs.)"
+              value={newOrderAmount}
+              onChange={e => setNewOrderAmount(Number(e.target.value))}
+            />
+            <input
+              type="number"
+              className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              placeholder="Validity (Days)"
+              value={newOrderValidity}
+              onChange={e => setNewOrderValidity(Number(e.target.value))}
+            />
+          </div>
+          <button
+            className="mt-4 w-full sm:w-auto px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow transition"
+            onClick={createOrder}
+          >
+            Create Order
+          </button>
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Description</label>
-          <input
-            type="text"
-            value={newOrderDescription}
-            onChange={(e) => setNewOrderDescription(e.target.value)}
-            placeholder="Enter order description"
-            className="border rounded p-2"
-          />
+        {/* Orders Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-slate-100">
+                <th className="border-b px-6 py-3 text-slate-700 font-semibold uppercase text-left">Title</th>
+                <th className="border-b px-6 py-3 text-slate-700 font-semibold uppercase text-left">Description</th>
+                <th className="border-b px-6 py-3 text-slate-700 font-semibold uppercase text-left">Amount (Rs.)</th>
+                <th className="border-b px-6 py-3 text-slate-700 font-semibold uppercase text-left">Validity (Days)</th>
+                <th className="border-b px-6 py-3 text-slate-700 font-semibold uppercase text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map(order => (
+                <tr key={order.id} className="even:bg-slate-50 hover:bg-slate-100 transition">
+                  <td className="px-6 py-3 text-slate-900 font-medium align-middle">{order.title}</td>
+                  <td className="px-6 py-3 text-slate-700 align-middle">{order.description}</td>
+                  <td className="px-6 py-3 text-slate-700 align-middle">₹{order.amount}</td>
+                  <td className="px-6 py-3 text-slate-700 align-middle">{order.validity}</td>
+                  <td className="px-6 py-3 align-middle">
+                    <button className="px-3 py-1 rounded bg-yellow-500 hover:bg-yellow-600 text-white mr-2 text-xs font-semibold transition" onClick={() => setEditingOrder(order)}>Edit</button>
+                    <button className="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition" onClick={() => handleDeleteClick(order.id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        {editingOrder && (
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Edit Order</h2>
+            
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Title</label>
+              <input
+                type="text"
+                value={editingOrder.title}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    title: e.target.value
+                  });
+                }}
+                className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              />
+            </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Amount (Rs.)</label>
-          <input
-            type="number"
-            value={newOrderAmount}
-            onChange={(e) => setNewOrderAmount(Number(e.target.value))}
-            placeholder="Enter amount"
-            className="border rounded p-2"
-          />
-        </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Description</label>
+              <input
+                type="text"
+                value={editingOrder.description}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    description: e.target.value
+                  });
+                }}
+                className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              />
+            </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Validity (Days)</label>
-          <input
-            type="number"
-            value={newOrderValidity}
-            onChange={(e) => setNewOrderValidity(Number(e.target.value))}
-            placeholder="Enter validity"
-            className="border rounded p-2"
-          />
-        </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Amount (Rs.)</label>
+              <input
+                type="number"
+                value={editingOrder.amount}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    amount: Number(e.target.value)
+                  });
+                }}
+                className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              />
+            </div>
 
-        <button
-          onClick={createOrder}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Create Order
-        </button>
-      </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Validity (Days)</label>
+              <input
+                type="number"
+                value={editingOrder.validity}
+                onChange={(e) => {
+                  setEditingOrder({
+                    ...editingOrder,
+                    validity: Number(e.target.value)
+                  });
+                }}
+                className="border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors placeholder-slate-400 text-slate-800"
+              />
+            </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Title</th>
-              <th className="border p-2">Description</th>
-              <th className="border p-2">Amount (Rs.)</th>
-              <th className="border p-2">Validity (Days)</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="border p-2">{order.title}</td>
-                <td className="border p-2">{order.description}</td>
-                <td className="border p-2">{order.amount}</td>
-                <td className="border p-2">{order.validity}</td>
-                <td className="border p-2">
+            <div className="flex space-x-2 mt-3"> 
+              <button
+                className="px-6 py-2 rounded-md bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow transition"
+                onClick={() => updateOrder(editingOrder)}
+              >
+                Save Changes
+              </button>
+              <button
+                className="px-6 py-2 rounded-md bg-white text-slate-700 hover:bg-slate-100 font-semibold shadow transition"
+                onClick={() => setEditingOrder(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full relative">
+              <div className="flex flex-col items-center">
+                <FaExclamationTriangle className="text-yellow-500 text-4xl mb-3" />
+                <h2 className="text-lg font-bold text-slate-800 mb-2">Confirm Deletion</h2>
+                <p className="text-slate-600 mb-6 text-center">Are you sure you want to delete this order? This action cannot be undone.</p>
+                <div className="flex gap-4 w-full justify-center">
                   <button
-                    onClick={() => setEditingOrder(order)}
-                    className="bg-green-500 text-white px-2 py-1 rounded mr-2 hover:bg-green-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteOrder(order.id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                    className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white font-semibold"
+                    onClick={confirmDeleteOrder}
                   >
                     Delete
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <button
+                    className="px-4 py-2 rounded bg-slate-200 text-slate-700 hover:bg-slate-300 font-semibold"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      {editingOrder && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Edit Order</h2>
-          
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Title</label>
-            <input
-              type="text"
-              value={editingOrder.title}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  title: e.target.value
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Description</label>
-            <input
-              type="text"
-              value={editingOrder.description}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  description: e.target.value
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Amount (Rs.)</label>
-            <input
-              type="number"
-              value={editingOrder.amount}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  amount: Number(e.target.value)
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Validity (Days)</label>
-            <input
-              type="number"
-              value={editingOrder.validity}
-              onChange={(e) => {
-                setEditingOrder({
-                  ...editingOrder,
-                  validity: Number(e.target.value)
-                });
-              }}
-              className="border rounded p-2"
-            />
-          </div>
-
-          <div className="flex space-x-2">
-            <button
-              onClick={() => updateOrder(editingOrder)}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-            >
-              Save Changes
-            </button>
-            <button
-              onClick={() => setEditingOrder(null)}
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
-      

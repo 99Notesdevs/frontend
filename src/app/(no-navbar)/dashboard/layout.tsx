@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "@/styles/globals.css";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { FaPlus, FaEdit } from "react-icons/fa";
 import { isAuth, AuthResponse } from "@/lib/isAuth";
 import { useState, useEffect } from "react";
@@ -137,7 +138,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [authState, setAuthState] = useState<AuthResponse | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -149,7 +152,9 @@ export default function DashboardLayout({
   }, []);
 
   if (!authState) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#181f2a] via-[#232b3a] to-[#1a2130]">
+      <span className="text-slate-200 text-lg font-medium animate-pulse">Loading dashboard...</span>
+    </div>;
   }
 
   if (!authState.isAuthenticated) {
@@ -179,30 +184,66 @@ export default function DashboardLayout({
 
   return (
     <div className={`flex min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8f9ff] ${inter.className}`}>
+      {/* Sidebar overlay for mobile */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity lg:hidden ${sidebarOpen ? "block" : "hidden"}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-slate-200">
-        <div className="p-4">
-          <h1
-            className={`${plusJakarta.className} text-[2rem] font-bold tracking-tight text-slate-900 mb-8`}
+      <aside
+        className={`fixed z-50 inset-y-0 left-0 w-60 bg-slate-800 border-r border-slate-900 flex flex-col transition-transform transform lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        style={{ minWidth: 240 }}
+      >
+        <div className="flex items-center h-16 px-6 border-b border-slate-900">
+          {/* Make Dashboard title clickable to go to /dashboard */}
+          <button
+            onClick={() => { router.push("/dashboard"); setSidebarOpen(false); }}
+            className="text-xl font-bold tracking-tight text-white hover:text-indigo-400 transition-colors focus:outline-none"
+            style={{ background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer" }}
+            aria-label="Go to Dashboard"
           >
-            {isAdmin ? "Admin Dashboard" : "User Dashboard"}
-          </h1>
+            Dashboard
+          </button>
+          <button
+            className="ml-auto text-slate-400 hover:text-white focus:outline-none lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
-        <nav className="space-y-1">
-          {navigation.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => router.push(item.path)}
-              className="flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-            >
-              <item.icon className="w-5 h-5" />
-              {item.text}
-            </button>
-          ))}
+        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+          {navigation.map((item, idx) => {
+            const isActive = pathname === item.path;
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.path}
+                onClick={() => { router.push(item.path); setSidebarOpen(false); }}
+                className={`group flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-150 text-left text-base font-medium
+                  ${isActive ? "bg-slate-700 text-white border-l-4 border-indigo-500" : "text-slate-300 hover:bg-slate-700 hover:text-white"}
+                `}
+                style={{ outline: "none" }}
+              >
+                <Icon className="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" />
+                <span className="truncate">{item.text}</span>
+              </button>
+            );
+          })}
         </nav>
-      </div>
-
-      {/* Main Content */}
+      </aside>
+      {/* Sidebar toggle button for mobile */}
+      {!sidebarOpen && (
+        <button
+          className="fixed z-50 top-4 left-4 p-2 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 focus:outline-none shadow-lg lg:hidden"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open sidebar"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+      )}
+      {/* Main content */}
       <div className="flex-1 min-w-0">
         {children}
       </div>
