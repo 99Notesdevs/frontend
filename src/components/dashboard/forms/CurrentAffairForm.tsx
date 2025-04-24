@@ -93,6 +93,7 @@ export function CurrentAffairForm({ onSubmit, defaultValues }: CurrentAffairForm
       twitterImage: "",
       canonicalUrl: "",
       schemaData: "",
+      showInNav: false,
     },
   });
 
