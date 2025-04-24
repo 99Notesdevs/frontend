@@ -33,6 +33,7 @@ import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
+import { Iframe } from "./Iframe";
 
 
 const lowlight = createLowlight(common);
@@ -166,6 +167,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       TableRow,
       TableCell,
       TableHeader,
+      Iframe
     ],
     content: content,
     onUpdate: ({ editor }) => {
@@ -213,6 +215,28 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       .setMark("fontSize", { size })
       .run();
     setCurrentSize(sizeName);
+  };
+
+  const setIframe = () => {
+    if (!editor) return;
+
+    const src = window.prompt("Enter iframe URL");
+    if (src) {
+      editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: "iframe",
+          attrs: {
+            src,
+            width: "100%",
+            height: "300",
+            frameborder: "0",
+            allowfullscreen: true,
+          },
+        })
+        .run();
+    }
   };
 
   const setHeading = (level: number) => {
@@ -421,6 +445,11 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               disabled={!editor?.can().redo()}
               icon={<Redo className="w-5 h-5" />}
               label="Redo"
+            />
+            <ToolbarButton
+              onClick={setIframe}
+              icon={<span className="w-5 h-5">Iframe</span>}
+              label="Embed Iframe"
             />
           </>
         )}

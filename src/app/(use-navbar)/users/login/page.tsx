@@ -15,7 +15,8 @@ const Login = () => {
   const token = Cookies.get('token');
     useEffect(() => {
       const checkAuth = async () => {
-        if (await isAuth()) {
+        const auth = await isAuth();
+        if (auth.isAuthenticated && auth.role === 'user') {
           router.push('/users/dashboard');
         }
       };
