@@ -114,7 +114,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Title</FormLabel>
+              <FormLabel className="text-gray-500 font-medium">Title *</FormLabel>
               <FormControl>
                 <Input
                   placeholder="Enter title"
@@ -135,7 +135,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-gray-500 font-medium">
-                  Author
+                  Author *
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -157,7 +157,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
               <FormLabel className="text-gray-500 font-medium">
-                Featured Image
+                Featured Image *
               </FormLabel>
               <FormControl>
                 <div className="space-y-4">
@@ -193,7 +193,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-gray-500 font-medium">
-                Content
+                Content *
               </FormLabel>
               <FormControl>
                 <div className="border border-blue-100 rounded-lg overflow-hidden">
