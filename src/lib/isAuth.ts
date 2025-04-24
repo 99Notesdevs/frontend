@@ -3,7 +3,7 @@ import { env } from '@/config/env'
 
 export interface AuthResponse {
   isAuthenticated: boolean;
-  role: 'admin' | 'editor' | 'author' | null;
+  role: 'admin' | 'editor' | 'author' | 'user' | null;
   userId: string | null;
 }
 
@@ -23,7 +23,8 @@ export async function isAuth(): Promise<AuthResponse> {
     const checkEndpoints = {
       admin: `${env.API}/admin/check`,
       editor: `${env.API}/editor/check`,
-      author: `${env.API}/author/check`
+      author: `${env.API}/author/check`,
+      user: `${env.API}/user/check`
     };
 
     // Try each endpoint in order of hierarchy (admin > editor > author)
@@ -40,7 +41,7 @@ export async function isAuth(): Promise<AuthResponse> {
         const data = await response.json();
         return {
           isAuthenticated: true,
-          role: role as 'admin' | 'editor' | 'author',
+          role: role as 'admin' | 'editor' | 'author' | 'user',
           userId: data.userId
         };
       }
