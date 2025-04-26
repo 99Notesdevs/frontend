@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,14 +10,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { Alert } from "@/components/ui/alert";
 
 const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  content: z.string().min(1, "Content is required"),
+  title: z.string(),
+  content: z.string(),
   showInNav: z.boolean().default(false),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -47,8 +46,43 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   onSubmit,
   initialData,
 }) => {
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "error" | "success" | "warning";
+  } | null>(null);
+
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: (values) => {
+      let errors = {};
+      const messages = [];
+
+      if (!values.title || values.title.trim() === "") {
+        messages.push("Title is required");
+        errors = {
+          ...errors,
+          title: { message: "" },
+        };
+      }
+
+      if (!values.content || values.content.trim() === "") {
+        messages.push("Content is required");
+        errors = {
+          ...errors,
+          content: { message: "" },
+        };
+      }
+
+      if (messages.length > 0) {
+        setAlert({
+          message: `Please fix the following:\n• ${messages.join("\n• ")}`,
+          type: "error",
+        });
+        return { values: {}, errors };
+      }
+
+      setAlert(null);
+      return { values, errors: {} };
+    },
     defaultValues: initialData || {
       title: "",
       content: "",
@@ -70,277 +104,278 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     },
   });
 
-  React.useEffect(() => {
-    const subscription = form.watch((value) => {
-      console.log("Form data changed:", value);
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
+  const handleFormSubmit = async (data: FormData) => {
+    try {
+      await onSubmit(data);
+      setAlert({
+        message: "Notes saved successfully!",
+        type: "success",
+      });
+    } catch (error) {
+      setAlert({
+        message: "Failed to save notes. Please try again.",
+        type: "error",
+      });
+    }
+  };
 
   return (
-    <Form {...form}>
+    <div className="relative">
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
+      <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter title" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter title" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="content"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Content</FormLabel>
-              <FormControl>
-                <Editor content={field.value} onChange={field.onChange} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Content *</FormLabel>
+                <FormControl>
+                  <Editor content={field.value} onChange={field.onChange} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        {/* Meta Title */}
-        <FormField
-          control={form.control}
-          name="metaTitle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Meta Title</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter meta title" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Meta Title */}
+          <FormField
+            control={form.control}
+            name="metaTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Title</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter meta title" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        {/* Meta Description */}
-        <FormField
-          control={form.control}
-          name="metaDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Meta Description</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter meta description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Meta Description */}
+          <FormField
+            control={form.control}
+            name="metaDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter meta description" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        {/* Meta Keywords */}
-        <FormField
-          control={form.control}
-          name="metaKeywords"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Meta Keywords</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter meta keywords (comma-separated)"
-                  {...field}
+          {/* Meta Keywords */}
+          <FormField
+            control={form.control}
+            name="metaKeywords"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Keywords</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter meta keywords (comma-separated)"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Robots */}
+          <FormField
+            control={form.control}
+            name="robots"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Robots</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter robots meta tag" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* OG Title */}
+          <FormField
+            control={form.control}
+            name="ogTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Title</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Open Graph title" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* OG Description */}
+          <FormField
+            control={form.control}
+            name="ogDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Open Graph description" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* OG Image */}
+          <FormField
+            control={form.control}
+            name="ogImage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Image URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Open Graph image URL" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* OG Type */}
+          <FormField
+            control={form.control}
+            name="ogType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>OG Type</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Open Graph type" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Twitter Card */}
+          <FormField
+            control={form.control}
+            name="twitterCard"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Card</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Twitter card type" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Twitter Title */}
+          <FormField
+            control={form.control}
+            name="twitterTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Title</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Twitter title" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Twitter Description */}
+          <FormField
+            control={form.control}
+            name="twitterDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Twitter description" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Twitter Image */}
+          <FormField
+            control={form.control}
+            name="twitterImage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter Image URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter Twitter image URL" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Canonical URL */}
+          <FormField
+            control={form.control}
+            name="canonicalUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Canonical URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter canonical URL" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Schema Data */}
+          <FormField
+            control={form.control}
+            name="schemaData"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Schema Data (JSON-LD)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter schema data as JSON" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="showInNav">Show in Navigation</Label>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="showInNav"
+                  checked={!!form.watch("showInNav")}
+                  onCheckedChange={(checked: boolean) => {
+                    form.setValue("showInNav", !!checked);
+                  }}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Robots */}
-        <FormField
-          control={form.control}
-          name="robots"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Robots</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter robots meta tag" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* OG Title */}
-        <FormField
-          control={form.control}
-          name="ogTitle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>OG Title</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Open Graph title" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* OG Description */}
-        <FormField
-          control={form.control}
-          name="ogDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>OG Description</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Open Graph description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* OG Image */}
-        <FormField
-          control={form.control}
-          name="ogImage"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>OG Image URL</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Open Graph image URL" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* OG Type */}
-        <FormField
-          control={form.control}
-          name="ogType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>OG Type</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Open Graph type" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Twitter Card */}
-        <FormField
-          control={form.control}
-          name="twitterCard"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Twitter Card</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Twitter card type" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Twitter Title */}
-        <FormField
-          control={form.control}
-          name="twitterTitle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Twitter Title</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Twitter title" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Twitter Description */}
-        <FormField
-          control={form.control}
-          name="twitterDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Twitter Description</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Twitter description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Twitter Image */}
-        <FormField
-          control={form.control}
-          name="twitterImage"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Twitter Image URL</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter Twitter image URL" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Canonical URL */}
-        <FormField
-          control={form.control}
-          name="canonicalUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Canonical URL</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter canonical URL" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Schema Data */}
-        <FormField
-          control={form.control}
-          name="schemaData"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Schema Data (JSON-LD)</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter schema data as JSON" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="showInNav">Show in Navigation</Label>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="showInNav"
-                checked={!!form.watch("showInNav")}
-                onCheckedChange={(checked: boolean) => {
-                  form.setValue("showInNav", !!checked);
-                }}
-              />
+              </div>
             </div>
           </div>
-        </div>
 
-        <Button type="submit" className="w-full">
-          Save
-        </Button>
-      </form>
-    </Form>
+          <Button type="submit" className="w-full">
+            Save
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
 

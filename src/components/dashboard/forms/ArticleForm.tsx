@@ -18,11 +18,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Alert } from "@/components/ui/alert";
 
 const articleSchema = z.object({
-  title: z.string().min(2, "Title must be at least 2 characters"),
-  content: z.string().min(10, "Content must be at least 10 characters"),
-  imageUrl: z.string().optional(),
+  title: z.string(),
+  content: z.string(),
+  imageUrl: z.string(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -55,9 +56,51 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     initialData?.imageUrl || null
   );
   const [isUploading, setIsUploading] = useState(false);
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "error" | "success" | "warning";
+  } | null>(null);
 
   const form = useForm<ArticleFormData>({
-    resolver: zodResolver(articleSchema),
+    resolver: (values) => {
+      let errors = {};
+      const messages = [];
+
+      if (!values.title || values.title.length < 2) {
+        messages.push("Title must be at least 2 characters");
+        errors = {
+          ...errors,
+          title: { message: "" }
+        };
+      }
+
+      if (!values.content || values.content.length < 10) {
+        messages.push("Content must be at least 10 characters");
+        errors = {
+          ...errors,
+          content: { message: "" }
+        };
+      }
+
+      if (!values.imageUrl) {
+        messages.push("Image is required");
+        errors = {
+          ...errors,
+          imageUrl: { message: "" }
+        };
+      }
+
+      if (messages.length > 0) {
+        setAlert({
+          message: `Please fix the following:\n• ${messages.join('\n• ')}`,
+          type: "error"
+        });
+        return { values: {}, errors };
+      }
+
+      setAlert(null);
+      return { values, errors: {} };
+    },
     defaultValues: initialData || {
       title: "",
       content: "",
@@ -87,7 +130,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true);
+        setIsUploading(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -104,11 +147,11 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             form.setValue("imageUrl", "www.google.com/fallbackUrl");
             throw new Error("Failed to upload image to S3");
           }
-        } catch (error) {
+      } catch (error) {
           console.error("Error uploading image:", error);
-        } finally {
-          setIsUploading(false);
-        }
+      } finally {
+        setIsUploading(false);
+      }
       };
       reader.readAsDataURL(file);
     }
@@ -139,31 +182,38 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   };
 
   return (
-    <Form {...form}>
+    <div className="relative">
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
+      <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmitForm)} className="space-y-6">
         {/* Title */}
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+              <FormLabel>Title *</FormLabel>
+                <FormControl>
                 <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
         {/* Image Upload */}
-        <FormField
-          control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Featured Image</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field }) => (
+              <FormItem>
+              <FormLabel>Featured Image *</FormLabel>
+                <FormControl>
                 <Input
                   type="file"
                   id="image"
@@ -172,16 +222,16 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                   className="mt-1"
                 />
               </FormControl>
-              {imagePreview && (
+                    {imagePreview && (
                 <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
-                  <Image
-                    src={imagePreview}
+                        <Image
+                          src={imagePreview}
                     alt="Image preview"
-                    fill
+                          fill
                     className="object-cover"
-                  />
-                </div>
-              )}
+                        />
+                      </div>
+                    )}
               <FormMessage />
             </FormItem>
           )}
@@ -193,17 +243,16 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Main Content</FormLabel>
+              <FormLabel>Main Content *</FormLabel>
               <FormControl>
                 <TiptapEditor
                   content={field.value}
                   onChange={handleEditorChange}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
         {/* Metadata */}
         <div className="grid  gap-6">
@@ -230,7 +279,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -244,7 +292,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -258,7 +305,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -272,7 +318,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -286,7 +331,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -300,7 +344,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -314,7 +357,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -328,7 +370,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -342,7 +383,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -356,7 +396,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -370,7 +409,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -384,7 +422,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -398,7 +435,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -407,23 +443,24 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             <div className="space-y-2">
               <Label htmlFor="showInNav">Show in Navigation</Label>
               <div className="flex items-center space-x-2">
-              <Checkbox
-                id="showInNav"
-                checked={!!form.watch("showInNav")}
-                onCheckedChange={(checked: boolean) => {
-                  form.setValue("showInNav", !!checked);
-                }}
-              />
+                <Checkbox
+                  id="showInNav"
+                  checked={!!form.watch("showInNav")}
+                  onCheckedChange={(checked: boolean) => {
+                    form.setValue("showInNav", !!checked);
+                  }}
+                />
 
+              </div>
               </div>
             </div>
           </div>
-        </div>
 
         <Button disabled={isUploading} type="submit" className="w-full mt-6">
-          {isUploading ? 'Uploading...' : 'Save'}
-        </Button>
-      </form>
-    </Form>
+            {isUploading ? 'Uploading...' : 'Save'}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
-};
+}

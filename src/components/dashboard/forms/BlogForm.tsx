@@ -1,21 +1,20 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
+import { Alert } from '@/components/ui/alert';
 
 const formSchema = z.object({
-  title: z.string().min(2, 'Title must be at least 2 characters'),
-  content: z.string().min(10, 'Content must be at least 10 characters'),
-  imageUrl: z.string().url("Image URL must be a valid URL").optional(),
+  title: z.string(),
+  content: z.string(),
+  imageUrl: z.string(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -42,14 +41,69 @@ interface BlogFormProps {
 }
 
 export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
-  console.log(defaultValues);
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "error" | "success" | "warning";
+  } | null>(null);
 
   const form = useForm<BlogFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: (values) => {
+      let errors = {};
+      const messages = [];
+
+      if (!values.title || values.title.length < 2) {
+        messages.push("Title must be at least 2 characters");
+        errors = {
+          ...errors,
+          title: { message: "" }
+        };
+      }
+
+      if (!values.content || values.content.length < 10) {
+        messages.push("Content must be at least 10 characters");
+        errors = {
+          ...errors,
+          content: { message: "" }
+        };
+      }
+
+      if (!values.imageUrl) {
+        messages.push("Image is required");
+        errors = {
+          ...errors,
+          imageUrl: { message: "" }
+        };
+      } else if (!values.imageUrl.match(/^https?:\/\/.+$/)) {
+        messages.push("Please provide a valid image URL");
+        errors = {
+          ...errors,
+          imageUrl: { message: "" }
+        };
+      }
+
+      if (!values.slug) {
+        messages.push("Slug is required");
+        errors = {
+          ...errors,
+          slug: { message: "" }
+        };
+      }
+
+      if (messages.length > 0) {
+        setAlert({
+          message: `Please fix the following:\n• ${messages.join('\n• ')}`,
+          type: "error"
+        });
+        return { values: {}, errors };
+      }
+
+      setAlert(null);
+      return { values, errors: {} };
+    },
     defaultValues: defaultValues || {
       title: '',
       content: '',
@@ -102,90 +156,110 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleFormSubmit = async (data: BlogFormValues) => {
+    try {
+      await onSubmit(data);
+      setAlert({
+        message: "Blog post saved successfully!",
+        type: "success"
+      });
+    } catch (error) {
+      setAlert({
+        message: "Failed to save blog post. Please try again.",
+        type: "error"
+      });
+    }
+  };
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Show success message */}
-        {isSuccess && (
-          <div className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
-            {successMessage}
-          </div>
-        )}
-        
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter blog title" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <div className="relative">
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
         />
+      )}
+      <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+          {/* Show success message */}
+          {isSuccess && (
+            <div className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
+              {successMessage}
+            </div>
+          )}
+          
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter blog title" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="content"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Content</FormLabel>
-              <FormControl>
-                <TiptapEditor content={field.value} onChange={field.onChange} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Content *</FormLabel>
+                <FormControl>
+                  <TiptapEditor content={field.value} onChange={field.onChange} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Image</FormLabel>
-              <FormControl>
-                <div className="flex flex-col gap-4">
-                  {imagePreview && (
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src={imagePreview}
-                        alt="Blog image preview"
-                        fill
-                        className="object-cover rounded-lg"
-                        priority
-                      />
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    disabled={isUploading}
-                  />
-                  {isUploading && (
-                    <div className="text-sm text-blue-500 mt-2">Uploading image...</div>
-                  )}
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Image *</FormLabel>
+                <FormControl>
+                  <div className="flex flex-col gap-4">
+                    {imagePreview && (
+                      <div className="relative h-48 w-full">
+                        <Image
+                          src={imagePreview}
+                          alt="Blog image preview"
+                          fill
+                          className="object-cover rounded-lg"
+                          priority
+                        />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      disabled={isUploading}
+                    />
+                    {isUploading && (
+                      <div className="text-sm text-blue-500 mt-2">Uploading image...</div>
+                    )}
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
             name="slug"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Slug</FormLabel>
+                <FormLabel>Slug *</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter slug" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -198,7 +272,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter meta title" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -212,7 +285,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter meta description" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -226,7 +298,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter meta keywords" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -239,7 +310,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="index,follow" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -256,7 +326,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter OG title" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -270,7 +339,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter OG description" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -284,7 +352,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter OG image URL" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -297,7 +364,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter OG Type" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -312,7 +378,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter Twitter Card" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -326,7 +391,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter Twitter title" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -340,7 +404,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter Twitter description" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -354,7 +417,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter Twitter image URL" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -368,7 +430,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter canonical URL" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -382,7 +443,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormControl>
                   <Input placeholder="Enter schema data" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -392,5 +452,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
         </Button>
       </form>
     </Form>
+  </div>
   );
 }

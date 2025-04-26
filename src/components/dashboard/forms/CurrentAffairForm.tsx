@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,11 +9,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { Label } from '@radix-ui/react-label';
 import { Checkbox } from '@radix-ui/react-checkbox';
+import { Alert } from '@/components/ui/alert';
 
 const currentAffairSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  content: z.string().min(1, 'Content is required'),
-  showInNav: z.boolean().default(false),
+  title: z.string(),
+  content: z.string(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -27,6 +28,7 @@ const currentAffairSchema = z.object({
   twitterImage: z.string().optional(),
   canonicalUrl: z.string().optional(),
   schemaData: z.string().optional(),
+  showInNav: z.boolean().optional(),
 });
 
 type CurrentAffairFormValues = z.infer<typeof currentAffairSchema>;
@@ -36,27 +38,62 @@ interface CurrentAffairFormProps {
   defaultValues?: CurrentAffairFormValues;
 }
 
-export const CurrentAffairForm: React.FC<CurrentAffairFormProps> = ({ onSubmit, defaultValues }) => {
+export function CurrentAffairForm({ onSubmit, defaultValues }: CurrentAffairFormProps) {
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "error" | "success" | "warning";
+  } | null>(null);
+
   const form = useForm<CurrentAffairFormValues>({
-    resolver: zodResolver(currentAffairSchema),
+    resolver: (values) => {
+      let errors = {};
+      const messages = [];
+
+      if (!values.title || values.title.length < 2) {
+        messages.push("Title must be at least 2 characters");
+        errors = {
+          ...errors,
+          title: { message: "" }
+        };
+      }
+
+      if (!values.content || values.content.length < 10) {
+        messages.push("Content must be at least 10 characters");
+        errors = {
+          ...errors,
+          content: { message: "" }
+        };
+      }
+
+      if (messages.length > 0) {
+        setAlert({
+          message: `Please fix the following:\n• ${messages.join('\n• ')}`,
+          type: "error"
+        });
+        return { values: {}, errors };
+      }
+
+      setAlert(null);
+      return { values, errors: {} };
+    },
     defaultValues: defaultValues || {
-      title: '',
-      content: '<p></p>',
+      title: "",
+      content: "",
+      metaTitle: "",
+      metaDescription: "",
+      metaKeywords: "",
+      robots: "",
+      ogTitle: "",
+      ogDescription: "",
+      ogImage: "",
+      ogType: "",
+      twitterCard: "",
+      twitterTitle: "",
+      twitterDescription: "",
+      twitterImage: "",
+      canonicalUrl: "",
+      schemaData: "",
       showInNav: false,
-      metaTitle: '',
-      metaDescription: '',
-      metaKeywords: '',
-      robots: '',
-      ogTitle: '',
-      ogDescription: '',
-      ogImage: '',
-      ogType: '',
-      twitterCard: '',
-      twitterTitle: '',
-      twitterDescription: '',
-      twitterImage: '',
-      canonicalUrl: '',
-      schemaData: '',
     },
   });
 
@@ -65,67 +102,71 @@ export const CurrentAffairForm: React.FC<CurrentAffairFormProps> = ({ onSubmit, 
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter title" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <div className="relative">
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
         />
+      )}
+      <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title *</FormLabel>
+                <FormControl>
+                <Input {...field} placeholder="Enter title" />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="content"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Content</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+              <FormLabel>Content *</FormLabel>
+                <FormControl>
                 <TiptapEditor
                   content={field.value}
                   onChange={(content) => field.onChange(content)}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
         {/* Metadata Fields */}
-        <FormField
-          control={form.control}
-          name="metaTitle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Meta Title</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name="metaTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Title</FormLabel>
+                <FormControl>
                 <Input {...field} placeholder="Enter meta title" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="metaDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Meta Description</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name="metaDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meta Description</FormLabel>
+                <FormControl>
                 <Input {...field} placeholder="Enter meta description" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
         <FormField
           control={form.control}
@@ -270,8 +311,9 @@ export const CurrentAffairForm: React.FC<CurrentAffairFormProps> = ({ onSubmit, 
 
         <Button type="submit" className="w-full">
           Submit
-        </Button>
-      </form>
-    </Form>
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };

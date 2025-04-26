@@ -1,10 +1,10 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
+
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { useState } from 'react';
@@ -12,11 +12,13 @@ import Image from 'next/image';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
 import { Label } from '@radix-ui/react-label';
 import { Checkbox } from "@/components/ui/Checkbox";
+import { Alert } from "@/components/ui/alert";
+
 const formSchema = z.object({
-  title: z.string().min(2, 'Title must be at least 2 characters'),
-  content: z.string().min(10, 'Content must be at least 10 characters'),
+  title: z.string(),
+  content: z.string(),
+  imageUrl: z.string(),
   showInNav: z.boolean().default(false),
-  imageUrl: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -44,14 +46,56 @@ interface GeneralStudiesFormProps {
 export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
   const [isUploading, setIsUploading] = useState(false);
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "error" | "success" | "warning";
+  } | null>(null);
 
   const form = useForm<GeneralStudiesFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: (values) => {
+      let errors = {};
+      const messages = [];
+
+      if (!values.title || values.title.length < 2) {
+        messages.push("Title must be at least 2 characters");
+        errors = {
+          ...errors,
+          title: { message: "" }
+        };
+      }
+
+      if (!values.content || values.content.length < 10) {
+        messages.push("Content must be at least 10 characters");
+        errors = {
+          ...errors,
+          content: { message: "" }
+        };
+      }
+
+      if (!values.imageUrl) {
+        messages.push("Image is required");
+        errors = {
+          ...errors,
+          imageUrl: { message: "" }
+        };
+      }
+
+      if (messages.length > 0) {
+        setAlert({
+          message: `Please fix the following:\n• ${messages.join('\n• ')}`,
+          type: "error"
+        });
+        return { values: {}, errors };
+      }
+
+      setAlert(null);
+      return { values, errors: {} };
+    },
     defaultValues: {
-      title: '',
-      content: '',
+      title: "",
+      content: "",
+      imageUrl: "",
       showInNav: false,
-      imageUrl: '',
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',
@@ -72,8 +116,8 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
   });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
+    const file = e.target.files?.[0];
+    if (file) {
         setIsUploading(true);
         const reader = new FileReader();
         reader.onloadend = async () => {
@@ -94,37 +138,44 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             } else {
               throw new Error("Failed to upload image to S3");
             }
-          } catch (error) {
+      } catch (error) {
             console.error("Error uploading image:", error);
-          } finally {
-            setIsUploading(false);
-          }
-        };
-        reader.readAsDataURL(file);
+      } finally {
+        setIsUploading(false);
       }
-    };
+  };
+        reader.readAsDataURL(file);
+    }
+  };
 
   return (
-    <Form {...form}>
+    <div className="relative">
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
+      <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {/* Title */}
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-500 font-medium">Title</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title *</FormLabel>
+                <FormControl>
                 <Input
                   placeholder="Enter title"
                   {...field}
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
         {/* Author */}
         {defaultValues?.author && (
@@ -143,22 +194,19 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                     className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
         )}
 
         {/* Image Upload */}
-        <FormField
-          control={form.control}
-          name="imageUrl"
+          <FormField
+            control={form.control}
+            name="imageUrl"
           render={({ field: { value, onChange, ...field } }) => (
-            <FormItem>
-              <FormLabel className="text-gray-500 font-medium">
-                Featured Image
-              </FormLabel>
-              <FormControl>
+              <FormItem>
+                <FormLabel>Image *</FormLabel>
+                <FormControl>
                 <div className="space-y-4">
                   <Input
                     type="file"
@@ -168,19 +216,18 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                     {...field}
                   />
 
-                  {imagePreview && (
+                    {imagePreview && (
                     <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
-                      <Image
-                        src={imagePreview}
+                        <Image
+                          src={imagePreview}
                         alt="Image preview"
-                        fill
+                          fill
                         className="object-cover"
-                      />
-                    </div>
-                  )}
+                        />
+                      </div>
+                    )}
                 </div>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -200,14 +247,13 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                     content={form.getValues("content")}
                     onChange={(html) => form.setValue("content", html)}
                   />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        {/* Metadata Fields */}
+          {/* Metadata Fields */}
         <FormField
           control={form.control}
           name="metaTitle"
@@ -223,7 +269,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -243,7 +288,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -263,7 +307,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -283,7 +326,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -303,7 +345,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -323,7 +364,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -343,7 +383,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -363,7 +402,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -383,7 +421,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -403,7 +440,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -423,7 +459,6 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -443,25 +478,25 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                 />
               </FormControl>
-              <FormMessage />
+            
             </FormItem>
           )}
         />
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="showInNav">Show in Navigation</Label>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="showInNav"
-                checked={!!form.watch("showInNav")}
-                onCheckedChange={(checked: boolean) => {
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="showInNav">Show in Navigation</Label>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="showInNav"
+                  checked={!!form.watch("showInNav")}
+                  onCheckedChange={(checked: boolean) => {
                   form.setValue("showInNav", !!checked);
-                }}
-              />
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
 
         {/* Submit Button */}
         <div className="flex justify-end">
@@ -473,7 +508,8 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             {isUploading ? "Uploading..." : "Save"}
           </Button>
         </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }
