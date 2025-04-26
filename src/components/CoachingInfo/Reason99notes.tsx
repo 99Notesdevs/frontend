@@ -40,11 +40,11 @@ const Reason99notes: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <div className="relative inline-block">
-            <span className="text-slate-900 font-medium tracking-wider text-sm uppercase mb-4 font-opensans">Reason</span>
+            <span className="text-yellow-500 font-medium tracking-wider text-sm uppercase mb-4 font-opensans">Reason</span>
             <h2 className="text-3xl font-semibold text-gray-900 pt-2 mb-4 font-opensans">
               Why 99Notes is the Best UPSC Coaching in Delhi
             </h2>
-            <div className="w-24 h-1 bg-slate-900 mx-auto mt-2"></div>
+            <div className="w-24 h-1 bg-yellow-500 mx-auto mt-2"></div>
           </div>
           <p className="text-gray-600 mt-4 max-w-2xl mx-auto font-normal font-opensans">
             Discover why thousands of UPSC aspirants choose us as their preferred coaching institute

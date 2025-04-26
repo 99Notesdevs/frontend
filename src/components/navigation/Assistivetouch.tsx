@@ -7,9 +7,11 @@ import { Menu, List, Navigation2, X } from 'lucide-react';
 
 interface AssistiveTouchProps {
   content: string;
+  currentPageId?: string;
+  basePath?: string;
 }
 
-export default function AssistiveTouch({ content }: AssistiveTouchProps) {
+export default function AssistiveTouch({ content, currentPageId, basePath }: AssistiveTouchProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showComponent, setShowComponent] = useState<'toc' | 'nav' | null>(null);
   const [showBackdrop, setShowBackdrop] = useState(false);
@@ -195,7 +197,7 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
                 {showComponent === 'toc' && (
                   <TableOfContents content={content} onLinkClick={handleTocLinkClick} />
                 )}
-                {showComponent === 'nav' && <SidebarNavigation />}
+                {showComponent === 'nav' && <SidebarNavigation currentPageId={currentPageId} basePath={basePath || 'blog'} />}
               </div>
             </div>
           </div>

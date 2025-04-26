@@ -28,25 +28,25 @@ const BlogsPage: React.FC = () => {
     try {
       setError(null);
       setLoading(true);
-      
+
       const skip = (currentPage - 1) * itemsPerPage;
-      const url = searchTerm 
+      const url = searchTerm
         ? `${env.API}/blog/search?skip=${skip}&take=${itemsPerPage}&query=${encodeURIComponent(searchTerm)}`
         : `${env.API}/blog?skip=${skip}&take=${itemsPerPage}`;
 
       const response = await fetch(url);
-      
+
       if (!response.ok) {
-        throw new Error('Failed to fetch blogs');
+        throw new Error("Failed to fetch blogs");
       }
 
       const data = await response.json();
       const blogsData = data.data || [];
-      
+
       // Get total count for pagination
       const countResponse = await fetch(`${env.API}/blog/count`);
       if (!countResponse.ok) {
-        throw new Error('No blogs available');
+        throw new Error("No blogs available");
       }
       const countData = await countResponse.json();
       const totalItems = countData.data || 0;
@@ -55,8 +55,8 @@ const BlogsPage: React.FC = () => {
       setFilteredBlogs(blogsData);
       setTotalPages(Math.ceil(totalItems / itemsPerPage));
     } catch (err) {
-      console.error('Error fetching blogs:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error("Error fetching blogs:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ const BlogsPage: React.FC = () => {
       const response = await fetch(`${env.API}/blog/slug/${searchQuery}`);
       console.log(response);
       if (!response.ok) {
-        throw new Error('Failed to search blogs');
+        throw new Error("Failed to search blogs");
       }
 
       const data = await response.json();
@@ -87,8 +87,8 @@ const BlogsPage: React.FC = () => {
       setTotalPages(Math.ceil(searchResults.length / itemsPerPage));
       setCurrentPage(1); // Reset to first page when searching
     } catch (error) {
-      console.error('Error searching blogs:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      console.error("Error searching blogs:", error);
+      setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -102,81 +102,102 @@ const BlogsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button
-          onClick={() => fetchBlogs()}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Try Again
-        </button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="p-8 bg-white rounded-lg shadow-lg text-center">
+          <p className="text-red-500 text-lg mb-4">{error}</p>
+          <button
+            onClick={() => fetchBlogs()}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl bg-white rounded-2xl shadow-md">
-      <h1 className="text-3xl font-bold mb-8">Blogs</h1>
-
-      <form onSubmit={handleSearch} className="mb-8">
-        <div className="flex gap-4">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search blogs..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            Search
-          </button>
+    <div className="min-h-screen bg-gray-100 pt-16 sm:pt-28">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col">
+        {/* Title and search section */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 text-left">
+            Blog Posts
+          </h1>
+          <form onSubmit={handleSearch} className="w-full sm:w-auto max-w-lg">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search blogs..."
+                className="flex-1 px-4 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-w-0"
+              />
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-base font-medium"
+              >
+                Search
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4">
-        {filteredBlogs.map((blog) => (
-          <BlogCard
-            key={blog.id}
-            blog={{
-              id: blog.id,
-              title: blog.title,
-              createdAt: new Date(blog.createdAt),
-              slug: blog.slug,
-              content: blog.content,
-              metadata: blog.metadata,
-              imageUrl: blog.imageUrl
-            }}
-          />
-        ))}
-      </div>
+        {/* Blog posts grid */}
+        {filteredBlogs.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600 text-lg">No blogs found. Try a different search.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {filteredBlogs.map((blog) => (
+              <div key={blog.id} className="bg-white rounded-md shadow-sm hover:shadow-md transition-all duration-200">
+                <BlogCard
+                  blog={{
+                    id: blog.id,
+                    title: blog.title,
+                    createdAt: new Date(blog.createdAt),
+                    slug: blog.slug,
+                    content: blog.content,
+                    metadata: blog.metadata, 
+                    imageUrl: blog.imageUrl,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
-      <div className="flex justify-center items-center mt-8">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        <span className="mx-4">Page {currentPage} of {totalPages}</span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 mx-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
+        {/* Pagination - simplified style */}
+        <div className="flex justify-center mt-8 mb-8">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+            >
+              ← Previous
+            </button>
+            <span className="text-sm font-medium text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
