@@ -296,7 +296,7 @@ const CurrentAffairsSectionPage = async ({
         {currentAffair?.type === 'daily' && (
           <SearchBar />
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 mt-5 mb-4">
           {sortedArticles.length > 0 ? (
             sortedArticles.map((article) => (
               <div

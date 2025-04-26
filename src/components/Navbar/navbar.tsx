@@ -215,7 +215,7 @@ export default function Navbar({ navigation }: NavbarProps) {
         }`}
       />
 
-      <nav className="fixed w-full top-0 z-50">
+      <nav className={`navbar-bottom-line fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'border-b-0' : ''}`}>
         {/* Top Bar - Hidden when scrolled */}
         <div
           className={`hidden md:block bg-amber-500 w-full transition-all duration-300 ${

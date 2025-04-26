@@ -105,9 +105,9 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-sm shadow-lg">
       <div className="text-center mb-8">
-        <h2 className="text-1xl font-bold text-gray-800 mb-2">
+        <h2 className="text-1xl font-bold text-gray-600 mb-2">
           Get Free UPSC Study Material
         </h2>
       </div>
@@ -163,7 +163,7 @@ const ContactForm: React.FC = () => {
         <div className="flex justify-center mt-6">
           <button
             type="submit"
-            className="px-8 py-3 bg-[#ffc107] hover:bg-[#ffb300] text-black font-semibold rounded-lg transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-md hover:shadow-lg flex items-center"
+            className="px-8 py-3 bg-[#ffc107] hover:bg-[#ffb300] text-black font-medium rounded-none transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-[15px] shadow-md hover:shadow-lg flex items-center"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
