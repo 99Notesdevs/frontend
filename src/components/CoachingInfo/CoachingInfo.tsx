@@ -7,11 +7,11 @@ const CoachingInfo = () => {
     <section className="py-16 bg-gradient-to-b from-white to-gray-50">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-16">
-          <span className="text-indigo-600 font-medium tracking-wider text-sm uppercase font-opensans">Expert Guidance</span>
+          <span className="text-yellow-500 font-medium tracking-wider text-sm uppercase font-opensans">Expert Guidance</span>
           <h2 className="text-3xl font-semibold text-gray-900 mt-3 mb-4 leading-tight font-opensans">
             BEST UPSC COACHING INSTITUTE IN DELHI
           </h2>
-          <div className="w-24 h-1 bg-indigo-600 mx-auto mb-6"></div>
+          <div className="w-24 h-1 bg-yellow-500 mx-auto mb-6"></div>
           <p className="text-lg font-normal text-gray-600 max-w-3xl mx-auto font-opensans">
             With Affordable Course Fees & Finest Quality UPSC Notes
           </p>

@@ -18,31 +18,31 @@ interface BlogCardProps {
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
   return (
-    <Link href={`/blog/${blog.slug}`} className="h-[400px] w-full md:w-[275px] lg:w-[275px] xl:w-[275px] bg-white rounded-2xl transition-all duration-300 overflow-hidden">
-      <div className="relative h-[180px] w-full overflow-hidden rounded-xl">
+    <Link href={`/blog/${blog.slug}`} className="group block bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 h-[360px] w-full">
+      <div className="relative h-[160px] w-full overflow-hidden">
         <Image
           src={blog.imageUrl}
           alt={blog.title}
           fill
-          className="object-cover"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
       </div>
-      <div className=" pt-4 flex-1">
-        <div className="space-y-3 ">
-          <h3 className="text-lg font-normal text-gray-800 line-clamp-3">
+      <div className="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-yellow-600 transition-colors duration-200">
             {blog.title}
           </h3>
-          <span className="text-sm text-gray-500">
+          <span className="text-xs text-gray-400 mb-2 block">
             {new Date(blog.createdAt).toLocaleDateString()}
           </span>
-          <p className="text-gray-600 text-sm line-clamp-4">
+          <p className="text-gray-700 text-sm line-clamp-3">
             {blog.content
               ? blog.content
                   .replace(/<[^>]*>/g, '')
                   .replace(/&nbsp;/g, ' ')
-                  .slice(0, 150)
-                  .trim() + (blog.content.length > 150 ? '...' : '')
+                  .slice(0, 120)
+                  .trim() + (blog.content.length > 120 ? '...' : '')
               : 'No content available'}
           </p>
         </div>

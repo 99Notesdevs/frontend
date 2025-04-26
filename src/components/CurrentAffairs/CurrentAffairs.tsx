@@ -96,7 +96,9 @@ const CurrentAffairs: React.FC = () => {
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
+        <span className="text-yellow-500 font-medium tracking-wider text-sm uppercase font-opensans">Current Affairs</span>
           <h2 className="text-3xl font-semibold text-gray-900 mb-4 font-opensans">UPSC Current Affairs</h2>
+          <div className="w-24 h-1 bg-yellow-500 mx-auto mb-6"></div>
           <p className="text-lg font-normal text-gray-600 max-w-3xl mx-auto font-opensans">
             Here you can also attempt questions carefully developed by our team on those topics, 
             which have high likelihood of being asked in the future exams, alongside the notes.

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { env } from "@/config/env";
 import { BaseTemplateProps } from "@/components/templates/types";
 import { Metadata } from "next";
+import AssistiveTouch from "@/components/navigation/Assistivetouch";
 
 async function getPage(
   slug: string
@@ -86,7 +87,7 @@ export default async function Page({ params }: { params: Params }) {
     notFound();
   }
 
-  const { title, content, metadata, imageUrl } = page;
+  const { title, content, metadata, imageUrl, id } = page;
   const parsedMetadata = typeof metadata === 'string' ? JSON.parse(metadata) : metadata || {};
   const jsonLD = parsedMetadata.schemaData;
   const displayImage = imageUrl || parsedMetadata.coverImage as string;
@@ -101,17 +102,19 @@ export default async function Page({ params }: { params: Params }) {
       </section>
       <main>
         <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative w-full overflow-x-hidden">
+          {/* Assistive Touch */}
+          <AssistiveTouch content={content || ''} currentPageId={id} basePath="blog" />
           <div
-            className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-12"
+            className="w-full max-w-7xl xl:max-w-6.5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-12"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-4 sm:mt-12">
               {/* Main Content Column */}
               <main className="lg:col-start-1 lg:col-span-8 xl:col-span-8 space-y-0 sm:space-y-0">
-                <div className="bg-white border shadow-lg">
+                <div className="bg-white border shadow-lg rounded-xl">
                   {/* Featured Image */}
                   {displayImage && (
                     <div className="w-full">
-                      <div className="relative w-full h-[400px]">
+                      <div className="relative w-full h-[400px] rounded-t-xl overflow-hidden">
                         <Image
                           src={`${displayImage}`}
                           alt={title}

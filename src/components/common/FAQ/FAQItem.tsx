@@ -14,20 +14,20 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, number }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-200 ${isOpen ? 'shadow-md' : 'hover:shadow'}`}>
       <button
-        className="w-full py-5 px-6 flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-orange-200"
+        className="w-full py-5 px-6 flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-yellow-300"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
         <div className="flex items-center space-x-3 pr-4">
           {number !== undefined && (
-            <span className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-orange-100 text-orange-600 font-semibold text-sm">
+            <span className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-orange-100 text-yellow-500 font-semibold text-sm">
               {number}
             </span>
           )}
           <h3 className="text-lg font-medium text-gray-900 leading-tight font-opensans">{question}</h3>
         </div>
         <div className="flex-shrink-0">
-          <span className={`flex items-center justify-center h-8 w-8 rounded-full border border-gray-200 ${isOpen ? 'bg-orange-50 text-orange-600' : 'bg-gray-50 text-gray-400'} transition-colors duration-200`}>
+          <span className={`flex items-center justify-center h-8 w-8 rounded-full border border-gray-200 ${isOpen ? 'bg-yellow-50 text-yellow-500' : 'bg-gray-50 text-gray-400'} transition-colors duration-200`}>
             <svg
               className={`w-4 h-4 transform transition-transform duration-300 ${
                 isOpen ? 'rotate-180' : ''

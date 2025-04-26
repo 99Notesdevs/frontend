@@ -101,12 +101,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
           {/* Main Content with padding adjustment */}
           <div
-            className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-12 
+            className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-12 
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
           >
             {/* <Breadcrumb /> */}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 mt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 mt-4 sm:mt-12">
               {/* Main Content Column */}
               <main className="lg:col-start-1 lg:col-span-6 xl:col-start-2 xl:col-span-7 space-y-4 sm:space-y-8">
                 {/* Featured Image */}
