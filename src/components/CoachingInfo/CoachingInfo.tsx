@@ -20,7 +20,7 @@ const CoachingInfo = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Left Column - Accordion */}
           <div className="lg:col-span-5">
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-[550px] overflow-y-auto">
+            <div className="bg-white p-6 rounded-sm shadow-lg border border-gray-100 h-[530px] overflow-y-auto">
               <div className="space-y-6">
                 <AccordionItem title="About 99notes IAS Institute">
                   <div className="text-gray-600 space-y-4 px-1">
@@ -98,7 +98,7 @@ const CoachingInfo = () => {
 
           {/* Right Column - Contact Form */}
           <div className="lg:col-span-7">
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <div className="bg-white p-6 rounded-sm shadow-lg border border-gray-100">
               <div className="max-h-[550px] overflow-y-auto">
                 <ContactForm />
               </div>

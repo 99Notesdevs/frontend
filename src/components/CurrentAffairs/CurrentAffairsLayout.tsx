@@ -192,10 +192,10 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <section className="max-w-5xl mx-auto px-0 sm:px-0 lg:px-0 py-12 mt-5 flex flex-col md:flex-row gap-1">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-blue-50 to-white">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 flex flex-col md:flex-row gap-4">
         {/* On mobile*/}
-        <div className="flex flex-col md:hidden">
+        <div className="flex flex-col md:hidden mt-4">
           <main className="flex-1">
             <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
               {memoizedChildren}
@@ -204,20 +204,20 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
         </div>
 
         {/* Sidebar */}
-        <aside className="w-full md:w-[280px] lg:w-[320px] flex-shrink-0">
-          <nav className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl md:sticky md:top-8">
+        <aside className="w-full md:w-[340px] lg:w-[400px] flex-shrink-0 mt-4 md:mt-0">
+          <nav className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl md:sticky md:top-32">
            {/* Navigation section */}
             {loading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500" />
               </div>
             ) : (
-              <section className="p-4 space-y-4">
+              <section className="p-5 space-y-5">
                 {navSections.map((section, sectionIndex) => (
                   <article key={sectionIndex} className="border-b border-gray-200 pb-3 last:border-b-0">
                     <button
                       onClick={() => memoizedToggleSection(section.title)}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium 
+                      className={`w-full flex items-center justify-between px-4 py-3 text-base font-semibold 
                         ${expandedSections[section.title] 
                           ? 'bg-amber-500 text-white' 
                           : 'text-gray-900 hover:bg-gray-50'}
@@ -243,7 +243,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
                         <Link
                           key={itemIndex}
                           href={item.path}
-                          className="group flex items-center px-4 py-1.5 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+                          className="group flex items-center px-5 py-2 text-[1.07rem] font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
                         >
                           <span className="mr-1">•</span>
                           <span className="truncate">{item.title}</span>
@@ -255,7 +255,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
               </section>
             )}
             
-            <footer className="border-t border-gray-200 bg-gray-50 p-6 space-y-8">
+            <div className="border-t border-gray-200 bg-gray-50 p-6 space-y-8">
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-orange-500 flex items-center justify-center gap-2">
                   Contact Us
@@ -274,7 +274,7 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
               </div>
               </div>
                 <Ads imageUrl="/" altText="Advertisement" />
-            </footer>
+            </div>
           </nav>
         </aside>
 

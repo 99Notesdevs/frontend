@@ -279,9 +279,9 @@ export default function ManageEmployees() {
   }
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto max-w-5xl px-2 sm:px-6 py-8 min-h-[80vh]">
+      <h1 className={`${plusJakarta.className} text-2xl font-bold text-slate-800 mb-8 text-center mt-16 sm:mt-10`}>Manage Employees</h1>
       <div className="flex justify-between items-center mb-6">
-        <h1 className={`${plusJakarta.className} text-2xl font-bold`}>Manage Employees</h1>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"

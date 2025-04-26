@@ -98,24 +98,22 @@ const CurrentAffairArticlePage = async ({
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 pt-5">
+    <div className="min-h-screen bg-gradient-to-br from-white via-white to-blue-50 pt-5">
       <div className="container max-w-7xl mx-auto px-4 py-2">
         <AssistiveTouch content={article?.content || ""} />
 
         {article ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Main content column */}
-            <div className="lg:col-span-7 xl:col-start-2 xl:col-span-7 pt-[50px]">
-              <div className="bg-white border rounded-xl shadow-lg p-4 hover:shadow-xl transition-all duration-300">
-                {/* Article Header */}
-                <div className="text-center mb-8 sm:mb-12"></div>
+            {/* Main content column - adjusting padding top for mobile */}
+            <div className="lg:col-span-8 xl:col-span-8 pt-4 lg:pt-[50px]">
+              <div className="bg-white border rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 mb-4">
                 {/* Article Header */}
                 <div className="text-center mb-8 sm:mb-12">
                   
                     <div className="mb-4">
                       <Link
                         href={`/current-affairs/${category}`}
-                        className="text-amber-500 hover:text-blue-800 font-medium text-sm"
+                        className="text-yellow-600 hover:text-blue-800 font-medium text-sm"
                       >
                         {category}
                       </Link>
@@ -123,17 +121,17 @@ const CurrentAffairArticlePage = async ({
                   
                   {article?.metadata && (
                     <>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8">
                       {JSON.parse(article.metadata).metaTitle}
                     </h1>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 mb-2" >
                       By {article.author} • {article.createdAt ? new Date(article.createdAt).toLocaleDateString('en-US', {
                         month: 'long',
                         day: 'numeric',
                         year: 'numeric'
                       }).replace(/\//g, '/') : 'N/A'}
                     </p>
-                    <Whatsapp />
+                    <div className="mt-7"><Whatsapp /></div>
                     </>
                   )}
                 </div>
@@ -208,13 +206,13 @@ const CurrentAffairArticlePage = async ({
               </div>
             </div>
 
-            {/* Right Sidebar */}
+            {/* Right Sidebar - increasing width */}
             <div className="lg:col-span-4 hidden lg:block space-y-4 sm:space-y-6 mt-12">
               {/* Sticky Container */}
               <div className="relative">
                 {/* TOC Section */}
               <div className="sticky top-8 space-y-4 sm:space-y-6">
-                <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
+                <div className="bg-white border border-blue-100 rounded-lg shadow-lg p-4 sm:p-6 
                   transition-all duration-300 hover:shadow-xl">
                   <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
                     Table of Contents
