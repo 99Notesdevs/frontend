@@ -6,6 +6,10 @@ import Link from "next/link";
 import axios from "axios";
 import { env } from "@/config/env";
 
+interface StudyMaterial {
+  title: string;
+  description: string;
+}
 interface Page {
   id: number;
   slug: string;
@@ -23,13 +27,12 @@ interface Page {
   updatedAt: string;
 }
 
-interface Material {
+interface StudyMaterialsProps {
   title: string;
-  image: string;
   description: string;
 }
 
-const StudyMaterials = () => {
+const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
   const [pages, setPages] = useState<Page[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
@@ -101,11 +104,10 @@ const StudyMaterials = () => {
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            UPSC Study Material & Notes
+            {title}
           </h2>
           <p className="text-lg text-gray-600">
-            Complete coverage of all topics along with PYQs from UPSC & State
-            PSCs
+            {description}
           </p>
         </div>
 

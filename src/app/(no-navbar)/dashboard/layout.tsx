@@ -43,6 +43,7 @@ const navigationItems = {
       category: "Site Management",
       items: [
         { icon: FaEdit, text: "Edit About99", path: "/dashboard/update-about" },
+        { icon: FaEdit, text: "Edit Home", path: "/dashboard/update-home" },
         { icon: FaEdit, text: "Manage Forms", path: "/dashboard/forms" }
       ]
     },
