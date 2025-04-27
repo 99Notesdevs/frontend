@@ -103,7 +103,7 @@ export default async function Page({ params }: { params: Params }) {
       <main>
         <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
           {/* Assistive Touch */}
-          <AssistiveTouch content={content || ''} currentPageId={id} basePath="blog" />
+          <AssistiveTouch content={content || ''} />
           <div
             className="w-full max-w-7xl xl:max-w-6.5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-12"
           >
