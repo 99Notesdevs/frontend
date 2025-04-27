@@ -94,21 +94,18 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
         />
       </section>
       <main>
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative w-full overflow-x-hidden">
+        <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
           {/* Assistive Touch */}
           <AssistiveTouch content={mainContentFinal} />
 
-
-          {/* Main Content with padding adjustment */}
+          {/* Main Content */}
           <div
-            className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-12 
+            className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
           >
-            {/* <Breadcrumb /> */}
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 mt-4 sm:mt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4 sm:mt-12">
               {/* Main Content Column */}
-              <main className="lg:col-start-1 lg:col-span-6 xl:col-start-2 xl:col-span-7 space-y-4 sm:space-y-8">
+              <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-8">
                 {/* Featured Image */}
                 {displayImage && (
                   <div className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
@@ -221,7 +218,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
               </main>
               {/* Right Sidebar */}
-              <aside className="lg:col-start-7 xl:col-start-9 lg:col-span-3 xl:col-span-3 space-y-4 sm:space-y-6">
+              <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
                 {/* Search Bar - Always visible at top */}
                 <div
                   className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 

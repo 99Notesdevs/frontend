@@ -20,14 +20,13 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
       <main>
-        <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            {/* <Breadcrumb /> */}
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 mt-8">
-              {/* Left Sidebar with increased width */}
-              <aside className="lg:col-span-5 xl:col-span-3 xl:col-start-2 order-2 lg:order-1">
-                {/* Sticky Container */}
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+          {/* Increase max width of the container */}
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 lg:py-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-7 lg:mt-16">
+              {/* Adjust sidebar width */}
+              <aside className="lg:col-span-4 order-2 lg:order-1">
+                {/* Rest of sidebar content remains same */}
                 <div className="relative">
                   <div className="sticky top-8 space-y-6">
                     {/* Navigation Section */}
@@ -72,31 +71,9 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 </div>
               </aside>
 
-              {/* Main Content with reduced width */}
-              <main className="lg:col-span-7 xl:col-span-7 order-1 lg:order-2">
-                <article className="bg-white border border-background-secondary rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
-                  {/* <h1 className="text-4xl sm:text-4xl font-bold mb-8 text-center">
-                <span className="text-primary border-b-2 border-accent-color pb-2">
-                  {page.title}
-                </span>
-              </h1> */}
-
-                  {/* <div className="flex flex-wrap gap-2 mb-8 justify-center">
-                    {Array.isArray(page.metadata?.keywords)
-                      ? page.metadata.keywords.map(
-                          (keyword: string, index: number) => (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                              className="text-sm px-4 py-2 bg-background-secondary text-primary border border-background-secondary rounded-lg hover:bg-background-tertiary transition-colors duration-200"
-                            >
-                              {keyword}
-                            </Badge>
-                          )
-                        )
-                      : null}
-                  </div> */}
-
+              {/* Adjust main content width */}
+              <main className="lg:col-span-8 order-1 lg:order-2">
+                <article className="bg-white border border-background-secondary rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 lg:p-8">
                   <div
                     className="prose prose-lg max-w-none
                   prose-headings:font-bold 

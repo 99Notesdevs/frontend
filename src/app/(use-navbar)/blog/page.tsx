@@ -125,7 +125,7 @@ const BlogsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-16 sm:pt-28">
+    <div className="min-h-screen bg-gray-100 pt-8 sm:pt-28">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col">
         {/* Title and search section */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">

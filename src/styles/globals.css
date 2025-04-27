@@ -17,6 +17,99 @@
   }
 }
 
+:root {
+  /* Primary and Secondary */
+  --primary: #f59e0b; /* yellow-500 */
+  --secondary: #d97706; /* yellow-600 */
+
+  /* Yellows */
+  --yellow-50: #fefce8;
+  --yellow-100: #fef9c3;
+  --yellow-200: #fef08a;
+  --yellow-300: #fde047;
+  --yellow-400: #facc15;
+  --yellow-500: #f59e0b;
+  --yellow-600: #d97706;
+  --yellow-700: #b45309;
+  --yellow-800: #92400e;
+  --yellow-900: #78350f;
+
+  /* Amber */
+  /* Navbar colors */
+  --amber-500: #f59e42;
+  --amber-600: #d97706;
+
+  /* Orange */
+  --orange-200: #fed7aa;
+  --orange-500: #fb923c;
+
+  /* Blue */
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-800: #1e40af;
+  --blue-900: #1e3a8a;
+  --blue-custom: #163265;
+
+  /* Green */
+  --green-50: #f0fdf4;
+  --green-200: #bbf7d0;
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --green-900: #14532d;
+
+  /* Red */
+  --red-50: #fef2f2;
+  --red-200: #fecaca;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-900: #7f1d1d;
+
+  /* Indigo */
+  --indigo-600: #4f46e5;
+
+  /* Slate */
+  --slate-100: #f1f5f9;
+  --slate-700: #334155;
+  --slate-900: #0f172a;
+
+  /* Gray */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* White/Black */
+  --white: #ffffff;
+  --black: #000000;
+
+  /* Custom Scrollbar */
+  --scrollbar-track: #333;
+  --scrollbar-thumb: #666;
+  --scrollbar-thumb-hover: #444;
+
+  /* Other custom */
+  --navbar-bottom: var(--amber-500);
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-blur: blur(4px);
+  --shadow-light: rgba(0,0,0,0.03);
+  --shadow-heading: rgba(0,0,0,0.05);
+  --locked-bg: rgba(0,0,0,0.7);
+  --locked-bg-hover: rgba(0,0,0,0.9);
+  --gradient-transparent: rgba(255,255,255,0);
+  --gradient-semi: rgba(255,255,255,0.8);
+  --gradient-opaque: rgba(255,255,255,1);
+}
+
 /* Yellow icon styling */
 .yellow-icon {
   filter: invert(70%) sepia(80%) saturate(1000%) hue-rotate(360deg) brightness(110%);
@@ -57,11 +150,6 @@
     /* Example: 16px */
     margin-bottom: 0.5rem;
 }
-.prose h6 {
-    font-size: 1rem;
-    /* Example: 16px */
-    margin-bottom: 0.5rem;
-}
 
 .locked-content {
     position: relative;
@@ -78,11 +166,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(rgba(255, 255, 255, 0) 50%,
+    background: linear-gradient(var(--gradient-transparent) 50%,
             /* Fully transparent at the top */
-            rgba(255, 255, 255, 0.8) 80%,
+            var(--gradient-semi) 80%,
             /* Semi-transparent in the middle */
-            rgba(255, 255, 255, 1) 100%
+            var(--gradient-opaque) 100%
             /* Fully opaque at the bottom */
         );
     pointer-events: none;
@@ -105,9 +193,9 @@
     transform: translate(-50%, -50%);
     /* Adjust for the element's size */
     z-index: 10;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--locked-bg);
     /* Semi-transparent black background */
-    color: white;
+    color: var(--white);
     padding: 10px 20px;
     border-radius: 8px;
     font-size: 14px;
@@ -118,7 +206,7 @@
 }
 
 .locked-content .login-link:hover {
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: var(--locked-bg-hover);
     /* Darker background on hover */
 }
 
@@ -180,17 +268,17 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: #333;
+    background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #666;
+    background: var(--scrollbar-thumb);
     border-radius: 6px;
-    border: 3px solid #333;
+    border: 3px solid var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #444;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* Prevent horizontal overflow */
@@ -216,10 +304,10 @@ p {
 
 /* Add glass morphism effect */
 .glass {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
 }
 
 /* Add text shadow for headings */
@@ -229,12 +317,12 @@ h3,
 h4,
 h5,
 h6 {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    text-shadow: 0 1px 2px var(--shadow-heading);
 }
 
 .navbar-bottom-line {
-  border-bottom: 1.5px solid #f59e42; /* amber-500 hex */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  border-bottom: 1.5px solid var(--navbar-bottom);
+  box-shadow: 0 2px 8px var(--shadow-light);
   transition: border-bottom 0.3s;
 }
 

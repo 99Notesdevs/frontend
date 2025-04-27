@@ -44,7 +44,7 @@ const ContactMap: React.FC = () => {
 
   return (
     <section className="py-10 bg-white">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Info Cards */}
           <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -52,7 +52,7 @@ const ContactMap: React.FC = () => {
               <div
                 key={index}
                 className="bg-white rounded-lg border border-gray-100 shadow-md p-6 flex items-start space-x-4 
-                          hover:shadow-2xl hover:shadow-orange-100 hover:border-orange-200 transform hover:scale-105 hover:-translate-y-2 
+                          hover:shadow-2xl hover:shadow-yellow-100 hover:border-yellow-200 transform hover:scale-105 hover:-translate-y-2 
                           transition-all duration-300 ease-in-out cursor-pointer"
               >
                 <div className="flex-shrink-0 p-3 bg-orange-50 rounded-full">
@@ -67,11 +67,11 @@ const ContactMap: React.FC = () => {
                       href={info.href} 
                       target={info.title === 'Address' ? "_blank" : undefined}
                       rel={info.title === 'Address' ? "noopener noreferrer" : undefined}
-                      className="hover:text-orange-500 transition-colors duration-300 relative 
+                      className="hover:text-yellow-500 transition-colors duration-300 relative 
                                 group inline-block"
                     >
                       {info.value}
-                      <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-orange-500 
+                      <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-yellow-400 
                                      group-hover:w-full transition-all duration-300"></span>
                     </a>
                   </p>
