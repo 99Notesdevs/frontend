@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TableOfContents } from './TableOfContents';
 import { SidebarNavigation } from './SidebarNavigation';
 import { Menu, List, Navigation2, X } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface AssistiveTouchProps {
   content: string;
@@ -21,6 +22,9 @@ export default function AssistiveTouch({ content, currentPageId, basePath }: Ass
   const buttonRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
+
+  const pathname = usePathname();
+  const router = useRouter();
 
   // Mouse event handlers
   useEffect(() => {
@@ -157,7 +161,15 @@ export default function AssistiveTouch({ content, currentPageId, basePath }: Ass
             </button>
             <button
               className="bg-black/50 hover:bg-black/60 border border-black/30 text-white p-2.5 rounded-full shadow-lg backdrop-blur-md hover:scale-110 transition-all duration-200 active:scale-95"
-              onClick={() => handleComponentClick('nav')}
+              onClick={() => {
+                // Only redirect if on blog page
+                if (pathname && pathname.startsWith('/blog')) {
+                  router.push('/blog');
+                } else {
+                  setShowComponent('nav');
+                  setShowBackdrop(true);
+                }
+              }}
             >
               <Navigation2 className="w-4 h-4" />
             </button>

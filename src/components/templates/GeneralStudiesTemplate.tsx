@@ -32,11 +32,11 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
     <main>
-    <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-7">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 lg:mt-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Left Column - Main Image and Content */}
-          <div className="lg:col-span-6 xl:col-start-2 xl:col-span-7">
+          <div className="lg:col-span-8 space-y-4 sm:space-y-8">
             {/* Main Topic Image */}
             <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-10 transform transition-all hover:scale-[1.02]">
               <div className="relative w-full h-72 md:h-96">
@@ -121,7 +121,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
 
             {/* Main Content Section */}
             <Card className="border-0 shadow-xl bg-white/90">
-              <CardContent className="p-10">
+              <CardContent className="p-8 lg:p-10">
                 <div 
                   className="prose prose-lg max-w-none
                     prose-h1:text-gray-900 prose-h1:text-center prose-h1:font-bold prose-h1:border-b-2 prose-h1:border-yellow-400 prose-h1:pb-2 prose-h1:mb-6
@@ -138,15 +138,16 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
           </div>
 
           {/* Right Sidebar */}
-          <aside className="lg:col-span-4 xl:col-span-3">
-            {/* Search Bar - Always visible at top */}
-            <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl mb-6">
+          <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
+            {/* Search Bar */}
+            <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-4 sm:p-6 
+                transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
               <SearchBar />
             </div>
 
             {/* Sticky Container */}
             <div className="relative">
-              <div className="sticky top-8 space-y-6">
+              <div className="sticky top-8 space-y-4 sm:space-y-6">
                 {/* Table of Contents Section */}
                 <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
                   <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
