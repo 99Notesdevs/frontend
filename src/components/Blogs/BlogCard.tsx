@@ -36,13 +36,13 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
           <span className="text-xs text-gray-400 mb-2 block">
             {new Date(blog.createdAt).toLocaleDateString()}
           </span>
-          <p className="text-gray-700 text-sm line-clamp-3">
+          <p className="text-gray-700 text-sm line-clamp-4">
             {blog.content
               ? blog.content
                   .replace(/<[^>]*>/g, '')
                   .replace(/&nbsp;/g, ' ')
-                  .slice(0, 120)
-                  .trim() + (blog.content.length > 120 ? '...' : '')
+                  .slice(0, 150)
+                  .trim() + (blog.content.length > 150 ? '...' : '')
               : 'No content available'}
           </p>
         </div>

@@ -192,8 +192,8 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-blue-50 to-white">
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 flex flex-col md:flex-row gap-4">
+    <div className="min-h-screen bg-white">
+      <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-4 md:pt-24 flex flex-col md:flex-row gap-4">
         {/* On mobile*/}
         <div className="flex flex-col md:hidden mt-4">
           <main className="flex-1">

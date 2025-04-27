@@ -101,7 +101,7 @@ export default async function Page({ params }: { params: Params }) {
         />
       </section>
       <main>
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative w-full overflow-x-hidden">
+        <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
           {/* Assistive Touch */}
           <AssistiveTouch content={content || ''} currentPageId={id} basePath="blog" />
           <div

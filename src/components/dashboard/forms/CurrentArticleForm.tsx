@@ -476,7 +476,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
           <Button
             disabled={isUploading}
             type="submit"
-            className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-2 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-colors duration-200"
+            className="bg-slate-700 text-white px-8 py-2 rounded-lg hover:bg-slate-800 transition-colors duration-200"
           >
             {isUploading ? "Uploading..." : "Save"}
           </Button>

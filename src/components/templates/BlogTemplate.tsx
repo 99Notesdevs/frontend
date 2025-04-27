@@ -22,7 +22,7 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-12">
                     {/* Main Content Column */}
-                    <main className="lg:col-start-1 lg:col-span-8 xl:col-span-8 space-y-0 sm:space-y-0">
+                    <main className="lg:col-start-1 lg:col-span-9 xl:col-span-9 space-y-0 sm:space-y-0">
                       <div className="bg-white border shadow-lg">
                         {/* Featured Image */}
                         {imageUrl && (
@@ -118,7 +118,7 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
                     </main>
       
                     {/* Sidebar */}
-                    <aside className="lg:col-start-9 lg:col-span-4 xl:col-start-9 xl:col-span-4 space-y-4 sm:space-y-8">
+                    <aside className="lg:col-start-10 lg:col-span-3 xl:col-start-10 xl:col-span-3 space-y-4 sm:space-y-8">
                       <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-lg font-semibold mb-4">Related Topics</h2>
                         <p className="text-gray-600">Coming soon...</p>

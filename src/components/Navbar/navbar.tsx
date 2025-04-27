@@ -303,8 +303,8 @@ export default function Navbar({ navigation }: NavbarProps) {
               <div className="lg:hidden">
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-full text-gray-700 
-                         hover:text-blue-600 hover:bg-blue-50 focus:outline-none transition-colors"
+                  className="inline-flex items-center justify-center p-2 rounded-lg text-gray-500 bg-yellow-50
+                         hover:text-yellow-600 hover:bg-yellow-100 focus:outline-none transition-colors"
                 >
                   <span className="sr-only">Open main menu</span>
                   {isOpen ? (
@@ -460,12 +460,12 @@ export default function Navbar({ navigation }: NavbarProps) {
             
             {/* About and Blogs */}
             <Link href="/about" passHref>
-              <span className="block px-3 py-2.5 text-base font-normal text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600 font-opensans" onClick={() => setIsOpen(false)}>
+              <span className="block px-3 py-2.5 text-base font-semibold text-gray-800 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600 font-opensans" onClick={() => setIsOpen(false)}>
                 About 99Notes
               </span>
             </Link>
-            <Link href="/blogs" passHref>
-              <span className="block px-3 py-2.5 text-base font-normal text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600 font-opensans" onClick={() => setIsOpen(false)}>
+            <Link href="/blog" passHref>
+              <span className="block px-3 py-2.5 text-base font-semibold text-gray-800 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600 font-opensans" onClick={() => setIsOpen(false)}>
                 Blogs
               </span>
             </Link>

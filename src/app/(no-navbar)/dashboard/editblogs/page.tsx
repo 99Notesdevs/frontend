@@ -271,7 +271,7 @@ export default function ArticlesPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-500"></div>
       </div>
     );
   }
@@ -284,7 +284,7 @@ export default function ArticlesPage() {
           onClick={() => {
             fetchPages();
           }}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
         >
           Try Again
         </button>
@@ -294,6 +294,7 @@ export default function ArticlesPage() {
 
   return (
     <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-8 text-slate-800">Manage Blogs</h1>
       <div className="flex flex-col gap-6">
         {/* Blog List */}
         <div className="bg-white p-6 rounded-xl shadow-md">
@@ -304,7 +305,7 @@ export default function ArticlesPage() {
                 placeholder="Search blogs..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700"
               />
             </div>
             <div className="flex items-center space-x-4">
@@ -314,7 +315,7 @@ export default function ArticlesPage() {
                   setSelectedPage(null);
                   setImagePreview(null);
                 }}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded"
               >
                 Clear Selection
               </button>
@@ -352,7 +353,7 @@ export default function ArticlesPage() {
                           e.stopPropagation();
                           handleEdit(page);
                         }}
-                        className="p-2 text-blue-500 hover:text-blue-700"
+                        className="p-2 text-slate-500 hover:text-slate-600"
                         title="Edit"
                       >
                         <PencilIcon className="h-5 w-5" />
@@ -362,7 +363,7 @@ export default function ArticlesPage() {
                           e.stopPropagation();
                           setDeleteConfirm(page.id);
                         }}
-                        className="p-2 text-red-500 hover:text-red-700"
+                        className="p-2 text-red-500 hover:text-red-600"
                         title="Delete"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -380,7 +381,7 @@ export default function ArticlesPage() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -391,7 +392,7 @@ export default function ArticlesPage() {
                     onClick={() => handlePageChange(page)}
                     className={`px-4 py-2 rounded ${
                       page === currentPage
-                        ? "bg-blue-500 text-white"
+                        ? "bg-slate-500 text-white"
                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                   >
@@ -403,7 +404,7 @@ export default function ArticlesPage() {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>
