@@ -14,6 +14,7 @@ import {
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Alert } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formSchema = z.object({
   title: z.string(),
@@ -209,7 +210,21 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               <FormItem>
                 <FormLabel>Robots</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter robots meta tag" {...field} />
+                  <Select 
+                    value={field.value || "noindex,nofollow"}
+                    onValueChange={(value) => field.onChange(value)}
+                    defaultValue="noindex,nofollow"
+                  >
+                    <SelectTrigger className="text-gray-500">
+                      <SelectValue placeholder="No index, No follow" />
+                    </SelectTrigger>
+                    <SelectContent className="text-gray-500">
+                      <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
+                      <SelectItem value="index,nofollow">Index, No follow</SelectItem>
+                      <SelectItem value="noindex,follow">No index, Follow</SelectItem>
+                      <SelectItem value="index,follow">Index, Follow</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               </FormItem>
             )}

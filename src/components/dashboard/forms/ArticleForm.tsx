@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Alert } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const articleSchema = z.object({
   title: z.string(),
@@ -303,7 +304,21 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
               <FormItem>
                 <FormLabel>Robots</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Select 
+                    value={field.value || "noindex,nofollow"}
+                    onValueChange={(value) => field.onChange(value)}
+                    defaultValue="noindex,nofollow"
+                  >
+                    <SelectTrigger className="text-white">
+                      <SelectValue placeholder="No index, No follow" />
+                    </SelectTrigger>
+                    <SelectContent className="text-white">
+                      <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
+                      <SelectItem value="index,nofollow">Index, No follow</SelectItem>
+                      <SelectItem value="noindex,follow">No index, Follow</SelectItem>
+                      <SelectItem value="index,follow">Index, Follow</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               </FormItem>
             )}
