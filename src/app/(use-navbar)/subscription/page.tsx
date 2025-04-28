@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { env } from '@/config/env';
 import Cookies from 'js-cookie';
+import { redirect } from 'next/dist/server/api-utils';
 
 export default function SubscriptionPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -15,7 +16,7 @@ export default function SubscriptionPage() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await fetch(`${env.API}/orders/type/Articles`);
+        const response = await fetch(`${env.API}/product`);
         if (!response.ok) throw new Error('Failed to fetch plans');
         const { data } = await response.json();
         setPlans(data);
@@ -32,14 +33,13 @@ export default function SubscriptionPage() {
   const handleBuyClick = async (plan: any) => {
     // implement buy click logic here
     const data = {
-      name: "test",
-      mobileNumber: "test",
-      orderId: plan.id,
-      amount: plan.amount,
-      validity: plan.validity,
-    }
-    console.log(data);
-    const response = await fetch(`${env.API}/payment/create-order`, {
+      orderDate: new Date().toISOString(),
+      totalAmount: Number(plan.price),
+      status: "Pending",
+      billingAddress: "",
+      shippingAddress: "",
+    };
+    const response = await fetch(`${env.API}/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,14 +47,33 @@ export default function SubscriptionPage() {
       },
       body: JSON.stringify(data),
     });
-    if (response.status === 401) {
+    if (response.status === 403) {
       alert('Please login to continue');
       window.location.href = '/users/login';
       return;
     }
     const responseData = await response.json();
-    window.location.href = responseData.data;
-    console.log(responseData);
+    console.log("First ", responseData);
+    const orderId = responseData.data.id;
+    const orderData = {
+      orderId: orderId,
+      phonepe_transactionId: "",
+      status: "",
+      amount: data.totalAmount,
+      redirectUrl: ""
+    }
+    const response2 = await fetch(`${env.API}/payment/create-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+    const responseData2 = await response2.json();
+    console.log(responseData2.data);
+    const redirectUrl = responseData2.redirectUrl;
+    window.location.href = redirectUrl;
   };
 
   const extractFeatures = (description: string) => {
@@ -85,8 +104,8 @@ export default function SubscriptionPage() {
                 className="border-2 border-amber-500 hover:border-amber-600 hover:border-primary transition-all duration-300"
               >
                 <CardHeader className="text-center">
-                  <CardTitle className="text-2xl font-bold mb-2">{plan.title}</CardTitle>
-                  <p className="text-3xl font-bold text-primary">{`₹${plan.amount}/${plan.validity} Days`}</p>
+                  <CardTitle className="text-2xl font-bold mb-2">{plan.name}</CardTitle>
+                  <p className="text-3xl font-bold text-primary">{`₹${plan.price}/${plan.validity} Days`}</p>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-gray-600">
