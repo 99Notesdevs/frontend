@@ -11,6 +11,7 @@ interface CurrentAffairSection {
   slug: string;
   createdAt: string;
   updatedAt: string;
+  showInNav: boolean;
   link: string | null;
 }
 
@@ -36,6 +37,7 @@ export async function getNavigationTree(): Promise<NavItem[]> {
       slug: string;
       title: string;
       link: string | null;
+      showInNav: boolean;
     }
 
     interface PageResponse {
@@ -58,6 +60,7 @@ export async function getNavigationTree(): Promise<NavItem[]> {
             title: index === parts.length ? (page.title) : part.replace(/\-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
             link: page.link,
             children: [],
+            showInNav: page.showInNav,
           };
           currentLevel.push(newItem);
           currentLevel = newItem.children;
@@ -90,24 +93,28 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
     slug: 'current-affairs',
     title: 'Current Affairs',
     link: null,
+    showInNav: true,
     children: [
       {
         slug: 'current-affairs/daily',
         title: 'Daily Current Affairs',
         link: null,
-        children: []
+        children: [],
+        showInNav: true,
       },
       {
         slug: 'current-affairs/monthly',
         title: 'Monthly Current Affairs',
         link: null,
-        children: []
+        children: [],
+        showInNav: true,
       },
       {
         slug: 'current-affairs/yearly',
         title: 'Yearly Current Affairs',
         link: null,
-        children: []
+        children: [],
+        showInNav: true,
       }
     ]
   };
@@ -142,7 +149,7 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
         const dailyNavItems = currentAffairsNav.children.find(item => item.slug === 'current-affairs/daily');
         
         if (dailyNavItems) {
-          dailyNavItems.children = dailySections.map((section: CurrentAffairSection) => {
+          dailyNavItems.children = dailySections.filter((section: CurrentAffairSection) => section.showInNav).map((section: CurrentAffairSection) => {
             // Extract the last part of the slug for the path
             const pathSlug = section.slug.split('/').pop() || section.slug;
             const isCustomLink = section.link && section.link !== '';
@@ -151,7 +158,8 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
               slug: `current-affairs/${pathSlug}`,
               title: section.title,
               link: section.link,
-              children: []
+              children: [],
+              showInNav: true,
             };
           });
         }
@@ -166,14 +174,15 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
         const monthlyNavItems = currentAffairsNav.children.find(item => item.slug === 'current-affairs/monthly');
         
         if (monthlyNavItems) {
-          monthlyNavItems.children = monthlySections.map((section: CurrentAffairSection) => {
+          monthlyNavItems.children = monthlySections.filter((section: CurrentAffairSection) => section.showInNav).map((section: CurrentAffairSection) => {
             // Extract the last part of the slug for the path
             const pathSlug = section.slug.split('/').pop() || section.slug;
             return {
               slug: `current-affairs/${pathSlug}`,
               title: section.title,
               link: section.link,
-              children: []
+              children: [],
+              showInNav: true,
             };
           });
         }
@@ -188,14 +197,15 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
         const yearlyNavItems = currentAffairsNav.children.find(item => item.slug === 'current-affairs/yearly');
         
         if (yearlyNavItems) {
-          yearlyNavItems.children = yearlySections.map((section: CurrentAffairSection) => {
+          yearlyNavItems.children = yearlySections.filter((section: CurrentAffairSection) => section.showInNav).map((section: CurrentAffairSection) => {
             // Extract the last part of the slug for the path
             const pathSlug = section.slug.split('/').pop() || section.slug;
             return {
               slug: `current-affairs/${pathSlug}`,
               title: section.title,
               link: section.link,
-              children: []
+              children: [],
+              showInNav: true,
             };
           });
         }
@@ -250,6 +260,7 @@ export async function getFooterLinks(): Promise<NavItem[]> {
             title: index === parts.length - 1 ? page.title : part.replace(/\-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
             link: page.link,
             children: [],
+            showInNav: true,
           };
           currentLevel.push(newItem);
           currentLevel = newItem.children;

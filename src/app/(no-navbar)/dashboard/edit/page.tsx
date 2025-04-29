@@ -439,7 +439,7 @@ function PageList() {
                             <TrashIcon className="h-5 w-5" />
                           </button>
                           <Link
-                            href={`/${page.slug}`}
+                            href={page.link ? page.link : `/${page.slug}`}
                             target="_blank"
                             className="p-2 text-green-600 hover:text-green-800 rounded-full hover:bg-green-50 transition-colors"
                             title="View"
