@@ -76,7 +76,7 @@ export default function PageListCurrent() {
         content: formData.content,
         type: selectedType || 'daily',
         slug,
-        
+        showInNav: formData.showInNav,
         updatedAt: new Date(),
         imageUrl: formData.imageUrl,
         metadata: JSON.stringify({
@@ -143,7 +143,6 @@ export default function PageListCurrent() {
         content: "dummy",
         type: selectedType || 'daily',
         slug:"dummy",
-        
         updatedAt: new Date(),
         imageUrl: "",
         metadata: ""
@@ -190,6 +189,7 @@ export default function PageListCurrent() {
         title: selectedPage.title,
         content: selectedPage.content || '',
         imageUrl: selectedPage.imageUrl || '',
+        showInNav: selectedPage.showInNav || false,
         metaTitle: parsedMetadata.metaTitle || '',
         metaDescription: parsedMetadata.metaDescription || '',
         metaKeywords: parsedMetadata.metaKeywords || '',
@@ -441,6 +441,7 @@ export default function PageListCurrent() {
                   defaultValues={{
                     title: selectedPage.title,
                     content: selectedPage.content || '',
+                    showInNav: selectedPage.showInNav || false,
                     imageUrl: selectedPage.imageUrl || '',
                     metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
                     metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',

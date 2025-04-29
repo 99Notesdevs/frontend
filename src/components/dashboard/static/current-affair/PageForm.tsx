@@ -15,6 +15,8 @@ interface CurrentAffairType {
   title: string;
   content: string;
   imageUrl: string;
+  link: string;
+  showInNav: boolean;
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -48,6 +50,7 @@ interface CurrentAffairArticleType {
   updatedAt: Date;
   parentSlug: string;
   quizQuestions?: string;
+  showInNav: boolean;
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -93,6 +96,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [newAffairData, setNewAffairData] = useState({
     title: '',
     content: '',
+    showInNav: false,
     imageUrl: '',
     type: 'daily',
     link: '',
@@ -122,6 +126,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     quizQuestions: '',
     author: 'here',
     link: '',
+    showInNav: false,
     metaTitle: '',
     metaDescription: '',
     metaKeywords: '',
@@ -297,6 +302,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         imageUrl: data.imageUrl,
         type: selectedType,
         slug,
+        showInNav: data.showInNav,
         link: selectedAffairTemplate === 'custom-link' ? data.link : '',
         metadata: JSON.stringify({
           metaTitle: data.metaTitle,
@@ -387,6 +393,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         content,
         author: data.author,
         slug: articleSlug,
+        showInNav: data.showInNav,
         parentSlug: selectedAffair.slug,
         quizQuestions: data.quizQuestions,
         type: selectedType,
@@ -568,6 +575,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                               required
                             />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Show in Navigation</label>
+                            <input type="checkbox" onChange={(e) => setNewAffairData(prev => ({ ...prev, showInNav: e.target.checked }))} className="w-4 h-4" />
                           </div>
                         </div>
 

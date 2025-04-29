@@ -7,6 +7,7 @@ import SocialMedia from "../navigation/socialmedia";
 interface FooterLink {
   slug: string;
   title: string;
+  link: string | null | undefined;
   children: FooterLink[];
 }
 
@@ -26,7 +27,7 @@ const Footer = ({ footerSections }: FooterProps) => {
                 {section.children.map((link) => (
                   <li key={link.slug}>
                     <Link
-                      href={`/${link.slug}`}
+                      href={link.link ? link.link : `/${link.slug}`}
                       className="hover:text-primary-active"
                     >
                       {link.title}

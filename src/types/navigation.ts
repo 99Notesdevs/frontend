@@ -3,4 +3,5 @@ export interface NavItem {
   title: string;
   children: NavItem[];
   link: string | null;
+  showInNav: boolean;
 }
