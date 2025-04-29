@@ -323,18 +323,18 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormLabel>Robots</FormLabel>
                 <FormControl>
                   <Select 
-                    value={field.value || "none"}
+                    value={field.value || "noindex,nofollow"}
                     onValueChange={(value) => field.onChange(value)}
-                    defaultValue="none"
+                    defaultValue="noindex,nofollow"
                   >
                     <SelectTrigger className="text-white">
-                      <SelectValue placeholder="None" />
+                      <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
                     <SelectContent className="text-white">
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="index">Index</SelectItem>
-                      <SelectItem value="follow">Follow</SelectItem>
-                      <SelectItem value="index,follow">Index and Follow</SelectItem>
+                      <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
+                      <SelectItem value="index,nofollow">Index, No follow</SelectItem>
+                      <SelectItem value="noindex,follow">No index, Follow</SelectItem>
+                      <SelectItem value="index,follow">Index, Follow</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
 import { set } from 'date-fns';
 import { QuizQuestions } from '@/components/dashboard/static/current-affair/QuizQuestions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
@@ -300,11 +301,21 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
                 Robots
               </FormLabel>
               <FormControl>
-                <Input
-                  placeholder="index, follow"
-                  {...field}
-                  className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                />
+                <Select 
+                  value={field.value || "noindex,nofollow"}
+                  onValueChange={(value) => field.onChange(value)}
+                  defaultValue="noindex,nofollow"
+                >
+                  <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-gray-500">
+                    <SelectValue placeholder="No index, No follow" />
+                  </SelectTrigger>
+                  <SelectContent className="text-gray-500">
+                    <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
+                    <SelectItem value="index,nofollow">Index, No follow</SelectItem>
+                    <SelectItem value="noindex,follow">No index, Follow</SelectItem>
+                    <SelectItem value="index,follow">Index, Follow</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
