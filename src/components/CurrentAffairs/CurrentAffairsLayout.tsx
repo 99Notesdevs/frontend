@@ -139,7 +139,7 @@ const navigationSections: NavSection[] = [
   {
     title: "Daily Current Affairs",
     items: (groupedSections['daily'] || [])
-      .filter((item: CurrentAffairSection) => !item.link && item.link !== "")
+      .filter((item: CurrentAffairSection) => !item.link )
       .map(section => {
         // Extract the last part of the slug for the path
         const pathSlug = section.slug.split('/').pop() || section.slug;
@@ -153,7 +153,7 @@ const navigationSections: NavSection[] = [
   {
     title: "Monthly Current Affairs",
     items: (groupedSections['monthly'] || [])
-      .filter((item: CurrentAffairSection) => !item.link && item.link !== "")
+      .filter((item: CurrentAffairSection) => !item.link )
       .map(section => {
         // Extract the last part of the slug for the path
         const pathSlug = section.slug.split('/').pop() || section.slug;
@@ -167,7 +167,7 @@ const navigationSections: NavSection[] = [
   {
     title: "Yearly Current Affairs",
     items: (groupedSections['yearly'] || [])
-      .filter((item: CurrentAffairSection) => !item.link && item.link !== "")
+      .filter((item: CurrentAffairSection) => !item.link )
       .map(section => {
         // Extract the last part of the slug for the path
         const pathSlug = section.slug.split('/').pop() || section.slug;
