@@ -7,6 +7,7 @@ import {
   UpscNotesForm,
   CurrentAffairForm,
   BlogForm,
+  CustomLinkForm,
 } from "../forms";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,7 +59,8 @@ interface PageFormData extends Record<string, any> {
   };
   content?: string;
   imageUrl?: string;
-  
+  slug?: string;
+  link?: string;
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -249,9 +251,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
       const pageData = {
         title: formData.title || formData.hero?.title,
         slug: fullPath,
+        link: currentTemplate.id === "custom-link" ? formData.link : "",
         templateId: currentTemplate.id,
         parentId: parentId || null,
-        content: formData.content, // Directly use the HTML content
+        content: currentTemplate.id === "custom-link" ? "dummyContent" : formData.content, // Directly use the HTML content
         metadata: {
           lastUpdated: new Date().toISOString(),
           metaTitle: formData.metaTitle || "",
@@ -364,6 +367,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       "upsc-notes": UpscNotesForm,
       "blog": BlogForm,
       "current-affairs": CurrentAffairForm,
+      "custom-link": CustomLinkForm,
     };
 
     const FormComponent = templateForms[currentTemplate.id];

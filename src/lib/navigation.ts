@@ -11,6 +11,7 @@ interface CurrentAffairSection {
   slug: string;
   createdAt: string;
   updatedAt: string;
+  link: string | null;
 }
 
 export async function getNavigationTree(): Promise<NavItem[]> {
@@ -34,6 +35,7 @@ export async function getNavigationTree(): Promise<NavItem[]> {
     interface Page {
       slug: string;
       title: string;
+      link: string | null;
     }
 
     interface PageResponse {
@@ -54,6 +56,7 @@ export async function getNavigationTree(): Promise<NavItem[]> {
           const newItem: NavItem = {
             slug: currentPath,
             title: index === parts.length ? (page.title) : part.replace(/\-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+            link: page.link,
             children: [],
           };
           currentLevel.push(newItem);
@@ -86,20 +89,24 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
   const currentAffairsNav: NavItem = {
     slug: 'current-affairs',
     title: 'Current Affairs',
+    link: null,
     children: [
       {
         slug: 'current-affairs/daily',
         title: 'Daily Current Affairs',
+        link: null,
         children: []
       },
       {
         slug: 'current-affairs/monthly',
         title: 'Monthly Current Affairs',
+        link: null,
         children: []
       },
       {
         slug: 'current-affairs/yearly',
         title: 'Yearly Current Affairs',
+        link: null,
         children: []
       }
     ]
@@ -138,9 +145,12 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
           dailyNavItems.children = dailySections.map((section: CurrentAffairSection) => {
             // Extract the last part of the slug for the path
             const pathSlug = section.slug.split('/').pop() || section.slug;
+            const isCustomLink = section.link && section.link !== '';
+            
             return {
               slug: `current-affairs/${pathSlug}`,
               title: section.title,
+              link: section.link,
               children: []
             };
           });
@@ -162,6 +172,7 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
             return {
               slug: `current-affairs/${pathSlug}`,
               title: section.title,
+              link: section.link,
               children: []
             };
           });
@@ -183,6 +194,7 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
             return {
               slug: `current-affairs/${pathSlug}`,
               title: section.title,
+              link: section.link,
               children: []
             };
           });
@@ -217,6 +229,7 @@ export async function getFooterLinks(): Promise<NavItem[]> {
     interface Page {
       slug: string;
       title: string;
+      link: string | null;
     }
 
     pages?.forEach((page: Page) => {
@@ -235,6 +248,7 @@ export async function getFooterLinks(): Promise<NavItem[]> {
           const newItem: NavItem = {
             slug: currentPath,
             title: index === parts.length - 1 ? page.title : part.replace(/\-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+            link: page.link,
             children: [],
           };
           currentLevel.push(newItem);

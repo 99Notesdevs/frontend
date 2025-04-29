@@ -11,6 +11,7 @@ interface CurrentAffairPage {
   content: string;
   type: 'daily' | 'monthly' | 'yearly';
   slug: string;
+  link?: string;
 }
 
 const formatContent = (content: string) => {
@@ -25,17 +26,17 @@ const CurrentAffairsIndex = async () => {
     // Fetch daily current affairs
     const dailyResponse = await fetch(`${env.API}/currentAffair/type/daily`);
     const dailyData = await dailyResponse.json();
-    const dailyPages = dailyData.data as CurrentAffairPage[];
+    const dailyPages = dailyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     // Fetch monthly current affairs
     const monthlyResponse = await fetch(`${env.API}/currentAffair/type/monthly`);
     const monthlyData = await monthlyResponse.json();
-    const monthlyPages = monthlyData.data as CurrentAffairPage[];
+    const monthlyPages = monthlyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     // Fetch yearly current affairs
     const yearlyResponse = await fetch(`${env.API}/currentAffair/type/yearly`);
     const yearlyData = await yearlyResponse.json();
-    const yearlyPages = yearlyData.data as CurrentAffairPage[];
+    const yearlyPages = yearlyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     return (
       <div className="min-h-screen bg-gray-100">

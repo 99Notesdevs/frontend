@@ -12,6 +12,7 @@ interface CurrentAffairSection {
   id: number;
   title: string;
   content: string;
+  link: string;
   type: string; // daily, monthly, yearly
   slug: string;
   createdAt: string;
@@ -134,44 +135,50 @@ const CurrentAffairsLayout: React.FC<CurrentAffairsLayoutProps> = ({
         });
         
         // Create navigation sections
-        const navigationSections: NavSection[] = [
-          {
-            title: "Daily Current Affairs",
-            items: (groupedSections['daily'] || []).map(section => {
-              // Extract the last part of the slug for the path
-              const pathSlug = section.slug.split('/').pop() || section.slug;
-              return {
-                title: section.title,
-                path: `/current-affairs/${pathSlug}`,
-                icon: { image: null }
-              };
-            })
-          },
-          {
-            title: "Monthly Current Affairs",
-            items: (groupedSections['monthly'] || []).map(section => {
-              // Extract the last part of the slug for the path
-              const pathSlug = section.slug.split('/').pop() || section.slug;
-              return {
-                title: section.title,
-                path: `/current-affairs/${pathSlug}`,
-                icon: { image: null }
-              };
-            })
-          },
-          {
-            title: "Yearly Current Affairs",
-            items: (groupedSections['yearly'] || []).map(section => {
-              // Extract the last part of the slug for the path
-              const pathSlug = section.slug.split('/').pop() || section.slug;
-              return {
-                title: section.title,
-                path: `/current-affairs/${pathSlug}`,
-                icon: { image: null }
-              };
-            })
-          }
-        ];
+const navigationSections: NavSection[] = [
+  {
+    title: "Daily Current Affairs",
+    items: (groupedSections['daily'] || [])
+      .filter((item: CurrentAffairSection) => !item.link && item.link !== "")
+      .map(section => {
+        // Extract the last part of the slug for the path
+        const pathSlug = section.slug.split('/').pop() || section.slug;
+        return {
+          title: section.title,
+          path: `/current-affairs/${pathSlug}`,
+          icon: { image: null }
+        };
+      })
+  },
+  {
+    title: "Monthly Current Affairs",
+    items: (groupedSections['monthly'] || [])
+      .filter((item: CurrentAffairSection) => !item.link && item.link !== "")
+      .map(section => {
+        // Extract the last part of the slug for the path
+        const pathSlug = section.slug.split('/').pop() || section.slug;
+        return {
+          title: section.title,
+          path: `/current-affairs/${pathSlug}`,
+          icon: { image: null }
+        };
+      })
+  },
+  {
+    title: "Yearly Current Affairs",
+    items: (groupedSections['yearly'] || [])
+      .filter((item: CurrentAffairSection) => !item.link && item.link !== "")
+      .map(section => {
+        // Extract the last part of the slug for the path
+        const pathSlug = section.slug.split('/').pop() || section.slug;
+        return {
+          title: section.title,
+          path: `/current-affairs/${pathSlug}`,
+          icon: { image: null }
+        };
+      })
+  }
+];
         
         // Filter out empty sections
         const filteredSections = navigationSections.filter(

@@ -13,6 +13,7 @@ interface Article {
   title: string;
   content?: string;
   slug: string;
+  link: string;
   imageUrl?: string;
   author?: string;
   createdAt?: string;
@@ -168,15 +169,7 @@ const CurrentAffairsSectionPage = async ({
       if (articlesData.status === 'success' && articlesData.data) {
         const allArticles = articlesData.data;
         articles = allArticles.filter((article: Article) => {
-          const slugParts = article.slug.split('/');
-
-          // Remove the last part (the article name) to get the parent slug
-          const extractedParentSlug = slugParts.slice(0, -1).join('/');
-
-          // Check if the extracted parent slug matches the current page's fullSlug
-          const matches = extractedParentSlug === fullSlug;
-
-          return matches;
+          return article.parentSlug === fullSlug;
         });
 
       } else {
@@ -316,7 +309,7 @@ const CurrentAffairsSectionPage = async ({
                       </h3>
                     </div>
                     <Link
-                      href={`/current-affairs/${category}/${article.slug.split("/").pop()}`}
+                      href={article.link || `/current-affairs/${category}/${article.slug.split("/").pop()}`}
                       className="text-blue-600 font-medium hover:text-blue-800"
                     >
                       Read More

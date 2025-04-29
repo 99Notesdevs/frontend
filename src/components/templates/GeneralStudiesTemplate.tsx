@@ -69,6 +69,11 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {page.children.map((child: any) => {
+                    // Skip children with custom-link template
+                    if (child.templateId === "custom-link") {
+                      return null;
+                    }
+
                     let childContent;
                     try {
                       if (typeof child.content === 'string') {

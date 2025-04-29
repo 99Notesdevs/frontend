@@ -95,6 +95,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     content: '',
     imageUrl: '',
     type: 'daily',
+    link: '',
     metaTitle: '',
     metaDescription: '',
     metaKeywords: '',
@@ -110,29 +111,31 @@ export function PageForm({ editPage = null }: PageFormProps) {
     canonicalUrl: '',
     schemaData: ''
   });
+  const [selectedAffairTemplate, setSelectedAffairTemplate] = useState<string>('article'); // 'article' or 'custom-link'
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Step 3: Article creation
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('article'); // 'article' or 'custom-link'
   const [articleData, setArticleData] = useState({
     title: '',
     content: '',
     quizQuestions: '',
     author: 'here',
-      metaTitle: '',
-      metaDescription: '',
-      metaKeywords: '',
-      robots: '',
-      ogTitle: '',
-      ogDescription: '',
-      ogImage: '',
-      ogType: '',
-      twitterCard: '',
-      twitterTitle: '',
-      twitterDescription: '',
-      twitterImage: '',
-      canonicalUrl: '',
-      schemaData: ''
-    
+    link: '',
+    metaTitle: '',
+    metaDescription: '',
+    metaKeywords: '',
+    robots: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    ogType: '',
+    twitterCard: '',
+    twitterTitle: '',
+    twitterDescription: '',
+    twitterImage: '',
+    canonicalUrl: '',
+    schemaData: ''
   });
   
   const token = Cookie.get('token');
@@ -279,16 +282,22 @@ export function PageForm({ editPage = null }: PageFormProps) {
         .replace(/[^a-z0-9-]/g, '');
       const slug = `current-affairs/${baseSlug}`;
 
-      // Ensure content is a string (even if empty)
-      const content = data.content || '';
-      const updatedContent = await handleImageUpload(content);
+      // Handle content based on template type
+      let content = '';
+      if (selectedAffairTemplate === 'article') {
+        content = data.content || '';
+      } else {
+        // Add default content for custom links
+        content = `This is a custom link to: ${data.link}\n\nClick the link below to view the content.`;
+      }
 
       const affairData = {
         title: data.title,
-        content: updatedContent,
+        content: content,
         imageUrl: data.imageUrl,
-        type: selectedType, // Use the type selected in step 1
+        type: selectedType,
         slug,
+        link: selectedAffairTemplate === 'custom-link' ? data.link : '',
         metadata: JSON.stringify({
           metaTitle: data.metaTitle,
           metaDescription: data.metaDescription,
@@ -311,14 +320,13 @@ export function PageForm({ editPage = null }: PageFormProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(affairData)
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'No error details available' }));
-        throw new Error(`Failed to create current affair: ${errorData.message || response.statusText}`);
+        throw new Error('Failed to create current affair');
       }
 
       const { data: newAffair } = await response.json();
@@ -346,14 +354,6 @@ export function PageForm({ editPage = null }: PageFormProps) {
         throw new Error('Title is required');
       }
 
-      if (!data.content || data.content.length < 10) {
-        throw new Error('Content must be at least 10 characters');
-      }
-
-      if (!data.author) {
-        throw new Error('Author is required');
-      }
-
       if (!selectedAffairId) {
         throw new Error('Please select a current affair');
       }
@@ -372,7 +372,15 @@ export function PageForm({ editPage = null }: PageFormProps) {
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
       const articleSlug = `${selectedAffair.slug}/${articleBaseSlug}`;
-      const content = await handleImageUpload(data.content);
+
+      // Handle content based on template type
+      let content = '';
+      if (selectedTemplate === 'article') {
+        content = await handleImageUpload(data.content || '');
+      }
+      else{
+        content = "dummy";
+      }
 
       const articlePayload = {
         title: data.title,
@@ -381,7 +389,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
         slug: articleSlug,
         parentSlug: selectedAffair.slug,
         quizQuestions: data.quizQuestions,
-        type: selectedType, // Use the type selected in step 1
+        type: selectedType,
+        link: selectedTemplate === 'custom-link' ? data.link : '',
         metadata: JSON.stringify({
           metaTitle: data.metaTitle,
           metaDescription: data.metaDescription,
@@ -413,7 +422,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         throw new Error('Failed to create article');
       }
 
-     
+      showToast('Article created successfully!', 'success');
     } catch (error) {
       console.error('Error creating article:', error);
       setError(error instanceof Error ? error.message : 'An error occurred');
@@ -422,6 +431,22 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setIsLoading(prev => ({ ...prev, creatingArticle: false, formSubmitting: false }));
       setStep(1);
     }
+  };
+
+  const handleTemplateChange = (value: string) => {
+    setSelectedTemplate(value);
+    setArticleData(prev => ({
+      ...prev,
+      templateId: value === 'custom-link' ? 'custom-link' : 'article'
+    }));
+  };
+
+  const handleAffairTemplateChange = (value: string) => {
+    setSelectedAffairTemplate(value);
+    setNewAffairData(prev => ({
+      ...prev,
+      templateId: value === 'custom-link' ? 'custom-link' : 'article'
+    }));
   };
 
   const renderStepContent = () => {
@@ -500,10 +525,63 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
                 {createNewAffair && (
                   <div className="mt-4 space-y-4 p-4 border border-slate-200 rounded-lg">
-                    <GeneralStudiesForm
-                      defaultValues={newAffairData}
-                      onSubmit={handleCreateAffair}
-                    />
+                    <div>
+                      <Select
+                        value={selectedAffairTemplate}
+                        onValueChange={handleAffairTemplateChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select template type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="article">Article</SelectItem>
+                          <SelectItem value="custom-link">Custom Link</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {selectedAffairTemplate === 'article' ? (
+                      <GeneralStudiesForm
+                        defaultValues={newAffairData}
+                        onSubmit={handleCreateAffair}
+                      />
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                            <input
+                              type="text"
+                              value={newAffairData.title}
+                              onChange={(e) => setNewAffairData(prev => ({ ...prev, title: e.target.value }))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Link *</label>
+                            <input
+                              type="url"
+                              value={newAffairData.link}
+                              onChange={(e) => setNewAffairData(prev => ({ ...prev, link: e.target.value }))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-4">
+                          <Button
+                            onClick={() => handleCreateAffair(newAffairData)}
+                            className="w-full bg-slate-800 text-white hover:bg-slate-700 transition-colors duration-200"
+                            disabled={isLoading.formSubmitting}
+                          >
+                            {isLoading.formSubmitting ? 'Creating...' : 'Create Current Affair'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -545,10 +623,63 @@ export function PageForm({ editPage = null }: PageFormProps) {
               </div>
               
               <div className="space-y-4">
-                <CurrentArticleForm
-                  defaultValues={articleData}
-                  onSubmit={handleCreateArticle}
-                />
+                <div className="flex flex-col gap-4">
+                  <Select
+                    value={selectedTemplate}
+                    onValueChange={handleTemplateChange}
+                  >
+                    <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
+                      <SelectValue placeholder="Select template type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="article">Article</SelectItem>
+                      <SelectItem value="custom-link">Custom Link</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {selectedTemplate === 'article' ? (
+                    <CurrentArticleForm
+                      defaultValues={articleData}
+                      onSubmit={handleCreateArticle}
+                    />
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                          <input
+                            type="text"
+                            value={articleData.title}
+                            onChange={(e) => setArticleData(prev => ({ ...prev, title: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Link *</label>
+                          <input
+                            type="url"
+                            value={articleData.link}
+                            onChange={(e) => setArticleData(prev => ({ ...prev, link: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <Button
+                          onClick={() => handleCreateArticle(articleData)}
+                          className="w-full bg-slate-800 text-white hover:bg-slate-700 transition-colors duration-200"
+                          disabled={isLoading.formSubmitting}
+                        >
+                          {isLoading.formSubmitting ? 'Creating...' : 'Create Article'}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

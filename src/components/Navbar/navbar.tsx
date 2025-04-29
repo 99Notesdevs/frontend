@@ -45,7 +45,7 @@ function NestedNavigation({
             }}
           >
             <Link
-              href={`/${item.slug}`}
+              href={item.link ? item.link : `/${item.slug}`}
               className="px-3 py-2 text-primary hover:text-primary-active rounded-md text-sm font-inter font-medium tracking-tight transition-colors duration-200 flex items-center"
             >
               {item.title}
@@ -77,7 +77,7 @@ function NestedNavigation({
                               {child.children.map((grandChild) => (
                                 <Link
                                   key={grandChild.slug}
-                                  href={`/${grandChild.slug}`}
+                                  href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
                                   className="block px-2 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[14px] font-normal flex items-center font-opensans"
                                 >
                                   <svg 
@@ -103,7 +103,7 @@ function NestedNavigation({
                         {item.children.map((child) => (
                           <div key={child.slug} className="mb-2">
                             <Link
-                              href={`/${child.slug}`}
+                              href={child.link ? child.link : `/${child.slug}`}
                               className="flex px-1 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[14px] font-medium items-center justify-between font-urbanist tracking-wide"
                               onMouseEnter={() => setOpenDropdown(child.slug)}
                             >
@@ -135,7 +135,7 @@ function NestedNavigation({
                                       {child.children.map((grandChild) => (
                                         <div key={grandChild.slug} className="mb-2">
                                           <Link
-                                            href={`/${grandChild.slug}`}
+                                            href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
                                             className="block px-3 py-1 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 text-[14px] font-normal items-center flex font-opensans"
                                           >
                                             {grandChild.title}
@@ -145,7 +145,7 @@ function NestedNavigation({
                                               {grandChild.children.map((greatGrandChild) => (
                                                 <Link
                                                   key={greatGrandChild.slug}
-                                                  href={`/${greatGrandChild.slug}`}
+                                                  href={greatGrandChild.link ? greatGrandChild.link : `/${greatGrandChild.slug}`}
                                                   className="flex px-1 py-1 text-[12.5px] font-inter font-normal tracking-normal text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-md transition-colors duration-200 items-center"
                                                 >
                                                   <svg 
@@ -366,7 +366,7 @@ export default function Navbar({ navigation }: NavbarProps) {
               <div key={item.slug} className="py-1">
                 <div className="flex items-center justify-between">
                   <Link
-                    href={`/${item.slug}`}
+                    href={item.link ? item.link : `/${item.slug}`}
                     className="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50 rounded-md"
                     onClick={() => setIsOpen(false)}
                   >
@@ -396,7 +396,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                       <div key={child.slug} className="py-1">
                         <div className="flex items-center justify-between">
                           <Link
-                            href={`/${child.slug}`}
+                            href={child.link ? child.link : `/${child.slug}`}
                             className="block px-3 py-2.5 text-base font-medium text-gray-800 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600"
                             onClick={() => setIsOpen(false)}
                           >
@@ -426,7 +426,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                               <div key={grandChild.slug} className="py-1">
                                 <div className="flex items-center justify-between">
                                   <Link
-                                    href={`/${grandChild.slug}`}
+                                    href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
                                     className="block px-4 py-2 text-sm font-normal text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600 font-inter font-normal tracking-normal"
                                     onClick={() => setIsOpen(false)}
                                   >
@@ -438,7 +438,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                                     {grandChild.children.map((greatGrandChild) => (
                                       <Link
                                         key={greatGrandChild.slug}
-                                        href={`/${greatGrandChild.slug}`}
+                                        href={greatGrandChild.link ? greatGrandChild.link : `/${greatGrandChild.slug}`}
                                         className="block px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md transition-colors duration-200 hover:text-blue-600 font-inter font-normal tracking-normal"
                                         onClick={() => setIsOpen(false)}
                                       >
