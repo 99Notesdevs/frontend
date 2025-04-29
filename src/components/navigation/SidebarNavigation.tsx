@@ -7,6 +7,7 @@ interface PageItem {
   id: string;
   title: string;
   slug: string;
+  link?: string;
   level: number;
   parentId: string | null;
   children?: PageItem[];
@@ -87,7 +88,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     return (
       <div key={page.id} className="w-full">
         <Link 
-          href={`/${page.slug}`}
+          href={page.link ? page.link : `/${page.slug}`}
           className={`
             group flex items-center py-2 px-4 text-[15px] rounded-md transition-all duration-200
             ${isCurrentPage 

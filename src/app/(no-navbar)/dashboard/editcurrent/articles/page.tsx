@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { GeneralStudiesForm, type GeneralStudiesFormValues } from '@/components/dashboard/forms/GeneralStudiesForm';
+import { CustomLinkForm, type CustomLinkFormData } from '@/components/dashboard/forms/CustomLinkForm';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 
@@ -16,6 +16,7 @@ interface CurrentAffairType {
   content: string;
   slug: string;
   author: string;
+  link: string | null;
   parentSlug: string;
   metadata?: string;
   createdAt: Date;
@@ -45,6 +46,7 @@ export default function ArticlesPage() {
         title: formData.title,
         content: formData.content,
         author: formData.author,
+        link: null,
         parentSlug: selectedPage?.parentSlug || '',
         slug: selectedPage?.slug || '',
         updatedAt: new Date(),
@@ -91,6 +93,52 @@ export default function ArticlesPage() {
       setSelectedPage(data);
       
       // Refresh the page list
+      const urlParams = new URLSearchParams(window.location.search);
+      const parentSlug = urlParams.get('parentPageName');
+      if (parentSlug) {
+        fetchPages(parentSlug);
+      }
+      
+      // Refresh the page after successful submission
+      window.location.reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+  const handleCustomLinkSubmit = async (formData: CustomLinkFormData) => {
+    try {
+      if (!selectedPage) {
+        setError('No page selected');
+        return;
+      }
+
+      const updateData = {
+        title: formData.title,
+        link: formData.link,
+        showInNav: formData.showInNav,
+        content: "dummy",
+        slug:"dummy",
+        parentSlug:selectedPage.parentSlug,
+        author:"dummy",
+        updatedAt: new Date(),
+        imageUrl: "",
+        metadata: ""
+      };
+
+      const response = await fetch(`${env.API}/currentArticle/${selectedPage.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update page');
+      }
+
+      // Refresh the page list/ Refresh the page list
       const urlParams = new URLSearchParams(window.location.search);
       const parentSlug = urlParams.get('parentPageName');
       if (parentSlug) {
@@ -295,11 +343,21 @@ export default function ArticlesPage() {
               <h2 className="text-xl font-semibold text-slate-900">
                 Edit Article
               </h2>
-              <CurrentArticleForm
-                onSubmit={handleEditSubmit}
-                defaultValues={{
-                  title: selectedPage.title,
-                  content: selectedPage.content || '',
+              {selectedPage.link ? (
+                <CustomLinkForm
+                  initialData={{
+                    title: selectedPage.title,
+                    link: selectedPage.link,
+                    showInNav:  false
+                  }}
+                  onSubmit={handleCustomLinkSubmit}
+                />
+              ) : (
+                <CurrentArticleForm
+                  onSubmit={handleEditSubmit}
+                  defaultValues={{
+                    title: selectedPage.title,
+                    content: selectedPage.content || '',
                   author: selectedPage.author || '',
                   imageUrl: selectedPage.imageUrl || '',
                   metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
@@ -318,7 +376,7 @@ export default function ArticlesPage() {
                   schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
                   quizQuestions: selectedPage.quizQuestions || '[]', // Ensure we always have a valid JSON string
                 }}
-              />
+              />)}
             </div>
           </div>
         </div>

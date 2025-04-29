@@ -239,7 +239,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-gray-500 font-medium">
-                Content
+                Content *
               </FormLabel>
               <FormControl>
                 <div className="border border-blue-100 rounded-lg overflow-hidden">

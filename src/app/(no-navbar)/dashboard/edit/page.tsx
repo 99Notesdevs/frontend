@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
-import {ArticleForm, UpscNotesForm, GeneralStudiesForm , CurrentAffairForm, BlogForm} from '@/components/dashboard/forms';
+import {ArticleForm, UpscNotesForm, GeneralStudiesForm , CurrentAffairForm, BlogForm, CustomLinkForm} from '@/components/dashboard/forms';
 import Cookie from 'js-cookie';
 import { env } from '@/config/env';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
@@ -20,7 +20,8 @@ interface Page {
   parentId?: number;
   level?: number;
   order?: number;
-  metadata?: string
+  metadata?: string;
+  link?: string;
 }
 
 function PageList() {
@@ -128,7 +129,8 @@ function PageList() {
         templateId: selectedPage.templateId,
         parentId: selectedPage.parentId || null,
         imageUrl: formData.imageUrl,
-        content: formData.content,
+        content: selectedPage.templateId === 'custom-link' ? "dummy" : formData.content,
+        link: selectedPage.templateId === 'custom-link' ? formData.link : null,
         metadata: {
           metaTitle: formData.metaTitle || "",
           metaDescription: formData.metaDescription || "",
@@ -276,6 +278,27 @@ function PageList() {
           showInNav: false,
           imageUrl: parsedimage || undefined,
           slug: page.slug || "",
+          metaTitle: metadata.metaTitle || "",
+          metaDescription: metadata.metaDescription || "",
+          metaKeywords: metadata.metaKeywords || "",
+          robots: metadata.robots || "",
+          ogTitle: metadata.ogTitle || "",
+          ogDescription: metadata.ogDescription || "",
+          ogImage: metadata.ogImage || "",
+          ogType: metadata.ogType || "",
+          twitterCard: metadata.twitterCard || "",
+          twitterTitle: metadata.twitterTitle || "",
+          twitterDescription: metadata.twitterDescription || "",
+          twitterImage: metadata.twitterImage || "",
+          canonicalUrl: metadata.canonicalUrl || "",
+          schemaData: metadata.schemaData || "",
+        };
+      case 'custom-link':
+        return {
+          title: page.title || "",
+          content: parsedContent || "",
+          link: page.link || "",
+          showInNav: page.showInNav || false,
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
           metaKeywords: metadata.metaKeywords || "",
@@ -479,6 +502,15 @@ function PageList() {
                 <BlogForm
                   onSubmit={saveEdit}
                   defaultValues={getInitialFormData(
+                    selectedPage,
+                    selectedPage.templateId
+                  )}
+                />
+              )}
+              {selectedPage.templateId === "custom-link" && (
+                <CustomLinkForm
+                  onSubmit={saveEdit}
+                  initialData={getInitialFormData(
                     selectedPage,
                     selectedPage.templateId
                   )}

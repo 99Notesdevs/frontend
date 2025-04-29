@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { GeneralStudiesForm, type GeneralStudiesFormValues } from '@/components/dashboard/forms/GeneralStudiesForm';
+import { CustomLinkForm, type CustomLinkFormData } from '@/components/dashboard/forms/CustomLinkForm';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 
@@ -15,11 +16,13 @@ interface CurrentAffairType {
   content: string;
   type: string; // daily, monthly, yearly
   slug: string;
+  link: string;
   metadata?: string;
   createdAt: Date;
   updatedAt: Date;
   imageUrl: string | null;
   dailyArticle?: CurrentAffairArticleType[];
+  showInNav?: boolean;
 }
 
 interface CurrentAffairArticleType {
@@ -27,6 +30,7 @@ interface CurrentAffairArticleType {
   title: string;
   content: string;
   slug: string;
+  link: string;
   author: string;
   metadata?: {
     metaTitle?: string;
@@ -72,6 +76,7 @@ export default function PageListCurrent() {
         content: formData.content,
         type: selectedType || 'daily',
         slug,
+        
         updatedAt: new Date(),
         imageUrl: formData.imageUrl,
         metadata: JSON.stringify({
@@ -113,6 +118,51 @@ export default function PageListCurrent() {
 
       const { data } = await response.json();
       setSelectedPage(data);
+      if (selectedType) {
+        fetchPages(selectedType);
+      }
+      
+      // Refresh the page after successful submission
+      window.location.reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
+  const handleCustomLinkSubmit = async (formData: CustomLinkFormData) => {
+    try {
+      if (!selectedPage) {
+        setError('No page selected');
+        return;
+      }
+
+      const updateData = {
+        title: formData.title,
+        link: formData.link,
+        showInNav: formData.showInNav,
+        content: "dummy",
+        type: selectedType || 'daily',
+        slug:"dummy",
+        
+        updatedAt: new Date(),
+        imageUrl: "",
+        metadata: ""
+      };
+
+      const response = await fetch(`${env.API}/currentAffair/${selectedPage.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update page');
+      }
+
+      // Refresh the page list
       if (selectedType) {
         fetchPages(selectedType);
       }
@@ -377,28 +427,39 @@ export default function PageListCurrent() {
               <h2 className="text-xl font-semibold text-slate-900">
                 Edit Current Affair
               </h2>
-              <GeneralStudiesForm
-                onSubmit={handleEditSubmit}
-                defaultValues={{
-                  title: selectedPage.title,
-                  content: selectedPage.content || '',
-                  imageUrl: selectedPage.imageUrl || '',
-                  metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
-                  metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',
-                  metaKeywords: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaKeywords || '' : '',
-                  robots: selectedPage.metadata ? JSON.parse(selectedPage.metadata).robots || '' : '',
-                  ogTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogTitle || '' : '',
-                  ogDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogDescription || '' : '',
-                  ogImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogImage || '' : '',
-                  ogType: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogType || '' : '',
-                  twitterCard: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterCard || '' : '',
-                  twitterTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterTitle || '' : '',
-                  twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
-                  twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
-                  canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
-                  schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : ''
-                }}
-              />
+              {selectedPage.link ? (
+                <CustomLinkForm
+                  initialData={{
+                    title: selectedPage.title,
+                    link: selectedPage.link,
+                    showInNav: selectedPage.showInNav || false
+                  }}
+                  onSubmit={handleCustomLinkSubmit}
+                />
+              ) : (
+                <GeneralStudiesForm
+                  defaultValues={{
+                    title: selectedPage.title,
+                    content: selectedPage.content || '',
+                    imageUrl: selectedPage.imageUrl || '',
+                    metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
+                    metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',
+                    metaKeywords: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaKeywords || '' : '',
+                    robots: selectedPage.metadata ? JSON.parse(selectedPage.metadata).robots || '' : '',
+                    ogTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogTitle || '' : '',
+                    ogDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogDescription || '' : '',
+                    ogImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogImage || '' : '',
+                    ogType: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogType || '' : '',
+                    twitterCard: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterCard || '' : '',
+                    twitterTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterTitle || '' : '',
+                    twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
+                    twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
+                    canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
+                    schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : ''
+                  }}
+                  onSubmit={handleEditSubmit}
+                />
+              )}
             </div>
           </div>
         </div>
