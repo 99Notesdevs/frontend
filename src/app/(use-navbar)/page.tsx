@@ -49,6 +49,9 @@ interface HomeProps {
   }[];
  }
 }
+
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const response = await axios.get(`${env.API}/about-99-notes/coreMembers`);
   const coreMemberImages = response.data.data;
