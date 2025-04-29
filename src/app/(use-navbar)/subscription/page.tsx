@@ -60,7 +60,8 @@ export default function SubscriptionPage() {
       phonepe_transactionId: "",
       status: "",
       amount: data.totalAmount,
-      redirectUrl: ""
+      redirectUrl: "",
+      validity: Number(plan.validity)
     }
     const response2 = await fetch(`${env.API}/payment/create-order`, {
       method: 'POST',
