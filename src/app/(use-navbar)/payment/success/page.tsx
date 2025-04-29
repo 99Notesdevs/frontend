@@ -22,7 +22,7 @@ export default function PaymentSuccessPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)]">
       <div className="text-center space-y-6">
         <div className="bg-green-100 p-8 rounded-lg shadow-lg">
           <svg
@@ -38,8 +38,8 @@ export default function PaymentSuccessPage() {
               d="M5 13l4 4L19 7"
             />
           </svg>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">Payment Successful!</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-[var(--surface-darker)] mt-4">Payment Successful!</h1>
+          <p className="text-[var(--text-tertiary)] mt-2">
             Your subscription has been activated successfully.
           </p>
           <button

@@ -16,6 +16,7 @@ import { env } from "@/config/env";
 import axios from "axios";
 import Cookies from "js-cookie";
 import WhatsApp from '@/components/ui/whatsapp';
+
 const processContent = (content: string, isAuthorized: boolean) => {
   return content.replace(/<lock>(.*?)<\/lock>/g, (lockedContent) => {
     return isAuthorized
@@ -84,7 +85,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // @ts-ignore
   const displayImage = page.imageUrl || coverImage as string;
 
-  // Function to process content and handle lock tags
   return (
     <>
       <section>
@@ -98,17 +98,14 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
           {/* Assistive Touch */}
           <AssistiveTouch content={mainContentFinal} />
 
-          {/* Main Content */}
-          <div
-            className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 
-        transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
-          >
+          <div className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 
+        transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4 sm:mt-12">
               {/* Main Content Column */}
               <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-8">
                 {/* Featured Image */}
                 {displayImage && (
-                  <div className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
+                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
                     <div className="relative w-full h-[400px]">
                       <Image
                         src={`${displayImage}`}
@@ -129,19 +126,19 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       <div className="mb-4">
                         <a 
                           href={`/${page.parent.slug}`} 
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          className="text-[var(--action-primary)] hover:text-[var(--accent-link)] transition-colors"
                         >
                           {page.parent.title}
                         </a>
                       </div>
                     )}
                     
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-2">
                       {parsedMetadata.metaTitle || 'Untitled Article'}
                     </h1>
                   </div>
 
-                  <div className="text-xs text-gray-500 mb-4">
+                  <div className="text-xs text-[var(--text-tertiary)] mb-4">
                     Created: {page.createdAt ? new Date(page.createdAt).toLocaleDateString() : 'N/A'}
                   </div>
 
@@ -149,81 +146,52 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   <div className="text-center mb-8 sm:mb-12">
                   </div>
 
-                  <div
-                    className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
-                  prose-headings:font-semibold
-                  prose-headings:tracking-normal
-                  prose-headings:text-left
-                  prose-headings:relative
-                  prose-headings:mb-6
-                  
-                  prose-h1:text-3xl sm:prose-h1:text-4xl
-                  prose-h1:font-bold
-                  prose-h1:text-gray-800
-                  prose-h1:leading-tight
-                  
-                  prose-h2:text-2xl sm:prose-h2:text-3xl
-                  prose-h2:text-gray-700
-                  prose-h2:pb-2
-                  prose-h2:after:content-['']
-                  prose-h2:after:block
-                  prose-h2:after:w-16
-                  prose-h2:after:h-[2px]
-                  prose-h2:after:mt-2
-                  prose-h2:after:bg-yellow-500
-                  prose-h2:after:rounded-full
-                  
-                  prose-h3:text-xl sm:prose-h3:text-2xl
-                  prose-h3:text-gray-600
-                  prose-h3:font-medium
-                  prose-h3:pl-3
-                  
-                  prose-h4:text-lg sm:prose-h4:text-xl
-                  prose-h4:text-gray-600
-                  prose-h4:font-medium
-                  prose-h4:before:content-['§']
-                  prose-h4:before:text-yellow-500
-                  prose-h4:before:mr-2
-                  prose-h4:before:opacity-70
-                  
-                  prose-p:text-gray-600
-                  prose-p:leading-relaxed
-                  prose-p:tracking-wide
-                  prose-strong:text-gray-800
-                  prose-a:text-blue-600
-                  prose-a:no-underline
-                  prose-a:border-b-2
-                  prose-a:border-blue-200
-                  prose-a:transition-colors
-                  prose-a:hover:border-blue-500
-                  prose-blockquote:border-l-blue-500
-                  prose-blockquote:bg-blue-50
-                  prose-blockquote:p-3 sm:prose-blockquote:p-4
-                  prose-blockquote:rounded-r-lg
-                  prose-pre:bg-gray-50
-                  prose-pre:rounded-lg
-                  prose-pre:p-3 sm:prose-pre:p-4
-                  prose-img:rounded-lg
-                  prose-img:shadow-md
-                  prose-ul:list-disc
-                  prose-ul:pl-4 sm:prose-ul:pl-6
-                  prose-ol:list-decimal
-                  prose-ol:pl-4 sm:prose-ol:pl-6
-                  [&>*]:w-full"
+                  <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
+                    prose-headings:font-semibold
+                    prose-headings:tracking-normal
+                    prose-headings:text-left
+                    prose-headings:relative
+                    prose-headings:mb-6
+                    
+                    prose-h1:text-3xl sm:prose-h1:text-4xl
+                    prose-h1:font-bold
+                    prose-h1:text-[var(--surface-dark)]
+                    prose-h1:leading-tight
+                    
+                    prose-h2:text-2xl sm:prose-h2:text-3xl
+                    prose-h2:text-[var(--text-strong)]
+                    prose-h2:pb-2
+                    prose-h2:after:content-['']
+                    prose-h2:after:block
+                    prose-h2:after:w-16
+                    prose-h2:after:h-[2px]
+                    prose-h2:after:mt-2
+                    prose-h2:after:bg-[var(--primary)]
+                    prose-h2:after:rounded-full
+                    
+                    prose-h3:text-xl sm:prose-h3:text-2xl
+                    prose-h3:text-[var(--text-tertiary)]
+                    
+                    prose-p:text-[var(--text-tertiary)]
+                    prose-strong:text-[var(--surface-dark)]
+                    prose-a:text-[var(--action-primary)]
+                    prose-a:border-[var(--info-surface)]
+                    prose-a:hover:border-[var(--accent-link)]
+                    
+                    prose-blockquote:border-l-[var(--action-primary)]
+                    prose-blockquote:bg-[var(--bg-subtle)]"
                   >
                     {mainContentFinal}
                   </div>
                 </div>
                 <Comments parentId={parentId} />
-
               </main>
+
               {/* Right Sidebar */}
               <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
-                {/* Search Bar - Always visible at top */}
-                <div
-                  className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
-              transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
-                >
+                {/* Search Bar */}
+                <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                    transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
                   <SearchBar />
                 </div>
 
@@ -231,22 +199,20 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 <div className="relative">
                   {/* TOC Section */}
                   <div className="sticky top-8 space-y-4 sm:space-y-6">
-                    <div
-                      className="hidden lg:block bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
-                  transition-all duration-300 hover:shadow-xl"
-                    >
-                      <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
-                         Table of Contents
+                    <div className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                      transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
+                        Table of Contents
                       </h3>
                       <div className="pr-2">
                         <TableOfContents content={mainContentFinal} />
                       </div>
                     </div>
 
-                    {/* Social Media Section - Fixed below TOC */}
-                    <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2 flex items-center gap-2">
-                        <span className="text-blue-500">🌐</span>
+                    {/* Social Media Section */}
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
+                        <span className="text-[var(--action-primary)]">🌐</span>
                         <span>Connect With Us</span>
                       </h3>
                       <div className="py-2 h-9">
@@ -255,21 +221,18 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     {/* Contact Form Section */}
-                    <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
                       <ContactForm />
                     </div>
 
-                    <div className="bg-white border border-blue-100 rounded-xl shadow-lg">
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
                       <Ads imageUrl="/" altText="ads" />
                     </div>
 
-                    {/* Tags Section - Fixed below Contact Form */}
+                    {/* Tags Section */}
                     {tags && tags.length > 0 && (
-                      <div
-                        className="bg-white border border-blue-100 rounded-xl shadow-lg p-4 sm:p-6 
-                    transition-all duration-300 hover:shadow-xl"
-                      >
-                        <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
+                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
                           🏷 Tags
                         </h3>
                         <div className="flex flex-wrap gap-2">
@@ -277,7 +240,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                             <Badge
                               key={tag}
                               variant="secondary"
-                              className="bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
+                              className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
                             >
                               {tag}
                             </Badge>
@@ -285,13 +248,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                         </div>
                       </div>
                     )}
-                   
                   </div>
-                 
                 </div>
-              </aside>{" "}
+              </aside>
             </div>
-           
           </div>
         </div>
       </main>

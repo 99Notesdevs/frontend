@@ -102,7 +102,7 @@ const BlogsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen bg-[var(--bg-main)]">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
       </div>
     );
@@ -110,7 +110,7 @@ const BlogsPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[var(--bg-main)]">
         <div className="p-8 bg-white rounded-lg shadow-lg text-center">
           <p className="text-red-500 text-lg mb-4">{error}</p>
           <button
@@ -125,11 +125,11 @@ const BlogsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-8 sm:pt-28">
+    <div className="min-h-screen bg-[var(--bg-elevated)] pt-8 sm:pt-28">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col">
         {/* Title and search section */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 text-left">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] text-left">
             Blog Posts
           </h1>
           <form onSubmit={handleSearch} className="w-full sm:w-auto max-w-lg">
@@ -139,11 +139,11 @@ const BlogsPage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search blogs..."
-                className="flex-1 px-4 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-w-0"
+                className="flex-1 px-4 py-2 text-base border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-w-0"
               />
               <button
                 type="submit"
-                className="w-full sm:w-auto px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-base font-medium"
+                className="w-full sm:w-auto px-6 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--secondary)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-base font-medium"
               >
                 Search
               </button>
@@ -154,7 +154,7 @@ const BlogsPage: React.FC = () => {
         {/* Blog posts grid */}
         {filteredBlogs.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 text-lg">No blogs found. Try a different search.</p>
+            <p className="text-[var(--text-tertiary)] text-lg">No blogs found. Try a different search.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -182,17 +182,17 @@ const BlogsPage: React.FC = () => {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--secondary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
             >
               ← Previous
             </button>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-[var(--text-strong)]">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
             >
               Next →
             </button>

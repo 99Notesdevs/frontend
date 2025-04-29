@@ -46,7 +46,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, basePa
           <Link key={page} href={`${basePath}?page=${page}`} legacyBehavior>
             <a 
               className={`inline-flex items-center justify-center px-3 py-1.5 border rounded-md transition-colors duration-300 
-                ${page === currentPage ? 'bg-yellow-500 text-white' : 'bg-white text-black hover:bg-gray-100'}
+                ${page === currentPage ? 'bg-[var(--primary)] text-white' : 'bg-white text-[var(--surface-darker)] hover:bg-[var(--bg-main)]'}
                 ${page === '...' ? 'cursor-default opacity-50' : ''}`}
             >
               {page}

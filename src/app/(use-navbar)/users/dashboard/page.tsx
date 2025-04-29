@@ -7,10 +7,10 @@ const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   return (
     <ProtectedRoute>
-      <div className="flex flex-col md:flex-row bg-gradient-to-br from-gray-50 to-yellow-50 min-h-screen">
+      <div className="flex flex-col md:flex-row bg-gradient-to-br from-[var(--bg-main)] to-yellow-50 min-h-screen">
         {/* Mobile menu button */}
         <button 
-          className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-[var(--primary)] text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           onClick={() => setSidebarOpen(true)}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,7 +37,7 @@ const Dashboard = () => {
             {/* Welcome Message */}
             <div className="bg-white/70 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-900 to-yellow-600 bg-clip-text text-transparent">Welcome back, Student!</h1>
-              <p className="text-gray-600 mt-2 text-lg">Here&apos;s your learning overview.</p>
+              <p className="text-[var(--text-tertiary)] mt-2 text-lg">Here&apos;s your learning overview.</p>
             </div>
 
             {/* Quick Access Section */}
@@ -53,7 +53,7 @@ const Dashboard = () => {
                   className="p-6 rounded-xl bg-white/70 backdrop-blur-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group"
                 >
                   <div className={`text-3xl mb-3 bg-gradient-to-r ${item.color} text-transparent bg-clip-text group-hover:scale-110 transition-transform duration-300`}>{item.icon}</div>
-                  <div className="text-sm font-semibold text-gray-700">{item.title}</div>
+                  <div className="text-sm font-semibold text-[var(--text-strong)]">{item.title}</div>
                 </button>
               ))}
             </div>
@@ -70,7 +70,7 @@ const Dashboard = () => {
                   ].map((activity, index) => (
                     <div key={index} className="flex items-center gap-4 p-4 bg-white/50 rounded-xl hover:bg-white/80 transition-colors duration-200">
                       <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full"></div>
-                      <p className="text-gray-700">{activity}</p>
+                      <p className="text-[var(--text-strong)]">{activity}</p>
                     </div>
                   ))}
                 </div>
@@ -87,10 +87,10 @@ const Dashboard = () => {
                   ].map((item, index) => (
                     <div key={index} className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">{item.course}</span>
+                        <span className="text-[var(--text-tertiary)]">{item.course}</span>
                         <span className="text-indigo-600">{item.progress}%</span>
                       </div>
-                      <div className="w-full h-2 bg-gray-200 rounded-full">
+                      <div className="w-full h-2 bg-[var(--text-disabled)] rounded-full">
                         <div 
                           className="h-full bg-indigo-600 rounded-full"
                           style={{ width: `${item.progress}%` }}
@@ -135,7 +135,7 @@ const Dashboard = () => {
                     'Maintenance scheduled for this weekend',
                     'Rate your recent learning experience'
                   ].map((announcement, index) => (
-                    <div key={index} className="p-4 bg-yellow-50 rounded-xl text-gray-700 text-sm hover:bg-yellow-100 transition-colors duration-200">
+                    <div key={index} className="p-4 bg-yellow-50 rounded-xl text-[var(--text-strong)] text-sm hover:bg-yellow-100 transition-colors duration-200">
                       {announcement}
                     </div>
                   ))}

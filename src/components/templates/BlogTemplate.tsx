@@ -16,7 +16,7 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
   return (
     <>
       <main>
-              <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative w-full overflow-x-hidden">
+              <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white relative w-full overflow-x-hidden">
                 <div
                   className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-12"
                 >
@@ -41,11 +41,11 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
       
                         {/* Article Content */}
                         <div className="p-8">
-                          <h1 className="text-3xl font-bold text-gray-900 mb-0">
+                          <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-0">
                             {title}
                           </h1>
       
-                          <div className="text-xs text-gray-500 mb-4">
+                          <div className="text-xs text-[var(--text-tertiary)] mb-4">
                             By 99Notes . Created: {formattedDate}
                           </div>
       
@@ -121,7 +121,7 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
                     <aside className="lg:col-start-10 lg:col-span-3 xl:col-start-10 xl:col-span-3 space-y-4 sm:space-y-8">
                       <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-lg font-semibold mb-4">Related Topics</h2>
-                        <p className="text-gray-600">Coming soon...</p>
+                        <p className="text-[var(--text-base)]">Coming soon...</p>
                       </div>
                     </aside>
                   </div>

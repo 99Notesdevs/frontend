@@ -204,7 +204,7 @@ const navigationSections: NavSection[] = [
         {/* On mobile*/}
         <div className="flex flex-col md:hidden mt-4">
           <main className="flex-1">
-            <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
+            <article className="bg-[var(--bg-main)] border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
               {memoizedChildren}
             </article>
           </main>
@@ -221,13 +221,13 @@ const navigationSections: NavSection[] = [
             ) : (
               <section className="p-5 space-y-5">
                 {navSections.map((section, sectionIndex) => (
-                  <article key={sectionIndex} className="border-b border-gray-200 pb-3 last:border-b-0">
+                  <article key={sectionIndex} className="border-b border-[var(--text-disabled)] pb-3 last:border-b-0">
                     <button
                       onClick={() => memoizedToggleSection(section.title)}
                       className={`w-full flex items-center justify-between px-4 py-3 text-base font-semibold 
                         ${expandedSections[section.title] 
-                          ? 'bg-amber-500 text-white' 
-                          : 'text-gray-900 hover:bg-gray-50'}
+                          ? 'bg-[var(--nav-primary)] text-white' 
+                          : 'text-[var(--surface-darker)] hover:bg-gray-50'}
                         rounded-md transition-colors duration-200`}
                     >
                       <span className="flex items-center gap-1">
@@ -250,7 +250,7 @@ const navigationSections: NavSection[] = [
                         <Link
                           key={itemIndex}
                           href={item.path}
-                          className="group flex items-center px-5 py-2 text-[1.07rem] font-medium rounded-md text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+                          className="group flex items-center px-5 py-2 text-[1.07rem] font-medium rounded-md text-[var(--text-strong)] hover:bg-gray-50 hover:text-[var(--surface-darker)] transition-all duration-200"
                         >
                           <span className="mr-1">•</span>
                           <span className="truncate">{item.title}</span>
@@ -262,12 +262,12 @@ const navigationSections: NavSection[] = [
               </section>
             )}
             
-            <div className="border-t border-gray-200 bg-gray-50 p-6 space-y-8">
+            <div className="border-t border-[var(--border-light)] bg-[var(--bg-main)] p-6 space-y-8">
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-orange-500 flex items-center justify-center gap-2">
                   Contact Us
                 </h3>
-                <div className="w-64 h-[4px] bg-amber-500 mx-auto my-2"></div>
+                <div className="w-64 h-[4px] bg-[var(--nav-primary)] mx-auto my-2"></div>
                 <ContactForm />
               </div>
               
@@ -275,7 +275,7 @@ const navigationSections: NavSection[] = [
               <h3 className="text-xl font-semibold text-orange-500 flex items-center justify-center gap-2">
                   Connect with Us
                 </h3>
-                <div className="w-64 h-[4px] bg-amber-500 mx-auto my-2"></div>
+                <div className="w-64 h-[4px] bg-[var(--nav-primary)] mx-auto my-2"></div>
                 <div className="flex flex-wrap gap-4 justify-center">
                   <SocialMedia />
               </div>
@@ -288,7 +288,7 @@ const navigationSections: NavSection[] = [
         {/* On tablet/desktop: Display main content second */}
         <div className="hidden md:flex flex-1">
           <main className="w-full">
-            <article className="bg-gray-50 border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
+            <article className="bg-[var(--bg-main)] border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
               {memoizedChildren}
             </article>
           </main>

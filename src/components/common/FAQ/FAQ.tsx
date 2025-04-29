@@ -96,15 +96,15 @@ const FAQ: React.FC<FAQProps> = ({ title, description, faqData }) => {
   const rightColumnFaqs = faqData.slice(midpoint);
 
   return (
-    <section className="py-5 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-5 bg-gradient-to-b from-[var(--bg-main)] to-white">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-16">
-          <span className="text-yellow-500 font-medium tracking-wider text-sm uppercase font-opensans">Common Questions</span>
-          <h2 className="text-3xl font-semibold text-gray-900 mt-3 mb-4 leading-tight font-opensans">
+          <span className="text-[var(--primary)] font-medium tracking-wider text-sm uppercase font-opensans">Common Questions</span>
+          <h2 className="text-3xl font-semibold text-[var(--surface-darker)] mt-3 mb-4 leading-tight font-opensans">
             {title}
           </h2>
-          <div className="w-24 h-1 bg-yellow-500 mx-auto mb-6"></div>
-          <p className="text-lg font-normal text-gray-600 max-w-3xl mx-auto font-opensans">
+          <div className="w-24 h-1 bg-[var(--primary)] mx-auto mb-6"></div>
+          <p className="text-lg font-normal text-[var(--text-strong)] max-w-3xl mx-auto font-opensans">
             {description}
           </p>
         </div>

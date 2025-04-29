@@ -27,12 +27,12 @@ const Ads: React.FC<AdProps> = ({ imageUrl, altText = 'Advertisement' }) => {
               priority
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+            <div className="w-full h-full bg-[var(--text-disabled)] flex items-center justify-center text-[var(--text-tertiary)]">
               Advertisement
             </div>
           )}
         </div>
-        <div className="bg-blue-50 py-2 px-3 text-xs text-center text-gray-600">
+        <div className="bg-[var(--info-surface)] py-2 px-3 text-xs text-center text-[var(--text-base)]">
           Visit our shop
         </div>
       </Link>

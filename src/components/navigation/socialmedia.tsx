@@ -38,9 +38,9 @@ const SocialMedia = () => {
           target="_blank"
           rel="noopener noreferrer"
           className={`p-2 rounded-lg transition-all duration-300 
-            ${social.color} hover:text-white bg-gray-50/80 
+            ${social.color} hover:text-white bg-[var(--bg-main)]/80 
             hover:shadow-lg transform hover:-translate-y-1 
-            border border-gray-100 hover:border-transparent 
+            border border-[var(--bg-elevated)] hover:border-transparent 
             flex items-center justify-center`}
           aria-label={`Visit our ${social.url.split('.com/')[1]} page`}
         >

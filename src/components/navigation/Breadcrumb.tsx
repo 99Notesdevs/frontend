@@ -9,10 +9,10 @@ export const Breadcrumb = () => {
   const segments = pathname.split('/').filter(Boolean);
 
   return (
-    <nav className="flex items-center text-sm text-gray-600 dark:text-gray-500 mb-6">
+    <nav className="flex items-center text-sm text-[var(--text-base)] dark:text-[var(--text-tertiary)] mb-6">
       <Link 
         href="/"
-        className="flex items-center hover:text-blue-500 p-1 rounded-md"
+        className="flex items-center hover:text-[var(--action-primary)] p-1 rounded-md"
       >
         <HomeIcon className="w-4 h-4" />
       </Link>
@@ -28,13 +28,13 @@ export const Breadcrumb = () => {
           <React.Fragment key={path}>
             <ChevronRightIcon className="w-4 h-4" />
             {isLast ? (
-              <span className="font-medium text-gray-900 dark:text-gray-500 p-1">
+              <span className="font-medium text-[var(--surface-darker)] dark:text-[var(--text-tertiary)] p-1">
                 {label}
               </span>
             ) : (
               <Link
                 href={path}
-                className="p-1 rounded-md hover:text-blue-500"
+                className="p-1 rounded-md hover:text-[var(--action-primary)]"
               >
                 {label}
               </Link>

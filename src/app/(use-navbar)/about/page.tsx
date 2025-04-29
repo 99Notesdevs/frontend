@@ -110,9 +110,9 @@ const About = async () => {
             </div>
             <div className="w-full md:w-1/2 relative z-10 mt-6 md:mt-0">
               <div className="space-y-4 xs:space-y-8">
-                <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight relative">
+                <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold text-[var(--surface-darker)] leading-tight relative">
                   About{" "}
-                  <span className="text-amber-500">
+                  <span className="text-[var(--nav-primary)]">
                     99Notes
                     <svg
                       className="absolute -bottom-2 left-0 w-full"
@@ -129,20 +129,20 @@ const About = async () => {
                       />
                       <defs>
                         <linearGradient id="paint0_linear" x1="0" y1="3" x2="200" y2="3" gradientUnits="userSpaceOnUse">
-                          <stop stopColor="#F59E0B" />
-                          <stop offset="1" stopColor="#D97706" />
+                          <stop stopColor="var(--nav-primary)" />
+                          <stop offset="1" stopColor="var(--nav-secondary)" />
                         </linearGradient>
                       </defs>
                     </svg>
                   </span>
                 </h1>
-                <p className="text-base xs:text-lg sm:text-xl leading-relaxed text-gray-700 pl-2 xs:pl-4 border-l-2 xs:border-l-4 border-amber-200">
+                <p className="text-base xs:text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] pl-2 xs:pl-4 border-l-2 xs:border-l-4 border-[var(--nav-primary)]">
                   {content.heroText}
                 </p>
                 {/* Decorative element */}
                 <div className="flex items-center space-x-1 xs:space-x-2">
-                  <div className="w-4 xs:w-8 h-1 bg-amber-600 rounded-full"></div>
-                  <div className="w-2 xs:w-4 h-1 bg-amber-500 rounded-full"></div>
+                  <div className="w-4 xs:w-8 h-1 bg-[var(--nav-secondary)] rounded-full"></div>
+                  <div className="w-2 xs:w-4 h-1 bg-[var(--nav-primary)] rounded-full"></div>
                   <div className="w-1 xs:w-2 h-1 bg-amber-400 rounded-full"></div>
                 </div>
               </div>
@@ -156,20 +156,20 @@ const About = async () => {
           <div className="absolute bottom-0 left-0 w-40 sm:w-80 h-40 sm:h-80 bg-amber-200/20 rounded-full blur-2xl hidden md:block"></div>
 
           <div className="text-center mb-8 sm:mb-12 md:mb-16 relative">
-            <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 relative z-10">{content.whatWeDo.title}</h2>
-            <div className="w-12 sm:w-24 h-1.5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full mx-auto mt-4"></div>
-            <p className="text-gray-700 mt-6 max-w-2xl mx-auto text-lg ">{content.whatWeDo.description}</p>
+            <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold text-[var(--surface-darker)] relative z-10">{content.whatWeDo.title}</h2>
+            <div className="w-12 sm:w-24 h-1.5 bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] rounded-full mx-auto mt-4"></div>
+            <p className="text-[var(--text-strong)] mt-6 max-w-2xl mx-auto text-lg ">{content.whatWeDo.description}</p>
           </div>
           <div className="flex flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 items-center">
             <div className="w-full lg:w-1/2 order-2 lg:order-1">
-              <p className="text-lg sm:text-xl leading-relaxed text-gray-700 ">{content.whatWeDo.description}</p>
+              <p className="text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] ">{content.whatWeDo.description}</p>
               <ul className="space-y-4 sm:space-y-6">
                 {content.whatWeDo.items.map((item, index) => (
                   <li key={index} className="flex items-start space-x-2 sm:space-x-4 group">
-                    <span className="flex-shrink-0 w-6 sm:w-8 h-6 sm:h-8 rounded-md bg-gradient-to-r from-amber-500 to-amber-600 flex items-center justify-center text-white font-bold transform group-hover:scale-110 transition-transform duration-300 rotate-3">
+                    <span className="flex-shrink-0 w-6 sm:w-8 h-6 sm:h-8 rounded-md bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] flex items-center justify-center text-white font-bold transform group-hover:scale-110 transition-transform duration-300 rotate-3">
                       {index + 1}
                     </span>
-                    <span className="text-lg sm:text-xl text-gray-700 group-hover:text-amber-600 transition-colors duration-300">
+                    <span className="text-lg sm:text-xl text-[var(--text-strong)] group-hover:text-[var(--nav-secondary)] transition-colors duration-300">
                       {item}
                     </span>
                   </li>
@@ -205,13 +205,13 @@ const About = async () => {
             <div className="absolute top-6 left-6 w-12 h-12 border-t border-l border-amber-200 opacity-70 hidden md:block"></div>
             <div className="absolute bottom-6 right-6 w-12 h-12 border-b border-r border-amber-200 opacity-70 hidden md:block"></div>
 
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden border border-gray-100 transform hover:scale-[1.01] transition-all duration-700">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden border border-[var(--bg-elevated)] transform hover:scale-[1.01] transition-all duration-700">
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/2 p-8 sm:p-12 md:p-16 flex flex-col justify-center relative">
                   <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-amber-200 -mt-4 -ml-4 hidden md:block"></div>
-                  <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-gray-900 mb-8 relative">
+                  <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] mb-8 relative">
                     Our{" "}
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600 relative">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] relative">
                       Mission
                       <svg
                         className="absolute -bottom-2 left-0 w-full"
@@ -235,24 +235,24 @@ const About = async () => {
                             y2="3"
                             gradientUnits="userSpaceOnUse"
                           >
-                            <stop stopColor="#F59E0B" />
-                            <stop offset="1" stopColor="#D97706" />
+                            <stop stopColor="var(--nav-primary)" />
+                            <stop offset="1" stopColor="var(--nav-secondary)" />
                           </linearGradient>
                         </defs>
                       </svg>
                     </span>
                   </h2>
-                  <p className="text-lg sm:text-xl leading-relaxed text-gray-700 mb-6 first-letter:text-3xl first-letter:font-bold first-letter:text-amber-600 first-letter:mr-1 first-letter:float-left">
+                  <p className="text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] mb-6 first-letter:text-3xl first-letter:font-bold first-letter:text-[var(--nav-secondary)] first-letter:mr-1 first-letter:float-left">
                     {content.mission.description}
                   </p>
                   <div className="flex items-center space-x-1 sm:space-x-2 mt-4">
-                    <div className="w-8 sm:w-12 h-1 bg-amber-600 rounded-full"></div>
-                    <div className="w-4 sm:w-6 h-1 bg-amber-500 rounded-full"></div>
+                    <div className="w-8 sm:w-12 h-1 bg-[var(--nav-secondary)] rounded-full"></div>
+                    <div className="w-4 sm:w-6 h-1 bg-[var(--nav-primary)] rounded-full"></div>
                     <div className="w-2 sm:w-3 h-1 bg-amber-400 rounded-full"></div>
                   </div>
                   <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-amber-200 -mb-4 -mr-4 hidden md:block"></div>
                 </div>
-                <div className="md:w-1/2 bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 p-8 sm:p-12 md:p-16 flex items-center justify-center relative overflow-hidden">
+                <div className="md:w-1/2 bg-gradient-to-br from-amber-400 via-[var(--nav-primary)] to-[var(--nav-secondary)] p-8 sm:p-12 md:p-16 flex items-center justify-center relative overflow-hidden">
                   <div className="absolute top-1/2 left-1/2 w-16 sm:w-24 h-16 sm:h-24 bg-white/10 rounded-full transform -translate-x-1/2 -translate-y-1/2 blur-md animate-pulse hidden md:block"></div>
                   <div className="absolute -bottom-8 -left-8 w-24 sm:w-32 h-24 sm:h-32 bg-white/5 rounded-full blur-md hidden md:block"></div>
                   <div className="absolute top-1/2 left-1/2 w-12 sm:w-16 h-12 sm:h-16 bg-amber-400/10 rounded-full transform -translate-x-1/2 -translate-y-1/2 blur-sm animate-pulse hidden md:block"></div>
@@ -323,9 +323,9 @@ const About = async () => {
           <div className="absolute left-0 bottom-0 w-1/4 h-full bg-amber-50/40 -z-10 transform -skew-y-6"></div>
           <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-gray-900 relative inline-block">
+              <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] relative inline-block">
                 Meet Our{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">
+                <span className="text-[var(--nav-primary)] bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)]">
                   Founder
                 </span>
                 <div className="absolute -bottom-4 left-0 w-full h-1 bg-gradient-to-r from-transparent to-amber-200"></div>
@@ -335,16 +335,16 @@ const About = async () => {
               <div className="md:w-1/2 order-2 md:order-1">
                 <div className="bg-white rounded-lg shadow-lg p-8 sm:p-12 md:p-16 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 relative">
                   <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-amber-200 -mt-4 -mr-4 hidden md:block"></div>
-                  <h3 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{content.founder.name}</h3>
-                  <p className="text-lg sm:text-xl text-amber-600 mb-6">{content.founder.title}</p>
-                  <blockquote className="text-lg sm:text-xl italic text-gray-700 border-l-4 border-amber-500 pl-6 py-2 mb-8 relative">
+                  <h3 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] mb-2">{content.founder.name}</h3>
+                  <p className="text-lg sm:text-xl text-[var(--nav-secondary)] mb-6">{content.founder.title}</p>
+                  <blockquote className="text-lg sm:text-xl italic text-[var(--text-strong)] border-l-4 border-[var(--nav-primary)] pl-6 py-2 mb-8 relative">
                     <div className="absolute -top-2 -left-2 text-4xl text-amber-200/50 ">"</div>
                     <div className="relative z-10">{content.founder.quote}</div>
                     <div className="absolute -bottom-4 -right-2 text-4xl text-amber-200/50 ">"</div>
                   </blockquote>
                   <div className="space-y-4 sm:space-y-6">
                     {content.founder.description.map((desc, index) => (
-                      <p key={index} className="text-gray-700 font-poppins leading-relaxed">
+                      <p key={index} className="text-[var(--text-strong)] font-poppins leading-relaxed">
                         {desc}
                       </p>
                     ))}
@@ -378,9 +378,9 @@ const About = async () => {
           <div className="absolute bottom-1/4 left-0 w-1/3 h-1/2 bg-amber-50/60 rounded-r-full opacity-70 -z-10"></div>
           <div className="absolute right-0 top-0 w-1/4 h-full bg-amber-50/40 -z-10 transform skew-y-6"></div>
           <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8">
-            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-gray-900 mb-12 sm:mb-16 text-center relative inline-block">
+            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] mb-12 sm:mb-16 text-center relative inline-block">
               Meet Our{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">
+              <span className="text-[var(--nav-primary)] bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)]">
                 Co-Founder
               </span>
               <div className="absolute -bottom-4 left-0 w-full h-1 bg-gradient-to-r from-transparent to-amber-200"></div>
@@ -405,16 +405,16 @@ const About = async () => {
               <div className="md:w-1/2">
                 <div className="bg-white rounded-lg shadow-lg p-8 sm:p-12 md:p-16 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 relative">
                   <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-amber-200 -mt-4 -mr-4 hidden md:block"></div>
-                  <h3 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{content.cofounder.name}</h3>
-                  <p className="text-lg sm:text-xl text-amber-600 mb-6">{content.cofounder.title}</p>
-                  <blockquote className="text-lg sm:text-xl italic text-gray-700 border-l-4 border-amber-500 pl-6 py-2 mb-8 relative">
+                  <h3 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] mb-2">{content.cofounder.name}</h3>
+                  <p className="text-lg sm:text-xl text-[var(--nav-secondary)] mb-6">{content.cofounder.title}</p>
+                  <blockquote className="text-lg sm:text-xl italic text-[var(--text-strong)] border-l-4 border-[var(--nav-primary)] pl-6 py-2 mb-8 relative">
                     <div className="absolute -top-2 -left-2 text-4xl text-amber-200/50 ">"</div>
                     <div className="relative z-10">{content.cofounder.quote}</div>
                     <div className="absolute -bottom-4 -right-2 text-4xl text-amber-200/50 ">"</div>
                   </blockquote>
                   <div className="space-y-4 sm:space-y-6">
                     {content.cofounder.description.map((desc, index) => (
-                      <p key={index} className="text-gray-700 leading-relaxed">
+                      <p key={index} className="text-[var(--text-strong)] leading-relaxed">
                         {desc}
                       </p>
                     ))}
@@ -435,14 +435,14 @@ const About = async () => {
             <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-6xl text-amber-100/40 font-poppins font-bold">
               Veterans
             </span>
-            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-gray-900 relative">
+            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] relative">
               Battle-Hardened{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)]">
                 Veterans
               </span>
             </h2>
-            <div className="w-12 sm:w-24 h-1.5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full mx-auto mt-4"></div>
-            <p className="text-gray-700 mt-6 max-w-2xl mx-auto text-lg font-poppins">{content.veterans.description}</p>
+            <div className="w-12 sm:w-24 h-1.5 bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] rounded-full mx-auto mt-4"></div>
+            <p className="text-[var(--text-strong)] mt-6 max-w-2xl mx-auto text-lg font-poppins">{content.veterans.description}</p>
           </div>
           <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 md:p-16 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
             {/* Decorative corners */}
@@ -462,14 +462,14 @@ const About = async () => {
             <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-6xl text-amber-100/40 font-poppins font-bold">
               Team
             </span>
-            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-gray-900 relative">
+            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] relative">
               Our{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)]">
                 Core Members
               </span>
             </h2>
-            <div className="w-12 sm:w-24 h-1.5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full mx-auto mt-4"></div>
-            <p className="text-gray-700 mt-6 max-w-2xl mx-auto text-lg font-poppins">
+            <div className="w-12 sm:w-24 h-1.5 bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] rounded-full mx-auto mt-4"></div>
+            <p className="text-[var(--text-strong)] mt-6 max-w-2xl mx-auto text-lg font-poppins">
               {content.coreMembers.description}
             </p>
           </div>
