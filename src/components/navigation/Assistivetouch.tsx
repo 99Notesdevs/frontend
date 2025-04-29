@@ -175,7 +175,7 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
           <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl">
             <div className="absolute top-4 right-4 z-10">
               <button
-                className="p-2 text-gray-500 hover:text-gray-700"
+                className="p-2 text-[var(--text-tertiary)] hover:text-[var(--text-strong)]"
                 onClick={() => {
                   setIsOpen(false);
                   setShowBackdrop(false);
@@ -187,7 +187,7 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
             </div>
 
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
+              <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-blue-200 pb-2">
                 {showComponent === 'toc' ? '📑 Table of Contents' : '🗄️ Navigation'}
               </h3>
 

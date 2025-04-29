@@ -113,7 +113,7 @@ const CurrentAffairArticlePage = async ({
                     <div className="mb-4">
                       <Link
                         href={`/current-affairs/${category}`}
-                        className="text-yellow-600 hover:text-blue-800 font-medium text-sm"
+                        className="text-[var(--secondary)] hover:text-blue-800 font-medium text-sm"
                       >
                         {category}
                       </Link>
@@ -121,10 +121,10 @@ const CurrentAffairArticlePage = async ({
                   
                   {article?.metadata && (
                     <>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-dark)] mb-8">
                       {JSON.parse(article.metadata).metaTitle}
                     </h1>
-                    <p className="text-sm text-gray-600 mb-2" >
+                    <p className="text-sm text-[var(--text-tertiary)] mb-2" >
                       By {article.author} • {article.createdAt ? new Date(article.createdAt).toLocaleDateString('en-US', {
                         month: 'long',
                         day: 'numeric',
@@ -145,37 +145,37 @@ const CurrentAffairArticlePage = async ({
                   
                   prose-h1:text-3xl sm:prose-h1:text-4xl
                   prose-h1:font-bold
-                  prose-h1:text-gray-800
+                  prose-h1:text-[var(--surface-dark)]
                   prose-h1:leading-tight
                   
                   prose-h2:text-2xl sm:prose-h2:text-3xl
-                  prose-h2:text-gray-700
+                  prose-h2:text-[var(--text-strong)]
                   prose-h2:pb-2
                   prose-h2:after:content-['']
                   prose-h2:after:block
                   prose-h2:after:w-16
                   prose-h2:after:h-[2px]
                   prose-h2:after:mt-2
-                  prose-h2:after:bg-yellow-500
+                  prose-h2:after:bg-[var(--primary)]
                   prose-h2:after:rounded-full
                   
                   prose-h3:text-xl sm:prose-h3:text-2xl
-                  prose-h3:text-gray-600
+                  prose-h3:text-[var(--text-tertiary)]
                   prose-h3:font-medium
                   prose-h3:pl-3
                   
                   prose-h4:text-lg sm:prose-h4:text-xl
-                  prose-h4:text-gray-600
+                  prose-h4:text-[var(--text-tertiary)]
                   prose-h4:font-medium
                   prose-h4:before:content-['§']
-                  prose-h4:before:text-yellow-500
+                  prose-h4:before:text-[var(--primary)]
                   prose-h4:before:mr-2
                   prose-h4:before:opacity-70
                   
-                  prose-p:text-gray-600
+                  prose-p:text-[var(--text-tertiary)]
                   prose-p:leading-relaxed
                   prose-p:tracking-wide
-                  prose-strong:text-gray-800
+                  prose-strong:text-[var(--surface-dark)]
                   prose-a:text-blue-600
                   prose-a:no-underline
                   prose-a:border-b-2
@@ -214,7 +214,7 @@ const CurrentAffairArticlePage = async ({
               <div className="sticky top-8 space-y-4 sm:space-y-6">
                 <div className="bg-white border border-blue-100 rounded-lg shadow-lg p-4 sm:p-6 
                   transition-all duration-300 hover:shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b-2 border-blue-200 pb-2">
+                  <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-blue-200 pb-2">
                     Table of Contents
                   </h3>
                   <div className="pr-2">
@@ -228,7 +228,7 @@ const CurrentAffairArticlePage = async ({
           <div className="text-center py-16 bg-white/80 backdrop-blur-sm rounded-2xl
             shadow-xl max-w-2xl mx-auto border border-gray-200">
             <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
-            <p className="text-gray-500 mb-6">
+            <p className="text-[var(--text-tertiary)] mb-6">
               The article you're looking for could not be found.
             </p>
             <Link

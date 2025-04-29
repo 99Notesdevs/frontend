@@ -188,8 +188,8 @@ const CurrentAffairsSectionPage = async ({
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <h1 className="text-2xl font-bold text-[var(--surface-darker)] mb-4">Error</h1>
+          <p className="text-[var(--text-tertiary)] mb-4">{error}</p>
           <Link href="/current-affairs" className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
             Go Back
           </Link>
@@ -235,7 +235,7 @@ const CurrentAffairsSectionPage = async ({
           )}
           <div className="max-w-4xl mx-auto">
             <div className="mt-4 mb-6">
-              <p className="text-xl font-bold text-center text-gray-800">
+              <p className="text-xl font-bold text-center text-[var(--surface-dark)]">
                 {currentAffair?.metadata ? 
                   (() => {
                     try {
@@ -247,7 +247,7 @@ const CurrentAffairsSectionPage = async ({
                   })()
                   : 'Title Of page'}
               </p>
-              <div className="w-full h-[3px] bg-amber-500 rounded-full mt-2"></div>
+              <div className="w-full h-[3px] bg-[var(--nav-primary)] rounded-full mt-2"></div>
             </div>
             {/* <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight">
               {/* {currentAffair?.title || sectionInfo.title} */}
@@ -266,7 +266,7 @@ const CurrentAffairsSectionPage = async ({
               ))}
             </div> */}
             <div className="mt-2 mb-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-[var(--text-tertiary)]">
                 {currentAffair?.metadata ? 
                   (() => {
                     try {
@@ -304,7 +304,7 @@ const CurrentAffairsSectionPage = async ({
                 {currentAffair?.type === 'daily' ? (
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-semibold text-[var(--surface-darker)]">
                         {article.title}
                       </h3>
                     </div>
@@ -322,7 +322,7 @@ const CurrentAffairsSectionPage = async ({
                     href={`/current-affairs/${category}/${article.slug
                       .split("/")
                       .pop()}`}
-                    className="text-amber-500 hover:text-amber-600 transition-colors"
+                    className="text-[var(--primary)] hover:text-[var(--secondary)] transition-colors"
                   >
                     <h2 className="text-xl sm:text-2xl font-semibold">
                       {article.title}
@@ -330,7 +330,7 @@ const CurrentAffairsSectionPage = async ({
                   </Link>
                   
                   <div className="w-full">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-[var(--text-tertiary)]">
                       {article.metadata ? 
                         (() => {
                           try {
@@ -342,7 +342,7 @@ const CurrentAffairsSectionPage = async ({
                         })()
                         : 'In-depth analysis of important current events and their relevance for UPSC Civil Services Examination.'}
                     </p>
-                    <div className="w-full h-[2px] bg-amber-500 rounded-full mt-2"></div>
+                    <div className="w-full h-[2px] bg-[var(--primary)] rounded-full mt-2"></div>
                   </div>
                 </div>
                 
@@ -353,7 +353,7 @@ const CurrentAffairsSectionPage = async ({
           ) : (
             <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
               <svg
-                className="w-16 h-16 mx-auto text-gray-400 mb-4"
+                className="w-16 h-16 mx-auto text-[var(--text-disabled)] mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -365,10 +365,10 @@ const CurrentAffairsSectionPage = async ({
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-[var(--surface-darker)] mb-2">
                 No Articles Found
               </h3>
-              <p className="text-gray-500">Check back later for new content.</p>
+              <p className="text-[var(--text-tertiary)]">Check back later for new content.</p>
             </div>
           )}
         </div>

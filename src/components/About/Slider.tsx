@@ -102,7 +102,7 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
       {/* Navigation Arrows - Adjusted for mobile */}
       <button 
         onClick={handlePrevClick}
-        className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
+        className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center text-[var(--surface-dark)] hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
         aria-label="Previous slide"
       >
         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +111,7 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
       </button>
       <button 
         onClick={handleNextClick}
-        className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
+        className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center text-[var(--surface-dark)] hover:bg-white hover:shadow-lg transition-all duration-200 shadow-md z-30"
         aria-label="Next slide"
       >
         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +128,7 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
             className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
               index === currentIndex 
                 ? 'bg-gradient-to-r from-amber-500 to-amber-600 w-4 sm:w-5'
-                : 'bg-gray-300 hover:bg-gray-400'
+                : 'bg-[var(--border-light)] hover:bg-[var(--text-secondary)]'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
@@ -138,7 +138,7 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
       {/* Play/Pause Button - Adjusted for mobile */}
       <button
         onClick={() => setIsAutoPlay(!isAutoPlay)}
-        className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-6 h-6 sm:w-8 sm:h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-800 hover:bg-white transition-all duration-200 shadow-md z-30"
+        className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-6 h-6 sm:w-8 sm:h-8 bg-white/90 rounded-full flex items-center justify-center text-[var(--surface-dark)] hover:bg-white transition-all duration-200 shadow-md z-30"
         aria-label={isAutoPlay ? "Pause slideshow" : "Play slideshow"}
       >
         {isAutoPlay ? (

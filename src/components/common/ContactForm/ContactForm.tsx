@@ -107,13 +107,13 @@ const ContactForm: React.FC = () => {
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-sm shadow-lg">
       <div className="text-center mb-8">
-        <h2 className="text-1xl font-bold text-gray-600 mb-2">
+        <h2 className="text-1xl font-bold text-[var(--text-strong)] mb-2">
           Get Free UPSC Study Material
         </h2>
       </div>
 
       {submitStatus === 'success' && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-center justify-center">
+        <div className="mb-4 p-4 bg-[var(--success-bg)] border border-[var(--success-border)] text-[var(--success-text)] rounded-lg text-sm flex items-center justify-center">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
           </svg>
@@ -122,7 +122,7 @@ const ContactForm: React.FC = () => {
       )}
 
       {submitStatus === 'error' && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center justify-center">
+        <div className="mb-4 p-4 bg-[var(--error-bg)] border border-[var(--error-border)] text-[var(--error-text)] rounded-lg text-sm flex items-center justify-center">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -148,8 +148,8 @@ const ContactForm: React.FC = () => {
               onChange={handleChange}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
               className={`w-full pl-10 pr-4 py-3 border ${
-                errors[field] ? 'border-red-500' : 'border-gray-300'
-              } rounded-lg text-gray-700 text-sm transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#ffc107] focus:border-transparent placeholder-gray-400 ${
+                errors[field] ? 'border-[var(--error-border)]' : 'border-[var(--border-light)]'
+              } rounded-lg text-[var(--text-strong)] text-sm transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder-[var(--text-tertiary)] ${
                 field === 'message' ? 'h-32 resize-none' : ''
               }`}
               disabled={isSubmitting}

@@ -20,7 +20,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
       <main>
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
           {/* Increase max width of the container */}
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 lg:py-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-7 lg:mt-16">
@@ -30,9 +30,9 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                 <div className="relative">
                   <div className="sticky top-8 space-y-6">
                     {/* Navigation Section */}
-                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                      <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                        <span className="text-primary">📚</span>
+                    <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] border-b-2 border-[var(--border-light)] pb-2 flex items-center gap-2">
+                        <span className="text-[var(--primary)]">📚</span>
                         <span>Complete UPSC Notes</span>
                       </h3>
                       <div className="pr-2 max-h-[60vh] overflow-y-auto">
@@ -45,18 +45,18 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                     </div>
 
                     {/* Contact Form */}
-                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                      <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                        <span className="text-primary">📝</span>
+                    <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] border-b-2 border-[var(--border-light)] pb-2 flex items-center gap-2">
+                        <span className="text-[var(--primary)]">📝</span>
                         <span>Contact Us</span>
                       </h3>
                       <ContactForm />
                     </div>
 
                     {/* Social Media Section */}
-                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                      <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                        <span className="text-primary">🌐</span>
+                    <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] border-b-2 border-[var(--border-light)] pb-2 flex items-center gap-2">
+                        <span className="text-[var(--primary)]">🌐</span>
                         <span>Connect With Us</span>
                       </h3>
                       <div className="py-2">
@@ -64,7 +64,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                       </div>
                     </div>
 
-                    <div className="bg-white border border-background-secondary rounded-xl shadow-lg">
+                    <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg">
                       <Ads imageUrl="/" altText="ads" />
                     </div>
                   </div>
@@ -73,18 +73,18 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
 
               {/* Adjust main content width */}
               <main className="lg:col-span-8 order-1 lg:order-2">
-                <article className="bg-white border border-background-secondary rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 lg:p-8">
+                <article className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 lg:p-8">
                   <div
                     className="prose prose-lg max-w-none
                   prose-headings:font-bold 
                   prose-headings:text-center
                   prose-headings:mb-6
                   prose-h1:border-b 
-                  prose-h1:border-accent-color 
+                  prose-h1:border-[var(--accent)] 
                   prose-h1:pb-2 
                   prose-h1:text-3xl
                   prose-h2:border-b 
-                  prose-h2:border-accent-color 
+                  prose-h2:border-[var(--accent)] 
                   prose-h2:pb-2 
                   prose-h2:text-2xl
                   prose-h3:text-xl
@@ -92,24 +92,24 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                   prose-h4:border-0
                   prose-h5:border-0
                   prose-h6:border-0
-                  prose-p:text-secondary
+                  prose-p:text-[var(--text-strong)]
                   prose-p:leading-relaxed
                   prose-p:my-4
-                  prose-a:text-primary 
+                  prose-a:text-[var(--primary)] 
                   prose-a:no-underline 
-                  hover:prose-a:text-accent-color
+                  hover:prose-a:text-[var(--accent)]
                   prose-a:transition-colors
-                  prose-strong:text-primary
+                  prose-strong:text-[var(--primary)]
                   prose-ul:list-disc
                   prose-ul:pl-6
                   prose-ul:my-4
                   prose-ol:pl-6
                   prose-ol:my-4
-                  prose-li:marker:text-gray-500
+                  prose-li:marker:text-[var(--text-tertiary)]
                   prose-li:mb-2
                   prose-blockquote:border-l-4
-                  prose-blockquote:border-background-secondary
-                  prose-blockquote:bg-background-tertiary
+                  prose-blockquote:border-[var(--border-light)]
+                  prose-blockquote:bg-[var(--tertiary)]
                   prose-blockquote:p-4
                   prose-blockquote:rounded-r-lg
                   prose-blockquote:my-6

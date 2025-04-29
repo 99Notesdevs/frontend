@@ -60,7 +60,7 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Search notes, subjects..."
-          className="w-full py-1.5 pl-8 pr-3 text-sm text-gray-700 placeholder-gray-400 
+          className="w-full py-1.5 pl-8 pr-3 text-sm text-[var(--text-strong)] placeholder-[var(--text-tertiary)] 
                     bg-transparent border-none outline-none"
           value={query}
           onChange={handleInputChange}
@@ -69,7 +69,7 @@ const SearchBar = () => {
         />
         <div className="absolute inset-y-0 left-0 flex items-center pl-2.5">
           <svg
-            className="w-4 h-4 text-gray-400"
+            className="w-4 h-4 text-[var(--text-tertiary)]"
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -84,16 +84,16 @@ const SearchBar = () => {
 
       {/* Search Results Dropdown */}
       {isFocused && query && (
-        <div className="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+        <div className="absolute top-full mt-2 w-full bg-white border border-[var(--border-light)] rounded-lg shadow-lg z-10">
           {isLoading ? (
-            <div className="p-4 text-sm text-gray-500">Loading...</div>
+            <div className="p-4 text-sm text-[var(--text-tertiary)]">Loading...</div>
           ) : results.length > 0 ? (
-            <ul className="divide-y divide-gray-200">
+            <ul className="divide-y divide-[var(--border-light)]">
               {results.map((result: any, index: number) => (
                 <li
                   key={index}
-                  className="p-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700 flex items-start gap-4"
-                  onClick={() => handleResultClick(result.slug)} // Redirect on click
+                  className="p-2 hover:bg-[var(--bg-main)] cursor-pointer text-sm text-[var(--text-strong)] flex items-start gap-4"
+                  onClick={() => handleResultClick(result.slug)}
                 >
                   {/* Display image if available */}
                   {result.imageUrl && (
@@ -107,7 +107,7 @@ const SearchBar = () => {
                     <h3 className="font-semibold">
                       {result.title || "Untitled"}
                     </h3>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--text-tertiary)]">
                       {result.content.replace(/<[^>]*>/g, "").slice(0, 50)}...
                     </p>
                   </div>
@@ -115,7 +115,7 @@ const SearchBar = () => {
               ))}
             </ul>
           ) : (
-            <div className="p-4 text-sm text-gray-500">No results found</div>
+            <div className="p-4 text-sm text-[var(--text-tertiary)]">No results found</div>
           )}
         </div>
       )}

@@ -77,7 +77,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+    <div className="flex h-screen bg-[var(--bg-main)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <Sidebar />
@@ -103,7 +103,7 @@ const Profile = () => {
           onClick={() => setIsMobileMenuOpen(true)}
         >
           <svg
-            className="w-6 h-6 text-gray-600"
+            className="w-6 h-6 text-[var(--text-tertiary)]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -174,8 +174,8 @@ const Profile = () => {
         <div className="max-w-5xl mx-auto p-6 space-y-8">
           <div className="grid grid-cols-1 gap-8">
             {/* Personal Information */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-8 border border-gray-100">
-              <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-3">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-8 border border-[var(--bg-elevated)]">
+              <h2 className="text-2xl font-bold mb-8 text-[var(--surface-dark)] flex items-center gap-3">
                 <span className="h-8 w-1 bg-yellow-500 rounded-full"></span>
                 Personal Information
               </h2>
@@ -219,7 +219,7 @@ const Profile = () => {
                 ].map((field) => (
                   <div
                     key={field.label}
-                    className="group hover:bg-gray-50/50 p-4 rounded-xl transition-all duration-300"
+                    className="group hover:bg-[var(--bg-main)]/50 p-4 rounded-xl transition-all duration-300"
                   >
                     <div className="flex items-center gap-3">
                       <div className="text-yellow-500/70 group-hover:text-yellow-500 transition-colors">
@@ -238,10 +238,10 @@ const Profile = () => {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <label className="block text-sm text-gray-500 group-hover:text-gray-600 transition-colors">
+                        <label className="block text-sm text-[var(--text-tertiary)] group-hover:text-[var(--text-tertiary)] transition-colors">
                           {field.label}
                         </label>
-                        <div className="text-gray-900 font-medium mt-1">
+                        <div className="text-[var(--surface-darker)] font-medium mt-1">
                           {field.value}
                         </div>
                       </div>
@@ -252,7 +252,7 @@ const Profile = () => {
             </div>
 
             {/* Reset Password Button */}
-            <button className="mx-auto bg-yellow-500 text-white px-6 py-2.5 rounded-lg hover:bg-yellow-600 transition-colors duration-300 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md text-sm">
+            <button className="mx-auto bg-[var(--primary)] text-white px-6 py-2.5 rounded-lg hover:bg-[var(--secondary)] transition-colors duration-300 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md text-sm">
               <svg
                 className="w-4 h-4"
                 fill="none"

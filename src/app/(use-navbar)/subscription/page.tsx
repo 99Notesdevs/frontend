@@ -102,14 +102,14 @@ export default function SubscriptionPage() {
             {plans.map((plan) => (
               <Card 
                 key={plan.id}
-                className="border-2 border-amber-500 hover:border-amber-600 hover:border-primary transition-all duration-300"
+                className="border-2 border-[var(--nav-primary)] hover:border-[var(--nav-secondary)] hover:border-primary transition-all duration-300"
               >
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl font-bold mb-2">{plan.name}</CardTitle>
                   <p className="text-3xl font-bold text-primary">{`₹${plan.price}/${plan.validity} Days`}</p>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2 text-gray-600">
+                  <ul className="space-y-2 text-[var(--text-tertiary)]">
                     {extractFeatures(plan.description).map((feature, idx) => (
                       <li key={idx} className="flex items-center">
                         <svg
@@ -131,7 +131,7 @@ export default function SubscriptionPage() {
                   </ul>
                   <div className="mt-6">
                     <Button
-                      className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3"
+                      className="w-full bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)] text-white font-semibold py-3"
                       onClick={() => handleBuyClick(plan)}
                     >
                       Buy Now
@@ -147,8 +147,8 @@ export default function SubscriptionPage() {
           <div className="text-center py-12">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold mb-6">Cover Your Entire UPSC Syllabus with 20 Books</h2>
-              {/* <p className="text-gray-600 mb-8">Get access to our comprehensive collection of UPSC preparation books</p> */}
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              {/* <p className="text-[var(--text-tertiary)] mb-8">Get access to our comprehensive collection of UPSC preparation books</p> */}
+              <Button className="bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)] text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
                 <a href="https://shop.99notes.in/books/" className="text-white">
                   Shop Now
                 </a>
@@ -161,7 +161,7 @@ export default function SubscriptionPage() {
           <div className="text-center py-12">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold mb-6">Cover Your Entire UPSC Syllabus with Handwritten Notes</h2>
-             <Button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+             <Button className="bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)] text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
                 <a href="https://shop.99notes.in/notes/" className="text-white">
                   Download Now
                 </a>
@@ -173,23 +173,23 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
       <div className="container mx-auto px-4 py-16">
         <div className="mb-8 flex justify-center gap-4">
           <Button
-            className={`px-6 py-3 ${selectedSection === 'Articles' ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+            className={`px-6 py-3 ${selectedSection === 'Articles' ? 'bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)]' : ''}`}
             onClick={() => setSelectedSection('Articles')}
           >
             Articles
           </Button>
           <Button
-            className={`px-6 py-3 ${selectedSection === 'Books' ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+            className={`px-6 py-3 ${selectedSection === 'Books' ? 'bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)]' : ''}`}
             onClick={() => setSelectedSection('Books')}
           >
             Books
           </Button>
           <Button
-            className={`px-6 py-3 ${selectedSection === 'Notes' ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+            className={`px-6 py-3 ${selectedSection === 'Notes' ? 'bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)]' : ''}`}
             onClick={() => setSelectedSection('Notes')}
           >
             Notes

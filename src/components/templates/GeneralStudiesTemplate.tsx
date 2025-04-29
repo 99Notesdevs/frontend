@@ -32,7 +32,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
     <main>
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
       <div className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 lg:mt-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Left Column - Main Image and Content */}
@@ -49,7 +49,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                   {/* <div className="p-8">
-                    <h1 className="text-3xl md:text-4xl font-bold text-primary tracking-tight">{title}</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-[var(--primary)] tracking-tight">{title}</h1>
                   </div> */}
                 </div>
               </div>
@@ -59,13 +59,13 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
             {page.children && page.children.length > 0 && (
               <div className="mb-10">
                 <div className="flex flex-col items-center mb-8">
-                  <h2 className="text-2xl font-medium text-primary mb-1 text-center">
+                  <h2 className="text-2xl font-medium text-[var(--primary)] mb-1 text-center">
                     {JSON.parse(metadata).metaTitle || 'Related Topics'}
                   </h2>
-                  <p className="text-gray-600 text-sm mb-1 text-center">
+                  <p className="text-[var(--text-tertiary)] text-sm mb-1 text-center">
                     {JSON.parse(metadata).metaDescription || 'Explore related topics to gain a deeper understanding of the subject.'}
                   </p>
-                  <div className="w-full h-1 bg-yellow-300 rounded-full"></div>
+                  <div className="w-full h-1 bg-[var(--highlight-bg)] rounded-full"></div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {page.children.map((child: any) => {
@@ -105,8 +105,8 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                             />
                           </div>
                           <div className="p-6">
-                            <h3 className="text-lg font-semibold mb-2 text-primary">{child.title}</h3>
-                            <p className="text-gray-600 text-sm line-clamp-2">
+                            <h3 className="text-lg font-semibold mb-2 text-[var(--primary)]">{child.title}</h3>
+                            <p className="text-[var(--text-tertiary)] text-sm line-clamp-2">
                               {child.content
                                 ? child.content
                                     .replace(/<[^>]*>/g, '') // Remove HTML tags
@@ -145,7 +145,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
           {/* Right Sidebar */}
           <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
             {/* Search Bar */}
-            <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-4 sm:p-6 
+            <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-4 sm:p-6 
                 transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
               <SearchBar />
             </div>
@@ -154,9 +154,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
             <div className="relative">
               <div className="sticky top-8 space-y-4 sm:space-y-6">
                 {/* Table of Contents Section */}
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                    <span className="text-primary">📑</span>
+                <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                  <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] border-b-2 border-[var(--border-light)] pb-2 flex items-center gap-2">
+                    <span className="text-[var(--primary)]">📑</span>
                     <span>Table of Contents</span>
                   </h3>
                   <div className="pr-2">
@@ -165,9 +165,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                 </div>
 
                 {/* Social Media Section */}
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg p-6">
-                  <h3 className="text-lg font-semibold mb-4 text-primary border-b-2 border-background-secondary pb-2 flex items-center gap-2">
-                    <span className="text-primary">🌐</span>
+                <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] border-b-2 border-[var(--border-light)] pb-2 flex items-center gap-2">
+                    <span className="text-[var(--primary)]">🌐</span>
                     <span>Connect With Us</span>
                   </h3>
                   <div className="py-2">
@@ -175,7 +175,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
                   </div>
                 </div>
 
-                <div className="bg-white border border-background-secondary rounded-xl shadow-lg">
+                <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg">
                   <Ads imageUrl ="/" altText="ads"  />
                 </div>
               </div>

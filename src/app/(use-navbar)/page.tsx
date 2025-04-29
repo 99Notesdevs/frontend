@@ -67,12 +67,11 @@ export default async function Home() {
           {/* Left Column - Text Content */}
           <div className="space-y-7 max-w-xl md:pl-9">
             <div className="space-y-4 mt-4 md:mt-0">
-              <h1 className="text-4xl font-semibold text-gray-800 leading-relaxed font-opensans">
-                {/* <span className="block">The</span> */}
+              <h1 className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans">
                 <span className="block" dangerouslySetInnerHTML={{ __html: homeData.Hero.title }}></span>
               </h1>
             </div>
-            <p className="text-base font-semibold text-gray-700 leading-relaxed font-opensans">
+            <p className="text-base font-semibold text-[var(--text-strong)] leading-relaxed font-opensans">
               {homeData.Hero.description}
             </p>
           </div>

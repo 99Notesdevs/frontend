@@ -63,7 +63,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-white px-4 sm:px-6">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[var(--bg-main)] to-white px-4 sm:px-6">
       {toast && (
         <div className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
           toast.type === 'success' 
@@ -75,13 +75,13 @@ const Register = () => {
           <p className="text-sm">{toast.message}</p>
         </div>
       )}
-      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[340px] sm:max-w-sm border border-gray-200">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-4">
+      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[340px] sm:max-w-sm border border-[var(--bg-elevated)]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[var(--surface-dark)] text-center mb-4">
           Register
         </h2>
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">
+            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
               First Name*
             </label>
             <input
@@ -89,22 +89,22 @@ const Register = () => {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">
+            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
               Last Name
             </label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">
+            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
               Email*
             </label>
             <input
@@ -112,11 +112,11 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">
+            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
               Password*
             </label>
             <div className="relative">
@@ -125,7 +125,7 @@ const Register = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <button
                 type="button"
@@ -146,7 +146,7 @@ const Register = () => {
                       strokeLinecap="round"
                     />
                     <path
-                      d="M6.71277 6.7226C3.66479 8.79527 2 12 2 12C2 12 5.63636 19 12 19C14.0503 19 15.8174 18.2734 17.2711 17.2884M11 5.05822C11.3254 5.02013 11.6588 5 12 5C18.3636 5 22 12 22 12C22 12 21.3082 13.3317 20 14.8335"
+                      d="M6.71277 6.7226C3.66479 8.79527 2 12 2 12C2 12 2 12 5.63636 19 12 19C14.0503 19 15.8174 18.2734 17.2711 17.2884M11 5.05822C11.3254 5.02013 11.6588 5 12 5C18.3636 5 22 12 22 12C22 12 21.3082 13.3317 20 14.8335"
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
@@ -180,7 +180,7 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">
+            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
               Repeat Password*
             </label>
             <input
@@ -188,19 +188,19 @@ const Register = () => {
               value={repeatPassword}
               onChange={(e) => setRepeatPassword(e.target.value)}
               required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-white py-2 sm:py-2.5 rounded-lg hover:bg-slate-700 transition duration-200 font-medium mt-2 text-sm sm:text-base"
+            className="w-full bg-[var(--primary)] text-white py-2 sm:py-2.5 rounded-lg hover:bg-slate-700 transition duration-200 font-medium mt-2 text-sm sm:text-base"
           >
             Register
           </button>
           <div className="flex justify-between items-center pt-2 text-sm">
             <a
               href="/users/login"
-              className="text-yellow-500 hover:text-yellow-600 font-medium"
+              className="text-[var(--primary)] hover:text-[var(--secondary)] font-medium"
             >
               Already have an account? Login
             </a>

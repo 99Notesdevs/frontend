@@ -16,7 +16,7 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
   const { title, content, metadata, children } = page;
   const mainContent = content || "";
   // @ts-ignore
-  const jsonLD = JSON.parse(metadata).schemaData ;
+  const jsonLD = JSON.parse(metadata).schemaData;
 
   return (
     <>
@@ -27,68 +27,68 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
         />
       </section>
       <main>
-        <div className="min-h-screen bg-gradient-to-b from-background-secondary to-white">
-      <div className="bg-background-tertiary py-12">
-        <div className="container mx-auto px-4 max-w-5xl">
-          {/* Page Title */}
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-primary mb-3">{title}</h2>
-            <div className="w-24 h-1 bg-accent-color rounded-full mx-auto"></div>
-          </div>
-
-          {/* Main Content */}
-          <div className="mb-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Child Cards */}
-              {children?.map((child: any) => (
-                <Link key={child.id} href={`/${child.slug}`} className="group">
-                  <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 h-[400px] flex flex-col justify-between border border-gray-200">
-                    <div>
-                      <h3 className="text-xl font-semibold text-primary group-hover:text-accent-color transition-colors text-center mb-4">
-                        {child.title}
-                      </h3>
-                      <div className="text-gray-600 text-sm leading-relaxed h-[80px] overflow-hidden">
-                        <span
-                          dangerouslySetInnerHTML={{ __html: child.content }}
-                          className="block overflow-hidden text-ellipsis"
-                        ></span>
-                      </div>
-                    </div>
-                    <div className="text-yellow-500 group-hover:text-yellow-600 font-medium flex items-center justify-center mt-4">
-                      <span className="text-sm">Read More →</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Main Content */}
-            {mainContent && (
-              <div className="mt-12">
-                <div
-                  className="prose prose-lg text-gray-700 mx-auto"
-                  dangerouslySetInnerHTML={{ __html: mainContent }}
-                ></div>
+        <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
+          <div className="bg-[var(--tertiary)] py-12">
+            <div className="container mx-auto px-4 max-w-5xl">
+              {/* Page Title */}
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold text-[var(--primary)] mb-3">{title}</h2>
+                <div className="w-24 h-1 bg-[var(--accent)] rounded-full mx-auto"></div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {/* Contact Section */}
-      <div className="bg-white py-12">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <h2 className="text-3xl font-bold text-primary mb-6 text-center">
-            Contact Us
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <ContactForm />
-            <ContactMap />
+              {/* Main Content */}
+              <div className="mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {/* Child Cards */}
+                  {children?.map((child: any) => (
+                    <Link key={child.id} href={`/${child.slug}`} className="group">
+                      <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 h-[400px] flex flex-col justify-between border border-[var(--border-light)]">
+                        <div>
+                          <h3 className="text-xl font-semibold text-[var(--primary)] group-hover:text-[var(--accent)] transition-colors text-center mb-4">
+                            {child.title}
+                          </h3>
+                          <div className="text-[var(--text-tertiary)] text-sm leading-relaxed h-[80px] overflow-hidden">
+                            <span
+                              dangerouslySetInnerHTML={{ __html: child.content }}
+                              className="block overflow-hidden text-ellipsis"
+                            ></span>
+                          </div>
+                        </div>
+                        <div className="text-[var(--primary)] group-hover:text-[var(--secondary)] font-medium flex items-center justify-center mt-4">
+                          <span className="text-sm">Read More →</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Main Content */}
+                {mainContent && (
+                  <div className="mt-12">
+                    <div
+                      className="prose prose-lg text-[var(--text-strong)] mx-auto"
+                      dangerouslySetInnerHTML={{ __html: mainContent }}
+                    ></div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Section */}
+          <div className="bg-white py-12">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <h2 className="text-3xl font-bold text-[var(--primary)] mb-6 text-center">
+                Contact Us
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <ContactForm />
+                <ContactMap />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    </main>
+      </main>
     </>
   );
 };

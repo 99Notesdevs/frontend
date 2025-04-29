@@ -128,11 +128,11 @@ export default async function Page({ params }: { params: Params }) {
 
                   {/* Article Content */}
                   <div className="p-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-0">
+                    <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-0">
                       {title}
                     </h1>
 
-                    <div className="text-xs text-gray-500 mb-4">
+                    <div className="text-xs text-[var(--text-tertiary)] mb-4">
                       By 99Notes . Created: {new Date(page.createdAt).toLocaleDateString()}
                     </div>
 
@@ -208,7 +208,7 @@ export default async function Page({ params }: { params: Params }) {
               <aside className="lg:col-start-9 lg:col-span-4 xl:col-start-9 xl:col-span-4 space-y-4 sm:space-y-8">
                 <div className="bg-white rounded-xl shadow-lg p-6">
                   <h2 className="text-lg font-semibold mb-4">Related Topics</h2>
-                  <p className="text-gray-600">Coming soon...</p>
+                  <p className="text-[var(--text-tertiary)]">Coming soon...</p>
                 </div>
               </aside>
             </div>

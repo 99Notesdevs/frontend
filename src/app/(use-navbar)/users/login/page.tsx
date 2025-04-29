@@ -90,9 +90,9 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-white px-4 sm:px-6">
-      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[380px] sm:max-w-sm border border-gray-200">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-2">Login</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[var(--bg-elevated)] to-white px-4 sm:px-6">
+      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[380px] sm:max-w-sm border border-[var(--border-light)]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[var(--surface-dark)] text-center mb-2">Login</h2>
         {toast && (
           <div className={`mb-4 p-3 rounded-lg shadow-sm transition-all duration-300 ${
             toast.type === 'success' 
@@ -106,29 +106,29 @@ const Login = () => {
         )}
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Email:</label>
+            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">Email:</label>
             <input
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1">Password:</label>
+            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">Password:</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 leading-5"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-tertiary)] leading-5"
               >
                 {showPassword ? (
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -151,20 +151,20 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-white py-2 sm:py-2.5 rounded-lg hover:bg-slate-700 transition duration-200 font-medium mt-2 text-sm sm:text-base"
+            className="w-full bg-[var(--primary)] text-white py-2 sm:py-2.5 rounded-lg hover:bg-slate-700 transition duration-200 font-medium mt-2 text-sm sm:text-base"
           >
             Login
           </button>
           <div className="flex justify-between items-center pt-2 text-sm">
             <a 
               href="/users/register" 
-              className="text-yellow-500 hover:text-yellow-600 font-medium"
+              className="text-[var(--primary)] hover:text-[var(--secondary)] font-medium"
             >
               Don't have an account? Register
             </a>
             <a 
               href="/users/password-reset" 
-              className="text-yellow-500 hover:text-yellow-600 font-medium"
+              className="text-[var(--primary)] hover:text-[var(--secondary)] font-medium"
             >
               Forgot Password?
             </a>

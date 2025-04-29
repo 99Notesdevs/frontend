@@ -54,15 +54,15 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
 
   if (error) {
     return (
-      <div className="py-16 bg-gray-50">
+      <div className="py-16 bg-[var(--bg-main)]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Current Affairs</h2>
-            <div className="w-24 h-1 bg-yellow-400 rounded-full mx-auto"></div>
+            <h2 className="text-2xl font-bold text-[var(--surface-darker)] mb-4">Current Affairs</h2>
+            <div className="w-24 h-1 bg-[var(--accent)] rounded-full mx-auto"></div>
           </div>
           <div className="text-center p-8">
             <h3 className="text-lg font-semibold text-red-600 mb-4">Error</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <p className="text-[var(--text-tertiary)] mb-4">{error}</p>
             <button
               onClick={fetchCurrentAffairs}
               className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
@@ -77,11 +77,11 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
 
   if (isLoading) {
     return (
-      <div className="py-16 bg-gray-50">
+      <div className="py-16 bg-[var(--bg-main)]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Current Affairs</h2>
-            <div className="w-24 h-1 bg-yellow-400 rounded-full mx-auto"></div>
+            <h2 className="text-2xl font-bold text-[var(--surface-darker)] mb-4">Current Affairs</h2>
+            <div className="w-24 h-1 bg-[var(--accent)] rounded-full mx-auto"></div>
           </div>
           <div className="text-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
@@ -98,13 +98,13 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
   }));
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-[var(--bg-main)]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-        <span className="text-yellow-500 font-medium tracking-wider text-sm uppercase font-opensans">Current Affairs</span>
-          <h2 className="text-3xl font-semibold text-gray-900 mb-4 font-opensans">{title}</h2>
-          <div className="w-24 h-1 bg-yellow-500 mx-auto mb-6"></div>
-          <p className="text-lg font-normal text-gray-600 max-w-3xl mx-auto font-opensans">
+        <span className="text-[var(--primary)] font-medium tracking-wider text-sm uppercase font-opensans">Current Affairs</span>
+          <h2 className="text-3xl font-semibold text-[var(--surface-darker)] mb-4 font-opensans">{title}</h2>
+          <div className="w-24 h-1 bg-[var(--primary)] mx-auto mb-6"></div>
+          <p className="text-lg font-normal text-[var(--text-tertiary)] max-w-3xl mx-auto font-opensans">
             {description}
           </p>
         </div>
