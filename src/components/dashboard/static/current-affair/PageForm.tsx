@@ -96,7 +96,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [newAffairData, setNewAffairData] = useState({
     title: '',
     content: '',
-    showInNav: false,
+    showInNav: true,
     imageUrl: '',
     type: 'daily',
     link: '',
@@ -126,7 +126,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     quizQuestions: '',
     author: 'here',
     link: '',
-    showInNav: false,
+    showInNav: true,
     metaTitle: '',
     metaDescription: '',
     metaKeywords: '',

@@ -95,7 +95,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
       title: "",
       content: "",
       imageUrl: "",
-      showInNav: false,
+      showInNav: true,
       metaTitle: '',
       metaDescription: '',
       metaKeywords: '',

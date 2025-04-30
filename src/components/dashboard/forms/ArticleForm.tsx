@@ -120,7 +120,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       twitterImage: "",
       canonicalUrl: "",
       schemaData: "",
-      showInNav: false,
+      showInNav: true,
     },
   });
 

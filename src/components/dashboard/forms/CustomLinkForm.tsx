@@ -37,7 +37,7 @@ export const CustomLinkForm: React.FC<CustomLinkFormProps> = ({
     resolver: zodResolver(customLinkSchema),
     defaultValues: initialData || {
       title: "",
-      showInNav: false,
+      showInNav: true,
       link: "",
     },
   });
