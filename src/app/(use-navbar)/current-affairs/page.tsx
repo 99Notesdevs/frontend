@@ -39,14 +39,17 @@ const CurrentAffairsIndex = async () => {
     const yearlyPages = yearlyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     return (
-      <div className="min-h-screen bg-[var(--bg-elevated)]">
-        <Head>
+      <>
+      <Head>
           <title>Current Affairs - 99Notes</title>
           <meta
             name="description"
             content="Current Affairs for UPSC Civil Services Examination"
-          />
+            />
         </Head>
+      <body>
+      <div className="min-h-screen bg-[var(--bg-elevated)]">
+        
 
         <div className="container mx-auto px-4 pt-8 pb-12 max-w-7xl">
           {/* Daily Current Affairs */}
@@ -182,10 +185,13 @@ const CurrentAffairsIndex = async () => {
         </div>
      
       </div>
+      </body>
+      </>
     );
   } catch (error) {
     console.error('Error fetching current affairs:', error);
     return (
+      <body>
       <div className="min-h-screen bg-[var(--bg-main)]">
         <div className="container mx-auto px-4 py-12 max-w-5xl">
           <div className="text-center py-12">
@@ -194,6 +200,7 @@ const CurrentAffairsIndex = async () => {
           </div>
         </div>
       </div>
+      </body>
     );
   }
 };

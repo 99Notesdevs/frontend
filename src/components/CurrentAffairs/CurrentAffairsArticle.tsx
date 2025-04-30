@@ -22,6 +22,7 @@ const CurrentAffairsArticle: React.FC<CurrentAffairsArticleProps> = ({
   pdfLink,
 }) => {
   return (
+    <body>
     <article className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm">
       {/* Article Header */}
       <div className="p-8 border-b">
@@ -109,6 +110,7 @@ const CurrentAffairsArticle: React.FC<CurrentAffairsArticleProps> = ({
         </div>
       </div>
     </article>
+    </body>
   );
 };
 

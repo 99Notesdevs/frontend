@@ -95,6 +95,7 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
   };
 
   return (
+    <body>
     <div 
       className={`
         h-screen bg-white/80 backdrop-blur-md shadow-xl
@@ -172,6 +173,7 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
         </button>
       </div>
     </div>
+    </body>
   );
 };
 

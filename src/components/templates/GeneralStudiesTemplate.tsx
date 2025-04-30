@@ -25,6 +25,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
   
 
   return (
+    <body>
     <>
     <section>
     <script 
@@ -186,6 +187,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({ page }) =>
     </div>
     </main>
     </>
+    </body>
   );
 }
 
