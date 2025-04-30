@@ -26,6 +26,8 @@ interface BlogType {
     twitterImage?: string;
     canonicalUrl?: string;
     schemaData?: string;
+    header?: string;
+    body?: string;
   };
   slug: string;
   order: number;
@@ -51,6 +53,8 @@ interface BlogFormValues {
   twitterImage?: string;
   canonicalUrl?: string;
   schemaData?: string;
+  header?: string;
+  body?: string;
   slug: string;
   order?: number;
 }
@@ -115,7 +119,9 @@ export default function PageForm({ editPage = null }: PageFormProps) {
         twitterDescription: data.twitterDescription,
         twitterImage: data.twitterImage,
         canonicalUrl: data.canonicalUrl,
-        schemaData: data.schemaData
+        schemaData: data.schemaData,
+        header: data.header,
+        body: data.body
       };
 
         data.content = await handleImageUpload(data.content);

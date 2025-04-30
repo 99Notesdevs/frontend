@@ -34,6 +34,8 @@ const formSchema = z.object({
   twitterImage: z.string().optional(),
   canonicalUrl: z.string().optional(),
   schemaData: z.string().optional(),
+  header: z.string().optional(),
+  body: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -102,6 +104,8 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       twitterImage: "",
       canonicalUrl: "",
       schemaData: "",
+      header: "",
+      body: "",
     },
   });
 
@@ -365,6 +369,32 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
                 <FormLabel>Schema Data (JSON-LD)</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter schema data as JSON" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="header"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Header</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="body"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Body</FormLabel>
+                <FormControl>
+                  <Input {...field} />
                 </FormControl>
               </FormItem>
             )}

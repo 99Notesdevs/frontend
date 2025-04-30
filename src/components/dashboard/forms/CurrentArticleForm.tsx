@@ -33,6 +33,8 @@ const formSchema = z.object({
   twitterImage: z.string().optional(),
   canonicalUrl: z.string().optional(),
   schemaData: z.string().optional(),
+  header: z.string().optional(),
+  body: z.string().optional(),
   author: z.string().optional(),
 });
 
@@ -68,6 +70,8 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
       twitterImage: '',
       canonicalUrl: '',
       schemaData: '',
+      header: '',
+      body: '',
       author: '',
       ...defaultValues,
     },
@@ -478,6 +482,32 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
                 />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="header"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Header</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="body"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Body</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
             </FormItem>
           )}
         />

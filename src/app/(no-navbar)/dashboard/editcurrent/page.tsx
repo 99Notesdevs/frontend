@@ -47,6 +47,8 @@ interface CurrentAffairArticleType {
     twitterImage?: string;
     canonicalUrl?: string;
     schemaData?: string;
+    header?: string;
+    body?: string;
   }
   createdAt: Date;
   updatedAt: Date;
@@ -93,7 +95,9 @@ export default function PageListCurrent() {
           twitterDescription: formData.twitterDescription,
           twitterImage: formData.twitterImage,
           canonicalUrl: formData.canonicalUrl,
-          schemaData: formData.schemaData
+          schemaData: formData.schemaData,
+          header: formData.header,
+          body: formData.body
         })
       };
 
@@ -203,7 +207,9 @@ export default function PageListCurrent() {
         twitterDescription: parsedMetadata.twitterDescription || '',
         twitterImage: parsedMetadata.twitterImage || '',
         canonicalUrl: parsedMetadata.canonicalUrl || '',
-        schemaData: parsedMetadata.schemaData || ''
+        schemaData: parsedMetadata.schemaData || '',
+        header: parsedMetadata.header || '',
+        body: parsedMetadata.body || ''
       };
 
       setImagePreview(selectedPage.imageUrl || null);
@@ -456,7 +462,9 @@ export default function PageListCurrent() {
                     twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
                     twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
                     canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
-                    schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : ''
+                    schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
+                    header: selectedPage.metadata ? JSON.parse(selectedPage.metadata).header || '' : '',
+                    body: selectedPage.metadata ? JSON.parse(selectedPage.metadata).body || '' : ''
                   }}
                   onSubmit={handleEditSubmit}
                 />

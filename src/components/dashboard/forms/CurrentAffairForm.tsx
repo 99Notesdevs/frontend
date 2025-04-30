@@ -28,6 +28,8 @@ const currentAffairSchema = z.object({
   twitterImage: z.string().optional(),
   canonicalUrl: z.string().optional(),
   schemaData: z.string().optional(),
+  header: z.string().optional(),
+  body: z.string().optional(),
   showInNav: z.boolean().optional(),
 });
 
@@ -93,6 +95,8 @@ export function CurrentAffairForm({ onSubmit, defaultValues }: CurrentAffairForm
       twitterImage: "",
       canonicalUrl: "",
       schemaData: "",
+      header: "",
+      body: "",
       showInNav: true,
     },
   });
@@ -290,6 +294,32 @@ export function CurrentAffairForm({ onSubmit, defaultValues }: CurrentAffairForm
                 <Input {...field} placeholder="Enter schema data" />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="header"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Header</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="body"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Body</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
             </FormItem>
           )}
         />

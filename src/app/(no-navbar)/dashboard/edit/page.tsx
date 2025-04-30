@@ -146,6 +146,8 @@ function PageList() {
           twitterImage: formData.twitterImage || "",
           canonicalUrl: formData.canonicalUrl || "",
           schemaData: formData.schemaData || "",
+          header: formData.header || "",
+          body: formData.body || ""
         },
         level: selectedPage.level || 0,
         showInNav: formData.showInNav || false,
@@ -206,6 +208,8 @@ function PageList() {
           twitterImage: metadata.twitterImage || "",
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
+          header: metadata.header || "",
+          body: metadata.body || ""
         };
       
       case 'general-studies':
@@ -228,6 +232,8 @@ function PageList() {
           twitterImage: metadata.twitterImage || "",
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
+          header: metadata.header || "",
+          body: metadata.body || ""
         };
       
       case 'current-affairs':
@@ -250,6 +256,8 @@ function PageList() {
           twitterImage: metadata.twitterImage || "",
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
+          header: metadata.header || "",
+          body: metadata.body || ""
         };
       case 'upsc-notes':
         return {
@@ -270,6 +278,8 @@ function PageList() {
           twitterImage: metadata.twitterImage || "",
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
+          header: metadata.header || "",
+          body: metadata.body || ""
         };
       case 'blog':
         return {
@@ -292,6 +302,8 @@ function PageList() {
           twitterImage: metadata.twitterImage || "",
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
+          header: metadata.header || "",
+          body: metadata.body || ""
         };
       case 'custom-link':
         return {
@@ -313,6 +325,8 @@ function PageList() {
           twitterImage: metadata.twitterImage || "",
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
+          header: metadata.header || "",
+          body: metadata.body || ""
         };
     }
   };

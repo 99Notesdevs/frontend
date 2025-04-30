@@ -30,6 +30,8 @@ const formSchema = z.object({
   twitterImage: z.string().optional(),
   canonicalUrl: z.string().optional(),
   schemaData: z.string().optional(),
+  header: z.string().optional(),
+  body: z.string().optional(),
   slug: z.string(),
   order: z.number().optional(),
 });
@@ -124,6 +126,8 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       twitterImage: '',
       canonicalUrl: '',
       schemaData: '',
+      header: '',
+      body: '',
     },
   });
 
@@ -470,6 +474,32 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 <FormLabel>Schema Data</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter schema data" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="header"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Header</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter header" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="body"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Body</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter body" {...field} />
                 </FormControl>
               </FormItem>
             )}
