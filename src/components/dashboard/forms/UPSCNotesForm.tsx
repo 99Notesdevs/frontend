@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const formSchema = z.object({
   title: z.string(),
   content: z.string(),
-  showInNav: z.boolean().default(false),
+  showInNav: z.boolean().default(true),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -87,7 +87,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     defaultValues: initialData || {
       title: "",
       content: "",
-      showInNav: false,
+      showInNav: true,
       metaTitle: "",
       metaDescription: "",
       metaKeywords: "",
