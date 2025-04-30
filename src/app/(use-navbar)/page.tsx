@@ -63,11 +63,11 @@ export default async function Home() {
     <body>
     <div className="min-h-screen">
       {/* Hero Section with Contact Form */}
-      <section className="container mx-auto px-6 lg:px-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center lg:mt-6">
+      <section className="container mx-auto px-6 lg:px-18">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center md:mt-7">
           {/* Left Column - Text Content */}
-          <div className="space-y-7 max-w-xl lg:pl-9">
-            <div className="space-y-4 mt-4 md:mt-0">
+          <div className="space-y-7 max-w-lg lg:pl-4 2xl:ml-20">
+            <div className="space-y-4 mt-4 lg:mt-0">
               <h1 className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans">
                 <span className="block" dangerouslySetInnerHTML={{ __html: homeData.Hero.title }}></span>
               </h1>

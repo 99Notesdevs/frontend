@@ -13,6 +13,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const jsonLD = JSON.parse(metadata)?.schemaData || "";
 
   return (
+    <body>
     <>
     <section>
       <script 
@@ -125,6 +126,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
         </div>
       </main>
     </>
+    </body>
   );
 };
 

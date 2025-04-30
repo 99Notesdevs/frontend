@@ -72,7 +72,6 @@ const About = async () => {
 
   const { title, content } = data
   return (
-    <body>
     <>
       <Head>
         <title>{title}</title>
@@ -80,8 +79,9 @@ const About = async () => {
         <link
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
           rel="stylesheet"
-        />
+          />
       </Head>
+      <body>
       <main className="w-full min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-amber-50/30 relative">
         {/* Hero Section with asymmetric design */}
         <div className="absolute top-0 right-0 w-1/2 sm:w-1/3 h-40 sm:h-96 bg-amber-50/40 rounded-bl-[60px] sm:rounded-bl-[120px] transform rotate-6 z-0 max-w-full hidden xs:block"></div>
@@ -483,8 +483,8 @@ const About = async () => {
           </div>
         </section>
       </main>
-    </>
     </body>
+    </>
   )
 }
 

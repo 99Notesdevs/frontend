@@ -102,14 +102,17 @@ const BlogsPage: React.FC = () => {
 
   if (loading) {
     return (
+      <body>
       <div className="flex justify-center items-center min-h-screen bg-[var(--bg-main)]">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
       </div>
+      </body>
     );
   }
 
   if (error) {
     return (
+      <body>
       <div className="flex flex-col items-center justify-center min-h-screen bg-[var(--bg-main)]">
         <div className="p-8 bg-white rounded-lg shadow-lg text-center">
           <p className="text-red-500 text-lg mb-4">{error}</p>
@@ -121,6 +124,7 @@ const BlogsPage: React.FC = () => {
           </button>
         </div>
       </div>
+      </body>
     );
   }
 
