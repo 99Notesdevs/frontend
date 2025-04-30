@@ -125,6 +125,7 @@ const BlogsPage: React.FC = () => {
   }
 
   return (
+    <body>
     <div className="min-h-screen bg-[var(--bg-elevated)] pt-8 sm:pt-28">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col">
         {/* Title and search section */}
@@ -200,6 +201,7 @@ const BlogsPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </body>
   );
 };
 

@@ -39,6 +39,7 @@ const CurrentAffairsIndex = async () => {
     const yearlyPages = yearlyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     return (
+      <body>
       <div className="min-h-screen bg-[var(--bg-elevated)]">
         <Head>
           <title>Current Affairs - 99Notes</title>
@@ -182,10 +183,12 @@ const CurrentAffairsIndex = async () => {
         </div>
      
       </div>
+      </body>
     );
   } catch (error) {
     console.error('Error fetching current affairs:', error);
     return (
+      <body>
       <div className="min-h-screen bg-[var(--bg-main)]">
         <div className="container mx-auto px-4 py-12 max-w-5xl">
           <div className="text-center py-12">
@@ -194,6 +197,7 @@ const CurrentAffairsIndex = async () => {
           </div>
         </div>
       </div>
+      </body>
     );
   }
 };

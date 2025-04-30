@@ -72,6 +72,7 @@ const About = async () => {
 
   const { title, content } = data
   return (
+    <body>
     <>
       <Head>
         <title>{title}</title>
@@ -483,6 +484,7 @@ const About = async () => {
         </section>
       </main>
     </>
+    </body>
   )
 }
 
