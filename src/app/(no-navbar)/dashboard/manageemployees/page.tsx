@@ -25,6 +25,7 @@ export default function ManageEmployees() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const [newEmployee, setNewEmployee] = useState<{
     id?: string;
@@ -123,8 +124,11 @@ export default function ManageEmployees() {
         body: JSON.stringify(newEmployee),
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error('Failed to add employee');
+        const errorMessage = data.error || 'Failed to add employee';
+        throw new Error(errorMessage);
       }
 
       setShowAddForm(false);
@@ -136,8 +140,16 @@ export default function ManageEmployees() {
         password: "",
       });
       fetchEmployees();
+      setSuccess('Employee added successfully');
+      setError(null);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
     } catch (error) {
-      setError('Failed to add employee');
+      setError(error instanceof Error ? error.message : 'An error occurred while adding employee');
+      setSuccess(null);
     }
   };
 
@@ -280,19 +292,24 @@ export default function ManageEmployees() {
 
   return (
     <div className="container mx-auto max-w-5xl px-2 sm:px-6 py-8 min-h-[80vh]">
-      <h1 className={`${plusJakarta.className} text-2xl font-bold text-slate-800 mb-8 text-center mt-16 sm:mt-10`}>Manage Employees</h1>
+      <h1 className={`${plusJakarta.className} text-2xl font-bold text-[var(--admin-bg-secondary)] mb-8 text-center mt-16 sm:mt-10`}>Manage Employees</h1>
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-md hover:bg-[var(--secondary)] transition-colors"
         >
           <FaPlus /> Add Employee
         </button>
       </div>
 
       {error && (
-        <div className="text-red-500 text-center p-4 mb-6">
+        <div className="text-red-500 text-center p-4 mb-6 rounded-md">
           {error}
+        </div>
+      )}
+      {success && (
+        <div className="text-green-500 text-center p-4 mb-6 rounded-md">
+          {success}
         </div>
       )}
 
@@ -307,7 +324,7 @@ export default function ManageEmployees() {
                   type="text"
                   value={newEmployee.name}
                   onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -317,7 +334,7 @@ export default function ManageEmployees() {
                   type="email"
                   value={newEmployee.email}
                   onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -326,7 +343,7 @@ export default function ManageEmployees() {
                 <select
                   value={newEmployee.role}
                   onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value as 'editor' | 'author' })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="editor">Editor</option>
                   <option value="author">Author</option>
@@ -338,7 +355,7 @@ export default function ManageEmployees() {
                   type="password"
                   value={newEmployee.password}
                   onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -346,13 +363,13 @@ export default function ManageEmployees() {
             <div className="flex gap-3">
               <button
                 onClick={handleAddEmployee}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+                className="px-4 py-2 bg-[var(--primary)] text-white rounded-md hover:bg-[var(--secondary)] transition-colors"
               >
                 Add Employee
               </button>
               <button
                 onClick={() => setShowAddForm(false)}
-                className="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 transition-colors"
+                className="px-4 py-2 bg-[var(--admin-bg-light)] text-[var(--admin-bg-primary)] rounded-md hover:bg-slate-300 transition-colors"
               >
                 Cancel
               </button>
@@ -366,25 +383,25 @@ export default function ManageEmployees() {
           <h2 className="text-lg font-semibold mb-4">Editors</h2>
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              <tr className="bg-[var(--admin-bg-light)]">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--admin-primary)] uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--admin-primary)] uppercase tracking-wider">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-[var(--admin-primary)] uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {employees
                 .filter((e) => e.role === 'editor')
                 .map((employee) => (
                   <tr key={employee.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{employee.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">{employee.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">
                       {new Date(employee.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -411,29 +428,29 @@ export default function ManageEmployees() {
           <h2 className="text-lg font-semibold mb-4">Authors</h2>
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              <tr className="bg-[var(--admin-bg-light)]">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--admin-primary)] uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--admin-primary)] uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--admin-primary)] uppercase tracking-wider">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-[var(--admin-primary)] uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {employees
                 .filter((e) => e.role === 'author')
                 .map((employee) => (
                   <tr key={employee.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{employee.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{employee.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">{employee.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">{employee.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">
                       {new Date(employee.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -475,7 +492,7 @@ export default function ManageEmployees() {
                     type="text"
                     value={newEmployee.name}
                     onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                    className="w-full border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
+                    className="w-full border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
                     required
                   />
                 </div>
@@ -486,7 +503,7 @@ export default function ManageEmployees() {
                   type="email"
                   value={newEmployee.email}
                   onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                  className="w-full border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
+                  className="w-full border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
                   required
                 />
               </div>
@@ -497,7 +514,7 @@ export default function ManageEmployees() {
                     type={showEditPassword ? "text" : "password"}
                     value={newEmployee.password}
                     onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
-                    className="w-full border-0 border-b-2 border-slate-300 bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors pr-10"
+                    className="w-full border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors pr-10"
                   />
                   <button
                     type="button"
@@ -512,13 +529,13 @@ export default function ManageEmployees() {
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+                  className="px-4 py-2 bg-[var(--primary)] text-white rounded-md hover:bg-[var(--secondary)] transition-colors"
                 >
                   Save Changes
                 </button>
                 <button
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 bg-white text-slate-700 rounded-md hover:bg-slate-100 transition-colors"
+                  className="px-4 py-2 bg-white text-[var(--admin-bg-primary)] rounded-md hover:bg-slate-100 transition-colors"
                   type="button"
                 >
                   Cancel
@@ -534,8 +551,8 @@ export default function ManageEmployees() {
           <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full relative">
             <div className="flex flex-col items-center">
               <FaExclamationTriangle className="text-yellow-500 text-4xl mb-3" />
-              <h2 className="text-lg font-bold text-slate-800 mb-2">Confirm Deletion</h2>
-              <p className="text-slate-600 mb-6 text-center">Are you sure you want to delete this employee? This action cannot be undone.</p>
+              <h2 className="text-lg font-bold text-[var(--admin-bg-secondary)] mb-2">Confirm Deletion</h2>
+              <p className="text-[var(--admin-primary)] mb-6 text-center">Are you sure you want to delete this employee? This action cannot be undone.</p>
               <div className="flex gap-4 w-full justify-center">
                 <button
                   className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white font-semibold"
@@ -544,7 +561,7 @@ export default function ManageEmployees() {
                   Delete
                 </button>
                 <button
-                  className="px-4 py-2 rounded bg-slate-200 text-slate-700 hover:bg-slate-300 font-semibold"
+                  className="px-4 py-2 rounded bg-[var(--admin-bg-light)] text-[var(--admin-bg-primary)] hover:bg-slate-300 font-semibold"
                   onClick={() => setShowDeleteModal(false)}
                 >
                   Cancel

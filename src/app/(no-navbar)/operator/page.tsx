@@ -96,34 +96,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--admin-bg-lightest)] via-white to-[var(--bg-elevated)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8 p-0">
         <div className="flex flex-col items-center">
           {/* Show heading only if no form is selected */}
           {!showAdminForm && !showEditorForm && !showAuthorForm && (
-            <h2 className="text-center text-5xl font-bold tracking-tight text-slate-900 font-sans">
+            <h2 className="text-center text-5xl font-bold tracking-tight text-[var(--admin-bg-dark)] font-sans">
               Welcome Back
             </h2>
           )}
           {/* Show dynamic heading when a form is selected */}
           {showAdminForm && (
-            <h2 className="text-center text-4xl font-bold tracking-tight text-slate-900 font-sans mb-2 uppercase">
+            <h2 className="text-center text-4xl font-bold tracking-tight text-[var(--admin-bg-dark)] font-sans mb-2 uppercase">
               Admin Login
             </h2>
           )}
           {showEditorForm && (
-            <h2 className="text-center text-4xl font-bold tracking-tight text-slate-900 font-sans mb-2 uppercase">
+            <h2 className="text-center text-4xl font-bold tracking-tight text-[var(--admin-bg-dark)] font-sans mb-2 uppercase">
               Editor Login
             </h2>
           )}
           {showAuthorForm && (
-            <h2 className="text-center text-4xl font-bold tracking-tight text-slate-900 font-sans mb-2 uppercase">
+            <h2 className="text-center text-4xl font-bold tracking-tight text-[var(--admin-bg-dark)] font-sans mb-2 uppercase">
               Author Login
             </h2>
           )}
           {/* Placeholder as heading when no form is selected */}
           {!showAdminForm && !showEditorForm && !showAuthorForm && (
-            <p className="mt-2 text-center text-base text-slate-500 font-medium">
+            <p className="mt-2 text-center text-base text-[var(--admin-primary)] font-medium">
               Please select your role to sign in
             </p>
           )}
@@ -132,19 +132,19 @@ export default function LoginPage() {
           <div className="mt-8 space-y-4">
             <button
               onClick={() => setShowAdminForm(true)}
-              className="group relative w-full flex justify-center py-3 px-4 border border-yellow-400 text-base font-semibold rounded-lg text-white bg-yellow-500 shadow-sm hover:bg-yellow-600 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
+              className="group relative w-full flex justify-center py-3 px-4 border border-[var(--accent)] text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]"
             >
               Sign in as Admin
             </button>
             <button
               onClick={() => setShowEditorForm(true)}
-              className="group relative w-full flex justify-center py-3 px-4 border border-slate-400 text-base font-semibold rounded-lg text-slate-900 bg-white shadow-sm hover:bg-yellow-600 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
+              className="group relative w-full flex justify-center py-3 px-4 border border-[var(--admin-scroll-thumb-hover)] text-base font-semibold rounded-lg text-[var(--admin-bg-dark)] bg-white shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
             >
               Sign in as Editor
             </button>
             <button
               onClick={() => setShowAuthorForm(true)}
-              className="group relative w-full flex justify-center py-3 px-4 border border-yellow-400 text-base font-semibold rounded-lg text-white bg-yellow-500 shadow-sm hover:bg-yellow-600 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
+              className="group relative w-full flex justify-center py-3 px-4 border border-[var(--accent)] text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]"
             >
               Sign in as Author
             </button>
@@ -154,7 +154,7 @@ export default function LoginPage() {
           <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleAdminLogin}>
             <div className="space-y-4 p-6">
               <div className="relative flex items-center">
-                <EnvelopeIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <EnvelopeIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
                 <input
                   id="email-address"
                   name="email"
@@ -163,12 +163,12 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full px-0 py-2 border-0 border-b-2 border-gray-400 focus:border-gray-700 focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-gray-400 text-gray-900 text-lg"
+                  className="block w-full px-0 py-2 border-0 border-b-2 border-[var(--admin-scroll-thumb-hover)] focus:border-[var(--admin-bg-primary)] focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-[var(--admin-scroll-thumb-hover)] text-[var(--admin-bg-dark)] text-lg"
                   placeholder="Email address"
                 />
               </div>
               <div className="relative flex items-center">
-                <LockClosedIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <LockClosedIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
                 <input
                   id="password"
                   name="password"
@@ -177,13 +177,13 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full px-0 py-2 border-0 border-b-2 border-gray-400 focus:border-gray-700 focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-gray-400 text-gray-900 text-lg pr-8"
+                  className="block w-full px-0 py-2 border-0 border-b-2 border-[var(--admin-scroll-thumb-hover)] focus:border-[var(--admin-bg-primary)] focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-[var(--admin-scroll-thumb-hover)] text-[var(--admin-bg-dark)] text-lg pr-8"
                   placeholder="Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)] hover:text-[var(--admin-bg-primary)] focus:outline-none"
                   tabIndex={-1}
                 >
                   {showPassword ? (
@@ -194,7 +194,7 @@ export default function LoginPage() {
                 </button>
               </div>
               <div className="relative flex items-center">
-                <KeyIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <KeyIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
                 <input
                   id="secret"
                   name="secret"
@@ -202,13 +202,13 @@ export default function LoginPage() {
                   required
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
-                  className="block w-full px-0 py-2 border-0 border-b-2 border-gray-400 focus:border-gray-700 focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-gray-400 text-gray-900 text-lg pr-8"
+                  className="block w-full px-0 py-2 border-0 border-b-2 border-[var(--admin-scroll-thumb-hover)] focus:border-[var(--admin-bg-primary)] focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-[var(--admin-scroll-thumb-hover)] text-[var(--admin-bg-dark)] text-lg pr-8"
                   placeholder="Secret Key"
                 />
                 <button
                   type="button"
                   onClick={() => setShowSecret((prev) => !prev)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)] hover:text-[var(--admin-bg-primary)] focus:outline-none"
                   tabIndex={-1}
                 >
                   {showSecret ? (
@@ -220,7 +220,7 @@ export default function LoginPage() {
               </div>
             </div>
             {error === 'wrong-password' && (
-              <div className="text-red-500 text-sm mt-2 text-center animate-shake">
+              <div className="text-[var(--critical)] text-sm mt-2 text-center animate-shake">
                 Wrong password. Please try again.
               </div>
             )}
@@ -228,7 +228,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-yellow-500 shadow-sm hover:bg-yellow-600 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:opacity-70"
+                className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] disabled:opacity-70"
               >
                 {loading ? 'Logging in...' : 'Sign in'}
               </button>
@@ -239,7 +239,7 @@ export default function LoginPage() {
           <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleEditorLogin}>
             <div className="space-y-4 p-6">
               <div className="relative flex items-center">
-                <EnvelopeIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <EnvelopeIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
                 <input
                   id="email-address"
                   name="email"
@@ -248,12 +248,12 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full px-0 py-2 border-0 border-b-2 border-gray-400 focus:border-gray-700 focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-gray-400 text-gray-900 text-lg"
+                  className="block w-full px-0 py-2 border-0 border-b-2 border-[var(--admin-scroll-thumb-hover)] focus:border-[var(--admin-bg-primary)] focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-[var(--admin-scroll-thumb-hover)] text-[var(--admin-bg-dark)] text-lg"
                   placeholder="Email address"
                 />
               </div>
               <div className="relative flex items-center">
-                <LockClosedIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <LockClosedIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
                 <input
                   id="password"
                   name="password"
@@ -262,13 +262,13 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full px-0 py-2 border-0 border-b-2 border-gray-400 focus:border-gray-700 focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-gray-400 text-gray-900 text-lg pr-8"
+                  className="block w-full px-0 py-2 border-0 border-b-2 border-[var(--admin-scroll-thumb-hover)] focus:border-[var(--admin-bg-primary)] focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-[var(--admin-scroll-thumb-hover)] text-[var(--admin-bg-dark)] text-lg pr-8"
                   placeholder="Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)] hover:text-[var(--admin-bg-primary)] focus:outline-none"
                   tabIndex={-1}
                 >
                   {showPassword ? (
@@ -280,7 +280,7 @@ export default function LoginPage() {
               </div>
             </div>
             {error === 'wrong-password' && (
-              <div className="text-red-500 text-sm mt-2 text-center animate-shake">
+              <div className="text-[var(--critical)] text-sm mt-2 text-center animate-shake">
                 Wrong password. Please try again.
               </div>
             )}
@@ -288,7 +288,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-yellow-500 shadow-sm hover:bg-yellow-600 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:opacity-70"
+                className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] disabled:opacity-70"
               >
                 {loading ? 'Logging in...' : 'Sign in'}
               </button>
@@ -299,7 +299,7 @@ export default function LoginPage() {
           <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleAuthorLogin}>
             <div className="space-y-4 p-6">
               <div className="relative flex items-center">
-                <EnvelopeIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <EnvelopeIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
                 <input
                   id="email-address"
                   name="email"
@@ -308,12 +308,12 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full px-0 py-2 border-0 border-b-2 border-gray-400 focus:border-gray-700 focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-gray-400 text-gray-900 text-lg"
+                  className="block w-full px-0 py-2 border-0 border-b-2 border-[var(--admin-scroll-thumb-hover)] focus:border-[var(--admin-bg-primary)] focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-[var(--admin-scroll-thumb-hover)] text-[var(--admin-bg-dark)] text-lg"
                   placeholder="Email address"
                 />
               </div>
               <div className="relative flex items-center">
-                <LockClosedIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <LockClosedIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
                 <input
                   id="password"
                   name="password"
@@ -322,13 +322,13 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full px-0 py-2 border-0 border-b-2 border-gray-400 focus:border-gray-700 focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-gray-400 text-gray-900 text-lg pr-8"
+                  className="block w-full px-0 py-2 border-0 border-b-2 border-[var(--admin-scroll-thumb-hover)] focus:border-[var(--admin-bg-primary)] focus:shadow-none outline-none bg-transparent transition-all duration-150 placeholder-[var(--admin-scroll-thumb-hover)] text-[var(--admin-bg-dark)] text-lg pr-8"
                   placeholder="Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)] hover:text-[var(--admin-bg-primary)] focus:outline-none"
                   tabIndex={-1}
                 >
                   {showPassword ? (
@@ -340,7 +340,7 @@ export default function LoginPage() {
               </div>
             </div>
             {error === 'wrong-password' && (
-              <div className="text-red-500 text-sm mt-2 text-center animate-shake">
+              <div className="text-[var(--critical)] text-sm mt-2 text-center animate-shake">
                 Wrong password. Please try again.
               </div>
             )}
@@ -348,7 +348,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-yellow-500 shadow-sm hover:bg-yellow-600 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:opacity-70"
+                className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] disabled:opacity-70"
               >
                 {loading ? 'Logging in...' : 'Sign in'}
               </button>
@@ -362,7 +362,7 @@ export default function LoginPage() {
               setShowEditorForm(false);
               setShowAuthorForm(false);
             }}
-            className="mt-6 w-full text-base text-slate-600 hover:text-slate-900 font-medium transition-all duration-150 underline underline-offset-2"
+            className="mt-6 w-full text-base text-[var(--admin-secondary)] hover:text-[var(--admin-bg-dark)] font-medium transition-all duration-150 underline underline-offset-2"
           >
             Back to role selection
           </button>

@@ -47,11 +47,11 @@ const SortableItem = ({ affair }: { affair: CurrentAffair }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-slate-50 shadow rounded-xl p-4 mb-2 border border-slate-200 cursor-move hover:bg-slate-100 transition-all"
+      className="bg-[var(--admin-bg-lightest)] shadow rounded-xl p-4 mb-2 border border-[var(--admin-border)] cursor-move hover:bg-[var(--admin-bg-light)] transition-all"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-slate-800">{affair.title}</h3>
-        <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">Order: {affair.order}</span>
+        <h3 className="text-base font-semibold text-[var(--admin-bg-secondary)]">{affair.title}</h3>
+        <span className="text-xs text-[var(--admin-primary)] bg-[var(--admin-bg-light)] px-2 py-1 rounded">Order: {affair.order}</span>
       </div>
     </div>
   );
@@ -146,13 +146,13 @@ const CurrentAffairsList = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+      <h1 className="text-2xl font-bold text-[var(--admin-bg-dark)] mb-6 mt-7">
         Sort Current Affairs
       </h1>
 
       {/* Daily Affairs */}
-      <div className="bg-white/90 shadow-xl rounded-2xl border border-slate-100 p-6 mb-8">
-        <h2 className="text-lg font-bold text-slate-700 mb-4 text-center">Daily Affairs</h2>
+      <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6 mb-8">
+        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">Daily Affairs</h2>
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, "daily")}
@@ -171,8 +171,8 @@ const CurrentAffairsList = () => {
       </div>
 
       {/* Monthly Affairs */}
-      <div className="bg-white/90 shadow-xl rounded-2xl border border-slate-100 p-6 mb-8">
-        <h2 className="text-lg font-bold text-slate-700 mb-4 text-center">Monthly Affairs</h2>
+      <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6 mb-8">
+        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">Monthly Affairs</h2>
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, "monthly")}
@@ -191,8 +191,8 @@ const CurrentAffairsList = () => {
       </div>
 
       {/* Yearly Affairs */}
-      <div className="bg-white/90 shadow-xl rounded-2xl border border-slate-100 p-6 mb-8">
-        <h2 className="text-lg font-bold text-slate-700 mb-4 text-center">Yearly Affairs</h2>
+      <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6 mb-8">
+        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">Yearly Affairs</h2>
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, "yearly")}

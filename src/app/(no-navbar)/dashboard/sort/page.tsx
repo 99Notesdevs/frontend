@@ -90,14 +90,14 @@ const SortableItem = ({ page }: { page: Page }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="article-item bg-white shadow-sm rounded-lg p-4 mb-2 border border-gray-200 cursor-move"
+      className="article-item bg-white shadow-sm rounded-lg p-4 mb-2 border border-[var(--admin-border)] cursor-move"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">{page.title}</h3>
+        <h3 className="text-lg font-semibold text-[var(--admin-bg-secondary)]">{page.title}</h3>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-500">Level: {page.level}</span>
-          <span className="text-sm text-gray-500">Order: {page.order}</span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-[var(--admin-primary)]">Level: {page.level}</span>
+          <span className="text-sm text-[var(--admin-primary)]">Order: {page.order}</span>
+          <span className="text-sm text-[var(--admin-primary)]">
             Parent: {page.parentId || "None"}
           </span>
         </div>
@@ -262,10 +262,10 @@ const ArticleList = () => {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-8 max-w-2xl">
-      <div className="bg-white/90 shadow-xl rounded-2xl border border-slate-100 p-6">
-        <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">Sort Pages</h1>
+      <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6">
+        <h1 className="text-2xl font-bold text-[var(--admin-bg-secondary)] mb-6 text-center">Sort Pages</h1>
         {flattenedPages.length === 0 ? (
-          <p className="text-slate-500 text-center">No pages found.</p>
+          <p className="text-[var(--admin-primary)] text-center">No pages found.</p>
         ) : (
           <DndContext
             collisionDetection={closestCenter}
@@ -277,7 +277,7 @@ const ArticleList = () => {
             >
               <div className="space-y-4">
                 {flattenedPages.map((page) => (
-                  <div key={page.id} className="bg-slate-50 rounded-lg shadow flex items-center px-4 py-3 border border-slate-200 hover:bg-slate-100 transition-all">
+                  <div key={page.id} className="bg-[var(--admin-bg-lightest)] rounded-lg shadow flex items-center px-4 py-3 border border-[var(--admin-border)] hover:bg-[var(--admin-bg-light)] transition-all">
                     <SortableItem page={page} />
                   </div>
                 ))}

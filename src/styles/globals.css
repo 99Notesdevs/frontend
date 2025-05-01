@@ -72,7 +72,8 @@
   --black: #000000;
 
   /* Admin Dashboard Slate Colors */
-  --admin-bg-light: #f1f5f9;     /* slate-100, light backgrounds, cards */
+  --admin-bg-lightest: #f8fafc; /* slate-50, lightest backgrounds */
+  --admin-bg-light: #f1f5f9; /* slate-100, light backgrounds, cards */
   --admin-border: #e5e7eb;       /* slate-200, borders, dividers */
   --admin-scroll-thumb: #cbd5e1; /* slate-300, scrollbar thumb */
   --admin-scroll-thumb-hover: #94a3b8; /* slate-400, scrollbar thumb hover */

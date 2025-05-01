@@ -350,16 +350,16 @@ function PageList() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+      <div className="mb-6 mt-7 ml-2">
+        <h1 className="text-3xl font-bold text-[var(--admin-bg-dark)] mb-1">
           Page Management
         </h1>
-        <p className="text-gray-600">Manage your pages and content</p>
+        <p className="text-[var(--admin-secondary)]">Manage your pages and content</p>
       </div>
 
       {pages.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-400 text-lg">
+          <p className="text-[var(--admin-primary)] text-lg">
             No pages found. Create your first page to get started!
           </p>
         </div>
@@ -367,7 +367,7 @@ function PageList() {
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="px-6 py-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Pages</h2>
+              <h2 className="text-xl font-semibold text-[var(--admin-bg-dark)]">Pages</h2>
               <Link
                 href="/dashboard/add"
                 target="_blank"
@@ -378,47 +378,47 @@ function PageList() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-[var(--admin-border)]">
+                <thead className="bg-[var(--admin-bg-lightest)]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[var(--admin-primary)] uppercase tracking-wider">
                       Title
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[var(--admin-primary)] uppercase tracking-wider">
                       Path
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[var(--admin-primary)] uppercase tracking-wider">
                       Template
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[var(--admin-primary)] uppercase tracking-wider">
                       Last Updated
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[var(--admin-primary)] uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-[var(--admin-border)]">
                   {pages.map((page) => (
                     <tr
                       key={page.id}
-                      className="hover:bg-gray-50 transition-colors duration-150"
+                      className="hover:bg-[var(--admin-bg-lightest)] transition-colors duration-150"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-[var(--admin-bg-dark)]">
                           {page.title}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{page.slug}</div>
+                        <div className="text-sm text-[var(--admin-primary)]">{page.slug}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-[var(--admin-primary)]">
                           {page.templateId}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-[var(--admin-primary)]">
                           {new Date(page.updatedAt).toLocaleDateString()}
                         </div>
                       </td>
@@ -460,7 +460,7 @@ function PageList() {
       {showForm && selectedPage && (
         <div className="mt-8">
           <div className="bg-white shadow-sm rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Edit Page</h2>
+            <h2 className="text-2xl font-bold text-[var(--admin-bg-dark)] mb-6">Edit Page</h2>
             <div className="space-y-6">
               {selectedPage.templateId === "article" && (
                 <ArticleForm
@@ -524,17 +524,17 @@ function PageList() {
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            <h2 className="text-lg font-semibold text-[var(--admin-bg-dark)] mb-4">
               Confirm Deletion
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-[var(--admin-secondary)] mb-6">
               Are you sure you want to delete this page? This action cannot be
               undone.
             </p>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                className="px-4 py-2 bg-[var(--admin-bg-light)] text-[var(--admin-bg-primary)] rounded-md hover:bg-gray-300"
               >
                 Cancel
               </button>

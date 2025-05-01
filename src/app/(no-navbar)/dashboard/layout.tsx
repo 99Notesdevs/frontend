@@ -103,8 +103,8 @@ export default function DashboardLayout({
   }, []);
 
   if (!authState) {
-    return <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#181f2a] via-[#232b3a] to-[#1a2130]">
-      <span className="text-slate-200 text-lg font-medium animate-pulse">Loading dashboard...</span>
+    return <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[var(--admin-bg-secondary)] via-[var(--admin-bg-primary)] to-[var(--admin-bg-dark]">
+      <span className="text-[var(--admin-border)] text-lg font-medium animate-pulse">Loading dashboard...</span>
     </div>;
   }
 
@@ -134,7 +134,7 @@ export default function DashboardLayout({
   const navigation = getNavigationItems();
 
   return (
-    <div className={`flex min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#f8f9ff] ${inter.className}`}>
+    <div className={`flex min-h-screen bg-gradient-to-br from-[var(--admin-bg-lightest)] via-[var(--admin-bg-light)] to-[var(--bg-elevated)] ${inter.className}`}>
       {/* Sidebar overlay for mobile */}
       <div
         className={`fixed inset-0 z-40 bg-black/40 transition-opacity lg:hidden ${sidebarOpen ? "block" : "hidden"}`}
@@ -143,10 +143,10 @@ export default function DashboardLayout({
       />
       {/* Sidebar */}
       <aside
-        className={`fixed z-50 inset-y-0 left-0 w-60 bg-slate-800 border-r border-slate-900 flex flex-col transition-transform transform lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed z-50 inset-y-0 left-0 w-60 bg-[var(--admin-bg-secondary)] border-r border-[var(--admin-bg-dark)] flex flex-col transition-transform transform lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
         style={{ minWidth: 240 }}
       >
-        <div className="flex items-center h-16 px-6 border-b border-slate-900">
+        <div className="flex items-center h-16 px-6 border-b border-[var(--admin-bg-dark)]">
           {/* Make Dashboard title clickable to go to /dashboard */}
           <button
             onClick={() => { router.push("/dashboard"); setSidebarOpen(false); }}
@@ -157,7 +157,7 @@ export default function DashboardLayout({
             Dashboard
           </button>
           <button
-            className="ml-auto text-slate-400 hover:text-white focus:outline-none lg:hidden"
+            className="ml-auto text-[var(--admin-scroll-thumb-hover)] hover:text-white focus:outline-none lg:hidden"
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar"
           >
@@ -181,18 +181,18 @@ export default function DashboardLayout({
                       className={`group relative flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-150 text-left text-base font-medium
                         ${isActive 
                           ? "bg-white/10 text-white border-l-4 border-white" 
-                          : "text-slate-300 hover:bg-slate-700/50 hover:text-white"}
+                          : "text-[var(--admin-scroll-thumb)] hover:bg-[var(--admin-bg-primary)]/50 hover:text-white"}
                       `}
                       title={item.text}
                     >
-                      <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+                      <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-white' : 'text-[var(--admin-scroll-thumb-hover)] group-hover:text-white'}`} />
                       <span className="truncate">{item.text}</span>
                     </button>
                   );
                 })}
               </div>
               {sectionIdx < navigation.length - 1 && (
-                <div className="my-4 border-t border-slate-700/50" />
+                <div className="my-4 border-t border-[var(--admin-bg-primary)]/50" />
               )}
             </div>
           ))}
@@ -201,7 +201,7 @@ export default function DashboardLayout({
       {/* Sidebar toggle button for mobile */}
       {!sidebarOpen && (
         <button
-          className="fixed z-50 top-4 left-4 p-2 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 focus:outline-none shadow-lg lg:hidden"
+          className="fixed z-50 top-4 left-4 p-2 rounded-md bg-[var(--admin-bg-secondary)] text-[var(--admin-scroll-thumb)] hover:text-white hover:bg-[var(--admin-bg-primary)] focus:outline-none shadow-lg lg:hidden"
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar"
         >

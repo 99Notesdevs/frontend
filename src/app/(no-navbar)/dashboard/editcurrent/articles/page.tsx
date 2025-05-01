@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -256,7 +256,7 @@ export default function ArticlesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <div className="bg-slate-800 rounded-lg p-4">
+        <div className="bg-[var(--admin-bg-secondary)] rounded-lg p-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-white">
               Edit Articles
@@ -268,7 +268,7 @@ export default function ArticlesPage() {
                 onClick={() =>
                   (window.location.href = "/dashboard/editcurrent")
                 }
-                className="border-slate-700 text-white hover:bg-slate-700"
+                className="border-[var(--admin-bg-primary)] text-white hover:bg-[var(--admin-bg-primary)]"
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-2" />
                 Back
@@ -301,7 +301,7 @@ export default function ArticlesPage() {
             >
               <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
                 <div
-                  className="text-gray-600 text-sm mb-4 line-clamp-3"
+                  className="text-[var(--admin-secondary)] text-sm mb-4 line-clamp-3"
                   dangerouslySetInnerHTML={{
                     __html: page.content ? (
                       page.content.substring(0, 100)
@@ -316,7 +316,7 @@ export default function ArticlesPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedPage(page)}
-                  className="border-slate-200 text-blue-600 hover:bg-blue-50"
+                  className="border-[var(--admin-border)] text-[var(--admin-primary)] hover:bg-[var(--admin-bg-light)]"
                 >
                   <PencilIcon className="w-4 h-4 mr-2 text-blue-500" />
                   Edit
@@ -325,7 +325,7 @@ export default function ArticlesPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => handleDelete(page.id)}
-                  className="border-slate-200 text-red-600 hover:bg-red-50"
+                  className="border-[var(--admin-border)] text-red-600 hover:bg-red-50"
                 >
                   <TrashIcon className="w-4 h-4 mr-2 text-red-500" />
                   Delete
@@ -340,7 +340,7 @@ export default function ArticlesPage() {
         <div className="mt-8">
           <div className="bg-white rounded-lg shadow-sm">
             <div className="p-6">
-              <h2 className="text-xl font-semibold text-slate-900">
+              <h2 className="text-xl font-semibold text-[var(--admin-bg-dark)]">
                 Edit Article
               </h2>
               {selectedPage.link ? (
