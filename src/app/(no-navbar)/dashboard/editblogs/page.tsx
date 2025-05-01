@@ -217,9 +217,6 @@ export default function ArticlesPage() {
 
       const { data } = await response.json();
       setSelectedPage(data);
-      
-      // Refresh the page after successful update
-      window.location.href = window.location.pathname;
 
       // Clear error if any
       setError(null);

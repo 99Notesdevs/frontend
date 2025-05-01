@@ -149,7 +149,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Content *</FormLabel>
+                <FormLabel>Content <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Editor content={field.value} onChange={field.onChange} />
                 </FormControl>
@@ -215,14 +215,14 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
                     onValueChange={(value) => field.onChange(value)}
                     defaultValue="noindex,nofollow"
                   >
-                    <SelectTrigger className="text-gray-500">
+                    <SelectTrigger className="text-white">
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
-                    <SelectContent className="text-gray-500">
-                      <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
-                      <SelectItem value="index,nofollow">Index, No follow</SelectItem>
-                      <SelectItem value="noindex,follow">No index, Follow</SelectItem>
-                      <SelectItem value="index,follow">Index, Follow</SelectItem>
+                    <SelectContent className="text-white">
+                      <SelectItem value="noindex,nofollow">No index,No follow</SelectItem>
+                      <SelectItem value="index,nofollow">Index,No follow</SelectItem>
+                      <SelectItem value="noindex,follow">No index,Follow</SelectItem>
+                      <SelectItem value="index,follow">Index,Follow</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -374,13 +374,20 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             <div className="space-y-2">
               <Label htmlFor="showInNav">Show in Navigation</Label>
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="showInNav"
-                  checked={!!form.watch("showInNav")}
-                  onCheckedChange={(checked: boolean) => {
-                    form.setValue("showInNav", !!checked);
+                <Select
+                  value={form.watch("showInNav") ? "show" : "hide"}
+                  onValueChange={(value) => {
+                    form.setValue("showInNav", value === "show");
                   }}
-                />
+                >
+                  <SelectTrigger className="text-white">
+                    <SelectValue placeholder="Show in Navbar" />
+                  </SelectTrigger>
+                  <SelectContent className="text-white">
+                    <SelectItem value="show">Show in Navbar</SelectItem>
+                    <SelectItem value="hide">Do not Show in Navbar</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

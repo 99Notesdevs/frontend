@@ -170,15 +170,20 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
                     {...field}
                   />
 
-                  {imagePreview && (
-                    <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
-                      <Image
-                        src={imagePreview}
-                        alt="Image preview"
-                        fill
-                        className="object-cover"
-                      />
+                  {imagePreview ? (
+                    <div className="space-y-2">
+                      <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
+                        <Image
+                          src={imagePreview}
+                          alt="Image preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <p className="text-sm text-green-500">Image uploaded successfully</p>
                     </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No image uploaded</p>
                   )}
                 </div>
               </FormControl>
