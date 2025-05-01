@@ -205,41 +205,48 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             name="title"
             render={({ field }) => (
               <FormItem>
-              <FormLabel>Title *</FormLabel>
+              <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
-                <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+                <Input {...field} className="border-[var(--admin-border)]" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         {/* Image Upload */}
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-              <FormLabel>Featured Image *</FormLabel>
-                <FormControl>
-                <Input
-                  type="file"
-                  id="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="mt-1"
-                />
-              </FormControl>
-                    {imagePreview && (
-                <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field: { value, onChange, ...field } }) => (
+            <FormItem>
+              <FormLabel>Image <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <div className="space-y-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="border-[var(--admin-border)]"
+                    {...field}
+                  />
+
+                  {imagePreview ? (
+                    <div className="space-y-2">
+                      <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
                         <Image
                           src={imagePreview}
-                    alt="Image preview"
+                          alt="Image preview"
                           fill
-                    className="object-cover"
+                          className="object-cover"
                         />
                       </div>
-                    )}
-              <FormMessage />
+                      <p className="text-sm text-green-500">Image uploaded successfully</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No image uploaded</p>
+                  )}
+                </div>
+              </FormControl>
             </FormItem>
           )}
         />
@@ -250,7 +257,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Main Content *</FormLabel>
+              <FormLabel>Main Content <span className="text-red-500">*</span></FormLabel>
               <FormControl>
                 <TiptapEditor
                   content={field.value}
@@ -490,13 +497,20 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             <div className="space-y-2">
               <Label htmlFor="showInNav">Show in Navigation</Label>
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="showInNav"
-                  checked={!!form.watch("showInNav")}
-                  onCheckedChange={(checked: boolean) => {
-                    form.setValue("showInNav", !!checked);
+                <Select
+                  value={form.watch("showInNav") ? "show" : "hide"}
+                  onValueChange={(value) => {
+                    form.setValue("showInNav", value === "show");
                   }}
-                />
+                >
+                  <SelectTrigger className="text-white">
+                    <SelectValue placeholder="Show in Navbar" />
+                  </SelectTrigger>
+                  <SelectContent className="text-white">
+                    <SelectItem value="show">Show in Navbar</SelectItem>
+                    <SelectItem value="hide">Do not Show in Navbar</SelectItem>
+                  </SelectContent>
+                </Select>
 
               </div>
               </div>

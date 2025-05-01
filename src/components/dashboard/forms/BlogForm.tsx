@@ -169,6 +169,10 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
         message: "Blog post saved successfully!",
         type: "success"
       });
+      // Auto-dismiss the success message after 3 seconds
+      setTimeout(() => {
+        setAlert(null);
+      }, 9000);
     } catch (error) {
       setAlert({
         message: "Failed to save blog post. Please try again.",
@@ -201,7 +205,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             name="title"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Title *</FormLabel>
+                <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Input placeholder="Enter blog title" {...field} />
                 </FormControl>
@@ -217,7 +221,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             name="content"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Content *</FormLabel>
+                <FormLabel>Content <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <TiptapEditor content={field.value} onChange={field.onChange} />
                 </FormControl>
@@ -233,19 +237,24 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             name="imageUrl"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Image *</FormLabel>
+                <FormLabel>Image <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <div className="flex flex-col gap-4">
-                    {imagePreview && (
-                      <div className="relative h-48 w-full">
-                        <Image
-                          src={imagePreview}
-                          alt="Blog image preview"
-                          fill
-                          className="object-cover rounded-lg"
-                          priority
-                        />
+                    {imagePreview ? (
+                      <div className="space-y-2">
+                        <div className="relative h-48 w-full">
+                          <Image
+                            src={imagePreview}
+                            alt="Blog image preview"
+                            fill
+                            className="object-cover rounded-lg"
+                            priority
+                          />
+                        </div>
+                        <p className="text-sm text-green-500">Image uploaded successfully</p>
                       </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No image uploaded</p>
                     )}
                     <input
                       type="file"
@@ -271,7 +280,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             name="slug"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Slug *</FormLabel>
+                <FormLabel>Slug <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Input placeholder="Enter slug" {...field} />
                 </FormControl>
@@ -344,10 +353,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                 </FormControl>
               </FormItem>
             )}
-          />
-       
-
-         
+          />        
           
           <FormField
             control={form.control}

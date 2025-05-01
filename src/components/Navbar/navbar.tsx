@@ -78,7 +78,7 @@ function NestedNavigation({
                                 <Link
                                   key={grandChild.slug}
                                   href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
-                                  className="block px-2 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal flex items-center font-opensans"
+                                  className="flex px-2 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal items-center font-opensans"
                                 >
                                   <svg 
                                     className="w-3 h-3 mr-2 fill-current opacity-80"
@@ -136,7 +136,7 @@ function NestedNavigation({
                                         <div key={grandChild.slug} className="mb-2">
                                           <Link
                                             href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
-                                            className="block px-3 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal items-center flex font-opensans"
+                                            className="flex px-3 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal items-center font-opensans"
                                           >
                                             {grandChild.title}
                                           </Link>
@@ -427,7 +427,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                                 <div className="flex items-center justify-between">
                                   <Link
                                     href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
-                                    className="block px-4 py-2 text-sm font-normal text-[var(--text-strong)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] font-inter font-normal tracking-normal"
+                                    className="block px-4 py-2 text-sm font-normal text-[var(--text-strong)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] font-inter tracking-normal"
                                     onClick={() => setIsOpen(false)}
                                   >
                                     {grandChild.title}

@@ -169,7 +169,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title *</FormLabel>
+                <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                 <Input
                   placeholder="Enter title"
@@ -209,7 +209,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             name="imageUrl"
           render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
-                <FormLabel>Image *</FormLabel>
+                <FormLabel>Image <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                 <div className="space-y-4">
                   <Input
@@ -220,16 +220,21 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                     {...field}
                   />
 
-                    {imagePreview && (
-                    <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
+                  {imagePreview ? (
+                    <div className="space-y-2">
+                      <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
                         <Image
                           src={imagePreview}
-                        alt="Image preview"
+                          alt="Image preview"
                           fill
-                        className="object-cover"
+                          className="object-cover"
                         />
                       </div>
-                    )}
+                      <p className="text-sm text-green-500">Image uploaded successfully</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No image uploaded</p>
+                  )}
                 </div>
               </FormControl>
             </FormItem>
@@ -243,7 +248,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-gray-500 font-medium">
-                Content *
+                Content <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
                 <div className="border border-blue-100 rounded-lg overflow-hidden">
@@ -329,10 +334,10 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                   onValueChange={(value) => field.onChange(value)}
                   defaultValue="noindex,nofollow"
                 >
-                  <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-gray-500">
+                  <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-white">
                     <SelectValue placeholder="No index, No follow" />
                   </SelectTrigger>
-                  <SelectContent className="text-gray-500">
+                  <SelectContent className="text-white">
                     <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
                     <SelectItem value="index,nofollow">Index, No follow</SelectItem>
                     <SelectItem value="noindex,follow">No index, Follow</SelectItem>
@@ -527,13 +532,20 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             <div className="space-y-2">
               <Label htmlFor="showInNav">Show in Navigation</Label>
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="showInNav"
-                  checked={!!form.watch("showInNav")}
-                  onCheckedChange={(checked: boolean) => {
-                  form.setValue("showInNav", !!checked);
+                <Select
+                  value={form.watch("showInNav") ? "show" : "hide"}
+                  onValueChange={(value) => {
+                    form.setValue("showInNav", value === "show");
                   }}
-                />
+                >
+                  <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-white">
+                    <SelectValue placeholder="Show in Navbar" />
+                  </SelectTrigger>
+                  <SelectContent className="text-white">
+                    <SelectItem value="show">Show in Navbar</SelectItem>
+                    <SelectItem value="hide">Do not Show in Navbar</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

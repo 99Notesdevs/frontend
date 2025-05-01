@@ -3,6 +3,13 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -121,7 +128,7 @@ export function CurrentAffairForm({ onSubmit, defaultValues }: CurrentAffairForm
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title *</FormLabel>
+                <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                 <Input {...field} placeholder="Enter title" />
                 </FormControl>
@@ -134,7 +141,7 @@ export function CurrentAffairForm({ onSubmit, defaultValues }: CurrentAffairForm
             name="content"
             render={({ field }) => (
               <FormItem>
-              <FormLabel>Content *</FormLabel>
+              <FormLabel>Content <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                 <TiptapEditor
                   content={field.value}
@@ -328,22 +335,29 @@ export function CurrentAffairForm({ onSubmit, defaultValues }: CurrentAffairForm
           <div className="space-y-2">
             <Label htmlFor="showInNav">Show in Navigation</Label>
             <div className="flex items-center space-x-2">
-              <Checkbox
-                id="showInNav"
-                checked={!!form.watch("showInNav")}
-                onCheckedChange={(checked: boolean) => {
-                  form.setValue("showInNav", !!checked);
+              <Select
+                value={form.watch("showInNav") ? "show" : "hide"}
+                onValueChange={(value) => {
+                  form.setValue("showInNav", value === "show");
                 }}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Show in Navbar" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="show">Show in Navbar</SelectItem>
+                  <SelectItem value="hide">Do not Show in Navbar</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
         <Button type="submit" className="w-full">
           Submit
-          </Button>
-        </form>
-      </Form>
-    </div>
-  );
+        </Button>
+      </form>
+    </Form>
+  </div>
+);
 };
