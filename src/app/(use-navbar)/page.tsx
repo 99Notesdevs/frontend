@@ -64,9 +64,10 @@ export default async function Home() {
     <div className="min-h-screen">
       {/* Hero Section with Contact Form */}
       <section className="container mx-auto px-6 lg:px-18">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center md:mt-7">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center md:mt-7">
+
           {/* Left Column - Text Content */}
-          <div className="space-y-7 max-w-lg lg:pl-4 2xl:ml-20">
+          <div className="space-y-7 max-w-lg lg:pl-10 2xl:ml-20">
             <div className="space-y-4 mt-4 lg:mt-0">
               <h1 className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans">
                 <span className="block" dangerouslySetInnerHTML={{ __html: homeData.Hero.title }}></span>
@@ -78,7 +79,7 @@ export default async function Home() {
           </div>
 
           {/* Right Column - Contact Form */}
-          <div className="mt-4 lg:mt-16 mb-5 w-full max-w-lg">
+          <div className="mt-4 md:mt-20 mb-5 w-full max-w-lg lg:ml-7">
             <ContactForm />
           </div>
         </div>

@@ -225,7 +225,7 @@ export default function Navbar({ navigation }: NavbarProps) {
           <div className="container mx-auto px-6 flex justify-between items-center h-12">
             <div className="mt-1.75">
               <Link href="/shop" passHref>
-                <span className="text-[12px] text-white font-bold tracking-wide hover:text-[var(--surface-dark)] 
+                <span className="text-[12px] text-white font-bold tracking-wide 
                                bg-[var(--primary)] border border-white px-4 py-1.5 shadow-sm hover:shadow-md transition-all">
                   Shop Now
                 </span>
@@ -295,12 +295,12 @@ export default function Navbar({ navigation }: NavbarProps) {
               </div>
 
               {/* Desktop search bar */}
-              <div className="hidden pr-20 md:block">
+              <div className="hidden xl:block pr-25 max-w-[200px]">
                 <SearchBar />
               </div>  
 
               {/* Mobile menu button */}
-              <div className="lg:hidden">
+              <div className="xl:hidden">
                 <button
                   onClick={() => setIsOpen(!isOpen)}
                   className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-tertiary)] bg-[var(--tertiary)]
@@ -351,7 +351,7 @@ export default function Navbar({ navigation }: NavbarProps) {
 
         {/* Mobile menu */}
         <div
-          className={`lg:hidden transform transition-all duration-300 ease-in-out ${
+          className={`xl:hidden transform transition-all duration-300 ease-in-out ${
             isOpen 
               ? "translate-y-0 opacity-100 max-h-[80vh] overflow-y-auto" 
               : "-translate-y-2 opacity-0 pointer-events-none max-h-0"

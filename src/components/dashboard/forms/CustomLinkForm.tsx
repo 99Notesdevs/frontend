@@ -6,7 +6,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/Checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -82,12 +82,22 @@ export const CustomLinkForm: React.FC<CustomLinkFormProps> = ({
           name="showInNav"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Show in Navigation</FormLabel>
-                <FormMessage />
-              </div>
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Select
+                  value={field.value ? "show" : "hide"}
+                  onValueChange={(value) => {
+                    field.onChange(value === "show");
+                  }}
+                  defaultValue="hide"
+                >
+                  <SelectTrigger className="text-white">
+                    <SelectValue placeholder="Show in Navbar" />
+                  </SelectTrigger>
+                  <SelectContent className="text-white">
+                    <SelectItem value="show">Show in Navbar</SelectItem>
+                    <SelectItem value="hide">Do not Show in Navbar</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItem>
           )}
