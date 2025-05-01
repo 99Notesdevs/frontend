@@ -13,65 +13,70 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
   // @ts-ignore
   const jsonLD = JSON.parse(metadata).schemaData;
   const parsedMetadata = JSON.parse(metadata);
-      const headScripts = parsedMetadata?.header?.split(",")?.map((script: string) => script.trim()) || [];
-      const bodyScripts = parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) || [];
-    
-      useEffect(() => {
-        // Inject head scripts
-        if (headScripts) {
-          headScripts.forEach((script: string) => {
-            try {
-              if (script.startsWith("<script")) {
-                // Parse the full <script> tag and extract attributes
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = script.trim();
-                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
-                if (scriptElement && scriptElement.tagName === "SCRIPT") {
-                  document.head.appendChild(scriptElement);
-                }
-              } else {
-                // Handle raw JavaScript content
-                const scriptElement = document.createElement("script");
-                scriptElement.textContent = script; // Use textContent for raw JavaScript
-                document.head.appendChild(scriptElement);
-              }
-            } catch (error) {
-              console.error("Error injecting head script:", error, script);
+  const headScripts =
+    parsedMetadata?.header
+      ?.split(",")
+      ?.map((script: string) => script.trim()) || [];
+  const bodyScripts =
+    parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) ||
+    [];
+
+  useEffect(() => {
+    // Inject head scripts
+    if (headScripts) {
+      headScripts.forEach((script: string) => {
+        try {
+          if (script.startsWith("<script")) {
+            // Parse the full <script> tag and extract attributes
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = script.trim();
+            const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+            if (scriptElement && scriptElement.tagName === "SCRIPT") {
+              document.head.appendChild(scriptElement);
             }
-          });
+          } else {
+            // Handle raw JavaScript content
+            const scriptElement = document.createElement("script");
+            scriptElement.textContent = script; // Use textContent for raw JavaScript
+            document.head.appendChild(scriptElement);
+          }
+        } catch (error) {
+          console.error("Error injecting head script:", error, script);
         }
-    
-        // Inject body scripts
-        if (bodyScripts) {
-          bodyScripts.forEach((script: string) => {
-            try {
-              if (script.startsWith("<script")) {
-                // Parse the full <script> tag and extract attributes
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = script.trim();
-                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
-                if (scriptElement && scriptElement.tagName === "SCRIPT") {
-                  document.body.appendChild(scriptElement);
-                }
-              } else {
-                // Handle raw JavaScript content
-                const scriptElement = document.createElement("script");
-                scriptElement.textContent = script; // Use textContent for raw JavaScript
-                document.body.appendChild(scriptElement);
-              }
-            } catch (error) {
-              console.error("Error injecting body script:", error, script);
+      });
+    }
+
+    // Inject body scripts
+    if (bodyScripts) {
+      bodyScripts.forEach((script: string) => {
+        try {
+          if (script.startsWith("<script")) {
+            // Parse the full <script> tag and extract attributes
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = script.trim();
+            const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+            if (scriptElement && scriptElement.tagName === "SCRIPT") {
+              document.body.appendChild(scriptElement);
             }
-          });
+          } else {
+            // Handle raw JavaScript content
+            const scriptElement = document.createElement("script");
+            scriptElement.textContent = script; // Use textContent for raw JavaScript
+            document.body.appendChild(scriptElement);
+          }
+        } catch (error) {
+          console.error("Error injecting body script:", error, script);
         }
-      }, [headScripts, bodyScripts]);
+      });
+    }
+  }, [headScripts, bodyScripts]);
 
   return (
     <>
       <section>
-        <script 
+        <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLD }} 
+          dangerouslySetInnerHTML={{ __html: jsonLD }}
         />
       </section>
       <main>
@@ -80,7 +85,9 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
             <div className="container mx-auto px-4 max-w-5xl">
               {/* Page Title */}
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold text-[var(--primary)] mb-3">{title}</h2>
+                <h2 className="text-3xl font-bold text-[var(--primary)] mb-3">
+                  {title}
+                </h2>
                 <div className="w-24 h-1 bg-[var(--accent)] rounded-full mx-auto"></div>
               </div>
 
@@ -89,7 +96,11 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {/* Child Cards */}
                   {children?.map((child: any) => (
-                    <Link key={child.id} href={`/${child.slug}`} className="group">
+                    <Link
+                      key={child.id}
+                      href={`/${child.slug}`}
+                      className="group"
+                    >
                       <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 h-[400px] flex flex-col justify-between border border-[var(--border-light)]">
                         <div>
                           <h3 className="text-xl font-semibold text-[var(--primary)] group-hover:text-[var(--accent)] transition-colors text-center mb-4">
@@ -97,7 +108,9 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
                           </h3>
                           <div className="text-[var(--text-tertiary)] text-sm leading-relaxed h-[80px] overflow-hidden">
                             <span
-                              dangerouslySetInnerHTML={{ __html: child.content }}
+                              dangerouslySetInnerHTML={{
+                                __html: child.content,
+                              }}
                               className="block overflow-hidden text-ellipsis"
                             ></span>
                           </div>

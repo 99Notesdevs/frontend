@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect } from "react";
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import SidebarNavigation from "@/components/navigation/SidebarNavigation";
@@ -11,8 +11,11 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   // @ts-ignore
   const jsonLD = JSON.parse(metadata)?.schemaData || "";
   const parsedMetadata = JSON.parse(metadata);
-  const headScripts = parsedMetadata.header.split(",").map((script: string) => script.trim()) || [];
-  const bodyScripts = parsedMetadata.body.split(",").map((script: string) => script.trim()) || [];
+  const headScripts =
+    parsedMetadata.header.split(",").map((script: string) => script.trim()) ||
+    [];
+  const bodyScripts =
+    parsedMetadata.body.split(",").map((script: string) => script.trim()) || [];
 
   useEffect(() => {
     // Inject head scripts
@@ -66,11 +69,12 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
 
   return (
     <body>
-    <section>
-      <script 
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: jsonLD }} />
-    </section>
+      <section>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLD }}
+        />
+      </section>
       <main>
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
           {/* Increase max width of the container */}

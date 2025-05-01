@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState, useEffect } from "react";
 import { ArticleTemplateProps } from "./types";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import Ads from "../navigation/Ads";
 import { env } from "@/config/env";
 import axios from "axios";
 import Cookies from "js-cookie";
-import WhatsApp from '@/components/ui/whatsapp';
+import WhatsApp from "@/components/ui/whatsapp";
 
 const processContent = (content: string, isAuthorized: boolean) => {
   return content.replace(/<lock>(.*?)<\/lock>/g, (lockedContent) => {
@@ -28,65 +28,71 @@ const processContent = (content: string, isAuthorized: boolean) => {
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
-  const parsedMetadata = typeof metadata === 'string' ? JSON.parse(metadata) : metadata || {};
+  const parsedMetadata =
+    typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
   const [isAuthorized, setIsAuthorized] = useState<null | boolean>(null);
   const [mainContentFinal, setMainContentFinal] = useState(content || "");
   const token = Cookies.get("token");
   // @ts-ignore
   const jsonLD = parsedMetadata.schemaData;
-      const headScripts = parsedMetadata?.header?.split(",")?.map((script: string) => script.trim()) || [];
-      const bodyScripts = parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) || [];
-    
-      useEffect(() => {
-        // Inject head scripts
-        if (headScripts) {
-          headScripts.forEach((script: string) => {
-            try {
-              if (script.startsWith("<script")) {
-                // Parse the full <script> tag and extract attributes
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = script.trim();
-                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
-                if (scriptElement && scriptElement.tagName === "SCRIPT") {
-                  document.head.appendChild(scriptElement);
-                }
-              } else {
-                // Handle raw JavaScript content
-                const scriptElement = document.createElement("script");
-                scriptElement.textContent = script; // Use textContent for raw JavaScript
-                document.head.appendChild(scriptElement);
-              }
-            } catch (error) {
-              console.error("Error injecting head script:", error, script);
+  const headScripts =
+    parsedMetadata?.header
+      ?.split(",")
+      ?.map((script: string) => script.trim()) || [];
+  const bodyScripts =
+    parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) ||
+    [];
+
+  useEffect(() => {
+    // Inject head scripts
+    if (headScripts) {
+      headScripts.forEach((script: string) => {
+        try {
+          if (script.startsWith("<script")) {
+            // Parse the full <script> tag and extract attributes
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = script.trim();
+            const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+            if (scriptElement && scriptElement.tagName === "SCRIPT") {
+              document.head.appendChild(scriptElement);
             }
-          });
+          } else {
+            // Handle raw JavaScript content
+            const scriptElement = document.createElement("script");
+            scriptElement.textContent = script; // Use textContent for raw JavaScript
+            document.head.appendChild(scriptElement);
+          }
+        } catch (error) {
+          console.error("Error injecting head script:", error, script);
         }
-    
-        // Inject body scripts
-        if (bodyScripts) {
-          bodyScripts.forEach((script: string) => {
-            try {
-              if (script.startsWith("<script")) {
-                // Parse the full <script> tag and extract attributes
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = script.trim();
-                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
-                if (scriptElement && scriptElement.tagName === "SCRIPT") {
-                  document.body.appendChild(scriptElement);
-                }
-              } else {
-                // Handle raw JavaScript content
-                const scriptElement = document.createElement("script");
-                scriptElement.textContent = script; // Use textContent for raw JavaScript
-                document.body.appendChild(scriptElement);
-              }
-            } catch (error) {
-              console.error("Error injecting body script:", error, script);
+      });
+    }
+
+    // Inject body scripts
+    if (bodyScripts) {
+      bodyScripts.forEach((script: string) => {
+        try {
+          if (script.startsWith("<script")) {
+            // Parse the full <script> tag and extract attributes
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = script.trim();
+            const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+            if (scriptElement && scriptElement.tagName === "SCRIPT") {
+              document.body.appendChild(scriptElement);
             }
-          });
+          } else {
+            // Handle raw JavaScript content
+            const scriptElement = document.createElement("script");
+            scriptElement.textContent = script; // Use textContent for raw JavaScript
+            document.body.appendChild(scriptElement);
+          }
+        } catch (error) {
+          console.error("Error injecting body script:", error, script);
         }
-      }, [headScripts, bodyScripts]);
+      });
+    }
+  }, [headScripts, bodyScripts]);
 
   useEffect(() => {
     const checkAuthorization = async () => {
@@ -120,9 +126,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   if (isAuthorized === null) {
     return (
       <body>
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
-      </div>
+        <div className="flex items-center justify-center min-h-screen">
+          <p>Loading...</p>
+        </div>
       </body>
     );
   }
@@ -130,76 +136,80 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // @ts-ignore
   const parentId = page.slug;
 
-  const { tags, coverImage } =
-    parsedMetadata || {};
+  const { tags, coverImage } = parsedMetadata || {};
 
   // Use either the content image or the metadata coverImage
   // @ts-ignore
-  const displayImage = page.imageUrl || coverImage as string;
+  const displayImage = page.imageUrl || (coverImage as string);
 
   return (
     <body>
-    <>
-      <section>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLD }}
-        />
-      </section>
-      <main>
-        <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
-          {/* Assistive Touch */}
-          <AssistiveTouch content={mainContentFinal} />
+      <>
+        <section>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: jsonLD }}
+          />
+        </section>
+        <main>
+          <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
+            {/* Assistive Touch */}
+            <AssistiveTouch content={mainContentFinal} />
 
-          <div className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 
-        transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4 sm:mt-12">
-              {/* Main Content Column */}
-              <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-8">
-                {/* Featured Image */}
-                {displayImage && (
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
-                    <div className="relative w-full h-[400px]">
-                      <Image
-                        src={`${displayImage}`}
-                        alt={title}
-                        fill
-                        className="object-cover"
-                        priority
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Article Content */}
-                <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
-                  {/* Article Header */}
-                  <div className="text-center mb-6">
-                    {page.parent && (
-                      <div className="mb-4">
-                        <a 
-                          href={`/${page.parent.slug}`} 
-                          className="text-[var(--action-primary)] hover:text-[var(--accent-link)] transition-colors"
-                        >
-                          {page.parent.title}
-                        </a>
+            <div
+              className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 
+        transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4 sm:mt-12">
+                {/* Main Content Column */}
+                <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-8">
+                  {/* Featured Image */}
+                  {displayImage && (
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
+                      <div className="relative w-full h-[400px]">
+                        <Image
+                          src={`${displayImage}`}
+                          alt={title}
+                          fill
+                          className="object-cover"
+                          priority
+                        />
                       </div>
-                    )}
-                    
-                    <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-2">
-                      {parsedMetadata.metaTitle || 'Untitled Article'}
-                    </h1>
-                  </div>
+                    </div>
+                  )}
 
-                  <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                    Created: {page.createdAt ? new Date(page.createdAt).toLocaleDateString() : 'N/A'}
-                  </div>
+                  {/* Article Content */}
+                  <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
+                    {/* Article Header */}
+                    <div className="text-center mb-6">
+                      {page.parent && (
+                        <div className="mb-4">
+                          <a
+                            href={`/${page.parent.slug}`}
+                            className="text-[var(--action-primary)] hover:text-[var(--accent-link)] transition-colors"
+                          >
+                            {page.parent.title}
+                          </a>
+                        </div>
+                      )}
 
-                  <WhatsApp />
-                  <div className="text-center mb-8 sm:mb-12">
-                  </div>
+                      <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-2">
+                        {parsedMetadata.metaTitle || "Untitled Article"}
+                      </h1>
+                    </div>
 
-                  <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
+                    <div className="text-xs text-[var(--text-tertiary)] mb-4">
+                      Created:{" "}
+                      {page.createdAt
+                        ? new Date(page.createdAt).toLocaleDateString()
+                        : "N/A"}
+                    </div>
+
+                    <WhatsApp />
+                    <div className="text-center mb-8 sm:mb-12"></div>
+
+                    <div
+                      className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
                     prose-headings:font-semibold
                     prose-headings:tracking-normal
                     prose-headings:text-left
@@ -233,82 +243,88 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     
                     prose-blockquote:border-l-[var(--action-primary)]
                     prose-blockquote:bg-[var(--bg-subtle)]"
-                  >
-                    {mainContentFinal}
+                    >
+                      {mainContentFinal}
+                    </div>
                   </div>
-                </div>
-                <Comments parentId={parentId} />
-              </main>
+                  <Comments parentId={parentId} />
+                </main>
 
-              {/* Right Sidebar */}
-              <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
-                {/* Search Bar */}
-                <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                    transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
-                  <SearchBar />
-                </div>
+                {/* Right Sidebar */}
+                <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
+                  {/* Search Bar */}
+                  <div
+                    className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                    transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
+                  >
+                    <SearchBar />
+                  </div>
 
-                {/* Sticky Container */}
-                <div className="relative">
-                  {/* TOC Section */}
-                  <div className="sticky top-8 space-y-4 sm:space-y-6">
-                    <div className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                      transition-all duration-300 hover:shadow-xl">
-                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                        Table of Contents
-                      </h3>
-                      <div className="pr-2">
-                        <TableOfContents content={mainContentFinal} />
-                      </div>
-                    </div>
-
-                    {/* Social Media Section */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
-                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
-                        <span className="text-[var(--action-primary)]">🌐</span>
-                        <span>Connect With Us</span>
-                      </h3>
-                      <div className="py-2 h-9">
-                        <SocialMedia />
-                      </div>
-                    </div>
-
-                    {/* Contact Form Section */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
-                      <ContactForm />
-                    </div>
-
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
-                      <Ads imageUrl="/" altText="ads" />
-                    </div>
-
-                    {/* Tags Section */}
-                    {tags && tags.length > 0 && (
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                  {/* Sticky Container */}
+                  <div className="relative">
+                    {/* TOC Section */}
+                    <div className="sticky top-8 space-y-4 sm:space-y-6">
+                      <div
+                        className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                      transition-all duration-300 hover:shadow-xl"
+                      >
                         <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                          🏷 Tags
+                          Table of Contents
                         </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {tags.map((tag: string) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
+                        <div className="pr-2">
+                          <TableOfContents content={mainContentFinal} />
                         </div>
                       </div>
-                    )}
+
+                      {/* Social Media Section */}
+                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
+                          <span className="text-[var(--action-primary)]">
+                            🌐
+                          </span>
+                          <span>Connect With Us</span>
+                        </h3>
+                        <div className="py-2 h-9">
+                          <SocialMedia />
+                        </div>
+                      </div>
+
+                      {/* Contact Form Section */}
+                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
+                        <ContactForm />
+                      </div>
+
+                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
+                        <Ads imageUrl="/" altText="ads" />
+                      </div>
+
+                      {/* Tags Section */}
+                      {tags && tags.length > 0 && (
+                        <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                          <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
+                            🏷 Tags
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {tags.map((tag: string) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </aside>
+                </aside>
+              </div>
             </div>
           </div>
-        </div>
-      </main>
-    </>
+        </main>
+      </>
     </body>
   );
 };
