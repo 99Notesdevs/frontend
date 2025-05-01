@@ -301,7 +301,7 @@ export default function UpdateHomePage() {
             <h2 className="text-xl font-semibold">{section}</h2>
             <button
               onClick={() => handleEditClick(section as keyof HomeProps)}
-              className="text-blue-600 hover:text-blue-800"
+              className="text-[var(--admin-scroll-thumb)] hover:text-[var(--admin-bg-dark)]"
             >
               <FaPencilAlt className="inline mr-1" />
               {editingSection === section ? "Cancel" : "Edit"}
@@ -319,7 +319,7 @@ export default function UpdateHomePage() {
                       name="title"
                       value={(tempContent.CoachingInfo as CoachingInfoSection)?.title || ""}
                       onChange={(e) => handleInputChange(e, "CoachingInfo", "title")}
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border border-[var(--admin-border)] rounded"
                     />
                   </div>
                   <div className="mb-4">
@@ -328,7 +328,7 @@ export default function UpdateHomePage() {
                       name="description"
                       value={(tempContent.CoachingInfo as CoachingInfoSection)?.description || ""}
                       onChange={(e) => handleInputChange(e, "CoachingInfo", "description")}
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border border-[var(--admin-border)] rounded"
                     />
                   </div>
 
@@ -337,14 +337,14 @@ export default function UpdateHomePage() {
                     <h3 className="text-lg font-semibold mb-4">Questions</h3>
                     <div className="space-y-4">
                       {(tempContent.CoachingInfo as CoachingInfoSection)?.faqs?.map((item, i) => (
-                        <div key={i} className="border p-4 rounded-lg">
+                        <div key={i} className="border border-[var(--admin-border)] p-4 rounded-lg">
                           <div className="mb-4">
                             <label className="block text-sm font-medium mb-1">question</label>
                             <textarea
                               name="question"
                               value={item.question || ""}
                               onChange={(e) => handleInputChange(e, "CoachingInfo", "faqs", i)}
-                              className="w-full p-2 border rounded"
+                              className="w-full p-2 border border-[var(--admin-border)] rounded"
                             />
                           </div>
                           <div className="mb-4">
@@ -353,7 +353,7 @@ export default function UpdateHomePage() {
                               name="answer"
                               value={(item.answer as string) || ""}
                               onChange={(e) => handleInputChange(e, "CoachingInfo", "faqs", i)}
-                              className="w-full p-2 border rounded"
+                              className="w-full p-2 border border-[var(--admin-border)] rounded"
                             />
                           </div>
                           <button
@@ -368,7 +368,7 @@ export default function UpdateHomePage() {
                       {/* Add button for coaching info questions */}
                       <button
                         onClick={handleAddCoachingInfo}
-                        className="text-blue-600 hover:text-blue-800 flex items-center"
+                        className="text-[var(--admin-scroll-thumb)] hover:text-[var(--admin-bg-dark)] flex items-center"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -398,7 +398,7 @@ export default function UpdateHomePage() {
                         <h3 className="text-lg font-semibold mb-4">{field}</h3>
                         <div className="space-y-4">
                           {(tempContent[section as keyof HomeProps] as any)[field].map((item: any, i: number) => (
-                            <div key={i} className="border p-4 rounded-lg">
+                            <div key={i} className="border border-[var(--admin-border)] p-4 rounded-lg">
                               {Object.entries(item).map(([subField, subValue]) => (
                                 <div key={subField} className="mb-4">
                                   <label className="block text-sm font-medium mb-1">{subField}</label>
@@ -406,7 +406,7 @@ export default function UpdateHomePage() {
                                     name={subField}
                                     value={(tempContent[section as keyof HomeProps] as any)[field][i][subField] || ""}
                                     onChange={(e) => handleInputChange(e, section as keyof HomeProps, field, i)}
-                                    className="w-full p-2 border rounded"
+                                    className="w-full p-2 border border-[var(--admin-border)] rounded"
                                   />
                                 </div>
                               ))}
@@ -430,7 +430,7 @@ export default function UpdateHomePage() {
                                 else handleAddFAQ()
                               } else if (field === "reasons") handleAddReason()
                             }}
-                            className="text-blue-600 hover:text-blue-800"
+                            className="text-[var(--admin-scroll-thumb)] hover:text-[var(--admin-bg-dark)]"
                           >
                             Add {field === "faqData" ? (section === "CoachingInfo" ? "Coaching Info" : "FAQ") : "Reason"}
                           </button>
@@ -446,17 +446,17 @@ export default function UpdateHomePage() {
                         name={field}
                         value={(tempContent[section as keyof HomeProps] as any)[field] || ""}
                         onChange={(e) => handleInputChange(e, section as keyof HomeProps, field)}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border border-[var(--admin-border)] rounded"
                       />
                     </div>
                   )
                 })}
 
               <div className="flex justify-end space-x-4">
-                <button onClick={handleCancel} className="px-4 py-2 border rounded hover:bg-gray-100">
+                <button onClick={handleCancel} className="px-4 py-2 border border-[var(--admin-border)] rounded hover:bg-[var(--admin-bg-lightest)]">
                   Cancel
                 </button>
-                <button onClick={handleSave} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <button onClick={handleSave} className="px-4 py-2 bg-[var(--admin-bg-dark)] text-white rounded hover:bg-[var(--admin-bg-secondary)]">
                   Save
                 </button>
               </div>
@@ -466,11 +466,11 @@ export default function UpdateHomePage() {
               {section === "Hero" && (
                 <div className="space-y-7 max-w-xl md:pl-9">
                   <div className="space-y-4 mt-4 md:mt-0">
-                    <h1 className="text-4xl font-semibold text-gray-800 leading-relaxed font-opensans">
+                    <h1 className="text-4xl font-semibold text-[var(--admin-bg-dark)] leading-relaxed font-opensans">
                       <span className="block" dangerouslySetInnerHTML={{ __html: sectionContent.title }}></span>
                     </h1>
                   </div>
-                  <p className="text-base font-semibold text-gray-700 leading-relaxed font-opensans">
+                  <p className="text-base font-semibold text-[var(--admin-bg-primary)] leading-relaxed font-opensans">
                     {sectionContent.description}
                   </p>
                 </div>

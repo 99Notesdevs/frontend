@@ -281,7 +281,7 @@ export default function PageListCurrent() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <div className="bg-slate-800 rounded-lg p-4">
+        <div className="bg-[var(--admin-bg-secondary)] rounded-lg p-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-white">
               Edit Current Affairs
@@ -293,7 +293,7 @@ export default function PageListCurrent() {
                 onClick={() =>
                   (window.location.href = "/dashboard")
                 }
-                className="border-slate-700 text-white hover:bg-slate-700"
+                className="border-[var(--admin-bg-primary)] text-white hover:bg-[var(--admin-bg-primary)]"
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-2" />
                 Back
@@ -309,30 +309,30 @@ export default function PageListCurrent() {
           <Button
             variant={selectedType === "daily" ? "default" : "outline"}
             onClick={() => handleTypeChange("daily")}
-            className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
+            className="flex-1 border-[var(--admin-border)] text-[var(--admin-bg-dark)] hover:bg-[var(--admin-bg-light)] transition-all duration-200"
           >
             <div className="flex items-center justify-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-slate-500" />
+              <CalendarIcon className="w-5 h-5 text-[var(--admin-primary)]" />
               <span>Daily</span>
             </div>
           </Button>
           <Button
             variant={selectedType === "monthly" ? "default" : "outline"}
             onClick={() => handleTypeChange("monthly")}
-            className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
+            className="flex-1 border-[var(--admin-border)] text-[var(--admin-bg-dark)] hover:bg-[var(--admin-bg-light)] transition-all duration-200"
           >
             <div className="flex items-center justify-center gap-2">
-              <CalendarDaysIcon className="w-5 h-5 text-slate-500" />
+              <CalendarDaysIcon className="w-5 h-5 text-[var(--admin-primary)]" />
               <span>Monthly</span>
             </div>
           </Button>
           <Button
             variant={selectedType === "yearly" ? "default" : "outline"}
             onClick={() => handleTypeChange("yearly")}
-            className="flex-1 border-slate-200 text-slate-900 hover:bg-slate-50 transition-all duration-200"
+            className="flex-1 border-[var(--admin-border)] text-[var(--admin-bg-dark)] hover:bg-[var(--admin-bg-light)] transition-all duration-200"
           >
             <div className="flex items-center justify-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-slate-500" />
+              <CalendarIcon className="w-5 h-5 text-[var(--admin-primary)]" />
               <span>Yearly</span>
             </div>
           </Button>
@@ -385,16 +385,16 @@ export default function PageListCurrent() {
                   onClick={() =>
                     (window.location.href = `/${page.slug}`)
                   }
-                  className="border-slate-200 text-slate-900 hover:bg-slate-50"
+                  className="border-[var(--admin-border)] text-[var(--admin-bg-dark)] hover:bg-[var(--admin-bg-light)]"
                 >
-                  <EyeIcon className="w-4 h-4 mr-2 text-slate-500" />
+                  <EyeIcon className="w-4 h-4 mr-2 text-[var(--admin-primary)]" />
                   View
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedPage(page)}
-                  className="border-slate-200 text-blue-600 hover:bg-blue-50"
+                  className="border-[var(--admin-border)] text-blue-600 hover:bg-blue-50"
                 >
                   <PencilIcon className="w-4 h-4 mr-2 text-blue-500" />
                   Edit
@@ -406,7 +406,7 @@ export default function PageListCurrent() {
                     const parentPageName = page.slug.replace(/\//g, " ");
                     window.location.href = `/dashboard/editcurrent/articles?parentPageName=${parentPageName}`;
                   }}
-                  className="border-slate-200 text-blue-600 hover:bg-blue-50"
+                  className="border-[var(--admin-border)] text-blue-600 hover:bg-blue-50"
                 >
                   <PencilIcon className="w-4 h-4 mr-2 text-blue-500" />
                   Edit Articles
@@ -415,7 +415,7 @@ export default function PageListCurrent() {
                   variant="destructive"
                   size="sm"
                   onClick={() => handleDelete(page.id)}
-                  className="border-slate-200 text-red-600 hover:bg-red-50"
+                  className="border-[var(--admin-border)] text-red-600 hover:bg-red-50"
                 >
                   <TrashIcon className="w-4 h-4 mr-2 text-red-500" />
                   Delete
@@ -430,7 +430,7 @@ export default function PageListCurrent() {
         <div className="mt-8">
           <div className="bg-white rounded-lg shadow-sm">
             <div className="p-6">
-              <h2 className="text-xl font-semibold text-slate-900">
+              <h2 className="text-xl font-semibold text-[var(--admin-bg-dark)]">
                 Edit Current Affair
               </h2>
               {selectedPage.link ? (

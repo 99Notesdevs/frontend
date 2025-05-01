@@ -273,7 +273,7 @@ export default function ArticlesPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--admin-primary)]"></div>
       </div>
     );
   }
@@ -281,12 +281,12 @@ export default function ArticlesPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-        <p className="text-red-600">{error}</p>
+        <p className="text-[var(--admin-primary)]">{error}</p>
         <button
           onClick={() => {
             fetchPages();
           }}
-          className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+          className="bg-[var(--admin-bg-primary)] hover:bg-[var(--admin-bg-secondary)] text-white font-bold py-2 px-4 rounded"
         >
           Try Again
         </button>
@@ -296,7 +296,7 @@ export default function ArticlesPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-slate-800">Manage Blogs</h1>
+      <h1 className="text-3xl font-bold mb-8 mt-4 text-[var(--admin-bg-secondary)] text-center">Manage Blogs</h1>
       <div className="flex flex-col gap-6">
         {/* Blog List */}
         <div className="bg-white p-6 rounded-xl shadow-md">
@@ -307,7 +307,7 @@ export default function ArticlesPage() {
                 placeholder="Search blogs..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-700"
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--admin-bg-primary)]"
               />
             </div>
             <div className="flex items-center space-x-4">
@@ -317,7 +317,7 @@ export default function ArticlesPage() {
                   setSelectedPage(null);
                   setImagePreview(null);
                 }}
-                className="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded"
+                className="bg-[var(--admin-bg-primary)] hover:bg-[var(--admin-bg-secondary)] text-white font-bold py-2 px-4 rounded"
               >
                 Clear Selection
               </button>
@@ -326,12 +326,12 @@ export default function ArticlesPage() {
 
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              <p className="text-red-600">{error}</p>
+              <p className="text-[var(--admin-primary)]">{error}</p>
             </div>
           )}
 
           {loading ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-[var(--admin-primary)]">
               Loading blogs...
             </div>
           ) : (
@@ -339,13 +339,13 @@ export default function ArticlesPage() {
               {filteredPages.map((page) => (
                 <div
                   key={page.id}
-                  className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="bg-[var(--admin-bg-lightest)] p-4 rounded-lg hover:bg-[var(--admin-bg-light)] transition-colors cursor-pointer"
                   onClick={() => handleEdit(page)}
                 >
                   <div className="flex justify-between items-start">
                     <div className="space-y-2">
                       <h3 className="text-lg font-semibold">{page.title}</h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-[var(--admin-primary)]">
                         Created: {new Date(page.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -355,7 +355,7 @@ export default function ArticlesPage() {
                           e.stopPropagation();
                           handleEdit(page);
                         }}
-                        className="p-2 text-slate-500 hover:text-slate-600"
+                        className="p-2 text-[var(--admin-primary)] hover:text-[var(--admin-secondary)]"
                         title="Edit"
                       >
                         <PencilIcon className="h-5 w-5" />
@@ -383,7 +383,7 @@ export default function ArticlesPage() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-secondary)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -394,8 +394,8 @@ export default function ArticlesPage() {
                     onClick={() => handlePageChange(page)}
                     className={`px-4 py-2 rounded ${
                       page === currentPage
-                        ? "bg-slate-500 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        ? "bg-[var(--admin-primary)] text-white"
+                        : "bg-[var(--admin-bg-light)] text-[var(--admin-primary)] hover:bg-[var(--admin-bg-light)]"
                     }`}
                   >
                     {page}
@@ -406,7 +406,7 @@ export default function ArticlesPage() {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-secondary)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>
@@ -446,7 +446,7 @@ export default function ArticlesPage() {
               }}
             />
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-[var(--admin-primary)]">
               Select a blog to edit
             </div>
           )}
@@ -460,7 +460,7 @@ export default function ArticlesPage() {
             <div className="flex justify-end space-x-2">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-[var(--admin-secondary)] hover:text-[var(--admin-bg-dark)]"
               >
                 Cancel
               </button>

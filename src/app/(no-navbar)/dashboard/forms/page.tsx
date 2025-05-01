@@ -98,12 +98,12 @@ const FormsPage = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              <h1 className="text-3xl font-bold text-[var(--admin-bg-dark)] mb-2">
                 Submitted Forms
               </h1>
-              <p className="text-sm text-slate-500">View all submitted forms</p>
+              <p className="text-sm text-[var(--admin-primary)]">View all submitted forms</p>
             </div>
           </div>
         </div>
@@ -113,7 +113,7 @@ const FormsPage = () => {
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           </div>
         ) : forms.length === 0 ? (
-          <div className="text-center text-gray-600 py-10">
+          <div className="text-center text-[var(--admin-primary)] py-10">
             <p>No forms have been submitted yet.</p>
           </div>
         ) : (
@@ -129,10 +129,10 @@ const FormsPage = () => {
                  <div className="text-white">Delete Selected</div>
                </Button>
              </div>
-          <div className="bg-white shadow-md rounded-lg overflow-hidden border border-slate-200 sm:mx-0 mx-[-1.5rem] sm:mt-0 mt-4">
+          <div className="bg-white shadow-md rounded-lg overflow-hidden border border-[var(--admin-border)] sm:mx-0 mx-[-1.5rem] sm:mt-0 mt-4">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-100 text-sm">
-                <thead className="bg-slate-100">
+              <table className="min-w-full divide-y divide-[var(--admin-border)] text-sm">
+                <thead className="bg-[var(--admin-bg-light)]">
                   <tr>
                     <th className="px-4 py-3">
                       <input
@@ -142,16 +142,16 @@ const FormsPage = () => {
                         className="accent-indigo-500 w-4 h-4 rounded border-slate-300 focus:ring-2 focus:ring-indigo-400"
                       />
                     </th>
-                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Name</th>
-                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Email</th>
-                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Mobile</th>
-                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Message</th>
-                    <th className="px-6 py-3 text-left font-semibold text-slate-700 uppercase tracking-wide">Submitted At</th>
+                    <th className="px-6 py-3 text-left font-semibold text-[var(--admin-bg-primary)] uppercase tracking-wide">Name</th>
+                    <th className="px-6 py-3 text-left font-semibold text-[var(--admin-bg-primary)] uppercase tracking-wide">Email</th>
+                    <th className="px-6 py-3 text-left font-semibold text-[var(--admin-bg-primary)] uppercase tracking-wide">Mobile</th>
+                    <th className="px-6 py-3 text-left font-semibold text-[var(--admin-bg-primary)] uppercase tracking-wide">Message</th>
+                    <th className="px-6 py-3 text-left font-semibold text-[var(--admin-bg-primary)] uppercase tracking-wide">Submitted At</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[var(--admin-border)]">
                   {forms.map((form, idx) => (
-                    <tr key={form.id} className={`transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'} hover:bg-slate-100`}>
+                    <tr key={form.id} className={`transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-[var(--admin-bg-lightest)]'} hover:bg-[var(--admin-bg-light)]`}>
                       <td className="px-4 py-4">
                         <input
                           type="checkbox"
@@ -160,8 +160,8 @@ const FormsPage = () => {
                           className="accent-indigo-500 w-4 h-4 rounded border-slate-300 focus:ring-2 focus:ring-indigo-400"
                         />
                       </td>
-                      <td className="px-6 py-4 text-slate-900 font-medium">{form.name}</td>
-                      <td className="px-6 py-4 text-slate-700">
+                      <td className="px-6 py-4 text-[var(--admin-bg-dark)] font-medium">{form.name}</td>
+                      <td className="px-6 py-4 text-[var(--admin-bg-primary)]">
                         <a
                           href={`mailto:${form.email}`}
                           className="text-indigo-600 hover:underline"
@@ -171,9 +171,9 @@ const FormsPage = () => {
                           {form.email}
                         </a>
                       </td>
-                      <td className="px-6 py-4 text-slate-700">{form.phone}</td>
-                      <td className="px-6 py-4 text-slate-700 max-w-xs break-words">{form.message}</td>
-                      <td className="px-6 py-4 text-slate-500 text-xs">{new Date(form.createdAt).toLocaleString()}</td>
+                      <td className="px-6 py-4 text-[var(--admin-bg-primary)]">{form.phone}</td>
+                      <td className="px-6 py-4 text-[var(--admin-bg-primary)] max-w-xs break-words">{form.message}</td>
+                      <td className="px-6 py-4 text-[var(--admin-primary)] text-xs">{new Date(form.createdAt).toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -187,10 +187,10 @@ const FormsPage = () => {
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">
+            <h2 className="text-lg font-bold text-[var(--admin-bg-dark)] mb-4">
               Confirm Deletion
             </h2>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-[var(--admin-primary)] mb-6">
               Are you sure you want to delete the selected forms? This action
               cannot be undone.
             </p>
