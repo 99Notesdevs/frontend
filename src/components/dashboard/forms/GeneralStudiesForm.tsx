@@ -43,9 +43,10 @@ export type GeneralStudiesFormValues = z.infer<typeof formSchema>;
 interface GeneralStudiesFormProps {
   onSubmit: (data: GeneralStudiesFormValues) => void;
   defaultValues?: Partial<GeneralStudiesFormValues>;
+  folder: string;
 }
 
-export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFormProps) {
+export function GeneralStudiesForm({ onSubmit, defaultValues, folder }: GeneralStudiesFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
   const [isUploading, setIsUploading] = useState(false);
   const [alert, setAlert] = useState<{
@@ -135,7 +136,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
             const formData = new FormData();
             formData.append("imageUrl", file);
   
-            const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
+            const s3Url = await uploadImageToS3(formData, folder); // Call your S3 upload function
             if (s3Url) {
               // Update the image field with the S3 URL
               form.setValue("imageUrl", s3Url, { shouldValidate: true });

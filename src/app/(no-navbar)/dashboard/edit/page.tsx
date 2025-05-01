@@ -86,7 +86,8 @@ function PageList() {
             const formData = new FormData();
             formData.append("imageUrl", blob, "image.png");
   
-            const url = (await uploadImageToS3(formData)) || "error";
+            const url =
+              (await uploadImageToS3(formData, "ContentImages")) || "error";
             img.setAttribute("src", url);
           } catch (error: unknown) {
             if (error instanceof Error) {
@@ -501,6 +502,7 @@ function PageList() {
                     selectedPage,
                     selectedPage.templateId
                   )}
+                  folder={"GeneralStudies"}
                 />
               )}
               {selectedPage.templateId === "current-affairs" && (

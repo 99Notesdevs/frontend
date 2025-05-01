@@ -9,6 +9,7 @@ import Cookie from 'js-cookie';
 
 import { PencilIcon, TrashIcon, EyeIcon, ArrowLeftIcon, CalendarIcon, CalendarDaysIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { uploadImageToS3 } from '@/config/imageUploadS3';
 
 interface CurrentAffairType {
   id: number;
@@ -64,6 +65,40 @@ export default function PageListCurrent() {
   const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
   const token = Cookie.get('token');
 
+  const handleImageUpload = async (content: string) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, "text/html");
+        const imgTags = doc.querySelectorAll("img");
+    
+        for (const img of imgTags) {
+          const src = img.getAttribute("src");
+          if (!src) continue;
+          console.log("I was here");
+          const isBlob = src.startsWith("blob:");
+          const isBase64 = src.startsWith("data:image");
+    
+          if (isBlob || isBase64) {
+            try {
+              const response = await fetch(src);
+              const blob = await response.blob();
+    
+              const formData = new FormData();
+              formData.append("imageUrl", blob, "image.png");
+    
+              const url =
+                (await uploadImageToS3(formData, "CurrentAffairImages")) || "error";
+              img.setAttribute("src", url);
+            } catch (error: unknown) {
+              if (error instanceof Error) {
+                console.error("Error uploading image:", error.message);
+              }
+            }
+          }
+        }
+    
+        return doc.body.innerHTML; // ⬅️ Only return after finishing all images
+      };
+
   const handleEditSubmit = async (formData: GeneralStudiesFormValues) => {
     try {
       // Generate slug from title
@@ -73,9 +108,11 @@ export default function PageListCurrent() {
         .replace(/[^a-z0-9-]/g, '');
       const slug = `current-affairs/${baseSlug}`;
 
+      const content = await handleImageUpload(formData.content || "");
+
       const updateData = {
         title: formData.title,
-        content: formData.content,
+        content: content,
         type: selectedType || 'daily',
         slug,
         showInNav: formData.showInNav,
@@ -466,7 +503,7 @@ export default function PageListCurrent() {
                     header: selectedPage.metadata ? JSON.parse(selectedPage.metadata).header || '' : '',
                     body: selectedPage.metadata ? JSON.parse(selectedPage.metadata).body || '' : ''
                   }}
-                  onSubmit={handleEditSubmit}
+                  onSubmit={handleEditSubmit} folder={"CurrentAffairs"}
                 />
               )}
             </div>

@@ -3,9 +3,9 @@ import Cookies from "js-cookie";
 
 const token = Cookies.get('token') || null;
 
-export const uploadImageToS3 = async (formData: FormData): Promise<string | null> => {
+export const uploadImageToS3 = async (formData: FormData, folder: string): Promise<string | null> => {
 
-  const res = await fetch(`${env.API}/aws/upload-image`, {
+  const res = await fetch(`${env.API}/aws/upload-image?folder=${folder}`, {
     method: 'POST',
     body: formData,
     headers: {

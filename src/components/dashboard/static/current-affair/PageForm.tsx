@@ -228,7 +228,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData);
+          const s3Url = await uploadImageToS3(formData, "CurrentAffairs");
           if (s3Url) {
             setNewAffairData(prev => ({ ...prev, imageUrl: s3Url }));
           } else {
@@ -265,7 +265,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
             const formData = new FormData();
             formData.append("imageUrl", blob, "image.png");
   
-            const url = (await uploadImageToS3(formData)) || "error";
+            const url = (await uploadImageToS3(formData, "CurrentAffairsContent")) || "error";
             img.setAttribute("src", url);
           } catch (error: unknown) {
             if (error instanceof Error) {
@@ -298,7 +298,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       // Handle content based on template type
       let content = '';
       if (selectedAffairTemplate === 'article') {
-        content = data.content || '';
+        content = await handleImageUpload(data.content || "");
       } else {
         // Add default content for custom links
         content = `This is a custom link to: ${data.link}\n\nClick the link below to view the content.`;
@@ -563,6 +563,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
                       <GeneralStudiesForm
                         defaultValues={newAffairData}
                         onSubmit={handleCreateAffair}
+                        folder={"CurrentAffairs"}
                       />
                     ) : (
                       <div className="space-y-4">

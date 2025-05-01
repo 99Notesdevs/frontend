@@ -145,7 +145,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData);
+          const s3Url = await uploadImageToS3(formData, "ArticlesType");
           if (s3Url) {
             form.setValue("imageUrl", s3Url, { shouldValidate: true });
           } else {
