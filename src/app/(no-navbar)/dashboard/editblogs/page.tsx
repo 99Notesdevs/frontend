@@ -132,7 +132,7 @@ export default function ArticlesPage() {
           const formData = new FormData();
           formData.append("imageUrl", blob, "image.png");
 
-          const url = (await uploadImageToS3(formData)) || "error";
+          const url = (await uploadImageToS3(formData, "BlogsContent")) || "error";
           img.setAttribute("src", url);
         } catch (error: unknown) {
           if (error instanceof Error) {

@@ -199,7 +199,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           const formData = new FormData();
           formData.append("imageUrl", blob, "image.png");
 
-          const url = (await uploadImageToS3(formData)) || "error";
+          const url = (await uploadImageToS3(formData, "ContentImages")) || "error";
           img.setAttribute("src", url);
         } catch (error: unknown) {
           if (error instanceof Error) {
@@ -362,6 +362,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     const formProps = {
       onSubmit: handleSubmit,
       defaultValues: editPage?.data || undefined,
+      folder: "GeneralStudies"
     };
 
     // Map template IDs to form components

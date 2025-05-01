@@ -199,7 +199,7 @@ const navigationSections: NavSection[] = [
   }, []);
 
   return (
-    <body>
+    <>
     <div className="min-h-screen bg-white">
       <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-4 md:pt-24 flex flex-col md:flex-row gap-4">
         {/* On mobile*/}
@@ -296,7 +296,7 @@ const navigationSections: NavSection[] = [
         </div>
       </section>
     </div>
-    </body>
+    </>
   );
 };
 

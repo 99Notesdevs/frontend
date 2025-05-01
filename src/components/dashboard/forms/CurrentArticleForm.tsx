@@ -93,7 +93,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             const formData = new FormData();
             formData.append("imageUrl", file);
   
-            const s3Url = await uploadImageToS3(formData); // Call your S3 upload function
+            const s3Url = await uploadImageToS3(formData, "CurrentArticle"); // Call your S3 upload function
             if (s3Url) {
               // Update the image field with the S3 URL
               form.setValue("imageUrl", s3Url, { shouldValidate: true });
