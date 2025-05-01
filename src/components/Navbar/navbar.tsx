@@ -187,7 +187,6 @@ export default function Navbar({ navigation }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  console.log(navigation);
 
   useEffect(() => {
     const handleScroll = () => {
