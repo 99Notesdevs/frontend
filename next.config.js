@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/blog",
+        permanent: true, // Set to true for a 308 permanent redirect
+      },
+    ];
+  },
   reactStrictMode: true,
   images: {
     remotePatterns: [
