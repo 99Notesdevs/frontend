@@ -1,12 +1,7 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import { BaseTemplateProps } from "./types";
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
-import { TableOfContents } from "@/components/navigation/TableOfContents";
-import SearchBar from "@/components/Navbar/SearchBar";
-import SocialMedia from "@/components/navigation/socialmedia";
-import Ads from "../navigation/Ads";
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import ContactMap from "@/components/ui/ContactMap";
 
@@ -17,6 +12,59 @@ export const CurrentAffairTemplate: React.FC<BaseTemplateProps> = ({
   const mainContent = content || "";
   // @ts-ignore
   const jsonLD = JSON.parse(metadata).schemaData;
+  const parsedMetadata = JSON.parse(metadata);
+      const headScripts = parsedMetadata?.header?.split(",")?.map((script: string) => script.trim()) || [];
+      const bodyScripts = parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) || [];
+    
+      useEffect(() => {
+        // Inject head scripts
+        if (headScripts) {
+          headScripts.forEach((script: string) => {
+            try {
+              if (script.startsWith("<script")) {
+                // Parse the full <script> tag and extract attributes
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = script.trim();
+                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+                if (scriptElement && scriptElement.tagName === "SCRIPT") {
+                  document.head.appendChild(scriptElement);
+                }
+              } else {
+                // Handle raw JavaScript content
+                const scriptElement = document.createElement("script");
+                scriptElement.textContent = script; // Use textContent for raw JavaScript
+                document.head.appendChild(scriptElement);
+              }
+            } catch (error) {
+              console.error("Error injecting head script:", error, script);
+            }
+          });
+        }
+    
+        // Inject body scripts
+        if (bodyScripts) {
+          bodyScripts.forEach((script: string) => {
+            try {
+              if (script.startsWith("<script")) {
+                // Parse the full <script> tag and extract attributes
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = script.trim();
+                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+                if (scriptElement && scriptElement.tagName === "SCRIPT") {
+                  document.body.appendChild(scriptElement);
+                }
+              } else {
+                // Handle raw JavaScript content
+                const scriptElement = document.createElement("script");
+                scriptElement.textContent = script; // Use textContent for raw JavaScript
+                document.body.appendChild(scriptElement);
+              }
+            } catch (error) {
+              console.error("Error injecting body script:", error, script);
+            }
+          });
+        }
+      }, [headScripts, bodyScripts]);
 
   return (
     <>

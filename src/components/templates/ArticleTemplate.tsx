@@ -2,11 +2,9 @@
 import { useState, useEffect } from "react";
 import { ArticleTemplateProps } from "./types";
 import { Badge } from "@/components/ui/badge";
-import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import SearchBar from "@/components/Navbar/SearchBar";
 import Image from "next/image";
-import { X } from "lucide-react";
 import SocialMedia from "@/components/navigation/socialmedia";
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
@@ -37,6 +35,58 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const token = Cookies.get("token");
   // @ts-ignore
   const jsonLD = parsedMetadata.schemaData;
+      const headScripts = parsedMetadata?.header?.split(",")?.map((script: string) => script.trim()) || [];
+      const bodyScripts = parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) || [];
+    
+      useEffect(() => {
+        // Inject head scripts
+        if (headScripts) {
+          headScripts.forEach((script: string) => {
+            try {
+              if (script.startsWith("<script")) {
+                // Parse the full <script> tag and extract attributes
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = script.trim();
+                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+                if (scriptElement && scriptElement.tagName === "SCRIPT") {
+                  document.head.appendChild(scriptElement);
+                }
+              } else {
+                // Handle raw JavaScript content
+                const scriptElement = document.createElement("script");
+                scriptElement.textContent = script; // Use textContent for raw JavaScript
+                document.head.appendChild(scriptElement);
+              }
+            } catch (error) {
+              console.error("Error injecting head script:", error, script);
+            }
+          });
+        }
+    
+        // Inject body scripts
+        if (bodyScripts) {
+          bodyScripts.forEach((script: string) => {
+            try {
+              if (script.startsWith("<script")) {
+                // Parse the full <script> tag and extract attributes
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = script.trim();
+                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+                if (scriptElement && scriptElement.tagName === "SCRIPT") {
+                  document.body.appendChild(scriptElement);
+                }
+              } else {
+                // Handle raw JavaScript content
+                const scriptElement = document.createElement("script");
+                scriptElement.textContent = script; // Use textContent for raw JavaScript
+                document.body.appendChild(scriptElement);
+              }
+            } catch (error) {
+              console.error("Error injecting body script:", error, script);
+            }
+          });
+        }
+      }, [headScripts, bodyScripts]);
 
   useEffect(() => {
     const checkAuthorization = async () => {
@@ -69,9 +119,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
   if (isAuthorized === null) {
     return (
+      <body>
       <div className="flex items-center justify-center min-h-screen">
         <p>Loading...</p>
       </div>
+      </body>
     );
   }
 
@@ -86,6 +138,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const displayImage = page.imageUrl || coverImage as string;
 
   return (
+    <body>
     <>
       <section>
         <script
@@ -256,6 +309,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
         </div>
       </main>
     </>
+    </body>
   );
 };
 

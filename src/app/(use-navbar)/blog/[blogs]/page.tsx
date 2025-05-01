@@ -93,6 +93,7 @@ export default async function Page({ params }: { params: Params }) {
   const displayImage = imageUrl || parsedMetadata.coverImage as string;
 
   return (
+    <body>
     <>
       <section>
         <script
@@ -105,11 +106,11 @@ export default async function Page({ params }: { params: Params }) {
           {/* Assistive Touch */}
           <AssistiveTouch content={content || ''} />
           <div
-            className="w-full max-w-7xl xl:max-w-6.5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-12"
+            className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-3 lg:px-8 py-4 sm:py-12"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-4 sm:mt-12">
               {/* Main Content Column */}
-              <main className="lg:col-start-1 lg:col-span-8 xl:col-span-8 space-y-0 sm:space-y-0">
+              <main className="lg:col-start-1 lg:col-span-9 space-y-0 sm:space-y-0">
                 <div className="bg-white border shadow-lg rounded-xl">
                   {/* Featured Image */}
                   {displayImage && (
@@ -205,7 +206,7 @@ export default async function Page({ params }: { params: Params }) {
               </main>
 
               {/* Sidebar */}
-              <aside className="lg:col-start-9 lg:col-span-4 xl:col-start-9 xl:col-span-4 space-y-4 sm:space-y-8">
+              <aside className="lg:col-start-10 lg:col-span-4 space-y-4 sm:space-y-8 mt-5 lg:mt-0">
                 <div className="bg-white rounded-xl shadow-lg p-6">
                   <h2 className="text-lg font-semibold mb-4">Related Topics</h2>
                   <p className="text-[var(--text-tertiary)]">Coming soon...</p>
@@ -216,5 +217,6 @@ export default async function Page({ params }: { params: Params }) {
         </div>
       </main>
     </>
+    </body>
   );
 }

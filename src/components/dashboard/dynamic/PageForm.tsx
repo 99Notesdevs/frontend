@@ -76,6 +76,8 @@ interface PageFormData extends Record<string, any> {
     twitterImage?: string;
     canonicalUrl?: string;
     schemaData?: string;
+    header?: string;
+    body?: string;
   };
 }
 
@@ -271,6 +273,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
           twitterImage: formData.twitterImage || "",
           canonicalUrl: formData.canonicalUrl || "",
           schemaData: formData.schemaData || "",
+          header: formData.header || "",
+          body: formData.body || "",
         },
         imageUrl: formData.imageUrl,
         level: pathLevel || 0, // Use the path depth as the level

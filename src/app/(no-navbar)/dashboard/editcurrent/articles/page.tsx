@@ -66,7 +66,9 @@ export default function ArticlesPage() {
           twitterDescription: formData.twitterDescription,
           twitterImage: formData.twitterImage,
           canonicalUrl: formData.canonicalUrl,
-          schemaData: formData.schemaData
+          schemaData: formData.schemaData,
+          header: formData.header,
+          body: formData.body
         })
       };
 
@@ -187,6 +189,8 @@ export default function ArticlesPage() {
         twitterImage: parsedMetadata.twitterImage || '',
         canonicalUrl: parsedMetadata.canonicalUrl || '',
         schemaData: parsedMetadata.schemaData || '',
+        header: parsedMetadata.header || '',
+        body: parsedMetadata.body || '',
         quizQuestions: selectedPage.quizQuestions || '[]', // Ensure we always have a valid JSON string
       };
 
@@ -375,6 +379,8 @@ export default function ArticlesPage() {
                   canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
                   schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
                   quizQuestions: selectedPage.quizQuestions || '[]', // Ensure we always have a valid JSON string
+                  header: selectedPage.metadata ? JSON.parse(selectedPage.metadata).header || '' : '',
+                  body: selectedPage.metadata ? JSON.parse(selectedPage.metadata).body || '' : ''
                 }}
               />)}
             </div>

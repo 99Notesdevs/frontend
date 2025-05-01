@@ -32,6 +32,8 @@ interface CurrentAffairType {
     twitterImage?: string;
     canonicalUrl?: string;
     schemaData?: string;
+    header?: string;
+    body?: string;
   };
   type: string; // daily, monthly, yearly
   slug: string;
@@ -66,6 +68,8 @@ interface CurrentAffairArticleType {
     twitterImage?: string;
     canonicalUrl?: string;
     schemaData?: string;
+    header?: string;
+    body?: string;
   };
 }
 
@@ -113,7 +117,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
     twitterDescription: '',
     twitterImage: '',
     canonicalUrl: '',
-    schemaData: ''
+    schemaData: '',
+    header: '',
+    body: '',
   });
   const [selectedAffairTemplate, setSelectedAffairTemplate] = useState<string>('article'); // 'article' or 'custom-link'
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -140,7 +146,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
     twitterDescription: '',
     twitterImage: '',
     canonicalUrl: '',
-    schemaData: ''
+    schemaData: '',
+    header: '',
+    body: '',
   });
   
   const token = Cookie.get('token');
@@ -318,7 +326,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
           twitterDescription: data.twitterDescription,
           twitterImage: data.twitterImage,
           canonicalUrl: data.canonicalUrl,
-          schemaData: data.schemaData
+          schemaData: data.schemaData,
+          header: data.header,
+          body: data.body
         })
       };
 
@@ -412,7 +422,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
           twitterDescription: data.twitterDescription,
           twitterImage: data.twitterImage,
           canonicalUrl: data.canonicalUrl,
-          schemaData: data.schemaData
+          schemaData: data.schemaData,
+          header: data.header,
+          body: data.body,
         })
       };
 

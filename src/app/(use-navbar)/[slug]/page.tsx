@@ -68,7 +68,6 @@ export async function generateMetadata({params}: {params: Params}): Promise<Meta
   }
   // @ts-ignore
   const JSONMetaData = JSON.parse(page.metadata);
-  console.log("JSONMetaData", JSONMetaData.schemaData);
   
   return {
     title: JSONMetaData.metaTitle || "Default Title",

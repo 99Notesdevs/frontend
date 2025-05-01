@@ -39,6 +39,8 @@ const articleSchema = z.object({
   twitterImage: z.string().optional(),
   canonicalUrl: z.string().optional(),
   schemaData: z.string().optional(),
+  header: z.string().optional(),
+  body: z.string().optional(),
   showInNav: z.boolean().default(false),
 });
 
@@ -120,6 +122,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       twitterImage: "",
       canonicalUrl: "",
       schemaData: "",
+      header: "",
+      body: "",
       showInNav: true,
     },
   });
@@ -177,6 +181,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       twitterImage: data.twitterImage,
       canonicalUrl: data.canonicalUrl,
       schemaData: data.schemaData,
+      header: data.header,
+      body: data.body,
       showInNav: data.showInNav,
     };
     onSubmit(transformedData);
@@ -447,6 +453,32 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Schema Data</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="header"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Header</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="body"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Body</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>

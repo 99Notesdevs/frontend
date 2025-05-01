@@ -33,6 +33,8 @@ const formSchema = z.object({
   twitterImage: z.string().optional(),
   canonicalUrl: z.string().optional(),
   schemaData: z.string().optional(),
+  header: z.string().optional(),
+  body: z.string().optional(),
   author: z.string().optional(),
 });
 
@@ -111,6 +113,8 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
       canonicalUrl: '',
       schemaData: '',
       author: '',
+      header: '',
+      body: '',
       ...defaultValues,
     },
   });
@@ -489,6 +493,32 @@ export function GeneralStudiesForm({ onSubmit, defaultValues }: GeneralStudiesFo
                 />
               </FormControl>
             
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="header"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Header</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="body"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Body</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
             </FormItem>
           )}
         />

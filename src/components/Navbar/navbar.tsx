@@ -187,7 +187,6 @@ export default function Navbar({ navigation }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  console.log(navigation);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -207,6 +206,7 @@ export default function Navbar({ navigation }: NavbarProps) {
   };
 
   return (
+    <body>
     <>
       {/* Spacer div to prevent content overlap */}
       <div
@@ -473,5 +473,6 @@ export default function Navbar({ navigation }: NavbarProps) {
         </div>
       </nav>
     </>
+    </body>
   );
 }

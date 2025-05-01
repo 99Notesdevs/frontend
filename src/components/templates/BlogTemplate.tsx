@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { BlogTemplateProps } from "./types";
 import { format } from "date-fns";
+import { useEffect } from "react";
 
 export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
   const { title, content, metadata, imageUrl } = page;
@@ -12,6 +13,58 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
 
   const createdAt = page.createdAt ? new Date(page.createdAt) : new Date();
   const formattedDate = format(createdAt, 'MMMM dd, yyyy');
+      const headScripts = parsedMetadata?.header?.split(",")?.map((script: string) => script.trim()) || [];
+      const bodyScripts = parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) || [];
+    
+      useEffect(() => {
+        // Inject head scripts
+        if (headScripts) {
+          headScripts.forEach((script: string) => {
+            try {
+              if (script.startsWith("<script")) {
+                // Parse the full <script> tag and extract attributes
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = script.trim();
+                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+                if (scriptElement && scriptElement.tagName === "SCRIPT") {
+                  document.head.appendChild(scriptElement);
+                }
+              } else {
+                // Handle raw JavaScript content
+                const scriptElement = document.createElement("script");
+                scriptElement.textContent = script; // Use textContent for raw JavaScript
+                document.head.appendChild(scriptElement);
+              }
+            } catch (error) {
+              console.error("Error injecting head script:", error, script);
+            }
+          });
+        }
+    
+        // Inject body scripts
+        if (bodyScripts) {
+          bodyScripts.forEach((script: string) => {
+            try {
+              if (script.startsWith("<script")) {
+                // Parse the full <script> tag and extract attributes
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = script.trim();
+                const scriptElement = tempDiv.firstChild as HTMLScriptElement;
+                if (scriptElement && scriptElement.tagName === "SCRIPT") {
+                  document.body.appendChild(scriptElement);
+                }
+              } else {
+                // Handle raw JavaScript content
+                const scriptElement = document.createElement("script");
+                scriptElement.textContent = script; // Use textContent for raw JavaScript
+                document.body.appendChild(scriptElement);
+              }
+            } catch (error) {
+              console.error("Error injecting body script:", error, script);
+            }
+          });
+        }
+      }, [headScripts, bodyScripts]);
 
   return (
     <>

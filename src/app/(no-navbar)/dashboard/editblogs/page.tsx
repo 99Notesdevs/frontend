@@ -177,7 +177,9 @@ export default function ArticlesPage() {
         twitterDescription: formData.twitterDescription || '',
         twitterImage: formData.twitterImage || '',
         canonicalUrl: formData.canonicalUrl || '',
-        schemaData: formData.schemaData || ''
+        schemaData: formData.schemaData || '',
+        header: formData.header || '',
+        body: formData.body || ''
       };
 
       // Log the metadata object
@@ -439,6 +441,8 @@ export default function ArticlesPage() {
                 twitterImage: JSON.parse(selectedPage.metadata || '')?.twitterImage,
                 canonicalUrl: JSON.parse(selectedPage.metadata || '')?.canonicalUrl,
                 schemaData: JSON.parse(selectedPage.metadata || '')?.schemaData,
+                header: JSON.parse(selectedPage.metadata || '')?.header,
+                body: JSON.parse(selectedPage.metadata || '')?.body
               }}
             />
           ) : (
