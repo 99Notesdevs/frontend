@@ -6,7 +6,12 @@ import Image from "next/image";
 import logo from '../../../public/logo.png'
 import SearchBar from "./SearchBar";
 import { NavItem } from "@/types/navigation";
-// import { isAuth } from "@/lib/isAuth";
+import { Plus_Jakarta_Sans } from 'next/font/google';
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
 
 interface NavbarProps {
   navigation: NavItem[];
@@ -46,7 +51,7 @@ function NestedNavigation({
           >
             <Link
               href={item.link ? item.link : `/${item.slug}`}
-              className="px-3 py-2 text-[var(--surface-darker)] hover:text-[var(--action-primary)] rounded-md text-sm font-inter font-medium tracking-tight transition-colors duration-200 flex items-center"
+              className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
             >
               {item.title}
               {item.children.length > 0 && (
@@ -78,7 +83,7 @@ function NestedNavigation({
                                 <Link
                                   key={grandChild.slug}
                                   href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
-                                  className="flex px-2 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal items-center font-opensans"
+                                  className={`${plusJakarta.className} flex px-3 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[13px] font-normal tracking-[-0.01em] items-center`}
                                 >
                                   <svg 
                                     className="w-3 h-3 mr-2 fill-current opacity-80"
@@ -208,18 +213,16 @@ export default function Navbar({ navigation }: NavbarProps) {
   return (
     <>
       {/* Spacer div to prevent content overlap */}
-      <div
+      {/* <div
         className={`w-full transition-all duration-300 ${
           isScrolled ? "h-[60px]" : "h-[72px]"
         }`}
-      />
+      /> */}
 
-      <nav className={`navbar-bottom-line fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'border-b-0' : ''}`}>
+      <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'border-b-0' : ''}`}>
         {/* Top Bar - Hidden when scrolled */}
         <div
-          className={`hidden md:block bg-[var(--primary)] w-full transition-all duration-300 ${
-            isScrolled ? "h-0 overflow-hidden opacity-0" : "h-12"
-          }`}
+          className={`hidden md:block bg-[var(--primary)] w-full transition-all duration-300 h-0 overflow-hidden opacity-0`}
         >
           <div className="container mx-auto px-6 flex justify-between items-center h-12">
             <div className="mt-1.75">
@@ -253,14 +256,14 @@ export default function Navbar({ navigation }: NavbarProps) {
 
         {/* Main Navbar */}
         <div
-          className={` w-full transition-all duration-300 -mt-[1px] ${
+              className={` w-full transition-all duration-300 -mt-[1px]  ${
             isScrolled
-              ? "bg-gradient-to-r from-[#f4d03f] via-[#f5ab35] to-[#f39c12] shadow-lg"
-              : "bg-white"
+              ? "bg-white h-[72px]  shadow-md"
+              : "bg-white h-[72px]"
           }`}
         >
           <div className="container mx-auto px-4 lg:px-6">
-            <div className="flex justify-between items-center h-[60px]">
+            <div className="flex justify-between items-center h-[72px] 2xl:pl-12">
               {/* Logo */}
               <div className="flex-shrink-0 min-w-[35px] mx-2">
                 <Link href="/" passHref>
@@ -274,19 +277,19 @@ export default function Navbar({ navigation }: NavbarProps) {
                   />
                 </Link>
               </div>
-              <div className="hidden lg:flex flex-1 justify-center items-center gap-1 ml-4 xl:ml-8">
-                <div className="flex items-center space-x-1 xl:space-x-2"></div>
+              <div className="hidden lg:flex flex-1 justify-end items-center gap-1 2xl:pr-8 ">
+                <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div>
                 <NestedNavigation items={navigation} />
                 <Link href="/about" passHref>
                   <span
-                    className={`px-3 py-2 text-[var(--surface-darker)] hover:text-[var(--action-primary)] rounded-md text-sm font-inter font-medium tracking-tight transition-colors duration-200 flex items-center`}
+                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
                   >
                     About 99Notes
                   </span>
                 </Link>
                 <Link href="/blog" passHref>
                   <span
-                    className={`px-3 py-2 text-[var(--surface-darker)] hover:text-[var(--action-primary)] rounded-md text-sm font-inter font-medium tracking-tight transition-colors duration-200 flex items-center`}
+                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
                   >
                     Blogs
                   </span>
@@ -294,12 +297,12 @@ export default function Navbar({ navigation }: NavbarProps) {
               </div>
 
               {/* Desktop search bar */}
-              <div className="hidden xl:block pr-25 max-w-[200px]">
+              <div className="hidden pr-25 max-w-[200px]">
                 <SearchBar />
               </div>  
 
               {/* Mobile menu button */}
-              <div className="xl:hidden">
+              <div className="lg:hidden">
                 <button
                   onClick={() => setIsOpen(!isOpen)}
                   className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-tertiary)] bg-[var(--tertiary)]
@@ -345,12 +348,11 @@ export default function Navbar({ navigation }: NavbarProps) {
           </div>
         </div>
 
-        {/* Yellow line below navbar */}
-        {/* <div className="w-full h-[1px] bg-[var(--primary)]"></div> */}
+
 
         {/* Mobile menu */}
         <div
-          className={`xl:hidden transform transition-all duration-300 ease-in-out ${
+          className={`lg:hidden transform transition-all duration-300 ease-in-out ${
             isOpen 
               ? "translate-y-0 opacity-100 max-h-[80vh] overflow-y-auto" 
               : "-translate-y-2 opacity-0 pointer-events-none max-h-0"
@@ -358,15 +360,15 @@ export default function Navbar({ navigation }: NavbarProps) {
         >
           <div className="px-2 pt-2 pb-3 space-y-1">
             {/* Search Bar in mobile menu */}
-            <div className="px-3 py-2">
+            {/* <div className="px-3 py-2">
               <SearchBar />
-            </div>
+            </div> */}
             {navigation.map((item) => (
               <div key={item.slug} className="py-1">
                 <div className="flex items-center justify-between">
                   <Link
                     href={item.link ? item.link : `/${item.slug}`}
-                    className="block px-3 py-2 text-base font-medium text-[var(--surface-darker)] hover:bg-[var(--bg-main)] rounded-md"
+                    className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--surface-dark)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
                     onClick={() => setIsOpen(false)}
                   >
                     {item.title}
@@ -396,7 +398,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                         <div className="flex items-center justify-between">
                           <Link
                             href={child.link ? child.link : `/${child.slug}`}
-                            className="block px-3 py-2.5 text-base font-medium text-[var(--surface-dark)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]"
+                            className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--surface-dark)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
                             onClick={() => setIsOpen(false)}
                           >
                             {child.title}
@@ -459,12 +461,18 @@ export default function Navbar({ navigation }: NavbarProps) {
             
             {/* About and Blogs */}
             <Link href="/about" passHref>
-              <span className="block px-3 py-2.5 text-base font-semibold text-[var(--surface-dark)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] font-opensans" onClick={() => setIsOpen(false)}>
+              <span
+                className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
+                onClick={() => setIsOpen(false)}
+              >
                 About 99Notes
               </span>
             </Link>
             <Link href="/blog" passHref>
-              <span className="block px-3 py-2.5 text-base font-semibold text-[var(--surface-dark)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] font-opensans" onClick={() => setIsOpen(false)}>
+              <span
+                className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
+                onClick={() => setIsOpen(false)}
+              >
                 Blogs
               </span>
             </Link>
