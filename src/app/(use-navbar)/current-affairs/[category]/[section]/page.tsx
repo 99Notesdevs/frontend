@@ -92,7 +92,6 @@ const CurrentAffairArticlePage = async ({
   const jsonLD = JSON.parse(article?.metadata).schemaData || "{}";
 
   return (
-    <body>
     <>
     <section>
       <script 
@@ -249,7 +248,6 @@ const CurrentAffairArticlePage = async ({
       </div>
     </div>
     </>
-    </body>
   );
 };
 

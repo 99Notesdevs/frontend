@@ -90,7 +90,6 @@ const Login = () => {
   };
 
   return (
-    <body>
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[var(--bg-elevated)] to-white px-4 sm:px-6">
       <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[380px] sm:max-w-sm border border-[var(--border-light)]">
         <h2 className="text-xl sm:text-2xl font-bold text-[var(--surface-dark)] text-center mb-2">Login</h2>
@@ -173,7 +172,6 @@ const Login = () => {
         </form>
       </div>
     </div>
-    </body>
   );
 };
 

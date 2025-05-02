@@ -60,7 +60,6 @@ export default async function Home() {
   const pageData = data.data.data; // Get the nested data object
   const homeData : HomeProps = JSON.parse(pageData.content);
   return (
-    <body>
     <div className="min-h-screen">
       {/* Hero Section with Contact Form */}
       <section className="container mx-auto px-6 lg:px-18">
@@ -103,6 +102,6 @@ export default async function Home() {
       <Reason99notes title={homeData.Reason99notes.title} description={homeData.Reason99notes.description} footer={homeData.Reason99notes.footer} reasons={homeData.Reason99notes.reasons} />
       <ContactMap />
     </div>
-    </body>
+   
   );
 }

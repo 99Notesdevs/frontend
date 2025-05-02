@@ -63,7 +63,6 @@ const Register = () => {
   };
 
   return (
-    <body>
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[var(--bg-main)] to-white px-4 sm:px-6">
       {toast && (
         <div className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
@@ -209,7 +208,6 @@ const Register = () => {
         </form>
       </div>
     </div>
-    </body>
   );
 };
 

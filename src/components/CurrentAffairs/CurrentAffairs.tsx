@@ -54,7 +54,6 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
 
   if (error) {
     return (
-      <body>
       <div className="py-16 bg-[var(--bg-main)]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -73,13 +72,11 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
           </div>
         </div>
       </div>
-      </body>
     );
   }
 
   if (isLoading) {
-    return (
-      <body>
+    return (    
       <div className="py-16 bg-[var(--bg-main)]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -90,8 +87,7 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
           </div>
         </div>
-      </div>
-      </body>
+      </div> 
     );
   }
 
@@ -102,7 +98,6 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
   }));
 
   return (
-    <body>
     <section className="py-16 bg-[var(--bg-main)]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
@@ -121,7 +116,6 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
         </div>
       </div>
     </section>
-    </body>
   );
 };
 

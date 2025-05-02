@@ -22,7 +22,6 @@ export default function PaymentFailurePage() {
   }, [router]);
 
   return (
-    <body>
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)]">
       <div className="text-center space-y-6">
         <div className="bg-red-50 p-8 rounded-lg shadow-lg">
@@ -52,6 +51,5 @@ export default function PaymentFailurePage() {
         </div>
       </div>
     </div>
-    </body>
   );
 }

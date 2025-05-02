@@ -208,7 +208,6 @@ const CurrentAffairsSectionPage = async ({
   // @ts-ignore
   const jsonLD = JSON.parse(currentAffair?.metadata).schemaData || "";
   return (
-    <body>
     <>
     <section>
       <script 
@@ -441,7 +440,6 @@ const CurrentAffairsSectionPage = async ({
     </CurrentAffairsLayout>
     </main>
     </>
-    </body>
   );
 };
 

@@ -93,7 +93,6 @@ export default async function Page({ params }: { params: Params }) {
   const displayImage = imageUrl || parsedMetadata.coverImage as string;
 
   return (
-    <body>
     <>
       <section>
         <script
@@ -217,6 +216,5 @@ export default async function Page({ params }: { params: Params }) {
         </div>
       </main>
     </>
-    </body>
   );
 }

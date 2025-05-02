@@ -68,7 +68,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   }, [headScripts, bodyScripts]);
 
   return (
-    <body>
+      <>
       <section>
         <script
           type="application/ld+json"
@@ -180,7 +180,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
           </div>
         </div>
       </main>
-    </body>
+      </>
   );
 };
 

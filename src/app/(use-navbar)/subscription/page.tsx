@@ -173,7 +173,6 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <body>
     <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
       <div className="container mx-auto px-4 py-16">
         <div className="mb-8 flex justify-center gap-4">
@@ -202,6 +201,5 @@ export default function SubscriptionPage() {
         </div>
       </div>
     </div>
-    </body>
   );
 }

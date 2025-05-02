@@ -73,7 +73,7 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
   }, [headScripts, bodyScripts]);
 
   return (
-    <body>
+    <>
       <main>
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white relative w-full overflow-x-hidden">
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-12">
@@ -193,6 +193,6 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLD) }}
       />
-    </body>
+      </>
   );
 };
