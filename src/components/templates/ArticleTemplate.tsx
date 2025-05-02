@@ -14,10 +14,13 @@ import { env } from "@/config/env";
 import axios from "axios";
 import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
+import { isLocked } from "@/lib/islocked";
 
-const processContent = (content: string, isAuthorized: boolean) => {
+
+const processContent = async (content: string, isAuthorized: boolean) => {
+  const isContentLocked = await isLocked();
   return content.replace(/<lock>\s*([^]*?)\s*<\/lock>/g, (lockedContent) => {
-    return isAuthorized
+    return   isAuthorized || !isContentLocked
       ? lockedContent
       : `<div class="locked-content">
            <p>${lockedContent}</p>
@@ -117,10 +120,14 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   }, [token]);
 
   useEffect(() => {
-    if (isAuthorized !== null) {
-      const result = processContent(content || "", isAuthorized);
-      setMainContentFinal(result);
-    }
+    const processContentAsync = async () => {
+      if (isAuthorized !== null) {
+        const result = await processContent(content || "", isAuthorized);
+        setMainContentFinal(result);
+      }
+    };
+
+    processContentAsync();
   }, [isAuthorized, content]);
 
   if (isAuthorized === null) {

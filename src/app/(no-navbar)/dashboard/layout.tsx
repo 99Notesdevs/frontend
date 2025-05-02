@@ -35,6 +35,12 @@ const navigationItems = {
       ]
     },
     {
+      category: "Admin Permissions",
+      items: [
+        { icon: FaEdit, text: "Admin Permissions", path: "/dashboard/adminpermissions" }
+      ]
+    },
+    {
       category: "Content Management",
       items: [
         { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
