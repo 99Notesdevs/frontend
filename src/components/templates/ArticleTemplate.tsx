@@ -16,7 +16,7 @@ import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
 
 const processContent = (content: string, isAuthorized: boolean) => {
-  return content.replace(/<lock>\s*([^]?)\s<\/lock>/g, (lockedContent) => {
+  return content.replace(/<lock>\s*([^]*?)\s*<\/lock>/g, (lockedContent) => {
     return isAuthorized
       ? lockedContent
       : `<div class="locked-content">

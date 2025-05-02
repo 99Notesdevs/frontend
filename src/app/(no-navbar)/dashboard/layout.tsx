@@ -29,6 +29,12 @@ const navigationItems = {
       ]
     },
     {
+      category: "User Management",
+      items: [
+        { icon: FaEdit, text: "Manage Users", path: "/dashboard/manageusers" }
+      ]
+    },
+    {
       category: "Content Management",
       items: [
         { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
