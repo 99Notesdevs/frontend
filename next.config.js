@@ -2,7 +2,9 @@
 const nextConfig = {
   async redirects() {
     // Only apply the redirect in production environment
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === "development") {
+      return []; // No redirects in development
+    } else {
       return [
         {
           source: "/",
@@ -11,7 +13,6 @@ const nextConfig = {
         },
       ];
     }
-    return []; // No redirects in production
   },
   reactStrictMode: true,
   images: {
