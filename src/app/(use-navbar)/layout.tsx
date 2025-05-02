@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar/navbar";
 import Footer from "@/components/Footer/Footer";
 import { getNavigationTree, getFooterLinks } from "@/lib/navigation";
 import { Suspense } from "react";
+import GlobalScriptsLoader from "@/components/GlobalScriptsLoader";
 
 const inter = Inter({
   subsets: ["latin"]
@@ -27,6 +28,7 @@ export default async function RootLayout({
   return (
     <html>
       <body className={inter.className}>
+        <GlobalScriptsLoader />
         <Suspense
           fallback={
             <div className="text-[var(--text-strong)]">Loading Navbar...</div>
