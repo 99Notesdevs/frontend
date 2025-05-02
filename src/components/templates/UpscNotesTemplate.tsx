@@ -12,15 +12,16 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const jsonLD = JSON.parse(metadata)?.schemaData || "";
   const parsedMetadata = JSON.parse(metadata);
   const headScripts =
-    parsedMetadata.header.split(",").map((script: string) => script.trim()) ||
+    parsedMetadata.header.split("||").map((script: string) => script.trim()) ||
     [];
   const bodyScripts =
-    parsedMetadata.body.split(",").map((script: string) => script.trim()) || [];
+    parsedMetadata.body.split("||").map((script: string) => script.trim()) || [];
 
   useEffect(() => {
     // Inject head scripts
     if (headScripts) {
       headScripts.forEach((script: string) => {
+        console.log(script);
         try {
           if (script.startsWith("<script")) {
             // Parse the full <script> tag and extract attributes
@@ -45,6 +46,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
     // Inject body scripts
     if (bodyScripts) {
       bodyScripts.forEach((script: string) => {
+        console.log(script)
         try {
           if (script.startsWith("<script")) {
             // Parse the full <script> tag and extract attributes

@@ -38,10 +38,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const jsonLD = parsedMetadata.schemaData;
   const headScripts =
     parsedMetadata?.header
-      ?.split(",")
+      ?.split("||")
       ?.map((script: string) => script.trim()) || [];
   const bodyScripts =
-    parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) ||
+    parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
 
   useEffect(() => {

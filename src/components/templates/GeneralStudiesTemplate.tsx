@@ -28,10 +28,10 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   const parsedMetadata = JSON.parse(metadata);
   const headScripts =
     parsedMetadata?.header
-      ?.split(",")
+      ?.split("||")
       ?.map((script: string) => script.trim()) || [];
   const bodyScripts =
-    parsedMetadata?.body?.split(",")?.map((script: string) => script.trim()) ||
+    parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
 
   useEffect(() => {
