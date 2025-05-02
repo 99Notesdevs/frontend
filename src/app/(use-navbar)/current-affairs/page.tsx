@@ -47,7 +47,6 @@ const CurrentAffairsIndex = async () => {
             content="Current Affairs for UPSC Civil Services Examination"
             />
         </Head>
-      <body>
       <div className="min-h-screen bg-[var(--bg-elevated)]">
         
 
@@ -185,13 +184,11 @@ const CurrentAffairsIndex = async () => {
         </div>
      
       </div>
-      </body>
       </>
     );
   } catch (error) {
     console.error('Error fetching current affairs:', error);
-    return (
-      <body>
+    return (  
       <div className="min-h-screen bg-[var(--bg-main)]">
         <div className="container mx-auto px-4 py-12 max-w-5xl">
           <div className="text-center py-12">
@@ -200,7 +197,6 @@ const CurrentAffairsIndex = async () => {
           </div>
         </div>
       </div>
-      </body>
     );
   }
 };

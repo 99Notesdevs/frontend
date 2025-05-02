@@ -21,8 +21,7 @@ export default function PaymentSuccessPage() {
     };
   }, [router]);
 
-  return (
-    <body>
+  return (  
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)]">
       <div className="text-center space-y-6">
         <div className="bg-green-100 p-8 rounded-lg shadow-lg">
@@ -52,6 +51,5 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
-    </body>
   );
 }

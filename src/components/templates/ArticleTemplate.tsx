@@ -125,11 +125,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
   if (isAuthorized === null) {
     return (
-      <body>
-        <div className="flex items-center justify-center min-h-screen">
-          <p>Loading...</p>
-        </div>
-      </body>
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading...</p>
+      </div>
     );
   }
 
@@ -143,7 +141,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const displayImage = page.imageUrl || (coverImage as string);
 
   return (
-    <body>
       <>
         <section>
           <script
@@ -325,7 +322,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
           </div>
         </main>
       </>
-    </body>
   );
 };
 

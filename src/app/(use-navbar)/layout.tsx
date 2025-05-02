@@ -26,25 +26,23 @@ export default async function RootLayout({
 
   return (
     <html>
-      <Suspense
-        fallback={
-          <body>
+      <body className={inter.className}>
+        <Suspense
+          fallback={
             <div className="text-[var(--text-strong)]">Loading Navbar...</div>
-          </body>
-        }
-      >
-        <Navbar navigation={navigation} />
-      </Suspense>
-      {children}
-      <Suspense
-        fallback={
-          <body>
+          }
+        >
+          <Navbar navigation={navigation} />
+        </Suspense>
+        {children}
+        <Suspense
+          fallback={
             <div className="text-[var(--text-strong)]">Loading Footer...</div>
-          </body>
-        }
-      >
-        <Footer footerSections={footerSections} />
-      </Suspense>
+          }
+        >
+          <Footer footerSections={footerSections} />
+        </Suspense>
+      </body>
     </html>
   );
 }

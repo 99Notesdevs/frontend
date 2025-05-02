@@ -6,7 +6,6 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <body>
     <ProtectedRoute>
       <div className="flex flex-col md:flex-row bg-gradient-to-br from-[var(--bg-main)] to-yellow-50 min-h-screen">
         {/* Mobile menu button */}
@@ -155,7 +154,6 @@ const Dashboard = () => {
         )}
       </div>
     </ProtectedRoute>
-    </body>
   );
 };
 

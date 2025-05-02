@@ -206,7 +206,6 @@ export default function Navbar({ navigation }: NavbarProps) {
   };
 
   return (
-    <body>
     <>
       {/* Spacer div to prevent content overlap */}
       <div
@@ -473,6 +472,5 @@ export default function Navbar({ navigation }: NavbarProps) {
         </div>
       </nav>
     </>
-    </body>
   );
 }

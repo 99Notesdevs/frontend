@@ -77,7 +77,6 @@ const Profile = () => {
   };
 
   return (
-    <body>
     <div className="flex h-screen bg-[var(--bg-main)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
@@ -273,7 +272,6 @@ const Profile = () => {
         </div>
       </div>
     </div>
-    </body>
   );
 };
 
