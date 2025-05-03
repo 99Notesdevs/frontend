@@ -200,10 +200,10 @@ const navigationSections: NavSection[] = [
 
   return (
     <>
-    <div className="min-h-screen bg-white">
-      <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-4 md:pt-24 flex flex-col md:flex-row gap-4">
-        {/* On mobile*/}
-        <div className="flex flex-col md:hidden mt-4">
+    <div className="min-h-screen bg-white pt-8">
+      <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-4 flex flex-col md:flex-row gap-6">
+        {/* On mobile */}
+        <div className="flex flex-col md:hidden">
           <main className="flex-1">
             <article className="bg-[var(--bg-main)] border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
               {memoizedChildren}
@@ -211,9 +211,9 @@ const navigationSections: NavSection[] = [
           </main>
         </div>
 
-        {/* Sidebar */}
-        <aside className="w-full md:w-[340px] lg:w-[400px] flex-shrink-0 mt-4 md:mt-0">
-          <nav className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl md:sticky md:top-32">
+        {/* Sidebar - now at the same level as main content */}
+        <aside className="w-full md:w-[340px] lg:w-[400px] flex-shrink-0">
+          <nav className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl md:sticky md:top-24">
            {/* Navigation section */}
             {loading ? (
               <div className="flex justify-center py-8">
