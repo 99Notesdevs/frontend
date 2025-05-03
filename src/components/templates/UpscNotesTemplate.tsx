@@ -12,10 +12,10 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const jsonLD = JSON.parse(metadata)?.schemaData || "";
   const parsedMetadata = JSON.parse(metadata);
   const headScripts =
-    parsedMetadata.header.split("||").map((script: string) => script.trim()) ||
+    parsedMetadata?.header?.split("||")?.map((script: string) => script.trim()) ||
     [];
   const bodyScripts =
-    parsedMetadata.body.split("||").map((script: string) => script.trim()) || [];
+    parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) || [];
 
   useEffect(() => {
     // Inject head scripts

@@ -249,22 +249,6 @@ const CurrentAffairsSectionPage = async ({
               </p>
               <div className="w-full h-[3px] bg-[var(--nav-primary)] rounded-full mt-2"></div>
             </div>
-            {/* <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight">
-              {/* {currentAffair?.title || sectionInfo.title} */}
-            {/* </h1>
-            {/* <div dangerouslySetInnerHTML={{ __html: currentAffair?.content || '' }}></div> */}
-            {/* <p className="text-lg text-gray-600 mb-6" } /> */}
-
-            {/* <div className="flex flex-wrap gap-2">
-              {sectionInfo.topics.map((topic) => (
-                <span
-                  key={topic}
-                  className="bg-white shadow-sm border border-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium"
-                >
-                  {topic}
-                </span>
-              ))}
-            </div> */}
             <div className="mt-2 mb-4">
               <p className="text-sm text-[var(--text-tertiary)]">
                 {currentAffair?.metadata ? 

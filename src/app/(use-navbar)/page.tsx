@@ -62,26 +62,25 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section with Contact Form */}
-      <section className="container mx-auto px-6 lg:px-18">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center md:mt-7">
-
-          {/* Left Column - Text Content */}
-          <div className="space-y-7 max-w-lg lg:pl-10 2xl:ml-20">
-            <div className="space-y-4 mt-4 lg:mt-0">
-              <h1 className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans">
-                <span className="block" dangerouslySetInnerHTML={{ __html: homeData.Hero.title }}></span>
-              </h1>
+      <section className="container w-full max-w-[2000px] px-6 lg:px-18">
+          <div className="md:flex justify-evenly items-center gap-20">
+            {/* Left Column - Text Content */}
+            <div className="space-y-7 max-w-lg md:max-w-[320px] lg:max-w-lg">
+              <div className="space-y-4">
+                <h1 className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans">
+                  <span className="block" dangerouslySetInnerHTML={{ __html: homeData.Hero.title }}></span>
+                </h1>
+              </div>
+              <p className="text-base font-semibold text-[var(--text-strong)] leading-relaxed font-opensans">
+                {homeData.Hero.description}
+              </p>
             </div>
-            <p className="text-base font-semibold text-[var(--text-strong)] leading-relaxed font-opensans">
-              {homeData.Hero.description}
-            </p>
-          </div>
 
-          {/* Right Column - Contact Form */}
-          <div className="mt-4 md:mt-20 mb-5 w-full max-w-lg lg:ml-7">
-            <ContactForm />
+            {/* Right Column - Contact Form */}
+            <div className="mt-12 mb-5 w-full max-w-lg md:max-w-[320px] lg:max-w-lg lg:ml-7">
+              <ContactForm />
+            </div>
           </div>
-        </div>
       </section>
 
       {/* Other Sections */}

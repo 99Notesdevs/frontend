@@ -213,11 +213,7 @@ export default function Navbar({ navigation }: NavbarProps) {
   return (
     <>
       {/* Spacer div to prevent content overlap */}
-      {/* <div
-        className={`w-full transition-all duration-300 ${
-          isScrolled ? "h-[60px]" : "h-[72px]"
-        }`}
-      /> */}
+      <div className="h-[70px] w-full" /> 
 
       <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'border-b-0' : ''}`}>
         {/* Top Bar - Hidden when scrolled */}
@@ -256,14 +252,14 @@ export default function Navbar({ navigation }: NavbarProps) {
 
         {/* Main Navbar */}
         <div
-              className={` w-full transition-all duration-300 -mt-[1px]  ${
+              className={` w-full max-w-[2000px] transition-all duration-300 -mt-[1px]  ${
             isScrolled
-              ? "bg-white h-[72px]  shadow-md"
-              : "bg-white h-[72px]"
+              ? "bg-white h-[70px]  shadow-md "
+              : "bg-white h-[70px]"
           }`}
         >
-          <div className="container mx-auto px-4 lg:px-6">
-            <div className="flex justify-between items-center h-[72px] 2xl:pl-12">
+          <div className="container w-full max-w-[2000px] px-2 lg:px-10">
+            <div className="flex justify-between items-center h-[72px]">
               {/* Logo */}
               <div className="flex-shrink-0 min-w-[35px] mx-2">
                 <Link href="/" passHref>
@@ -278,7 +274,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                 </Link>
               </div>
               <div className="hidden lg:flex flex-1 justify-end items-center gap-1 2xl:pr-8 ">
-                <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div>
+                {/* <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div> */}
                 <NestedNavigation items={navigation} />
                 <Link href="/about" passHref>
                   <span
