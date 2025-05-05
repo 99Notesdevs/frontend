@@ -85,7 +85,7 @@ const About = async () => {
         {/* Hero Section with asymmetric design */}
         <div className="absolute top-0 right-0 w-1/2 sm:w-1/3 h-40 sm:h-96 bg-amber-50/40 rounded-bl-[60px] sm:rounded-bl-[120px] transform rotate-6 z-0 max-w-full hidden xs:block"></div>
         <div className="absolute bottom-0 left-0 w-1/2 sm:w-1/4 h-32 sm:h-80 bg-amber-50/40 rounded-tr-[50px] sm:rounded-tr-[100px] transform -rotate-6 z-0 max-w-full hidden xs:block"></div>
-        <section className="w-full max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-12 md:py-20 relative mt-2 md:mt-10">
+        <section className="w-full max-w-7xl mx-auto px-2 lg:px-4 py-6 md:py-12 relative mt-2">
           <div className="absolute -top-6 left-1/4 w-10 h-10 bg-amber-100/50 rounded-full animate-pulse hidden md:block"></div>
           <div className="absolute bottom-6 right-10 w-16 h-16 bg-amber-50/50 rounded-full animate-pulse delay-300 hidden md:block"></div>
           <div className="absolute top-20 right-20 w-8 h-8 bg-amber-100/40 rounded-full animate-pulse delay-700 hidden md:block"></div>

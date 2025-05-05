@@ -15,7 +15,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
-
+import { LiveChat } from "@/components/livechat/livechat";
 
 const processContent = async (content: string, isAuthorized: boolean) => {
   const isContentLocked = await isLocked();
@@ -30,11 +30,13 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 };
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
+  console.log("page",page);
   const { title, content, metadata } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
-  const [isAuthorized, setIsAuthorized] = useState<null | boolean>(null);
+  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [mainContentFinal, setMainContentFinal] = useState(content || "");
   const token = Cookies.get("token");
   // @ts-ignore
@@ -46,6 +48,18 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const bodyScripts =
     parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
+
+  useEffect(() => {
+    const handleToggleChat = (event: CustomEvent) => {
+      setIsLiveChatOpen(event.detail.isOpen);
+    };
+
+    window.addEventListener('toggleChat', handleToggleChat as EventListener);
+    
+    return () => {
+      window.removeEventListener('toggleChat', handleToggleChat as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     // Inject head scripts
@@ -147,6 +161,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // @ts-ignore
   const displayImage = page.imageUrl || (coverImage as string);
 
+  const formattedDate = page.createdAt ? new Date(page.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }) : 'N/A';
+
   return (
       <>
         <section>
@@ -161,7 +181,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             <AssistiveTouch content={mainContentFinal} />
 
             <div
-              className="w-full max-w-[1400px] mx-auto px-4 lg:px-10 py-4 sm:py-12 
+              className="w-full max-w-[1400px] mx-auto px-2 lg:px-10  py-6 
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4">
@@ -203,10 +223,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      {" "}
-                      {page.createdAt
-                        ? new Date(page.createdAt).toLocaleDateString()
-                        : "N/A"}
+                      Created: {formattedDate}
                     </div>
 
                     <WhatsApp />
@@ -251,83 +268,113 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       {mainContentFinal}
                     </div>
                   </div>
+                  <button 
+                    onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
+                    className="px-4 py-2 bg-[var(--info-surface)] text-[var(--text-strong)] rounded-lg hover:bg-[var(--info-surface-hover)] transition-colors"
+                  >
+                    {isLiveChatOpen ? "Close Chat" : "Open Chat"}
+                  </button>
                   <Comments parentId={parentId} />
                 </main>
 
                 {/* Right Sidebar */}
                 <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
-                  {/* Search Bar */}
-                  <div
-                    className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                    transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
-                  >
-                    <SearchBar />
-                  </div>
-
-                  {/* Sticky Container */}
-                  <div className="relative">
-                    {/* TOC Section */}
-                    <div className="sticky top-8 space-y-4 sm:space-y-6">
-                      <div
-                        className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                      transition-all duration-300 hover:shadow-xl"
-                      >
-                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                          Table of Contents
-                        </h3>
-                        <div className="pr-2">
-                          <TableOfContents content={mainContentFinal} />
-                        </div>
-                      </div>
-
-                      {/* Social Media Section */}
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
-                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
-                          <span className="text-[var(--action-primary)]">
-                            🌐
-                          </span>
-                          <span>Connect With Us</span>
-                        </h3>
-                        <div className="py-2 h-9">
-                          <SocialMedia />
-                        </div>
-                      </div>
-
-                      {/* Contact Form Section */}
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
-                        <ContactForm />
-                      </div>
-
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
-                        <Ads imageUrl="/" altText="ads" />
-                      </div>
-
-                      {/* Tags Section */}
-                      {tags && tags.length > 0 && (
-                        <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
-                          <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                            🏷 Tags
-                          </h3>
-                          <div className="flex flex-wrap gap-2">
-                            {tags.map((tag: string) => (
-                              <Badge
-                                key={tag}
-                                variant="secondary"
-                                className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                  {/* Sidebar content - No longer conditionally hidden */}
+                  <div>
+                    {/* Search Bar */}
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                        transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
+                      <SearchBar />
                     </div>
+
+                    {/* TOC Section */}
+                    <div className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                        transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
+                        Table of Contents
+                      </h3>
+                      <div className="pr-2">
+                        <TableOfContents content={mainContentFinal} />
+                      </div>
+                    </div>
+
+                    {/* Social Media Section */}
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
+                        <span className="text-[var(--action-primary)]">🌐</span>
+                        <span>Connect With Us</span>
+                      </h3>
+                      <div className="py-2 h-9">
+                        <SocialMedia />
+                      </div>
+                    </div>
+
+                    {/* Contact Form Section */}
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                      <ContactForm />
+                    </div>
+
+                    {/* Ads Section */}
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                      <Ads imageUrl="/" altText="ads" />
+                    </div>
+
+                    {/* Tags Section */}
+                    {tags && tags.length > 0 && (
+                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
+                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
+                          🏷 Tags
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {tags.map((tag: string) => (
+                            <Badge
+                              key={tag}
+                              variant="secondary"
+                              className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </aside>
+
+                {/* LiveChat Component */}
+                <div className={`${isLiveChatOpen ? 'block' : 'hidden'} fixed inset-0 z-[99999] lg:z-[99999]`}>
+                  <div className="absolute inset-0 bg-black/20" onClick={() => setIsLiveChatOpen(false)}></div>
+                  <div className="absolute right-4 bottom-[15vh] h-[70vh] md:h-[60vh] w-[90%] sm:w-[400px] z-max">
+                    <LiveChat id={page.id} />
+                  </div>
+                </div>
+
+                {/* LiveChat Toggle Button */}
+                <button 
+                  onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
+                  className="fixed bottom-6 right-6 z-max bg-blue-500 text-white rounded-full p-4 shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center gap-2"
+                >
+                  {isLiveChatOpen ? (
+                    <>
+                      <span>Close Chat</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </>
+                  ) : (
+                    <>
+                      <span>Chat with us</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03 8.25-9 8.25s9 3.694 9 8.25z" />
+                      </svg>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
         </main>
+        
       </>
   );
 };
