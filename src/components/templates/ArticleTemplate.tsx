@@ -161,10 +161,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             <AssistiveTouch content={mainContentFinal} />
 
             <div
-              className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 
+              className="w-full max-w-[1400px] mx-auto px-4 lg:px-10 py-4 sm:py-12 
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4 sm:mt-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4">
                 {/* Main Content Column */}
                 <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-8">
                   {/* Featured Image */}
@@ -203,7 +203,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      Created:{" "}
+                      {" "}
                       {page.createdAt
                         ? new Date(page.createdAt).toLocaleDateString()
                         : "N/A"}

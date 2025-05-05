@@ -94,7 +94,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
         </section>
         <main>
           <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
-            <div className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12 lg:mt-10">
+            <div className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                 {/* Left Column - Main Image and Content */}
                 <div className="lg:col-span-8 space-y-4 sm:space-y-8">

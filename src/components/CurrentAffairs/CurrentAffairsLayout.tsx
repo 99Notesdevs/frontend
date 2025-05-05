@@ -201,7 +201,7 @@ const navigationSections: NavSection[] = [
   return (
     <>
     <div className="min-h-screen bg-white pt-8">
-      <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-4 flex flex-col md:flex-row gap-6">
+      <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-6">
         {/* On mobile */}
         <div className="flex flex-col md:hidden">
           <main className="flex-1">

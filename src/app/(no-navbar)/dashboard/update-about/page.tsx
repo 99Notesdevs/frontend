@@ -217,7 +217,7 @@ export default function UpdateAboutPage() {
           <p className="text-sm">{toast.message}</p>
         </div>
       )}
-      <header className="bg-[var(--admin-bg-dark)] text-white shadow-md">
+      <header className="bg-[var(--admin-bg-secondary)] text-white shadow-md">
         <div className="container mx-auto px-6 py-4">
           <h1 className="text-2xl font-semibold">Dashboard - Update About Page</h1>
           <p className="text-[var(--admin-scroll-thumb)] text-sm mt-1">Make changes to the About page content</p>
