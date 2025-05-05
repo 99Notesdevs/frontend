@@ -133,7 +133,7 @@ export default async function Page({ params }: { params: Params }) {
                     </h1>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      By 99Notes . {new Date(page.createdAt).toLocaleDateString()}
+                      By 99Notes
                     </div>
 
                     <div

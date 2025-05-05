@@ -5,7 +5,7 @@ import Image from 'next/image';
 interface Blog {
   id: string;
   title: string;
-  createdAt: Date;
+  // createdAt: Date;
   slug: string;
   content: string;
   metadata: string;
@@ -34,7 +34,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
             {blog.title}
           </h3>
           <span className="text-xs text-[var(--text-secondary)] mb-2 block">
-            {new Date(blog.createdAt).toLocaleDateString()}
+            By 99Notes
           </span>
           <p className="text-[var(--text-strong)] text-sm line-clamp-4">
             {blog.content

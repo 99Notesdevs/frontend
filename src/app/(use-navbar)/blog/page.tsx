@@ -164,7 +164,6 @@ const BlogsPage: React.FC = () => {
                   blog={{
                     id: blog.id,
                     title: blog.title,
-                    createdAt: new Date(blog.createdAt),
                     slug: blog.slug,
                     content: blog.content,
                     metadata: blog.metadata, 
