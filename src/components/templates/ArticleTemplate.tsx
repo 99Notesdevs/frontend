@@ -15,7 +15,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
-
+import { LiveChat } from "@/components/livechat/livechat";
 
 const processContent = async (content: string, isAuthorized: boolean) => {
   const isContentLocked = await isLocked();
@@ -30,11 +30,13 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 };
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
+  console.log("page",page);
   const { title, content, metadata } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
-  const [isAuthorized, setIsAuthorized] = useState<null | boolean>(null);
+  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [mainContentFinal, setMainContentFinal] = useState(content || "");
   const token = Cookies.get("token");
   // @ts-ignore
@@ -147,6 +149,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // @ts-ignore
   const displayImage = page.imageUrl || (coverImage as string);
 
+  const formattedDate = page.createdAt ? new Date(page.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }) : 'N/A';
+
   return (
       <>
         <section>
@@ -203,10 +211,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      Created:{" "}
-                      {page.createdAt
-                        ? new Date(page.createdAt).toLocaleDateString()
-                        : "N/A"}
+                      Created: {formattedDate}
                     </div>
 
                     <WhatsApp />
@@ -251,83 +256,98 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       {mainContentFinal}
                     </div>
                   </div>
+                  <button 
+                    onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
+                    className="px-4 py-2 bg-[var(--info-surface)] text-[var(--text-strong)] rounded-lg hover:bg-[var(--info-surface-hover)] transition-colors"
+                  >
+                    {isLiveChatOpen ? "Close Chat" : "Open Chat"}
+                  </button>
                   <Comments parentId={parentId} />
                 </main>
 
                 {/* Right Sidebar */}
-                <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
-                  {/* Search Bar */}
-                  <div
-                    className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                    transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
-                  >
-                    <SearchBar />
-                  </div>
+                {isLiveChatOpen ? (
+                  <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
+                    <div className="fixed inset-0 lg:inset-auto lg:right-0 lg:top-0 w-full lg:w-[25rem] h-screen bg-white border-l border-[var(--info-surface)]">
+                      <LiveChat id={page.id} />
+                    </div>
+                  </aside>
+                ) : (
+                  <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
+                    {/* Search Bar */}
+                    <div
+                      className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                      transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
+                    >
+                      <SearchBar />
+                    </div>
 
-                  {/* Sticky Container */}
-                  <div className="relative">
-                    {/* TOC Section */}
-                    <div className="sticky top-8 space-y-4 sm:space-y-6">
-                      <div
-                        className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                      transition-all duration-300 hover:shadow-xl"
-                      >
-                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                          Table of Contents
-                        </h3>
-                        <div className="pr-2">
-                          <TableOfContents content={mainContentFinal} />
-                        </div>
-                      </div>
-
-                      {/* Social Media Section */}
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
-                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
-                          <span className="text-[var(--action-primary)]">
-                            🌐
-                          </span>
-                          <span>Connect With Us</span>
-                        </h3>
-                        <div className="py-2 h-9">
-                          <SocialMedia />
-                        </div>
-                      </div>
-
-                      {/* Contact Form Section */}
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
-                        <ContactForm />
-                      </div>
-
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
-                        <Ads imageUrl="/" altText="ads" />
-                      </div>
-
-                      {/* Tags Section */}
-                      {tags && tags.length > 0 && (
-                        <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                    {/* Sticky Container */}
+                    <div className="relative">
+                      {/* TOC Section */}
+                      <div className="sticky top-8 space-y-4 sm:space-y-6">
+                        <div
+                          className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                          transition-all duration-300 hover:shadow-xl"
+                        >
                           <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                            🏷 Tags
+                            Table of Contents
                           </h3>
-                          <div className="flex flex-wrap gap-2">
-                            {tags.map((tag: string) => (
-                              <Badge
-                                key={tag}
-                                variant="secondary"
-                                className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
+                          <div className="pr-2">
+                            <TableOfContents content={mainContentFinal} />
                           </div>
                         </div>
-                      )}
+
+                        {/* Social Media Section */}
+                        <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                          <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
+                            <span className="text-[var(--action-primary)]">
+                              🌐
+                            </span>
+                            <span>Connect With Us</span>
+                          </h3>
+                          <div className="py-2 h-9">
+                            <SocialMedia />
+                          </div>
+                        </div>
+
+                        {/* Contact Form Section */}
+                        <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
+                          <ContactForm />
+                        </div>
+
+                        <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg">
+                          <Ads imageUrl="/" altText="ads" />
+                        </div>
+
+                        {/* Tags Section */}
+                        {tags && tags.length > 0 && (
+                          <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                            <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
+                              🏷 Tags
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {tags.map((tag: string) => (
+                                <Badge
+                                  key={tag}
+                                  variant="secondary"
+                                  className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </aside>
+                  </aside>
+                )}
               </div>
             </div>
           </div>
         </main>
+        
       </>
   );
 };
