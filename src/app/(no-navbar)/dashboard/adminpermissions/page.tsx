@@ -111,13 +111,13 @@ export default function AdminPermissions() {
     };
 
     return (
-        <div className="p-4 space-y-8">
-            <h1 className="text-2xl font-bold">Admin Permissions</h1>
+        <div className="p-6 space-y-10 sm:mt-5 lg:mt-2">
+            <h1 className="text-3xl font-bold mb-4 text-center">Admin Permissions</h1>
 
             {/* Content Lock Section */}
             <div className="space-y-4">
                 <div>
-                    <p className="text-lg mb-2">Global Content Restrictions:</p>
+                    <p className="text-lg mb-4">Global Content Restrictions:</p>
                     <p className={isContentLocked ? "text-red-500" : "text-green-500"}>
                         {isContentLocked ? "Content is locked" : "Content is not locked"}
                     </p>
@@ -125,13 +125,13 @@ export default function AdminPermissions() {
                 <button
                     onClick={toggleGlobalRestrictions}
                     disabled={isLoading}
-                    className={`px-4 py-2 rounded ${
+                    className={`px-6 py-3 rounded-lg ${
                         isLoading
-                            ? 'bg-gray-300 cursor-not-allowed'
+                            ? 'bg-slate-300 cursor-not-allowed'
                             : isContentLocked
-                            ? 'bg-red-500 hover:bg-red-600'
-                            : 'bg-green-500 hover:bg-green-600'
-                    } text-white`}
+                            ? 'bg-slate-900 hover:bg-slate-800'
+                            : 'bg-slate-700 hover:bg-slate-600'
+                    } text-white font-medium`}
                 >
                     {isLoading ? 'Loading...' : isContentLocked ? 'Unlock Content' : 'Lock Content'}
                 </button>
@@ -145,14 +145,14 @@ export default function AdminPermissions() {
                     onChange={(e) => setHeaderScript(e.target.value)}
                     placeholder="Enter header scripts (one per line)"
                     rows={5}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-4 border rounded-lg border-slate-300 bg-white"
                 />
                 <button
                     onClick={updateHeaderScripts}
                     disabled={isLoading}
-                    className={`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ${
+                    className={`px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 ${
                         isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    } font-medium`}
                 >
                     {isLoading ? 'Saving...' : 'Save Header Scripts'}
                 </button>
@@ -166,14 +166,14 @@ export default function AdminPermissions() {
                     onChange={(e) => setFooterScript(e.target.value)}
                     placeholder="Enter footer scripts (one per line)"
                     rows={5}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-4 border rounded-lg border-slate-300 bg-white"
                 />
                 <button
                     onClick={updateFooterScripts}
                     disabled={isLoading}
-                    className={`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ${
+                    className={`px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 ${
                         isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    } font-medium`}
                 >
                     {isLoading ? 'Saving...' : 'Save Footer Scripts'}
                 </button>

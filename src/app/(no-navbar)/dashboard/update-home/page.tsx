@@ -292,16 +292,22 @@ export default function UpdateHomePage() {
   if (!content) return <div>Loading...</div>
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-8">Update Home Content</h1>
+    <div className="max-w-7xl">
+      <header className="bg-[var(--admin-bg-secondary)] text-white shadow-md">
+        <div className="container mx-auto px-6 py-4">
+              <h1 className="text-2xl font-semibold">Dashboard - Update Home Page</h1>
+              <p className="text-[var(--admin-scroll-thumb)] text-sm mt-1">Make changes to the Home page content</p>
+        </div>
+      </header>
 
+      <div className="container mx-auto p-6">
       {Object.entries(content || {}).map(([section, sectionContent]) => (
         <div key={section} className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">{section}</h2>
+          <div className="flex justify-between items-center mb-6 mt-5">
+            <h2 className="text-2xl font-bold text-slate-900">{section}</h2>
             <button
               onClick={() => handleEditClick(section as keyof HomeProps)}
-              className="text-[var(--admin-scroll-thumb)] hover:text-[var(--admin-bg-dark)]"
+              className="text-slate-500 hover:text-slate-700 transition-colors duration-200"
             >
               <FaPencilAlt className="inline mr-1" />
               {editingSection === section ? "Cancel" : "Edit"}
@@ -360,6 +366,9 @@ export default function UpdateHomePage() {
                             onClick={() => handleRemoveCoachingInfo(i)}
                             className="text-red-600 hover:text-red-800"
                           >
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
                             Remove
                           </button>
                         </div>
@@ -517,6 +526,7 @@ export default function UpdateHomePage() {
           {toast.message}
         </div>
       )}
+    </div>
     </div>
   )
 }

@@ -81,7 +81,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
           {/* Increase max width of the container */}
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 lg:py-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-7 lg:mt-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-7 ">
               {/* Adjust sidebar width */}
               <aside className="lg:col-span-4 order-2 lg:order-1">
                 {/* Rest of sidebar content remains same */}

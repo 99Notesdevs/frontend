@@ -105,9 +105,9 @@ export default async function Page({ params }: { params: Params }) {
           {/* Assistive Touch */}
           <AssistiveTouch content={content || ''} />
           <div
-            className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-3 lg:px-8 py-4 sm:py-12"
+            className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-2 lg:px-8 py-2"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-4 sm:mt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-10">
               {/* Main Content Column */}
               <main className="lg:col-start-1 lg:col-span-9 space-y-0 sm:space-y-0">
                 <div className="bg-white border shadow-lg rounded-xl">
@@ -133,7 +133,7 @@ export default async function Page({ params }: { params: Params }) {
                     </h1>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      By 99Notes . Created: {new Date(page.createdAt).toLocaleDateString()}
+                      By 99Notes . {new Date(page.createdAt).toLocaleDateString()}
                     </div>
 
                     <div
