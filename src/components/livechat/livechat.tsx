@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+"use client";
+import { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
 import { io, Socket } from 'socket.io-client';
 import { env } from '@/config/env';
@@ -8,6 +9,12 @@ interface ChatMessage {
   content: string;
   type: 'TEXT';
   createdAt: string;
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }
 }
 
 interface LiveChatProps {
@@ -16,6 +23,7 @@ interface LiveChatProps {
 
 export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null); 
   const [message, setMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const [chatRoomId, setChatRoomId] = useState<string | null>(null);
@@ -23,7 +31,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    console.log('Fetching user and chat room data...');
+    // console.log('Fetching user and chat room data...');
     const fetchUserData = async () => {
       try {
         const res = await fetch(`${env.API}/user`, {
@@ -34,7 +42,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
           }
         });
         const data = await res.json();
-        console.log('User data received:', data);
+        // console.log('User data received:', data);
         if (data?.data?.id) {
           setUserId(data.data.id);
         }
@@ -53,7 +61,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
           }
         });
         const data = await res.json();
-        console.log('Chat room data received:', data);
+        // console.log('Chat room data received:', data);
         if (data?.data?.id) {
           setChatRoomId(data.data.id);
         }
@@ -77,13 +85,14 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
           }
         });
         const data = await res.json();
-        console.log('Chat history received:', data);
+        // console.log('Chat history received:', data);
         if (data?.success && data?.data) {
           // Sort messages from oldest to newest
           const sortedMessages = [...data.data].sort((a, b) => {
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           });
           setMessages(sortedMessages);
+          console.log('Chat history sorted:', sortedMessages);
         }
       } catch (error) {
         console.error('Error fetching chat history:', error);
@@ -96,14 +105,14 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
   }, [chatRoomId]);
 
   useEffect(() => {
-    console.log('Current state:', { userId, chatRoomId });
+    // console.log('Current state:', { userId, chatRoomId });
     
     if (!userId || !chatRoomId) {
-      console.log('Missing required data:', { userId, chatRoomId });
+      // console.log('Missing required data:', { userId, chatRoomId });
       return;
     }
 
-    console.log('Initializing socket...');
+    // console.log('Initializing socket...');
     const newSocket = io(`${env.SOCKET}`, {
       path: '/socket.io'
     });
@@ -112,9 +121,9 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
     setIsConnected(false);
 
     newSocket.on('connect', () => {
-      console.log('Socket connected!');
+      // console.log('Socket connected!');
       setIsConnected(true);
-      console.log('Joining room:', { chatRoomId, userId });
+      // console.log('Joining room:', { chatRoomId, userId });
       newSocket.emit('join_room', JSON.stringify({
         chatRoomId,
         userId
@@ -127,7 +136,7 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
     });
 
     newSocket.on('disconnect', () => {
-      console.log('Socket disconnected');
+      // console.log('Socket disconnected');
       setIsConnected(false);
     });
 
@@ -144,13 +153,13 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
     });
 
     newSocket.on('user_typing', (data: { userId: string }) => {
-      console.log('User typing:', data);
+      // console.log('User typing:', data);
       // Handle typing indicator UI
     });
 
     return () => {
       if (newSocket) {
-        console.log('Leaving room and disconnecting socket...');
+        // console.log('Leaving room and disconnecting socket...');
         newSocket.emit('leave_room', JSON.stringify({ chatRoomId }));
         newSocket.disconnect();
       }
@@ -199,6 +208,14 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
     }));
   };
 
+  useEffect(() => {
+    // Scroll to the bottom whenever messages change
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className="fixed bottom-16 right-4 w-96 bg-white rounded-lg shadow-xl border border-gray-200">
       <div className="sticky top-0 bg-white border-b border-gray-200 pb-2 mb-4">
@@ -206,10 +223,13 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
         <p className="text-gray-600 px-4 text-sm">Chat with our support team</p>
       </div>
       <div className="flex flex-col h-[500px]">
-        <div className="flex-1 overflow-y-auto p-4 border-b border-gray-200">
+        <div
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto p-4 border-b border-gray-200"
+        >
           {messages.map((msg, index) => (
             <div key={index} className="mb-4">
-              <p className="text-sm text-gray-500 mb-1">{msg.userId}</p>
+              <p className="text-sm text-gray-500 mb-1">{`${msg.user.firstName} ${msg.user.lastName}`}</p>
               <p className="text-gray-800">{msg.content}</p>
             </div>
           ))}
@@ -226,18 +246,18 @@ export const LiveChat: React.FC<LiveChatProps> = ({ id }) => {
                 handleTyping();
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   sendMessage();
                 }
               }}
               disabled={!isConnected}
             />
-            <button 
+            <button
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={sendMessage}
               disabled={!message.trim() || !isConnected}
             >
-              {isConnected ? 'Send' : 'Connecting...'}
+              {isConnected ? "Send" : "Connecting..."}
             </button>
           </div>
         </div>
