@@ -20,11 +20,13 @@ import {
 } from "@/components/ui/form";
 import { Alert } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TagInput } from "@/components/ui/tags/tag-input";
 
 const articleSchema = z.object({
   title: z.string(),
   content: z.string(),
   imageUrl: z.string(),
+  tags: z.array(z.string()).optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -107,6 +109,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     defaultValues: initialData || {
       title: "",
       content: "",
+      tags: [],
       imageUrl: "",
       metaTitle: "",
       metaDescription: "",
@@ -167,6 +170,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       title: data.title,
       content: data.content,
       imageUrl: data.imageUrl || '',
+      tags: data.tags || [],
       metaTitle: data.metaTitle,
       metaDescription: data.metaDescription,
       metaKeywords: data.metaKeywords,
@@ -267,6 +271,26 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
               </FormItem>
             )}
           />
+
+        {/* Tags */}
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field: { onChange, value, ...field } }) => (
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <FormControl>
+                <TagInput
+                  value={value || []}
+                  onChange={onChange}
+                  placeholder="Add tags..."
+                  className="w-full"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Metadata */}
         <div className="grid  gap-6">

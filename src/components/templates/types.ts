@@ -5,6 +5,7 @@ export interface Page {
   image: string;
   metadata: string;
   slug: string;
+  tags: Array<{ name: string }>;
   parentSlug: string;
   createdAt: string;
   template: Template;

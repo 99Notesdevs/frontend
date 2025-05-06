@@ -15,6 +15,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
+import { Tags } from "@/components/ui/tags/Tags";
 
 
 const processContent = async (content: string, isAuthorized: boolean) => {
@@ -204,9 +205,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
                       {" "}
-                      {page.createdAt
+                      {/* {page.createdAt
                         ? new Date(page.createdAt).toLocaleDateString()
-                        : "N/A"}
+                        : "N/A"} */}
                     </div>
 
                     <WhatsApp />
@@ -250,7 +251,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     >
                       {mainContentFinal}
                     </div>
+                    <Tags tags={page.tags} />
                   </div>
+                 
                   <Comments parentId={parentId} />
                 </main>
 
