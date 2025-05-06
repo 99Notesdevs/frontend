@@ -12,6 +12,12 @@ interface Page {
   id: number;
   slug: string;
   title: string;
+  tags: Array<{
+    id: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
   templateId: string;
   showInNav: boolean;
   updatedAt: string;
@@ -154,6 +160,7 @@ function PageList() {
         showInNav: formData.showInNav || false,
         order: selectedPage.order || 0,
         updatedAt: new Date().toISOString(),
+        tags: formData.tags
       };
 
       // Prepare data for API submission with stringified content and metadata
@@ -195,6 +202,7 @@ function PageList() {
           content: parsedContent || "",
           showInNav: page.showInNav || false,
           imageUrl: parsedimage || undefined,
+          tags: page.tags.map(tag => tag.name) || [],
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
           metaKeywords: metadata.metaKeywords || "",
@@ -331,7 +339,6 @@ function PageList() {
         };
     }
   };
-
   const openDeleteModal = (pageId: number) => {
     setShowDeleteModal(true);
     setPageIdToDelete(pageId);

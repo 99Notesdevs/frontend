@@ -16,6 +16,8 @@ import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
 import { LiveChat } from "@/components/livechat/livechat";
+import { Tags } from "@/components/ui/tags/Tags";
+
 
 const processContent = async (content: string, isAuthorized: boolean) => {
   const isContentLocked = await isLocked();
@@ -223,7 +225,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      Created: {formattedDate}
+                      {" "}
+                      {/* {page.createdAt
+                        ? new Date(page.createdAt).toLocaleDateString()
+                        : "N/A"} */}
                     </div>
 
                     <WhatsApp />
@@ -267,6 +272,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     >
                       {mainContentFinal}
                     </div>
+                    <Tags tags={page.tags} />
                   </div>
                   <button 
                     onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
