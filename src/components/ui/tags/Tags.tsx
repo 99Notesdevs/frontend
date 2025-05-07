@@ -11,18 +11,33 @@ export function Tags({ tags }: TagsProps) {
   if (!tags || tags.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-4 mt-6">
-      {tags.map((tag) => (
-        <Link
-          key={tag.name}
-          href={`/tag/${encodeURIComponent(tag.name)}`}
-          className="group relative inline-flex items-center justify-center px-6 py-3 text-lg font-medium transition-all duration-200 ease-out hover:bg-[var(--accent-link)] hover:text-white"
-        >
-          <span className="absolute inset-0 bg-gradient-to-r from-[var(--accent-link)] to-[var(--accent-link-dark)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-          <span className="relative">#</span>
-          <span className="relative ml-1">{tag.name}</span>
-        </Link>
-      ))}
+    <div className="mt-8">
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-[var(--info-surface)]" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-white px-4 text-md font-semibold text-[var(--surface-dark)]">
+            🏷 Tags
+          </span>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-3">
+        {tags.map((tag) => (
+          <Link
+            key={tag.name}
+            href={`/tag/${encodeURIComponent(tag.name)}`}
+            className="group"
+          >
+            <Badge
+              variant="secondary"
+              className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer px-4 py-2 text-base"
+            >
+              {tag.name}
+            </Badge>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
