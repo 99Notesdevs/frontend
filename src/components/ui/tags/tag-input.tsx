@@ -39,17 +39,17 @@ export function TagInput({
 
   return (
     <div className={cn("relative flex flex-col gap-2", className)}>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 ">
         {(isArray(value) ? value : value.map(v => v.name)).map((tag, index) => (
           <div
             key={index}
-            className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm"
+            className="flex items-center gap-2 rounded-full bg-[var(--admin-border)] border rounded px-3 py-1.5 text-sm font-medium transition-all duration-200 hover:bg-primary/10"
           >
-            <span>{tag}</span>
+            <span className="text-primary">{tag}</span>
             <button
               type="button"
               onClick={() => handleDelete(index)}
-              className="text-muted-foreground hover:text-primary"
+              className="text-muted-foreground hover:text-primary transition-colors duration-200"
             >
               ×
             </button>
