@@ -4,6 +4,7 @@ import { env } from "@/config/env";
 import { BaseTemplateProps } from "@/components/templates/types";
 import { Metadata } from "next";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
+import { RelatedTopics } from "@/components/Blogs/relatedTopics";
 
 async function getPage(
   slug: string
@@ -14,7 +15,7 @@ async function getPage(
     const response = await fetch(`${env.API}/blog/slug/${normalizedSlug}`);
     const res = await response.json();
     const page = res.data;
-
+    
     if (!page) {
       return null;
     }
@@ -26,10 +27,12 @@ async function getPage(
   }
 }
 
-type Params = Promise<{ blogs: string }>;
+interface Params {
+  blogs: string;
+}
 
 export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
-  const slug = (await params).blogs;
+  const { blogs: slug } = await params;  // Await params first
   const page = await getPage(slug);
   
   if (!page || !page.metadata) {
@@ -79,8 +82,8 @@ export async function generateMetadata({params}: {params: Params}): Promise<Meta
 }
 
 export default async function Page({ params }: { params: Params }) {
-  const slug = (await params).blogs;
-  const normalizedSlug = slug.replace(/\s+/g, '-'); // Normalize slug by replacing spaces with hyphens
+  const { blogs: slug } = await params;  // Await params first
+  const normalizedSlug = slug.replace(/\s+/g, '-');
   const page = await getPage(normalizedSlug);
 
   if (!page) {
@@ -116,8 +119,8 @@ export default async function Page({ params }: { params: Params }) {
                     <div className="w-full">
                       <div className="relative w-full h-[400px] rounded-t-xl overflow-hidden">
                         <Image
-                          src={`${displayImage}`}
-                          alt={title}
+                          src={displayImage}
+                          alt={title || 'Blog Post'}
                           fill
                           className="object-cover"
                           priority
@@ -206,10 +209,7 @@ export default async function Page({ params }: { params: Params }) {
 
               {/* Sidebar */}
               <aside className="lg:col-start-10 lg:col-span-4 space-y-4 sm:space-y-8 mt-5 lg:mt-0">
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <h2 className="text-lg font-semibold mb-4">Related Topics</h2>
-                  <p className="text-[var(--text-tertiary)]">Coming soon...</p>
-                </div>
+                <RelatedTopics currentBlogSlug={slug} />
               </aside>
             </div>
           </div>
