@@ -15,7 +15,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
-import { LiveChat } from "@/components/livechat/livechat";
+// import { LiveChat } from "@/components/livechat/livechat";
 import { Tags } from "@/components/ui/tags/Tags";
 
 
@@ -37,7 +37,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
-  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
+  // const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [mainContentFinal, setMainContentFinal] = useState(content || "");
   const token = Cookies.get("token");
@@ -51,17 +51,17 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
 
-  useEffect(() => {
-    const handleToggleChat = (event: CustomEvent) => {
-      setIsLiveChatOpen(event.detail.isOpen);
-    };
+  // useEffect(() => {
+  //   const handleToggleChat = (event: CustomEvent) => {
+  //     setIsLiveChatOpen(event.detail.isOpen);
+  //   };
 
-    window.addEventListener('toggleChat', handleToggleChat as EventListener);
+  //   window.addEventListener('toggleChat', handleToggleChat as EventListener);
     
-    return () => {
-      window.removeEventListener('toggleChat', handleToggleChat as EventListener);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener('toggleChat', handleToggleChat as EventListener);
+  //   };
+  // }, []);
 
   useEffect(() => {
     // Inject head scripts
@@ -274,12 +274,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                     <Tags tags={page.tags} />
                   </div>
-                  <button 
+                  {/* <button 
                     onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
                     className="px-4 py-2 bg-[var(--info-surface)] text-[var(--text-strong)] rounded-lg hover:bg-[var(--info-surface-hover)] transition-colors"
                   >
                     {isLiveChatOpen ? "Close Chat" : "Open Chat"}
-                  </button>
+                  </button> */}
                   <Comments parentId={parentId} />
                 </main>
 
@@ -348,15 +348,15 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 </aside>
 
                 {/* LiveChat Component */}
-                <div className={`${isLiveChatOpen ? 'block' : 'hidden'} fixed inset-0 z-[99999] lg:z-[99999]`}>
+                {/* <div className={`${isLiveChatOpen ? 'block' : 'hidden'} fixed inset-0 z-[99999] lg:z-[99999]`}>
                   <div className="absolute inset-0 bg-black/20" onClick={() => setIsLiveChatOpen(false)}></div>
                   <div className="absolute right-4 bottom-[15vh] h-[70vh] md:h-[60vh] w-[90%] sm:w-[400px] z-max">
                     <LiveChat id={page.id} />
                   </div>
-                </div>
+                </div> */}
 
                 {/* LiveChat Toggle Button */}
-                <button 
+                {/* <button 
                   onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
                   className="fixed bottom-6 right-6 z-max bg-blue-500 text-white rounded-full p-4 shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center gap-2"
                 >
@@ -375,7 +375,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </svg>
                     </>
                   )}
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
