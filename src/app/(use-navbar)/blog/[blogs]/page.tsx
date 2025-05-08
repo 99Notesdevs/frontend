@@ -108,21 +108,21 @@ export default async function Page({ params }: { params: Params }) {
           {/* Assistive Touch */}
           <AssistiveTouch content={content || ''} />
           <div
-            className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-2 lg:px-8 py-2"
+            className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-2 lg:px-8 py-4 sm:py-6"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-5">
               {/* Main Content Column */}
-              <main className="lg:col-start-1 lg:col-span-9 space-y-0 sm:space-y-0">
+              <main className="lg:col-start-1 lg:col-span-9 space-y-4 sm:space-y-6">
                 <div className="bg-white border shadow-lg rounded-xl">
                   {/* Featured Image */}
                   {displayImage && (
                     <div className="w-full">
-                      <div className="relative w-full h-[400px] rounded-t-xl overflow-hidden">
+                      <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] bg-gray-50">
                         <Image
                           src={displayImage}
                           alt={title || 'Blog Post'}
                           fill
-                          className="object-cover"
+                          className="object-cover rounded-t-xl"
                           priority
                         />
                       </div>
@@ -130,12 +130,12 @@ export default async function Page({ params }: { params: Params }) {
                   )}
 
                   {/* Article Content */}
-                  <div className="p-8">
-                    <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-0">
+                  <div className="p-4 sm:p-6">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--surface-darker)] mb-4">
                       {title}
                     </h1>
 
-                    <div className="text-xs text-[var(--text-tertiary)] mb-4">
+                    <div className="text-sm text-[var(--text-tertiary)] mb-4">
                       By 99Notes
                     </div>
 
@@ -147,7 +147,7 @@ export default async function Page({ params }: { params: Params }) {
                       prose-headings:relative
                       prose-headings:mb-6
                       
-                      prose-h1:text-3xl sm:prose-h1:text-4xl
+                      prose-h1:text-2xl sm:prose-h1:text-3xl lg:prose-h1:text-4xl
                       prose-h1:font-bold
                       prose-h1:text-gray-800
                       prose-h1:leading-tight
@@ -199,7 +199,47 @@ export default async function Page({ params }: { params: Params }) {
                       prose-ul:pl-4 sm:prose-ul:pl-6
                       prose-ol:list-decimal
                       prose-ol:pl-4 sm:prose-ol:pl-6
-                      [&>*]:w-full"
+                      [&>*]:w-full
+                      
+                      /* YouTube Video Styles */
+                      iframe {
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100%;
+                        aspect-ratio: 16/9;
+                      }
+                      
+                      /* Responsive YouTube Container */
+                      .youtube-container {
+                        position: relative;
+                        width: 100%;
+                        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+                        margin: 1rem 0;
+                      }
+                      
+                      .youtube-container iframe {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100% !important;
+                        height: 100% !important;
+                        border: none;
+                      }
+                      
+                      /* Prevent overflow */
+                      .prose-video {
+                        overflow: hidden;
+                        max-width: 100%;
+                        margin: 1rem 0;
+                      }
+                      
+                      /* Responsive images */
+                      img {
+                        max-width: 100%;
+                        height: auto;
+                        display: block;
+                        margin: 0 auto;
+                      }"
                     >
                       <div dangerouslySetInnerHTML={{ __html: content || '' }}></div>
                     </div>
