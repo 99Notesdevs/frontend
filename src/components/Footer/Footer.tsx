@@ -22,7 +22,9 @@ const Footer = ({ footerSections }: FooterProps) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {footerSections.map((section) => (
             <div key={section.slug} className="flex flex-col">
-              <h3 className="text-xl font-semibold mb-4 text-primary">{section.title}</h3>
+              <Link href={section.link ? section.link : `/${section.slug}`}>
+                <h3 className="text-xl font-semibold mb-4 text-primary">{section.title}</h3>
+              </Link>
               <ul className="space-y-2">
                 {section.children.map((link) => (
                   <li key={link.slug}>
