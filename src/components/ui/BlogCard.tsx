@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 
 interface BlogCardProps {
@@ -12,11 +13,12 @@ interface BlogCardProps {
     publishedDate: string;
     category?: string;
     author?: string;
+    imageUrl?: string;
   };
 }
 
 export const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
-  const { id, title, excerpt, publishedDate, category, author } = blog;
+  const { id, title, excerpt, publishedDate, category, author, imageUrl } = blog;
 
   const formatDate = (dateString: string) => {
     try {
@@ -28,6 +30,15 @@ export const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 h-full flex flex-col">
+      <div className="relative w-full h-[200px]">
+        <Image
+          src={imageUrl || '/placeholder.jpg'}
+          alt={title}
+          fill
+          className="object-contain rounded-t-xl"
+          priority
+        />
+      </div>
       {category && (
         <span className="text-primary-600 text-sm font-medium mb-2">{category}</span>
       )}

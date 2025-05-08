@@ -79,14 +79,14 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
       </section>
       <main>
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
-          {/* Increase max width of the container */}
-          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 lg:py-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-7 ">
+          {/* Responsive container */}
+          <div className="max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-8 pt-4 lg:pt-7 lg:py-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-4 lg:mt-7">
               {/* Adjust sidebar width */}
-              <aside className="lg:col-span-4 order-2 lg:order-1">
+              <aside className="lg:col-span-4 order-2 lg:order-1 mb-6 lg:mb-0">
                 {/* Rest of sidebar content remains same */}
                 <div className="relative">
-                  <div className="sticky top-8 space-y-6">
+                  <div className="sticky top-4 lg:top-8 space-y-4 lg:space-y-6">
                     {/* Navigation Section */}
                     <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
                       <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] border-b-2 border-[var(--border-light)] pb-2 flex items-center gap-2">
@@ -131,7 +131,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
 
               {/* Adjust main content width */}
               <main className="lg:col-span-8 order-1 lg:order-2">
-                <article className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 lg:p-8">
+                <article className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 lg:p-8">
                   <div
                     className="prose prose-lg max-w-none
                   prose-headings:font-bold 

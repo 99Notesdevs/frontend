@@ -94,13 +94,13 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
         </section>
         <main>
           <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
-            <div className="w-full max-w-[1400px] mx-auto px-4 xs:px-5 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-12">
+            <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-0 md:px-6 lg:px-8 py-4 sm:py-8">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                 {/* Left Column - Main Image and Content */}
-                <div className="lg:col-span-8 space-y-4 sm:space-y-8">
+                <div className="lg:col-span-8 space-y-4 sm:space-y-6">
                   {/* Main Topic Image */}
-                  <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-10 transform transition-all hover:scale-[1.02]">
-                    <div className="relative w-full h-72 md:h-96">
+                  <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-8 sm:mb-10 transform transition-all hover:scale-[1.02]">
+                    <div className="relative w-full h-64 md:h-96">
                       <Image
                         src={`${pageImage || "/"}`}
                         alt={title}
@@ -118,8 +118,8 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
 
                   {/* Related Topics Section */}
                   {page.children && page.children.length > 0 && (
-                    <div className="mb-10">
-                      <div className="flex flex-col items-center mb-8">
+                    <div className="mb-8 sm:mb-10">
+                      <div className="flex flex-col items-center mb-6 sm:mb-8">
                         <h2 className="text-2xl font-medium text-[var(--primary)] mb-1 text-center">
                           {JSON.parse(metadata).metaTitle || "Related Topics"}
                         </h2>
@@ -129,7 +129,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                         </p>
                         <div className="w-full h-1 bg-[var(--highlight-bg)] rounded-full"></div>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         {page.children.map((child: any) => {
                           // Skip children with custom-link template
                           if (child.templateId === "custom-link") {
@@ -196,7 +196,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
 
                   {/* Main Content Section */}
                   <Card className="border-0 shadow-xl bg-white/90">
-                    <CardContent className="p-8 lg:p-10">
+                    <CardContent className="p-y-5 p-x-2 lg:p-10">
                       <div
                         className="prose prose-lg max-w-none
                     prose-h1:text-gray-900 prose-h1:text-center prose-h1:font-bold prose-h1:border-b-2 prose-h1:border-yellow-400 prose-h1:pb-2 prose-h1:mb-6

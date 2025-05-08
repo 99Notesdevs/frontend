@@ -183,21 +183,21 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             <AssistiveTouch content={mainContentFinal} />
 
             <div
-              className="w-full max-w-[1400px] mx-auto px-2 lg:px-10  py-6 
+              className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-10 py-4 sm:py-6
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4">
                 {/* Main Content Column */}
-                <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-8">
+                <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-6">
                   {/* Featured Image */}
                   {displayImage && (
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-12">
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-8 sm:mb-12">
                       <div className="relative w-full h-[400px]">
                         <Image
                           src={`${displayImage}`}
                           alt={title}
                           fill
-                          className="object-cover"
+                          className="object-cover w-full h-full"
                           priority
                         />
                       </div>
@@ -205,7 +205,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   )}
 
                   {/* Article Content */}
-                  <div className="bg-white border rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
+                  <div className="bg-white border rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
                     {/* Article Header */}
                     <div className="text-center mb-6">
                       {page.parent && (
@@ -310,7 +310,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                         <span className="text-[var(--action-primary)]">🌐</span>
                         <span>Connect With Us</span>
                       </h3>
-                      <div className="py-2 h-9">
+                      <div className="space-y-4 sm:space-y-6">
                         <SocialMedia />
                       </div>
                     </div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import logo from '../../../public/logo.png'
+import logo from '../../../public/Logo.svg'
 import SearchBar from "./SearchBar";
 import { NavItem } from "@/types/navigation";
 import { Plus_Jakarta_Sans } from 'next/font/google';
@@ -65,7 +65,7 @@ function NestedNavigation({
               )}
             </Link>
             {item.children.length > 0 && (
-              <div className={`absolute left-0 mt-0 w-[700px] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-[var(--border-light)] z-50 ${
+              <div className={`absolute left-0 mt-0 w-[max(700px,100%)] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-[var(--border-light)] z-50 ${
                 item.slug === 'current-affairs' ? 'p-4' : ''
               }`}>
                 <div className={`${item.slug === 'current-affairs' ? 'grid grid-cols-3 gap-2' : 'flex h-full'}`}>
@@ -266,9 +266,9 @@ export default function Navbar({ navigation }: NavbarProps) {
                   <Image
                     src={logo}
                     alt="99Notes"
-                    width={40}
-                    height={40}
-                    className="h-8 w-auto object-contain"
+                    width={80}
+                    height={70}
+                    className="h-12 w-auto object-contain"
                     priority
                   />
                 </Link>

@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "../../../public/logo.png";
+import logo from "../../../public/Logo.svg";
 import SocialMedia from "../navigation/socialmedia";
 
 interface FooterLink {
@@ -46,7 +46,7 @@ const Footer = ({ footerSections }: FooterProps) => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <Link href="/">
-                <Image src={logo} alt="Logo" className="h-12" />
+                <Image src={logo} alt="Logo" className="h-20 w-auto" />
               </Link>
             </div>
             <div className="w-full md:w-auto max-w-sm">
