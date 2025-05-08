@@ -324,7 +324,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
                       <Ads imageUrl="/" altText="ads" />
                     </div>
+                    
                       {/* Tags Section */}
+                    <div>
                       {tags && tags.length > 0 && (
                         <Tags tags={tags.map((tag: string) => ({ name: tag }))} />
                       )}

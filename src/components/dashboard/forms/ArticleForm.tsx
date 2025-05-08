@@ -541,7 +541,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             </div>
           </div>
 
-        <Button disabled={isUploading} type="submit" className="w-full mt-6">
+        <Button disabled={isUploading} type="submit" className="w-full mt-6 bg-slate-300 hover:bg-slate-400">
             {isUploading ? 'Uploading...' : 'Save'}
           </Button>
         </form>
