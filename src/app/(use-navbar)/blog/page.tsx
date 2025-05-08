@@ -75,7 +75,7 @@ const BlogsPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${env.API}/blog/slug/${searchQuery}`);
+      const response = await fetch(`${env.API}/blog/title/${searchQuery}`);
       console.log(response);
       if (!response.ok) {
         throw new Error("Failed to search blogs");
