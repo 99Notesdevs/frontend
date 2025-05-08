@@ -324,26 +324,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
                       <Ads imageUrl="/" altText="ads" />
                     </div>
-
-                    {/* Tags Section */}
-                    {tags && tags.length > 0 && (
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
-                        <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                          🏷 Tags
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {tags.map((tag: string) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      {/* Tags Section */}
+                      {tags && tags.length > 0 && (
+                        <Tags tags={tags.map((tag: string) => ({ name: tag }))} />
+                      )}
+                    </div>
                   </div>
                 </aside>
 
