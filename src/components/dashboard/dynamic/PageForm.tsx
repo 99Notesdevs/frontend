@@ -305,12 +305,34 @@ export function PageForm({ editPage = null }: PageFormProps) {
       });
 
       const responseData = await response.json().catch(() => ({}));
-
+      
       if (!response.ok) {
         throw new Error(
           responseData.message || responseData.error || "Failed to create page"
         );
       }
+
+      // Create chat room for the new page
+      
+      if(currentTemplate.id === "article"){
+        const chatResponse = await fetch(`${env.API}/chat/room`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            articleId: responseData.data.id,
+            // name: `Chat for ${apiPageData.title}`
+          }),
+        });
+        if (!chatResponse.ok) {
+          console.error("Failed to create chat room:", await chatResponse.json());
+        }
+      }
+
+        
+      
 
       // Reset form and refresh
       setSelectedTemplate("");
