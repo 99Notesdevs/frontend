@@ -146,24 +146,39 @@ export default function DashboardLayout({
   const navigation = getNavigationItems();
 
   return (
-    <div className={`flex min-h-screen bg-gradient-to-br from-[var(--admin-bg-lightest)] via-[var(--admin-bg-light)] to-[var(--bg-elevated)] ${inter.className}`}>
+    <div
+      className={`flex h-screen bg-gradient-to-br from-[var(--admin-bg-lightest)] via-[var(--admin-bg-light)] to-[var(--bg-elevated)] ${inter.className}`}
+    >
       {/* Sidebar overlay for mobile */}
       <div
-        className={`fixed inset-0 z-40 bg-black/40 transition-opacity lg:hidden ${sidebarOpen ? "block" : "hidden"}`}
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity lg:hidden ${
+          sidebarOpen ? "block" : "hidden"
+        }`}
         onClick={() => setSidebarOpen(false)}
         aria-hidden="true"
       />
       {/* Sidebar */}
       <aside
-        className={`fixed z-50 inset-y-0 left-0 w-60 bg-[var(--admin-bg-secondary)] border-r border-[var(--admin-bg-dark)] flex flex-col transition-transform transform lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`z-50 w-60 bg-[var(--admin-bg-secondary)] border-r border-[var(--admin-bg-dark)] flex flex-col transition-transform transform lg:translate-x-0 lg:static ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
         style={{ minWidth: 240 }}
       >
         <div className="flex items-center h-16 px-6 border-b border-[var(--admin-bg-dark)]">
           {/* Make Dashboard title clickable to go to /dashboard */}
           <button
-            onClick={() => { router.push("/dashboard"); setSidebarOpen(false); }}
+            onClick={() => {
+              router.push("/dashboard");
+              setSidebarOpen(false);
+            }}
             className="text-xl font-bold tracking-tight text-white hover:text-indigo-400 transition-colors focus:outline-none"
-            style={{ background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer" }}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              margin: 0,
+              cursor: "pointer",
+            }}
             aria-label="Go to Dashboard"
           >
             Dashboard
@@ -173,7 +188,19 @@ export default function DashboardLayout({
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
         </div>
         <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
@@ -189,15 +216,26 @@ export default function DashboardLayout({
                   return (
                     <button
                       key={item.path}
-                      onClick={() => { router.push(item.path); setSidebarOpen(false); }}
+                      onClick={() => {
+                        router.push(item.path);
+                        setSidebarOpen(false);
+                      }}
                       className={`group relative flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-150 text-left text-base font-medium
-                        ${isActive 
-                          ? "bg-white/10 text-white border-l-4 border-white" 
-                          : "text-[var(--admin-scroll-thumb)] hover:bg-[var(--admin-bg-primary)]/50 hover:text-white"}
+                        ${
+                          isActive
+                            ? "bg-white/10 text-white border-l-4 border-white"
+                            : "text-[var(--admin-scroll-thumb)] hover:bg-[var(--admin-bg-primary)]/50 hover:text-white"
+                        }
                       `}
                       title={item.text}
                     >
-                      <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-white' : 'text-[var(--admin-scroll-thumb-hover)] group-hover:text-white'}`} />
+                      <Icon
+                        className={`w-5 h-5 mr-3 ${
+                          isActive
+                            ? "text-white"
+                            : "text-[var(--admin-scroll-thumb-hover)] group-hover:text-white"
+                        }`}
+                      />
                       <span className="truncate">{item.text}</span>
                     </button>
                   );
@@ -217,13 +255,23 @@ export default function DashboardLayout({
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
         </button>
       )}
       {/* Main content */}
-      <div className="flex-1 min-w-0">
-        {children}
-      </div>
+      <div className="flex-1 min-w-0 overflow-y-auto">{children}</div>
     </div>
   );
 }
