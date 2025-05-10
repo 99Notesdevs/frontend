@@ -191,13 +191,13 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-6">
                   {/* Featured Image */}
                   {displayImage && (
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] mb-8 sm:mb-12">
-                      <div className="relative w-full h-[400px]">
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+                      <div className="relative w-full h-[300px] md:h-[400px]">
                         <Image
                           src={`${displayImage}`}
                           alt={title}
                           fill
-                          className="object-cover w-full h-full"
+                          className="object-cover w-full"
                           priority
                         />
                       </div>

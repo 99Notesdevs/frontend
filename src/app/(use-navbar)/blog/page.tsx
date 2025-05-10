@@ -125,7 +125,7 @@ const BlogsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-elevated)] pt-8 ">
+    <div className="min-h-screen gradient:bg-gray-50 to bg-white pt-8 ">
       <div className="w-full max-w-[2000px] px-4 sm:px-8 flex flex-col">
         {/* Title and search section */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">

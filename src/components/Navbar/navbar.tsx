@@ -37,7 +37,7 @@ function NestedNavigation({
         {items.map((item) => (
           <div 
             key={item.slug} 
-            className="group"
+            className="group relative"
             onMouseEnter={() => {
               setHoveredParent(item.slug);
               if (item.children.length > 0) {
@@ -65,8 +65,10 @@ function NestedNavigation({
               )}
             </Link>
             {item.children.length > 0 && (
-              <div className={`absolute left-0 mt-0 w-[max(700px,100%)] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-[var(--border-light)] z-50 ${
+              <div className={`absolute mt-0 w-[max(700px,100%)] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-[var(--border-light)] z-50 ${
                 item.slug === 'current-affairs' ? 'p-4' : ''
+              } ${
+                items.indexOf(item) >= items.length - 2 ? 'right-0' : 'left-0'
               }`}>
                 <div className={`${item.slug === 'current-affairs' ? 'grid grid-cols-3 gap-2' : 'flex h-full'}`}>
                   {item.slug === 'current-affairs' ? (
@@ -258,16 +260,16 @@ export default function Navbar({ navigation }: NavbarProps) {
               : "bg-white h-[70px]"
           }`}
         >
-          <div className="container w-full max-w-[2000px] px-2 lg:px-10">
-            <div className="flex justify-between items-center h-[72px]">
+          <div className="container w-full max-w-[2000px] px-2 lg:px-12">
+            <div className="flex justify-between items-center h-[72px] lg:px-5">
               {/* Logo */}
               <div className="flex-shrink-0 min-w-[35px] mx-2">
                 <Link href="/" passHref>
                   <Image
                     src={logo}
                     alt="99Notes"
-                    width={80}
-                    height={70}
+                    width={90}
+                    height={75}
                     className="h-12 w-auto object-contain"
                     priority
                   />
