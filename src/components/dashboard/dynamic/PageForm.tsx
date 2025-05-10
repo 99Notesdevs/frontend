@@ -253,7 +253,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       // Create the page data based on template type
       const pageData = {
         title: formData.title || formData.hero?.title,
-        slug: fullPath,
+        slug: formData.slug || fullPath,
         link: currentTemplate.id === "custom-link" ? formData.link : "",
         templateId: currentTemplate.id,
         parentId: parentId || null,
