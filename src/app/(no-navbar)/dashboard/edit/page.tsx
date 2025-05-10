@@ -7,6 +7,7 @@ import {ArticleForm, UpscNotesForm, GeneralStudiesForm , CurrentAffairForm, Blog
 import Cookie from 'js-cookie';
 import { env } from '@/config/env';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
+import Drafts from '@/components/ui/drafts';
 
 interface Page {
   id: number;
@@ -692,6 +693,7 @@ function PageList() {
           </div>
         </div>
       )}
+      <Drafts/>
     </div>
   );
 }

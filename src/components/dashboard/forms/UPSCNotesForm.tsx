@@ -60,33 +60,70 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     message: string;
     type: "error" | "success" | "warning";
   } | null>(null);
-  const [showDraftDialog, setShowDraftDialog] = useState(true);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [drafts, setDrafts] = useState<{
+    title: string;
+    data: FormData & { imageUrl: string | undefined ,showInNav: boolean | undefined};
+  }[]>([]);
 
   useEffect(() => {
-    const savedDraft = localStorage.getItem("upscNotesDraft");
-    if (savedDraft) {
-      setShowDraftDialog(true); // Show the dialog if a draft exists
+    const savedDrafts = localStorage.getItem("upscNotesDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      setDrafts(parsedDrafts);
+      if (parsedDrafts.length > 0) {
+        setShowDraftDialog(true);
+      }
     }
   }, []);
 
   const loadDraft = () => {
-    const savedDraft = localStorage.getItem("upscNotesDraft");
-    if (savedDraft) {
-      form.reset(JSON.parse(savedDraft)); // Populate the form with the saved draft
+    const savedDrafts = localStorage.getItem("upscNotesDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      if (parsedDrafts.length > 0) {
+        setShowDraftDialog(true);
+      }
     }
-    setShowDraftDialog(false); // Close the dialog
   };
 
-  const startNew = () => {
-    form.reset(initialData || {}); // Reset the form to initial data or empty
-    setShowDraftDialog(false); // Close the dialog
+  const selectDraft = (title: string) => {
+    const savedDrafts = localStorage.getItem("upscNotesDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      const selectedDraft = parsedDrafts.find(
+        (draft: { title: string; data: FormData & { imageUrl: string | undefined ,showInNav: boolean | undefined} }) => draft.title === title
+      );
+      if (selectedDraft) {
+        form.reset(selectedDraft.data);
+        setShowDraftDialog(false);
+      }
+    }
   };
 
   const saveDraft = () => {
-    const draftData = form.getValues(); // Get the current form values
+    const draftData = form.getValues();
+    const draftTitle = draftData.title || `Draft ${Date.now()}`;
+
     try {
-      // Save the draft to local storage or send it to an API
-      localStorage.setItem("upscNotesDraft", JSON.stringify(draftData));
+      const savedDrafts = localStorage.getItem("upscNotesDrafts");
+      const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
+
+      // Remove any existing draft with the same title
+      const filteredDrafts = existingDrafts.filter(
+        (draft: { title: string; data: FormData & { imageUrl: string | undefined ,showInNav: boolean | undefined} }) => draft.title !== draftTitle
+      );
+
+      // Add the new draft
+      const newDraft = {
+        title: draftTitle,
+        data: draftData,
+      };
+
+      const updatedDrafts = [...filteredDrafts, newDraft];
+      localStorage.setItem("upscNotesDrafts", JSON.stringify(updatedDrafts));
+
+      setDrafts(updatedDrafts);
       setAlert({
         message: "Draft saved successfully!",
         type: "success",
@@ -98,6 +135,11 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
         type: "error",
       });
     }
+  };
+
+  const startNew = () => {
+    form.reset(initialData || {});
+    setShowDraftDialog(false);
   };
 
   const form = useForm<FormData>({
@@ -177,6 +219,8 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
         onClose={() => setShowDraftDialog(false)}
         onLoadDraft={loadDraft}
         onStartNew={startNew}
+        drafts={drafts}
+        onSelectDraft={selectDraft}
       />
       {alert && (
         <Alert
@@ -186,7 +230,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
         />
       )}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
           <FormField
             control={form.control}
             name="title"

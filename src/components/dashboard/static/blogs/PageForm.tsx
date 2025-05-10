@@ -5,6 +5,7 @@ import { BlogForm } from '@/components/dashboard/forms';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 import { uploadImageToS3 } from '@/config/imageUploadS3';
+import Drafts from '@/components/ui/drafts';
 
 interface BlogType {
   id: number;
@@ -160,7 +161,9 @@ export default function PageForm({ editPage = null }: PageFormProps) {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{editPage ? 'Edit Blog' : 'Add New Blog'}</h1>
       <BlogForm onSubmit={handleSubmit} defaultValues={editPage || undefined} />
+      <Drafts types={["blogDrafts"]}/>
     </div>
+    
   );
 }
  

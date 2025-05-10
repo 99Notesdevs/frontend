@@ -72,32 +72,71 @@ export function GeneralStudiesForm({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [drafts, setDrafts] = useState<{
+    title: string;
+    data: GeneralStudiesFormValues;
+  }[]>([]);
 
   useEffect(() => {
-    const savedDraft = localStorage.getItem("generalStudiesDraft");
-    if (savedDraft) {
-      setShowDraftDialog(true); // Show the dialog if a draft exists
+    const savedDrafts = localStorage.getItem("generalStudiesDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      setDrafts(parsedDrafts);
+      if (parsedDrafts.length > 0) {
+        setShowDraftDialog(true);
+      }
     }
   }, []);
 
   const loadDraft = () => {
-    const savedDraft = localStorage.getItem("generalStudiesDraft");
-    if (savedDraft) {
-      form.reset(JSON.parse(savedDraft)); // Populate the form with the saved draft
+    const savedDrafts = localStorage.getItem("generalStudiesDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      if (parsedDrafts.length > 0) {
+        
+        setShowDraftDialog(true);
+      }
     }
-    setShowDraftDialog(false); // Close the dialog
   };
 
-  const startNew = () => {
-    form.reset(defaultValues || {}); // Reset the form to initial data or empty
-    setShowDraftDialog(false); // Close the dialog
+  const selectDraft = (title: string) => {
+    const savedDrafts = localStorage.getItem("generalStudiesDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      const selectedDraft = parsedDrafts.find(
+        (draft: { title: string; data: GeneralStudiesFormValues }) => draft.title === title
+      );
+      if (selectedDraft) {
+        form.reset(selectedDraft.data);
+        setImagePreview(selectedDraft.data.imageUrl);
+        setShowDraftDialog(false);
+      }
+    }
   };
 
   const saveDraft = () => {
-    const draftData = form.getValues(); // Get the current form values
+    const draftData = form.getValues();
+    const draftTitle = draftData.title || `Draft ${Date.now()}`;
+
     try {
-      // Save the draft to local storage or send it to an API
-      localStorage.setItem("generalStudiesDraft", JSON.stringify(draftData));
+      const savedDrafts = localStorage.getItem("generalStudiesDrafts");
+      const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
+
+      // Remove any existing draft with the same title
+      const filteredDrafts = existingDrafts.filter(
+        (draft: { title: string; data: GeneralStudiesFormValues }) => draft.title !== draftTitle
+      );
+
+      // Add the new draft
+      const newDraft = {
+        title: draftTitle,
+        data: draftData,
+      };
+
+      const updatedDrafts = [...filteredDrafts, newDraft];
+      localStorage.setItem("generalStudiesDrafts", JSON.stringify(updatedDrafts));
+
+      setDrafts(updatedDrafts);
       setAlert({
         message: "Draft saved successfully!",
         type: "success",
@@ -109,6 +148,11 @@ export function GeneralStudiesForm({
         type: "error",
       });
     }
+  };
+
+  const startNew = () => {
+    form.reset(defaultValues || {});
+    setShowDraftDialog(false);
   };
 
   const form = useForm<GeneralStudiesFormValues>({
@@ -217,6 +261,8 @@ export function GeneralStudiesForm({
         onClose={() => setShowDraftDialog(false)}
         onLoadDraft={loadDraft}
         onStartNew={startNew}
+        drafts={drafts}
+        onSelectDraft={selectDraft}
       />
       {alert && (
         <Alert

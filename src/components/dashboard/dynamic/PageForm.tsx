@@ -23,6 +23,7 @@ import { uploadImageToS3 } from "@/config/imageUploadS3";
 import {
   Checkbox,
 } from "@/components/ui/Checkbox";
+import Drafts from "@/components/ui/drafts";
 
 interface TemplateType {
   id: string;
@@ -591,6 +592,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       </div>
 
       {renderStepContent()}
+      <Drafts/>
     </div>
   );
 }
