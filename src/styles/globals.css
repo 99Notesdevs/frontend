@@ -331,3 +331,27 @@ h6 {
 .border-b-0 {
   border-bottom: 0 !important;
 }
+
+/* Table styles for TipTap editor */
+.ProseMirror table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.ProseMirror td, .ProseMirror th {
+  min-width: 1em;
+  border: 2px solid #ced4da;
+  padding: 8px;
+  position: relative;
+  vertical-align: top;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Reset expanded width */
+.ProseMirror td p, .ProseMirror th p {
+  margin: 0;
+  min-width: 0;
+}

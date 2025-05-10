@@ -380,7 +380,7 @@ export default function ArticlesPage() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-secondary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-[var(--admin-primary)] text-slate-900 rounded hover:bg-[var(--admin-secondary)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -391,8 +391,8 @@ export default function ArticlesPage() {
                     onClick={() => handlePageChange(page)}
                     className={`px-4 py-2 rounded ${
                       page === currentPage
-                        ? "bg-[var(--admin-primary)] text-white"
-                        : "bg-[var(--admin-bg-light)] text-[var(--admin-primary)] hover:bg-[var(--admin-bg-light)]"
+                        ? "bg-[var(--admin-bg-light)] text-[var(--admin-primary)] "
+                        : "bg-[var(--admin-primary)] text-[var(--admin-primary)] hover:bg-[var(--admin-bg-light)]"
                     }`}
                   >
                     {page}

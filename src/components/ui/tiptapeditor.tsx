@@ -26,15 +26,20 @@ import {
   AlignRight,
   Undo,
   Redo,
+  Table as TableIcon,
+  RowsIcon,
+  ColumnsIcon,
+  Trash2,
+  ChevronDown,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { Iframe } from "./Iframe";
-
 
 const lowlight = createLowlight(common);
 
@@ -73,6 +78,25 @@ const FontSize = Mark.create({
   },
 });
 
+const PRESET_COLORS = [
+  '#000000', // Black
+  '#343A40', // Dark Gray
+  '#495057', // Gray
+  '#868E96', // Medium Gray
+  '#E9ECEF', // Light Gray
+  '#F8F9FA', // Almost White
+  '#E03131', // Red
+  '#C2255C', // Pink
+  '#9C36B5', // Purple
+  '#3B5BDB', // Blue
+  '#1098AD', // Cyan
+  '#0CA678', // Teal
+  '#37B24D', // Green
+  '#74B816', // Lime
+  '#F59F00', // Yellow
+  '#F76707', // Orange
+];
+
 interface ToolbarButtonProps {
   onClick: () => void;
   icon: React.ReactNode;
@@ -102,6 +126,216 @@ const ToolbarButton = ({
     >
       {icon}
     </button>
+  );
+};
+
+interface TableMenuProps {
+  editor: any;
+}
+
+const TableMenu = ({ editor }: TableMenuProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const addTable = () => {
+    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    setIsOpen(false);
+  };
+
+  const addRowAfter = () => {
+    editor.chain().focus().addRowAfter().run();
+    setIsOpen(false);
+  };
+
+  const addColumnAfter = () => {
+    editor.chain().focus().addColumnAfter().run();
+    setIsOpen(false);
+  };
+
+  const deleteRow = () => {
+    editor.chain().focus().deleteRow().run();
+    setIsOpen(false);
+  };
+
+  const deleteColumn = () => {
+    editor.chain().focus().deleteColumn().run();
+    setIsOpen(false);
+  };
+
+  const deleteTable = () => {
+    editor.chain().focus().deleteTable().run();
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-900 flex items-center gap-1",
+          editor.isActive("table") && "bg-gray-100 text-blue-600",
+        )}
+        title="Table"
+      >
+        <TableIcon className="w-5 h-5" />
+        {editor.isActive("table") && (
+          <ChevronDown className="w-3 h-3 transition-transform duration-200" 
+            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          />
+        )}
+      </button>
+      {isOpen && (
+        <div className="absolute z-50 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+          <div className="py-1" role="menu" aria-orientation="vertical">
+            {!editor.isActive("table") && (
+              <button
+                onClick={addTable}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
+              >
+                <TableIcon className="w-4 h-4" />
+                Insert Table
+              </button>
+            )}
+            {editor.isActive("table") && (
+              <>
+                <button
+                  onClick={addRowAfter}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
+                >
+                  <RowsIcon className="w-4 h-4" />
+                  Add Row
+                </button>
+                <button
+                  onClick={addColumnAfter}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
+                >
+                  <ColumnsIcon className="w-4 h-4" />
+                  Add Column
+                </button>
+                <button
+                  onClick={deleteRow}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete Row
+                </button>
+                <button
+                  onClick={deleteColumn}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete Column
+                </button>
+                <button
+                  onClick={deleteTable}
+                  className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 hover:text-red-900 flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete Table
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface ColorMenuProps {
+  editor: any;
+}
+
+const ColorMenu = ({ editor }: ColorMenuProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [customColor, setCustomColor] = useState('#000000');
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const setColor = (color: string) => {
+    editor.chain().focus().setColor(color).run();
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-900 flex items-center gap-1",
+          editor.isActive("textStyle") && "bg-gray-100"
+        )}
+        title="Text Color"
+      >
+        <div className="flex items-center gap-1">
+          <Palette 
+            className="w-5 h-5" 
+            style={{ 
+              color: editor.getAttributes('textStyle').color || '#000000' 
+            }} 
+          />
+          <ChevronDown
+            className="w-3 h-3 transition-transform duration-200"
+            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          />
+        </div>
+      </button>
+      {isOpen && (
+        <div className="absolute z-50 mt-2 p-2 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5" style={{ width: '272px' }}>
+          <div className="grid grid-cols-8 gap-1" role="menu">
+            {PRESET_COLORS.map((color) => (
+              <button
+                key={color}
+                onClick={() => setColor(color)}
+                className="w-8 h-8 rounded-md border border-gray-200 transition-transform hover:scale-110 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: color,
+                  transform: editor.getAttributes('textStyle').color === color ? 'scale(1.1)' : 'scale(1)'
+                }}
+                title={color}
+              />
+            ))}
+          </div>
+          <div className="mt-2 pt-2 border-t">
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={customColor}
+                onChange={(e) => setCustomColor(e.target.value)}
+                className="w-8 h-8 p-0 border-0 rounded cursor-pointer"
+              />
+              <button
+                onClick={() => setColor(customColor)}
+                className="flex-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md px-3 py-1.5 transition-colors"
+              >
+                Custom Color
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -163,11 +397,24 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       Color,
       TextStyle,
       FontSize,
-      Table.configure({ resizable: true }),
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: 'min-w-full border-collapse border border-gray-200 table-fixed',
+        }
+      }),
       TableRow,
-      TableCell,
-      TableHeader,
-      Iframe
+      TableHeader.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-200 break-words',
+        }
+      }),
+      TableCell.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-200 p-2 break-words whitespace-normal',
+        }
+      }),
+      Iframe,
     ],
     content: content,
     onUpdate: ({ editor }) => {
@@ -256,37 +503,13 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     }
   };
 
-  const addTable = () => {
-    if (!editor) return;
-    editor
-      .chain()
-      .focus()
-      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-      .run();
-  };
-
-  const addRow = () => {
-    if (!editor) return;
-    editor.chain().focus().addRowAfter().run();
-  };
-
-  const addColumn = () => {
-    if (!editor) return;
-    editor.chain().focus().addColumnAfter().run();
-  };
-
-  const deleteTable = () => {
-    if (!editor) return;
-    editor.chain().focus().deleteTable().run();
-  };
-
   if (!editor) {
     return null;
   }
 
   const formatHTML = (html: string) => {
     return html.replace(/></g, ">\n<");
-  }
+  };
 
   return (
     <div className="border border-input rounded-lg">
@@ -348,6 +571,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               label="Strike"
               isActive={editor.isActive("strike")}
             />
+            <ColorMenu editor={editor} />
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               icon={<List className="w-5 h-5" />}
@@ -372,39 +596,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               label="Code Block"
               isActive={editor.isActive("codeBlock")}
             />
-            <ToolbarButton
-              onClick={addTable}
-              icon={<span className="w-5 h-5">📋</span>}
-              label="Add Table"
-            />
-            <ToolbarButton
-              onClick={addRow}
-              icon={<span className="w-5 h-5"> Row</span>}
-              label="Add Row"
-            />
-            <ToolbarButton
-              onClick={addColumn}
-              icon={<span className="w-5 h-5"> Col</span>}
-              label="Add Column"
-            />
-            <ToolbarButton
-              onClick={deleteTable}
-              icon={<span className="w-5 h-5"> Table</span>}
-              label="Delete Table"
-            />
-            <input
-              type="color"
-              onInput={(e: React.FormEvent<HTMLInputElement>) =>
-                editor
-                  ?.chain()
-                  .focus()
-                  .setColor((e.target as HTMLInputElement).value)
-                  .run()
-              }
-              value={editor.getAttributes("textStyle").color || "#000000"}
-              className="h-8 w-8 cursor-pointer border-0 bg-transparent p-1"
-              title="Text Color"
-            />
+            <TableMenu editor={editor} />
             <ToolbarButton
               onClick={setLink}
               icon={<LinkIcon className="w-5 h-5" />}
