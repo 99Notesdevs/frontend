@@ -8,7 +8,7 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import TextAlign from "@tiptap/extension-text-align";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
-import { Mark, mergeAttributes } from "@tiptap/core";
+import { Mark, mergeAttributes, Extension } from "@tiptap/core";
 import { common, createLowlight } from "lowlight";
 import Heading from "@tiptap/extension-heading";
 import {
@@ -75,6 +75,28 @@ const FontSize = Mark.create({
   },
   renderHTML({ HTMLAttributes }) {
     return ["span", mergeAttributes(HTMLAttributes), 0];
+  },
+});
+
+const TableStyles = Extension.create({
+  name: 'tableStyles',
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ['table', 'tableRow', 'tableCell', 'tableHeader'],
+        attributes: {
+          style: {
+            default: null,
+            parseHTML: element => element.getAttribute('style'),
+            renderHTML: attributes => {
+              if (!attributes.style) return {}
+              return { style: attributes.style }
+            }
+          }
+        }
+      }
+    ]
   },
 });
 
@@ -397,21 +419,26 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       Color,
       TextStyle,
       FontSize,
+      TableStyles,
       Table.configure({
         resizable: true,
         HTMLAttributes: {
-          class: 'min-w-full border-collapse border border-gray-200 table-fixed',
+          style: 'width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;'
         }
       }),
-      TableRow,
+      TableRow.configure({
+        HTMLAttributes: {
+          style: 'border: 1px solid #e5e7eb;'
+        }
+      }),
       TableHeader.configure({
         HTMLAttributes: {
-          class: 'border border-gray-200 break-words',
+          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; background-color: #f9fafb; font-weight: 500;'
         }
       }),
       TableCell.configure({
         HTMLAttributes: {
-          class: 'border border-gray-200 p-2 break-words whitespace-normal',
+          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top;'
         }
       }),
       Iframe,
@@ -443,11 +470,35 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     if (!editor) return;
 
     if (!isHtmlMode) {
-      // Switching to HTML mode
-      setHtmlContent(editor.getHTML());
+      // Switching to HTML mode - preserve table styles
+      const content = editor.getHTML();
+      // Process content to ensure table styles are preserved
+      const processedContent = content.replace(
+        /<table([^>]*)>/g,
+        (match, attrs) => {
+          // Keep existing style attribute if present
+          if (attrs.includes('style=')) return match;
+          return `<table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;"${attrs}>`;
+        }
+      ).replace(
+        /<t[hd]([^>]*)>/g,
+        (match, attrs) => {
+          // Keep existing style attribute if present
+          if (attrs.includes('style=')) return match;
+          return `<td style="border: 1px solid #e5e7eb; padding: 0.5rem;"${attrs}>`;
+        }
+      );
+      setHtmlContent(processedContent);
     } else {
-      // Switching to rich text mode
-      editor.commands.setContent(htmlContent);
+      // Switching back to rich text mode - preserve custom styles
+      const contentWithPreservedStyles = htmlContent.replace(
+        /<table[^>]*style="([^"]*)"[^>]*>/g,
+        (match, style) => {
+          // Preserve custom styles while switching back
+          return match;
+        }
+      );
+      editor.commands.setContent(contentWithPreservedStyles, false);
     }
     setIsHtmlMode(!isHtmlMode);
   };
