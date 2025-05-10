@@ -23,6 +23,7 @@ import { uploadImageToS3 } from "@/config/imageUploadS3";
 import {
   Checkbox,
 } from "@/components/ui/Checkbox";
+import Drafts from "@/components/ui/drafts";
 
 interface TemplateType {
   id: string;
@@ -253,7 +254,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       // Create the page data based on template type
       const pageData = {
         title: formData.title || formData.hero?.title,
-        slug: fullPath,
+        slug: formData.slug || fullPath,
         link: currentTemplate.id === "custom-link" ? formData.link : "",
         templateId: currentTemplate.id,
         parentId: parentId || null,
@@ -591,6 +592,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       </div>
 
       {renderStepContent()}
+      <Drafts/>
     </div>
   );
 }

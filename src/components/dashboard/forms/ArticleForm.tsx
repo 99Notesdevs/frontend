@@ -70,33 +70,57 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     message: string;
     type: "error" | "success" | "warning";
   } | null>(null);
-  const [showDraftDialog, setShowDraftDialog] = useState(true);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [drafts, setDrafts] = useState<{ title: string; data: ArticleFormData }[]>([]);
 
   useEffect(() => {
-    const savedDraft = localStorage.getItem("articleDraft");
-    if (savedDraft) {
-      setShowDraftDialog(true); // Show the dialog if a draft exists
+    const savedDrafts = localStorage.getItem("articleDrafts");
+    if (savedDrafts) {
+      setDrafts(JSON.parse(savedDrafts));
     }
   }, []);
 
   const loadDraft = () => {
-    const savedDraft = localStorage.getItem("articleDraft");
-    if (savedDraft) {
-      form.reset(JSON.parse(savedDraft)); // Populate the form with the saved draft
+    const savedDrafts = localStorage.getItem("articleDrafts");
+    if (savedDrafts) {
+      const drafts = JSON.parse(savedDrafts);
+      if (drafts.length > 0) {
+        setShowDraftDialog(true);
+        return;
+      }
     }
-    setShowDraftDialog(false); // Close the dialog
+    startNew();
   };
 
-  const startNew = () => {
-    form.reset(initialData || {}); // Reset the form to initial data or empty
-    setShowDraftDialog(false); // Close the dialog
+  const selectDraft = (title: string) => {
+    const savedDrafts = localStorage.getItem("articleDrafts");
+    if (savedDrafts) {
+      const drafts = JSON.parse(savedDrafts);
+      const selectedDraft = drafts.find((draft: { title: string; data: ArticleFormData }) => draft.title === title);
+      if (selectedDraft) {
+        form.reset(selectedDraft.data);
+        setShowDraftDialog(false);
+      }
+    }
   };
 
   const saveDraft = () => {
-    const draftData = form.getValues(); // Get the current form values
+    const draftData = form.getValues();
+    const title = draftData.title || "Untitled Draft";
     try {
-      // Save the draft to local storage or send it to an API
-      localStorage.setItem("articleDraft", JSON.stringify(draftData));
+      const savedDrafts = localStorage.getItem("articleDrafts");
+      const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
+
+      // Check if draft with same title exists, update it if it does
+      const existingIndex = existingDrafts.findIndex((draft: { title: string; data: ArticleFormData }) => draft.title === title);
+      if (existingIndex !== -1) {
+        existingDrafts[existingIndex] = { title, data: draftData };
+      } else {
+        existingDrafts.push({ title, data: draftData });
+      }
+
+      localStorage.setItem("articleDrafts", JSON.stringify(existingDrafts));
+      setDrafts(existingDrafts);
       setAlert({
         message: "Draft saved successfully!",
         type: "success",
@@ -108,6 +132,11 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         type: "error",
       });
     }
+  };
+
+  const startNew = () => {
+    form.reset(initialData || {});
+    setShowDraftDialog(false);
   };
 
   const form = useForm<ArticleFormData>({
@@ -243,6 +272,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         onClose={() => setShowDraftDialog(false)}
         onLoadDraft={loadDraft}
         onStartNew={startNew}
+        drafts={drafts}
+        onSelectDraft={selectDraft}
       />
       {alert && (
         <Alert

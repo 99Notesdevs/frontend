@@ -3,9 +3,10 @@ import Image from "next/image";
 import { BlogTemplateProps } from "./types";
 import { format } from "date-fns";
 import { useEffect } from "react";
+import { RelatedTopics } from "../Blogs/relatedTopics";
 
 export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
-  const { title, content, metadata, imageUrl } = page;
+  const { title, content, metadata, imageUrl, slug } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
@@ -103,7 +104,7 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
                     </h1>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      By 99Notes . Created: {formattedDate}
+                      By 99Notes
                     </div>
 
                     <div
@@ -177,11 +178,8 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
               </main>
 
               {/* Sidebar */}
-              <aside className="lg:col-start-10 lg:col-span-3 xl:col-start-10 xl:col-span-3 space-y-4 sm:space-y-8">
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <h2 className="text-lg font-semibold mb-4">Related Topics</h2>
-                  <p className="text-[var(--text-base)]">Coming soon...</p>
-                </div>
+              <aside className="lg:col-start-10 lg:col-span-4 space-y-4 sm:space-y-8 mt-5 lg:mt-0">
+                <RelatedTopics currentBlogSlug={slug} />
               </aside>
             </div>
           </div>
@@ -193,6 +191,6 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLD) }}
       />
-      </>
+    </>
   );
 };

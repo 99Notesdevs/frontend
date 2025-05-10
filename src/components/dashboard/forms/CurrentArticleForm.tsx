@@ -71,33 +71,94 @@ export function CurrentArticleForm({
     message: string;
     type: "success" | "error";
   } | null>(null);
-  const [showDraftDialog, setShowDraftDialog] = useState(true);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [drafts, setDrafts] = useState<{
+    title: string;
+    data: CurrentArticleFormValues & { imageUrl: string | undefined ,showInNav: boolean | undefined,quizQuestions: string};
+  }[]>([]);
 
   useEffect(() => {
-    const savedDraft = localStorage.getItem("currentArticleDraft");
-    if (savedDraft) {
-      setShowDraftDialog(true); // Show the dialog if a draft exists
+    const savedDrafts = localStorage.getItem("currentArticleDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      setDrafts(parsedDrafts);
+      if (parsedDrafts.length > 0) {
+        setShowDraftDialog(true);
+      }
     }
   }, []);
 
   const loadDraft = () => {
-    const savedDraft = localStorage.getItem("currentArticleDraft");
-    if (savedDraft) {
-      form.reset(JSON.parse(savedDraft)); // Populate the form with the saved draft
+    const savedDrafts = localStorage.getItem("currentArticleDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      if (parsedDrafts.length > 0) {
+        setShowDraftDialog(true);
+      }
     }
-    setShowDraftDialog(false); // Close the dialog
   };
 
-  const startNew = () => {
-    form.reset(defaultValues || {}); // Reset the form to initial data or empty
-    setShowDraftDialog(false); // Close the dialog
+  const selectDraft = (title: string) => {
+    const savedDrafts = localStorage.getItem("currentArticleDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      const selectedDraft = parsedDrafts.find(
+        (draft: { title: string; data: CurrentArticleFormValues }) => draft.title === title
+      );
+      if (selectedDraft) {
+        // The quiz questions are already in JSON string format
+        const draftData = {
+          ...selectedDraft.data
+        };
+        
+        form.reset(draftData);
+        setImagePreview(selectedDraft.data.imageUrl);
+        
+        console.log("selectedDraft.data", selectedDraft.data);
+        setShowDraftDialog(false);
+      }
+    }
   };
 
-  const saveDraft = () => {
-    const draftData = form.getValues(); // Get the current form values
+  const saveDraft = async () => {
     try {
-      // Save the draft to local storage or send it to an API
-      localStorage.setItem("currentArticleDraft", JSON.stringify(draftData));
+      const draftTitle = form.getValues("title") || "Untitled Draft";
+      const draftData = form.getValues();
+      
+      const savedDrafts = localStorage.getItem("currentArticleDrafts");
+      const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
+
+      // Remove any existing draft with the same title
+      const filteredDrafts = existingDrafts.filter(
+        (draft: { title: string; data: CurrentArticleFormValues }) => draft.title !== draftTitle
+      );
+
+      // Add the new draft with all form data
+      const newDraft = {
+        title: draftTitle,
+        data: {
+          ...draftData,
+          imageUrl: draftData.imageUrl || imagePreview,
+          showInNav: false,
+          quizQuestions: draftData.quizQuestions || JSON.stringify([{
+            id: 1,
+            question: "",
+            options: ["", "", "", ""],
+            correctAnswer: 0,
+            explanation: ""
+          }])
+        } as CurrentArticleFormValues & { 
+          imageUrl: string | undefined, 
+          showInNav: boolean | undefined,
+          quizQuestions: string
+        },
+      };
+
+      console.log("newDraft", newDraft);
+      const updatedDrafts = [...filteredDrafts, newDraft];
+      localStorage.setItem("currentArticleDrafts", JSON.stringify(updatedDrafts));
+
+      setDrafts(updatedDrafts);
       setAlert({
         message: "Draft saved successfully!",
         type: "success",
@@ -109,6 +170,11 @@ export function CurrentArticleForm({
         type: "error",
       });
     }
+  };
+
+  const startNew = () => {
+    form.reset(defaultValues || {});
+    setShowDraftDialog(false);
   };
 
   const form = useForm<CurrentArticleFormValues>({
@@ -179,6 +245,8 @@ export function CurrentArticleForm({
         onClose={() => setShowDraftDialog(false)}
         onLoadDraft={loadDraft}
         onStartNew={startNew}
+        drafts={drafts}
+        onSelectDraft={selectDraft}
       />
       {alert && (
         <Alert
