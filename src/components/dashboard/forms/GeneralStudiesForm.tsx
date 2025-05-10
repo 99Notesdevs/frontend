@@ -676,21 +676,19 @@ export function GeneralStudiesForm({
           <Button
             type="button"
             onClick={saveDraft}
-            className="bg-gray-300 hover:bg-gray-400"
+            className="bg-gray-300 hover:bg-gray-400 mr-5"
           >
             Save as draft
           </Button>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
             <Button
               disabled={isUploading}
               type="submit"
-              className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-2 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-colors duration-200"
+              className="bg-slate-700 text-white rounded-md hover:bg-slate-800"
             >
               {isUploading ? "Uploading..." : "Save"}
             </Button>
-          </div>
         </form>
       </Form>
     </div>

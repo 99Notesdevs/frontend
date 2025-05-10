@@ -431,7 +431,16 @@ export default function PageListCurrent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setSelectedPage(page)}
+                  onClick={() => {
+                    setSelectedPage(page);
+                    // Scroll to the form container after a small delay to ensure it's mounted
+                    setTimeout(() => {
+                      const formContainer = document.querySelector('.bg-white.rounded-lg.shadow-sm');
+                      if (formContainer) {
+                        formContainer.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
                   className="border-[var(--admin-border)] text-blue-600 hover:bg-blue-50"
                 >
                   <PencilIcon className="w-4 h-4 mr-2 text-blue-500" />

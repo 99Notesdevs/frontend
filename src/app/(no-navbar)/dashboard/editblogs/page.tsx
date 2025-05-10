@@ -107,8 +107,17 @@ export default function ArticlesPage() {
     fetchPages(query);
   };
 
-  const handleEdit = (page: BlogType) => {
+  const handleEdit = async (page: BlogType) => {
     setSelectedPage(page);
+    setError(null);
+    
+    // Scroll to the form container after a small delay to ensure the form is mounted
+    setTimeout(() => {
+      const formContainer = document.querySelector('.bg-white.p-6.rounded-xl.shadow-md');
+      if (formContainer) {
+        formContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
     setImagePreview(page.imageUrl || null);
   };
 

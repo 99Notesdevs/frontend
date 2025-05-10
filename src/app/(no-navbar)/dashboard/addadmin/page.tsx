@@ -101,7 +101,7 @@ export default function AddAdmin() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] bg-transparent">
-      <div className="w-full max-w-lg bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-10 border border-[var(--admin-bg-light)] mt-10">
+      <div className="w-full max-w-lg bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-10 border border-[var(--admin-bg-light)] mt-10 mb-10">
         <h1
           className={`${plusJakarta.className} text-2xl font-bold text-[var(--admin-bg-secondary)] mb-8 text-center`}
         >

@@ -676,7 +676,7 @@ export function CurrentArticleForm({
           <Button
             type="button"
             onClick={saveDraft}
-            className="bg-gray-300 hover:bg-gray-400"
+            className="bg-gray-300 hover:bg-gray-400 mr-5"
           >
             Save as draft
           </Button>

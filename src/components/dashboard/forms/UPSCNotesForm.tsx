@@ -532,14 +532,15 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
           <Button
             type="button"
             onClick={saveDraft}
-            className="bg-gray-300 hover:bg-gray-400"
+            className="bg-gray-300 hover:bg-gray-400 mr-5"
           >
             Save as draft
           </Button>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="bg-slate-700 hover:bg-slate-900 text-white">
             Save
           </Button>
+
         </form>
       </Form>
     </div>

@@ -9,8 +9,10 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { TagInput } from "@/components/ui/tags/tag-input";
 import TiptapEditor from "@/components/ui/tiptapeditor";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -29,6 +31,7 @@ const formSchema = z.object({
   title: z.string(),
   content: z.string(),
   imageUrl: z.string(),
+  tags: z.array(z.string()).optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -47,6 +50,7 @@ const formSchema = z.object({
   body: z.string().optional(),
   slug: z.string(),
   order: z.number().optional(),
+  showInNav: z.boolean().default(false),
 });
 
 export type BlogFormValues = z.infer<typeof formSchema>;
@@ -213,6 +217,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       title: "",
       content: "",
       imageUrl: "",
+      tags: [],
       slug: "",
       metaTitle: "",
       metaDescription: "",
@@ -230,6 +235,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       schemaData: "",
       header: "",
       body: "",
+      showInNav: true,
     },
   });
 
@@ -411,6 +417,29 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                   <div className="text-red-600 font-semibold text-sm mt-1">
                     {fieldState.error.message}
                   </div>
+                )}
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field: { onChange, value, ...field }, formState }) => (
+              <FormItem>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <TagInput
+                    value={value || []}
+                    onChange={onChange}
+                    placeholder="Add tags..."
+                    className="w-full"
+                  />
+                </FormControl>
+                {formState.errors.tags && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {formState.errors.tags.message}
+                  </p>
                 )}
               </FormItem>
             )}
@@ -666,7 +695,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           <Button
             type="button"
             onClick={saveDraft}
-            className="bg-gray-300 hover:bg-gray-400"
+            className="bg-gray-300 hover:bg-gray-400 mr-5"
           >
             Save as Draft
           </Button>
