@@ -27,9 +27,9 @@ async function getPage(
   }
 }
 
-interface Params {
+type Params = Promise<{
   blogs: string;
-}
+}>;
 
 export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
   const { blogs: slug } = await params;  // Await params first
