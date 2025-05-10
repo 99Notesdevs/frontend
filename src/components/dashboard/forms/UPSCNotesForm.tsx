@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,14 @@ import {
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Alert } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import DraftDialog from "@/components/ui/DraftDialog";
 
 const formSchema = z.object({
   title: z.string(),
@@ -53,6 +60,45 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     message: string;
     type: "error" | "success" | "warning";
   } | null>(null);
+  const [showDraftDialog, setShowDraftDialog] = useState(true);
+
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("upscNotesDraft");
+    if (savedDraft) {
+      setShowDraftDialog(true); // Show the dialog if a draft exists
+    }
+  }, []);
+
+  const loadDraft = () => {
+    const savedDraft = localStorage.getItem("upscNotesDraft");
+    if (savedDraft) {
+      form.reset(JSON.parse(savedDraft)); // Populate the form with the saved draft
+    }
+    setShowDraftDialog(false); // Close the dialog
+  };
+
+  const startNew = () => {
+    form.reset(initialData || {}); // Reset the form to initial data or empty
+    setShowDraftDialog(false); // Close the dialog
+  };
+
+  const saveDraft = () => {
+    const draftData = form.getValues(); // Get the current form values
+    try {
+      // Save the draft to local storage or send it to an API
+      localStorage.setItem("upscNotesDraft", JSON.stringify(draftData));
+      setAlert({
+        message: "Draft saved successfully!",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      setAlert({
+        message: "Failed to save draft. Please try again.",
+        type: "error",
+      });
+    }
+  };
 
   const form = useForm<FormData>({
     resolver: (values) => {
@@ -126,6 +172,12 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
 
   return (
     <div className="relative">
+      <DraftDialog
+        open={showDraftDialog}
+        onClose={() => setShowDraftDialog(false)}
+        onLoadDraft={loadDraft}
+        onStartNew={startNew}
+      />
       {alert && (
         <Alert
           message={alert.message}
@@ -134,7 +186,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
         />
       )}
       <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
             name="title"
@@ -153,7 +205,9 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Content <span className="text-red-500">*</span></FormLabel>
+                <FormLabel>
+                  Content <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Editor content={field.value} onChange={field.onChange} />
                 </FormControl>
@@ -214,7 +268,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               <FormItem>
                 <FormLabel>Robots</FormLabel>
                 <FormControl>
-                  <Select 
+                  <Select
                     value={field.value || "noindex,nofollow"}
                     onValueChange={(value) => field.onChange(value)}
                     defaultValue="noindex,nofollow"
@@ -223,9 +277,15 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
                     <SelectContent className="text-white">
-                      <SelectItem value="noindex,nofollow">No index,No follow</SelectItem>
-                      <SelectItem value="index,nofollow">Index,No follow</SelectItem>
-                      <SelectItem value="noindex,follow">No index,Follow</SelectItem>
+                      <SelectItem value="noindex,nofollow">
+                        No index,No follow
+                      </SelectItem>
+                      <SelectItem value="index,nofollow">
+                        Index,No follow
+                      </SelectItem>
+                      <SelectItem value="noindex,follow">
+                        No index,Follow
+                      </SelectItem>
                       <SelectItem value="index,follow">Index,Follow</SelectItem>
                     </SelectContent>
                   </Select>
@@ -256,7 +316,10 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               <FormItem>
                 <FormLabel>OG Description</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter Open Graph description" {...field} />
+                  <Input
+                    placeholder="Enter Open Graph description"
+                    {...field}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -421,6 +484,14 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               </div>
             </div>
           </div>
+
+          <Button
+            type="button"
+            onClick={saveDraft}
+            className="bg-gray-300 hover:bg-gray-400"
+          >
+            Save as draft
+          </Button>
 
           <Button type="submit" className="w-full">
             Save
