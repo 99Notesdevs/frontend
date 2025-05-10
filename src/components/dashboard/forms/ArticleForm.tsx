@@ -1,13 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import TiptapEditor from "@/components/ui/tiptapeditor";
+import DraftDialog from "@/components/ui/DraftDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/Checkbox";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 import {
@@ -19,7 +18,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Alert } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { TagInput } from "@/components/ui/tags/tag-input";
 
 const articleSchema = z.object({
@@ -65,6 +70,45 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     message: string;
     type: "error" | "success" | "warning";
   } | null>(null);
+  const [showDraftDialog, setShowDraftDialog] = useState(true);
+
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("articleDraft");
+    if (savedDraft) {
+      setShowDraftDialog(true); // Show the dialog if a draft exists
+    }
+  }, []);
+
+  const loadDraft = () => {
+    const savedDraft = localStorage.getItem("articleDraft");
+    if (savedDraft) {
+      form.reset(JSON.parse(savedDraft)); // Populate the form with the saved draft
+    }
+    setShowDraftDialog(false); // Close the dialog
+  };
+
+  const startNew = () => {
+    form.reset(initialData || {}); // Reset the form to initial data or empty
+    setShowDraftDialog(false); // Close the dialog
+  };
+
+  const saveDraft = () => {
+    const draftData = form.getValues(); // Get the current form values
+    try {
+      // Save the draft to local storage or send it to an API
+      localStorage.setItem("articleDraft", JSON.stringify(draftData));
+      setAlert({
+        message: "Draft saved successfully!",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      setAlert({
+        message: "Failed to save draft. Please try again.",
+        type: "error",
+      });
+    }
+  };
 
   const form = useForm<ArticleFormData>({
     resolver: (values) => {
@@ -75,7 +119,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         messages.push("Title must be at least 2 characters");
         errors = {
           ...errors,
-          title: { message: "" }
+          title: { message: "" },
         };
       }
 
@@ -83,7 +127,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         messages.push("Content must be at least 10 characters");
         errors = {
           ...errors,
-          content: { message: "" }
+          content: { message: "" },
         };
       }
 
@@ -91,14 +135,14 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         messages.push("Image is required");
         errors = {
           ...errors,
-          imageUrl: { message: "" }
+          imageUrl: { message: "" },
         };
       }
 
       if (messages.length > 0) {
         setAlert({
-          message: `Please fix the following:\n• ${messages.join('\n• ')}`,
-          type: "error"
+          message: `Please fix the following:\n• ${messages.join("\n• ")}`,
+          type: "error",
         });
         return { values: {}, errors };
       }
@@ -138,7 +182,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-        setIsUploading(true);
+      setIsUploading(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -155,11 +199,11 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             form.setValue("imageUrl", "www.google.com/fallbackUrl");
             throw new Error("Failed to upload image to S3");
           }
-      } catch (error) {
+        } catch (error) {
           console.error("Error uploading image:", error);
-      } finally {
-        setIsUploading(false);
-      }
+        } finally {
+          setIsUploading(false);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -169,7 +213,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     const transformedData = {
       title: data.title,
       content: data.content,
-      imageUrl: data.imageUrl || '',
+      imageUrl: data.imageUrl || "",
       tags: data.tags || [],
       metaTitle: data.metaTitle,
       metaDescription: data.metaDescription,
@@ -194,6 +238,12 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
 
   return (
     <div className="relative">
+      <DraftDialog
+        open={showDraftDialog}
+        onClose={() => setShowDraftDialog(false)}
+        onLoadDraft={loadDraft}
+        onStartNew={startNew}
+      />
       {alert && (
         <Alert
           message={alert.message}
@@ -202,350 +252,382 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         />
       )}
       <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmitForm)} className="space-y-6">
-        {/* Title */}
+        <form
+          onSubmit={form.handleSubmit(handleSubmitForm)}
+          className="space-y-6"
+        >
+          {/* Title */}
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
               <FormItem>
-              <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
+                <FormLabel>
+                  Title <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
-                <Input {...field} className="border-[var(--admin-border)]" />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        {/* Image Upload */}
-        <FormField
-          control={form.control}
-          name="imageUrl"
-          render={({ field: { value, onChange, ...field } }) => (
-            <FormItem>
-              <FormLabel>Image <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <div className="space-y-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="border-[var(--admin-border)]"
-                    {...field}
-                  />
-
-                  {imagePreview ? (
-                    <div className="space-y-2">
-                      <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
-                        <Image
-                          src={imagePreview}
-                          alt="Image preview"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="text-sm text-green-500">Image uploaded successfully</p>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500">No image uploaded</p>
-                  )}
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        {/* Main Content */}
-        <FormField
-          control={form.control}
-          name="content"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Main Content <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <TiptapEditor
-                  content={field.value}
-                  onChange={handleEditorChange}
-                />
+                  <Input {...field} className="border-[var(--admin-border)]" />
                 </FormControl>
               </FormItem>
             )}
           />
 
-        {/* Tags */}
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field: { onChange, value, ...field } }) => (
-            <FormItem>
-              <FormLabel>Tags</FormLabel>
-              <FormControl>
-                <TagInput
-                  value={value || []}
-                  onChange={onChange}
-                  placeholder="Add tags..."
-                  className="w-full"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Metadata */}
-        <div className="grid  gap-6">
+          {/* Image Upload */}
           <FormField
             control={form.control}
-            name="metaTitle"
+            name="imageUrl"
+            render={({ field: { value, onChange, ...field } }) => (
+              <FormItem>
+                <FormLabel>
+                  Image <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="space-y-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="border-[var(--admin-border)]"
+                      {...field}
+                    />
+
+                    {imagePreview ? (
+                      <div className="space-y-2">
+                        <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
+                          <Image
+                            src={imagePreview}
+                            alt="Image preview"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <p className="text-sm text-green-500">
+                          Image uploaded successfully
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No image uploaded</p>
+                    )}
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Main Content */}
+          <FormField
+            control={form.control}
+            name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Meta Title</FormLabel>
+                <FormLabel>
+                  Main Content <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <TiptapEditor
+                    content={field.value}
+                    onChange={handleEditorChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Tags */}
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field: { onChange, value, ...field } }) => (
+              <FormItem>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <TagInput
+                    value={value || []}
+                    onChange={onChange}
+                    placeholder="Add tags..."
+                    className="w-full"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="metaDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Meta Description</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          {/* Metadata */}
+          <div className="grid  gap-6">
+            <FormField
+              control={form.control}
+              name="metaTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meta Title</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="metaKeywords"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Meta Keywords</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="metaDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meta Description</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="robots"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Robots</FormLabel>
-                <FormControl>
-                  <Select 
-                    value={field.value || "noindex,nofollow"}
-                    onValueChange={(value) => field.onChange(value)}
-                    defaultValue="noindex,nofollow"
+            <FormField
+              control={form.control}
+              name="metaKeywords"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meta Keywords</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="robots"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Robots</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value || "noindex,nofollow"}
+                      onValueChange={(value) => field.onChange(value)}
+                      defaultValue="noindex,nofollow"
+                    >
+                      <SelectTrigger className="text-white">
+                        <SelectValue placeholder="No index, No follow" />
+                      </SelectTrigger>
+                      <SelectContent className="text-white">
+                        <SelectItem value="noindex,nofollow">
+                          No index, No follow
+                        </SelectItem>
+                        <SelectItem value="index,nofollow">
+                          Index, No follow
+                        </SelectItem>
+                        <SelectItem value="noindex,follow">
+                          No index, Follow
+                        </SelectItem>
+                        <SelectItem value="index,follow">
+                          Index, Follow
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ogTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>OG Title</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ogDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>OG Description</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ogImage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>OG Image</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ogType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>OG Type</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="twitterCard"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Twitter Card</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="twitterTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Twitter Title</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="twitterDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Twitter Description</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="twitterImage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Twitter Image</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="canonicalUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Canonical URL</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="schemaData"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Schema Data</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="header"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Header</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="body"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Body</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="showInNav">Show in Navigation</Label>
+                <div className="flex items-center space-x-2">
+                  <Select
+                    value={form.watch("showInNav") ? "show" : "hide"}
+                    onValueChange={(value) => {
+                      form.setValue("showInNav", value === "show");
+                    }}
                   >
                     <SelectTrigger className="text-white">
-                      <SelectValue placeholder="No index, No follow" />
+                      <SelectValue placeholder="Show in Navbar" />
                     </SelectTrigger>
                     <SelectContent className="text-white">
-                      <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
-                      <SelectItem value="index,nofollow">Index, No follow</SelectItem>
-                      <SelectItem value="noindex,follow">No index, Follow</SelectItem>
-                      <SelectItem value="index,follow">Index, Follow</SelectItem>
+                      <SelectItem value="show">Show in Navbar</SelectItem>
+                      <SelectItem value="hide">
+                        Do not Show in Navbar
+                      </SelectItem>
                     </SelectContent>
                   </Select>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ogTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OG Title</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ogDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OG Description</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ogImage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OG Image</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ogType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OG Type</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="twitterCard"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Twitter Card</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="twitterTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Twitter Title</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="twitterDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Twitter Description</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="twitterImage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Twitter Image</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="canonicalUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Canonical URL</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="schemaData"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Schema Data</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="header"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Header</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="body"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Body</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="showInNav">Show in Navigation</Label>
-              <div className="flex items-center space-x-2">
-                <Select
-                  value={form.watch("showInNav") ? "show" : "hide"}
-                  onValueChange={(value) => {
-                    form.setValue("showInNav", value === "show");
-                  }}
-                >
-                  <SelectTrigger className="text-white">
-                    <SelectValue placeholder="Show in Navbar" />
-                  </SelectTrigger>
-                  <SelectContent className="text-white">
-                    <SelectItem value="show">Show in Navbar</SelectItem>
-                    <SelectItem value="hide">Do not Show in Navbar</SelectItem>
-                  </SelectContent>
-                </Select>
-
-              </div>
+                </div>
               </div>
             </div>
           </div>
 
-        <Button disabled={isUploading} type="submit" className="w-full mt-6 bg-slate-300 hover:bg-slate-400">
-            {isUploading ? 'Uploading...' : 'Save'}
+          <Button
+            type="button"
+            onClick={saveDraft}
+            className="bg-gray-300 hover:bg-gray-400"
+          >
+            Save as draft
+          </Button>
+
+          <Button
+            disabled={isUploading}
+            type="submit"
+            className="w-full mt-6 bg-slate-300 hover:bg-slate-400"
+          >
+            {isUploading ? "Uploading..." : "Save"}
           </Button>
         </form>
       </Form>
     </div>
   );
-}
+};

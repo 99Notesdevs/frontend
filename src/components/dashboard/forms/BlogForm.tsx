@@ -1,16 +1,29 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import TiptapEditor from '@/components/ui/tiptapeditor';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { uploadImageToS3 } from '@/config/imageUploadS3';
-import { Alert } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import TiptapEditor from "@/components/ui/tiptapeditor";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
+import { Alert } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import DraftDialog from "@/components/ui/DraftDialog";
 
 const formSchema = z.object({
   title: z.string(),
@@ -44,14 +57,58 @@ interface BlogFormProps {
 }
 
 export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    defaultValues?.imageUrl || null
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
   const [alert, setAlert] = useState<{
     message: string;
     type: "error" | "success" | "warning";
   } | null>(null);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+
+  // Check for saved draft on component load
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("blogDraft");
+    if (savedDraft) {
+      setShowDraftDialog(true); // Show dialog if a draft exists
+    }
+  }, []);
+
+  // Save draft function
+  const saveDraft = () => {
+    const draftData = form.getValues(); // Get current form values
+    try {
+      localStorage.setItem("blogDraft", JSON.stringify(draftData)); // Save to localStorage
+      setAlert({
+        message: "Draft saved successfully!",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      setAlert({
+        message: "Failed to save draft. Please try again.",
+        type: "error",
+      });
+    }
+  };
+
+  // Load draft function
+  const loadDraft = () => {
+    const savedDraft = localStorage.getItem("blogDraft");
+    if (savedDraft) {
+      form.reset(JSON.parse(savedDraft)); // Populate form with draft data
+    }
+    setShowDraftDialog(false); // Close dialog
+  };
+
+  // Start new form function
+  const startNew = () => {
+    form.reset(defaultValues || {}); // Reset form to default values
+    setShowDraftDialog(false); // Close dialog
+  };
 
   const form = useForm<BlogFormValues>({
     resolver: (values) => {
@@ -62,7 +119,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
         messages.push("Title must be at least 2 characters");
         errors = {
           ...errors,
-          title: { message: "Title must be at least 2 characters" }
+          title: { message: "Title must be at least 2 characters" },
         };
       }
 
@@ -70,7 +127,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
         messages.push("Content must be at least 10 characters");
         errors = {
           ...errors,
-          content: { message: "Content must be at least 10 characters" }
+          content: { message: "Content must be at least 10 characters" },
         };
       }
 
@@ -78,13 +135,13 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
         messages.push("Image is required");
         errors = {
           ...errors,
-          imageUrl: { message: "Image is required" }
+          imageUrl: { message: "Image is required" },
         };
       } else if (!values.imageUrl.match(/^https?:\/\/.+$/)) {
         messages.push("Please provide a valid image URL");
         errors = {
           ...errors,
-          imageUrl: { message: "Please provide a valid image URL" }
+          imageUrl: { message: "Please provide a valid image URL" },
         };
       }
 
@@ -92,14 +149,14 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
         messages.push("Slug is required");
         errors = {
           ...errors,
-          slug: { message: "Slug is required" }
+          slug: { message: "Slug is required" },
         };
       }
 
       if (messages.length > 0) {
         setAlert({
-          message: `Please fix the following:\n• ${messages.join('\n• ')}`,
-          type: "error"
+          message: `Please fix the following:\n• ${messages.join("\n• ")}`,
+          type: "error",
         });
         return { values: {}, errors };
       }
@@ -108,26 +165,26 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       return { values, errors: {} };
     },
     defaultValues: defaultValues || {
-      title: '',
-      content: '',
-      imageUrl: '',
-      slug: '',
-      metaTitle: '',
-      metaDescription: '',
-      metaKeywords: '',
-      robots: '',
-      ogTitle: '',  
-      ogDescription: '',
-      ogImage: '',
-      ogType: '',
-      twitterCard: '',
-      twitterTitle: '',
-      twitterDescription: '',
-      twitterImage: '',
-      canonicalUrl: '',
-      schemaData: '',
-      header: '',
-      body: '',
+      title: "",
+      content: "",
+      imageUrl: "",
+      slug: "",
+      metaTitle: "",
+      metaDescription: "",
+      metaKeywords: "",
+      robots: "",
+      ogTitle: "",
+      ogDescription: "",
+      ogImage: "",
+      ogType: "",
+      twitterCard: "",
+      twitterTitle: "",
+      twitterDescription: "",
+      twitterImage: "",
+      canonicalUrl: "",
+      schemaData: "",
+      header: "",
+      body: "",
     },
   });
 
@@ -167,7 +224,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       await onSubmit(data);
       setAlert({
         message: "Blog post saved successfully!",
-        type: "success"
+        type: "success",
       });
       // Auto-dismiss the success message after 3 seconds
       setTimeout(() => {
@@ -176,41 +233,63 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     } catch (error) {
       setAlert({
         message: "Failed to save blog post. Please try again.",
-        type: "error"
+        type: "error",
       });
     }
   };
 
   return (
     <div className="relative">
+      <DraftDialog
+        open={showDraftDialog}
+        onClose={() => setShowDraftDialog(false)}
+        onLoadDraft={loadDraft}
+        onStartNew={startNew}
+      />
       {alert && (
         <Alert
           message={alert.message}
           type={alert.type}
           onClose={() => setAlert(null)}
-          className={`font-bold px-4 py-3 rounded mb-4 ${alert.type === 'error' ? 'bg-red-100 text-red-800 border border-red-400' : alert.type === 'success' ? 'bg-green-100 text-green-800 border border-green-400' : 'bg-yellow-100 text-yellow-800 border border-yellow-400'}`}
+          className={`font-bold px-4 py-3 rounded mb-4 ${
+            alert.type === "error"
+              ? "bg-red-100 text-red-800 border border-red-400"
+              : alert.type === "success"
+              ? "bg-green-100 text-green-800 border border-green-400"
+              : "bg-yellow-100 text-yellow-800 border border-yellow-400"
+          }`}
         />
       )}
       <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleFormSubmit)}
+          className="space-y-6"
+        >
           {/* Show success message */}
           {isSuccess && (
-            <div className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
+            <div
+              className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50"
+              role="alert"
+            >
               {successMessage}
             </div>
           )}
-          
+
           <FormField
             control={form.control}
             name="title"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
+                <FormLabel>
+                  Title <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input placeholder="Enter blog title" {...field} />
                 </FormControl>
                 {fieldState.error?.message && (
-                  <div className="text-red-600 font-semibold text-sm mt-1">{fieldState.error.message}</div>
+                  <div className="text-red-600 font-semibold text-sm mt-1">
+                    {fieldState.error.message}
+                  </div>
                 )}
               </FormItem>
             )}
@@ -221,12 +300,19 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             name="content"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Content <span className="text-red-500">*</span></FormLabel>
+                <FormLabel>
+                  Content <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
-                  <TiptapEditor content={field.value} onChange={field.onChange} />
+                  <TiptapEditor
+                    content={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 {fieldState.error?.message && (
-                  <div className="text-red-600 font-semibold text-sm mt-1">{fieldState.error.message}</div>
+                  <div className="text-red-600 font-semibold text-sm mt-1">
+                    {fieldState.error.message}
+                  </div>
                 )}
               </FormItem>
             )}
@@ -237,7 +323,9 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             name="imageUrl"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Image <span className="text-red-500">*</span></FormLabel>
+                <FormLabel>
+                  Image <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <div className="flex flex-col gap-4">
                     {imagePreview ? (
@@ -251,7 +339,9 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                             priority
                           />
                         </div>
-                        <p className="text-sm text-green-500">Image uploaded successfully</p>
+                        <p className="text-sm text-green-500">
+                          Image uploaded successfully
+                        </p>
                       </div>
                     ) : (
                       <p className="text-sm text-gray-500">No image uploaded</p>
@@ -264,12 +354,16 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                       disabled={isUploading}
                     />
                     {isUploading && (
-                      <div className="text-sm text-blue-500 mt-2">Uploading image...</div>
+                      <div className="text-sm text-blue-500 mt-2">
+                        Uploading image...
+                      </div>
                     )}
                   </div>
                 </FormControl>
                 {fieldState.error?.message && (
-                  <div className="text-red-600 font-semibold text-sm mt-1">{fieldState.error.message}</div>
+                  <div className="text-red-600 font-semibold text-sm mt-1">
+                    {fieldState.error.message}
+                  </div>
                 )}
               </FormItem>
             )}
@@ -280,12 +374,16 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             name="slug"
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Slug <span className="text-red-500">*</span></FormLabel>
+                <FormLabel>
+                  Slug <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input placeholder="Enter slug" {...field} />
                 </FormControl>
                 {fieldState.error?.message && (
-                  <div className="text-red-600 font-semibold text-sm mt-1">{fieldState.error.message}</div>
+                  <div className="text-red-600 font-semibold text-sm mt-1">
+                    {fieldState.error.message}
+                  </div>
                 )}
               </FormItem>
             )}
@@ -335,7 +433,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               <FormItem>
                 <FormLabel>Robots</FormLabel>
                 <FormControl>
-                  <Select 
+                  <Select
                     value={field.value || "noindex,nofollow"}
                     onValueChange={(value) => field.onChange(value)}
                     defaultValue="noindex,nofollow"
@@ -344,17 +442,25 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
                     <SelectContent className="text-white">
-                      <SelectItem value="noindex,nofollow">No index, No follow</SelectItem>
-                      <SelectItem value="index,nofollow">Index, No follow</SelectItem>
-                      <SelectItem value="noindex,follow">No index, Follow</SelectItem>
-                      <SelectItem value="index,follow">Index, Follow</SelectItem>
+                      <SelectItem value="noindex,nofollow">
+                        No index, No follow
+                      </SelectItem>
+                      <SelectItem value="index,nofollow">
+                        Index, No follow
+                      </SelectItem>
+                      <SelectItem value="noindex,follow">
+                        No index, Follow
+                      </SelectItem>
+                      <SelectItem value="index,follow">
+                        Index, Follow
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
               </FormItem>
             )}
-          />        
-          
+          />
+
           <FormField
             control={form.control}
             name="ogTitle"
@@ -405,9 +511,8 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               </FormItem>
             )}
           />
-       
 
-        <FormField
+          <FormField
             control={form.control}
             name="twitterCard"
             render={({ field }) => (
@@ -419,7 +524,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="twitterTitle"
@@ -458,8 +563,8 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
               </FormItem>
             )}
           />
-      
-        <FormField
+
+          <FormField
             control={form.control}
             name="canonicalUrl"
             render={({ field }) => (
@@ -472,7 +577,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             )}
           />
 
-        <FormField
+          <FormField
             control={form.control}
             name="schemaData"
             render={({ field }) => (
@@ -511,11 +616,25 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             )}
           />
 
-        <Button type="submit" className="bg-slate-700 hover:bg-slate-800 text-white" disabled={isUploading || form.formState.isSubmitting}>
-          {isUploading || form.formState.isSubmitting ? "Processing..." : "Save Blog"}
-        </Button>
-      </form>
-    </Form>
-  </div>
+          <Button
+            type="button"
+            onClick={saveDraft}
+            className="bg-gray-300 hover:bg-gray-400"
+          >
+            Save as Draft
+          </Button>
+
+          <Button
+            type="submit"
+            className="bg-slate-700 hover:bg-slate-800 text-white"
+            disabled={isUploading || form.formState.isSubmitting}
+          >
+            {isUploading || form.formState.isSubmitting
+              ? "Processing..."
+              : "Save Blog"}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 }
