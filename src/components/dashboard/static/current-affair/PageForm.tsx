@@ -9,6 +9,7 @@ import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 import {uploadImageToS3} from '@/config/imageUploadS3';
 import { CurrentArticleForm, CurrentArticleFormValues } from '@/components/dashboard/forms/CurrentArticleForm';
+import Drafts from '@/components/ui/drafts';
 // Types for CurrentAffair models
 interface CurrentAffairType {
   id: number;
@@ -757,6 +758,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       </div>
 
       {renderStepContent()}
+      <Drafts types={["generalStudiesDrafts","currentArticleDrafts"]} />
     </div>
   );
 }

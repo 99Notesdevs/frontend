@@ -68,20 +68,47 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [drafts, setDrafts] = useState<{
+    title: string;
+    data: BlogFormValues & { showInNav: boolean };
+  }[]>([]);
 
-  // Check for saved draft on component load
+  // Check for saved drafts on component load
   useEffect(() => {
-    const savedDraft = localStorage.getItem("blogDraft");
-    if (savedDraft) {
-      setShowDraftDialog(true); // Show dialog if a draft exists
+    const savedDrafts = localStorage.getItem("blogDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      setDrafts(parsedDrafts);
+      if (parsedDrafts.length > 0) {
+        setShowDraftDialog(true);
+      }
     }
   }, []);
 
   // Save draft function
   const saveDraft = () => {
-    const draftData = form.getValues(); // Get current form values
+    const draftData = form.getValues();
+    const draftTitle = draftData.title || `Draft ${Date.now()}`;
+
     try {
-      localStorage.setItem("blogDraft", JSON.stringify(draftData)); // Save to localStorage
+      const savedDrafts = localStorage.getItem("blogDrafts");
+      const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
+
+      // Remove any existing draft with the same title
+      const filteredDrafts = existingDrafts.filter(
+        (draft: { title: string; data: BlogFormValues }) => draft.title !== draftTitle
+      );
+
+      // Add the new draft
+      const newDraft = {
+        title: draftTitle,
+        data: draftData,
+      };
+
+      const updatedDrafts = [...filteredDrafts, newDraft];
+      localStorage.setItem("blogDrafts", JSON.stringify(updatedDrafts));
+
+      setDrafts(updatedDrafts);
       setAlert({
         message: "Draft saved successfully!",
         type: "success",
@@ -97,17 +124,35 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
 
   // Load draft function
   const loadDraft = () => {
-    const savedDraft = localStorage.getItem("blogDraft");
-    if (savedDraft) {
-      form.reset(JSON.parse(savedDraft)); // Populate form with draft data
+    const savedDrafts = localStorage.getItem("blogDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      if (parsedDrafts.length > 0) {
+        setShowDraftDialog(true);
+      }
     }
-    setShowDraftDialog(false); // Close dialog
+  };
+
+  // Select draft function
+  const selectDraft = (title: string) => {
+    const savedDrafts = localStorage.getItem("blogDrafts");
+    if (savedDrafts) {
+      const parsedDrafts = JSON.parse(savedDrafts);
+      const selectedDraft = parsedDrafts.find(
+        (draft: { title: string; data: BlogFormValues }) => draft.title === title
+      );
+      if (selectedDraft) {
+        form.reset(selectedDraft.data);
+        setImagePreview(selectedDraft.data.imageUrl);
+        setShowDraftDialog(false);
+      }
+    }
   };
 
   // Start new form function
   const startNew = () => {
-    form.reset(defaultValues || {}); // Reset form to default values
-    setShowDraftDialog(false); // Close dialog
+    form.reset(defaultValues || {});
+    setShowDraftDialog(false);
   };
 
   const form = useForm<BlogFormValues>({
@@ -245,6 +290,8 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
         onClose={() => setShowDraftDialog(false)}
         onLoadDraft={loadDraft}
         onStartNew={startNew}
+        drafts={drafts}
+        onSelectDraft={selectDraft}
       />
       {alert && (
         <Alert
