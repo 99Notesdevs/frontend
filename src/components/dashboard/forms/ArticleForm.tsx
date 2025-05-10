@@ -70,7 +70,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     message: string;
     type: "error" | "success" | "warning";
   } | null>(null);
-  const [showDraftDialog, setShowDraftDialog] = useState(true);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
   const [drafts, setDrafts] = useState<{ title: string; data: ArticleFormData }[]>([]);
 
   useEffect(() => {
