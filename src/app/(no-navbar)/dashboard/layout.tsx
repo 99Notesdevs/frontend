@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { FaPlus, FaEdit } from "react-icons/fa";
 import { isAuth, AuthResponse } from "@/lib/isAuth";
 import { useState, useEffect } from "react";
+import Cookies from 'js-cookie';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -107,21 +108,45 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const auth = await isAuth();
-      setAuthState(auth);
+      try {
+        const auth = await isAuth();
+        
+        // If not authenticated, clear everything and redirect
+        if (!auth.isAuthenticated) {
+          // Clear all auth data
+          Cookies.remove('token', { path: '/' });
+          localStorage.clear();
+          sessionStorage.clear();
+          router.replace('/operator');
+          return;
+        }
+        
+        // If authenticated, set the auth state
+        setAuthState(auth);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        // On error, clear all auth data and redirect
+        Cookies.remove('token', { path: '/' });
+        localStorage.clear();
+        sessionStorage.clear();
+        router.replace('/operator');
+      }
     };
 
     checkAuth();
-  }, []);
+  }, [router]);
 
+  // Show loading state while checking auth
   if (!authState) {
-    return <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[var(--admin-bg-secondary)] via-[var(--admin-bg-primary)] to-[var(--admin-bg-dark]">
-      <span className="text-[var(--admin-border)] text-lg font-medium animate-pulse">Loading dashboard...</span>
-    </div>;
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[var(--admin-bg-secondary)] via-[var(--admin-bg-primary)] to-[var(--admin-bg-dark)]">
+        <span className="text-[var(--admin-border)] text-lg font-medium animate-pulse">Verifying authentication...</span>
+      </div>
+    );
   }
 
+  // If not authenticated, show nothing (will be redirected by useEffect)
   if (!authState.isAuthenticated) {
-    router.push("/operator");
     return null;
   }
 
@@ -164,8 +189,8 @@ export default function DashboardLayout({
         }`}
         style={{ minWidth: 240 }}
       >
-        <div className="flex items-center h-16 px-6 border-b border-[var(--admin-bg-dark)]">
-          {/* Make Dashboard title clickable to go to /dashboard */}
+        <div className="flex items-center justify-between h-16 px-6 border-b border-[var(--admin-bg-dark)]">
+          {/* Dashboard title */}
           <button
             onClick={() => {
               router.push("/dashboard");
@@ -182,6 +207,43 @@ export default function DashboardLayout({
             aria-label="Go to Dashboard"
           >
             Dashboard
+          </button>
+          {/* Logout button */}
+          <button
+            onClick={() => {
+              // Clear all auth data
+              Cookies.remove('token', { path: '/' });
+              localStorage.clear();
+              sessionStorage.clear();
+              // Force a full page reload to clear any cached state
+              window.location.href = '/operator';
+            }}
+            className="text-gray-300 hover:text-white transition-colors focus:outline-none"
+            aria-label="Logout"
+            style={{
+              background: "none",
+              border: "none",
+              padding: '4px',
+              cursor: "pointer",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+              />
+            </svg>
           </button>
           <button
             className="ml-auto text-[var(--admin-scroll-thumb-hover)] hover:text-white focus:outline-none lg:hidden"
