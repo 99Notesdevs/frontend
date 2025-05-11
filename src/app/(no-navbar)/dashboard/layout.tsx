@@ -72,6 +72,12 @@ const navigationItems = {
       items: [
         { icon: FaEdit, text: "Manage Subscriptions", path: "/dashboard/subscription" }
       ]
+    },
+    {
+      category: "Media Management",
+      items: [
+        { icon: FaEdit, text: "Manage Media", path: "/dashboard/media" }
+      ]
     }
   ],
   author: [
