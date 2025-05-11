@@ -5,6 +5,7 @@ import { BaseTemplateProps } from "@/components/templates/types";
 import { Metadata } from "next";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { RelatedTopics } from "@/components/Blogs/relatedTopics";
+import { Tags } from "@/components/ui/tags/Tags";
 
 async function getPage(
   slug: string
@@ -15,7 +16,7 @@ async function getPage(
     const response = await fetch(`${env.API}/blog/slug/${normalizedSlug}`);
     const res = await response.json();
     const page = res.data;
-    
+    console.log("PAGE", page);
     if (!page) {
       return null;
     }
@@ -85,7 +86,7 @@ export default async function Page({ params }: { params: Params }) {
   const { blogs: slug } = await params;  // Await params first
   const normalizedSlug = slug.replace(/\s+/g, '-');
   const page = await getPage(normalizedSlug);
-
+  const tags = page?.tags;
   if (!page) {
     notFound();
   }
@@ -242,6 +243,12 @@ export default async function Page({ params }: { params: Params }) {
                       }"
                     >
                       <div dangerouslySetInnerHTML={{ __html: content || '' }}></div>
+                    </div>
+                    <div>
+                      {tags && tags.length > 0 && (
+                        
+                        <Tags tags={tags} />
+                      )}
                     </div>
                   </div>
                 </div>

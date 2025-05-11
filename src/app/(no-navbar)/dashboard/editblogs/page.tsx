@@ -13,6 +13,7 @@ import Image from "next/image";
 import { BlogForm } from "@/components/dashboard/forms";
 import { BlogFormValues } from "@/components/dashboard/forms/BlogForm";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
+import Drafts from "@/components/ui/drafts";
 interface BlogType {
   id: number;
   title: string;
@@ -20,6 +21,7 @@ interface BlogType {
   slug: string;
   order: number;
   metadata?: string;
+  tags?: string[];
   createdAt: Date;
   updatedAt: Date;
   imageUrl: string | null;
@@ -198,6 +200,7 @@ export default function ArticlesPage() {
       const updateData = {
         title: formData.title,
         content: formData.content,
+        tags: formData.tags,
         slug: formData.slug,
         updatedAt: new Date(),
         imageUrl: formData.imageUrl || '',
@@ -433,6 +436,7 @@ export default function ArticlesPage() {
                 slug: selectedPage?.slug || '',
                 order: selectedPage?.order || 0,
                 imageUrl: selectedPage?.imageUrl || '',
+                tags: selectedPage?.tags || [],
                 metaTitle: JSON.parse(selectedPage.metadata || '')?.metaTitle,
                 metaDescription: JSON.parse(selectedPage.metadata || '')?.metaDescription,
                 metaKeywords: JSON.parse(selectedPage.metadata || '').metaKeywords,
@@ -480,6 +484,7 @@ export default function ArticlesPage() {
           </div>
         </div>
       )}
+      <Drafts types={["blogDrafts"]}/>
     </div>
   );
 }
