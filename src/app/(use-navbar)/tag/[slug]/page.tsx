@@ -59,7 +59,7 @@ export default function TagPage() {
   
   const slug = pathname.split('/').pop() || '';
 
-  const itemsPerPage = 2;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchCounts = async () => {
