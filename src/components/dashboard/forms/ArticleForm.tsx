@@ -645,7 +645,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           <Button
             type="button"
             onClick={saveDraft}
-            className="bg-gray-300 hover:bg-gray-400"
+            className="bg-gray-300 hover:bg-gray-400 mr-5"
           >
             Save as draft
           </Button>
@@ -653,7 +653,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           <Button
             disabled={isUploading}
             type="submit"
-            className="w-full mt-6 bg-slate-300 hover:bg-slate-400"
+            className="mt-6 bg-slate-700 hover:bg-slate-800 text-white"
           >
             {isUploading ? "Uploading..." : "Save"}
           </Button>

@@ -94,6 +94,14 @@ function PageList() {
       const { data } = await response.json();
       setSelectedPage(data);
       setShowForm(true);
+      
+      // Scroll to the form container after a small delay to ensure the form is mounted
+      setTimeout(() => {
+        const formContainer = document.querySelector('.bg-white.shadow-sm.rounded-lg.p-6');
+        if (formContainer) {
+          formContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     } catch (error) {
       console.error('Error fetching page:', error);
     }

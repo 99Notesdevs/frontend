@@ -441,7 +441,7 @@ export function CurrentAffairForm({
                     form.setValue("showInNav", value === "show");
                   }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="text-white">
                     <SelectValue placeholder="Show in Navbar" />
                   </SelectTrigger>
                   <SelectContent>
@@ -455,12 +455,12 @@ export function CurrentAffairForm({
           <Button
             type="button"
             onClick={saveDraft}
-            className="bg-gray-300 hover:bg-gray-400"
+            className="bg-gray-300 hover:bg-gray-400 mr-5"
           >
             Save as Draft
           </Button>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="bg-slate-700 hover:bg-slate-900 text-white">
             Submit
           </Button>
         </form>
