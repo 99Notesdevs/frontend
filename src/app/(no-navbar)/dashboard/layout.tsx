@@ -115,7 +115,6 @@ export default function DashboardLayout({
         if (!auth.isAuthenticated) {
           // Clear all auth data
           Cookies.remove('token', { path: '/' });
-          localStorage.clear();
           sessionStorage.clear();
           router.replace('/operator');
           return;
@@ -127,7 +126,6 @@ export default function DashboardLayout({
         console.error('Auth check failed:', error);
         // On error, clear all auth data and redirect
         Cookies.remove('token', { path: '/' });
-        localStorage.clear();
         sessionStorage.clear();
         router.replace('/operator');
       }
@@ -213,7 +211,6 @@ export default function DashboardLayout({
             onClick={() => {
               // Clear all auth data
               Cookies.remove('token', { path: '/' });
-              localStorage.clear();
               sessionStorage.clear();
               // Force a full page reload to clear any cached state
               window.location.href = '/operator';
