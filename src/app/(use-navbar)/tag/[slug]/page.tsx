@@ -22,124 +22,255 @@ interface Page {
   }>;
 }
 
+interface Blog {
+  id: number;
+  slug: string;
+  title: string;
+  content: string;
+  imageUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+  tags: Array<{
+    id: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+}
+
 export default function TagPage() {
   const [pages, setPages] = useState<Page[]>([]);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState({
+    pages: 1,
+    blogs: 1
+  });
+  const [totalPages, setTotalPages] = useState({
+    pages: 1,
+    blogs: 1
+  });
+  const [totalItems, setTotalItems] = useState({
+    pages: 0,
+    blogs: 0
+  });
   const router = useRouter();
   const pathname = usePathname();
   
   const slug = pathname.split('/').pop() || '';
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 2;
 
   useEffect(() => {
-    const fetchPages = async () => {
+    const fetchCounts = async () => {
       try {
-        const skip = (currentPage - 1) * itemsPerPage;
-        const response = await fetch(`${env.API}/tag/${slug}?skip=${skip}&take=${itemsPerPage}`);
-        const data = await response.json();
-        setPages(data.data);
-        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        // Fetch pages count
+        const pagesCountResponse = await fetch(`${env.API}/tag/count/${slug}`);
+        const pagesCountData = await pagesCountResponse.json();
+        
+        // Fetch blogs count
+        const blogsCountResponse = await fetch(`${env.API}/tag/blogs/count/${slug}`);
+        const blogsCountData = await blogsCountResponse.json();
+        
+        setTotalItems({
+          pages: pagesCountData.data,
+          blogs: blogsCountData.data
+        });
+        setTotalPages({
+          pages: Math.ceil(pagesCountData.data / itemsPerPage),
+          blogs: Math.ceil(blogsCountData.data / itemsPerPage)
+        });
       } catch (error) {
-        console.error('Error fetching pages:', error);
+        console.error('Error fetching counts:', error);
+      }
+    };
+
+    const fetchContent = async () => {
+      try {
+        // Fetch pages
+        const skipPages = (currentPage.pages - 1) * itemsPerPage;
+        const responsePages = await fetch(`${env.API}/tag/${slug}?skip=${skipPages}&take=${itemsPerPage}`);
+        const dataPages = await responsePages.json();
+        setPages(dataPages.data);
+
+        // Fetch blogs
+        const skipBlogs = (currentPage.blogs - 1) * itemsPerPage;
+        const responseBlogs = await fetch(`${env.API}/tag/blogs/${slug}?skip=${skipBlogs}&take=${itemsPerPage}`);
+        const dataBlogs = await responseBlogs.json();
+        setBlogs(dataBlogs.data);
+      } catch (error) {
+        console.error('Error fetching content:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPages();
-  }, [slug, currentPage]);
+    fetchCounts().then(() => fetchContent());
+  }, [slug, currentPage.pages, currentPage.blogs]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handlePageClick = (slug: string) => {
+    router.push(`/${slug}`);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-[var(--bg-main)]">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-      </div>
-    );
-  }
+  const handleBlogClick = (slug: string) => {
+    router.push(`/blog/${slug}`);
+  };
+
+  const handlePageChange = (type: 'pages' | 'blogs', page: number) => {
+    setCurrentPage(prev => ({ ...prev, [type]: page }));
+    setLoading(true); // Show loading state while fetching new page
+  };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-elevated)] pt-8">
-      <div className="w-full max-w-[2000px] px-4 sm:px-8 flex flex-col">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] text-left">
-            {slug}
-          </h1>
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Tag: {slug}</h1>
+      
+      {/* Pages Section */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-blue-600">Pages</h2>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (currentPage.pages > 1) {
+                  setCurrentPage(prev => ({ ...prev, pages: prev.pages - 1 }));
+                }
+              }}
+              disabled={currentPage.pages === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (currentPage.pages < totalPages.pages) {
+                  setCurrentPage(prev => ({ ...prev, pages: prev.pages + 1 }));
+                }
+              }}
+              disabled={currentPage.pages === totalPages.pages}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-
-        {pages.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-[var(--text-tertiary)] text-lg">No posts found for this tag.</p>
+        
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pages.map((page) => (
-              <div 
+              <Card 
                 key={page.id} 
-                className="bg-white rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:scale-[1.02] overflow-hidden cursor-pointer w-full"
-                onClick={() => router.push(`/${page.slug}`)}
+                className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                onClick={() => handlePageClick(page.slug)}
               >
-                <Card className="border-none">
-                  <CardHeader>
-                    {page.imageUrl && (
-                      <img 
-                        src={page.imageUrl}
-                        alt={page.title}
-                        className="w-full h-40 object-cover rounded-t-xl"
-                      />
-                    )}
-                    <CardTitle className="text-lg font-semibold mt-2">{page.title}</CardTitle>
-                    <CardDescription>
-                      {new Date(page.createdAt).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="line-clamp-2 text-[var(--text-tertiary)]">
-                      {page.content}
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="w-full bg-[var(--primary)] text-white hover:bg-[var(--secondary)] transition-all duration-200 rounded-lg"
-                    >
-                      Read More
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
+                <CardHeader>
+                  <CardTitle>{page.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="line-clamp-2">{page.content}</p>
+                  {page.imageUrl && (
+                    <img 
+                      src={page.imageUrl} 
+                      alt={page.title} 
+                      className="mt-2 rounded-md w-full h-40 object-cover"
+                    />
+                  )}
+                </CardContent>
+                <CardFooter className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">{new Date(page.createdAt).toLocaleDateString()}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePageClick(page.slug);
+                    }}
+                  >
+                    Read More
+                  </Button>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         )}
+      </div>
 
-        <div className="flex justify-center mt-8 mb-8">
-          <div className="flex items-center gap-4">
+      {/* Blogs Section */}
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-green-600">Blogs</h2>
+          <div className="flex gap-2">
             <Button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--secondary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+              variant="outline"
+              onClick={() => {
+                if (currentPage.blogs > 1) {
+                  setCurrentPage(prev => ({ ...prev, blogs: prev.blogs - 1 }));
+                }
+              }}
+              disabled={currentPage.blogs === 1}
             >
-              ← Previous
+              Previous
             </Button>
-            <span className="text-sm font-medium text-[var(--text-strong)]">
-              Page {currentPage} of {totalPages}
-            </span>
             <Button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+              variant="outline"
+              onClick={() => {
+                if (currentPage.blogs < totalPages.blogs) {
+                  setCurrentPage(prev => ({ ...prev, blogs: prev.blogs + 1 }));
+                }
+              }}
+              disabled={currentPage.blogs === totalPages.blogs}
             >
-              Next →
+              Next
             </Button>
           </div>
         </div>
+        
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {blogs.map((blog) => (
+              <Card 
+                key={blog.id} 
+                className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                onClick={() => handleBlogClick(blog.slug)}
+              >
+                <CardHeader>
+                  <CardTitle>{blog.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="line-clamp-2">{blog.content}</p>
+                  {blog.imageUrl && (
+                    <img 
+                      src={blog.imageUrl} 
+                      alt={blog.title} 
+                      className="mt-2 rounded-md w-full h-40 object-cover"
+                    />
+                  )}
+                </CardContent>
+                <CardFooter className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBlogClick(blog.slug);
+                    }}
+                  >
+                    Read More
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

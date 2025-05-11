@@ -12,6 +12,7 @@ interface BlogType {
   title: string;
   content: string;
   imageUrl: string;
+  tags?: string[];
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -40,6 +41,7 @@ interface BlogFormValues {
   title: string;
   content: string;
   imageUrl?: string;
+  tags?: string[];
   metaTitle?: string;
   metaDescription?: string;
   metaKeywords?: string;
@@ -132,6 +134,7 @@ export default function PageForm({ editPage = null }: PageFormProps) {
         content: data.content,
         imageUrl: data.imageUrl,
         metadata: JSON.stringify(metadata),
+        tags: data.tags,
         slug: data.slug,
         order: data.order
       };
