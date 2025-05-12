@@ -41,12 +41,18 @@ interface Page {
     level: number;
     showInNav: boolean;
     parentId?: string | null;
+    categories?: {
+        id: number;
+        name: string;
+        pageId: string;
+        parentTagId: string;
+    };
 }
 
 interface PageWithRelations extends Page {
     parent: PageWithRelations | null;
-  children: PageWithRelations[];
-  data?: any;
+    children: PageWithRelations[];
+    data?: any;
 }
 
 interface PageFormProps {
@@ -64,6 +70,7 @@ interface PageFormData extends Record<string, any> {
   category?: string;
   link?: string;
   tags?: string[];
+  parentTagId?: string;
   metadata?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -88,6 +95,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const [pages, setPages] = useState<PageWithRelations[]>([]);
   const [templates, setTemplates] = useState<TemplateType[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>(
+    Array(7).fill("")
+  );
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
     Array(7).fill("")
   );
   const [selectedTemplate, setSelectedTemplate] = useState("");
@@ -144,12 +154,23 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   const handleLevelChange = (level: number, value: string) => {
     const newLevels = [...selectedLevels];
-    newLevels[level] = value === "_none" ? "" : value; // Convert _none to empty string
-    // Clear all subsequent levels
+    const newCategories = [...selectedCategories];
+    
+    // Get the selected page to get its category ID
+    const selectedPage = pages.find(p => p.id === value);
+    const category = selectedPage?.categories?.id;
+    
+    newLevels[level] = value === "_none" ? "" : value;
+    newCategories[level] = category?.toString() || "";
+    
+    // Clear all subsequent levels and their categories
     for (let i = level + 1; i < newLevels.length; i++) {
       newLevels[i] = "";
+      newCategories[i] = "";
     }
+    
     setSelectedLevels(newLevels);
+    setSelectedCategories(newCategories);
   };
 
   const getPagesForLevel = (level: number): PageWithRelations[] => {
@@ -180,6 +201,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   const getSelectedParentId = (): string | null => {
     return selectedLevels.filter(Boolean).pop() || null;
+  };
+
+  const getSelectedCategoryId = (): string | null => {
+    console.log(selectedCategories);
+    return selectedCategories.filter(Boolean).pop() || null;
   };
 
   const handleImageUpload = async (content: string) => {
@@ -219,6 +245,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const handleSubmit = async (formData: PageFormData) => {
     try {
       const parentId = getSelectedParentId();
+      const categoryId = getSelectedCategoryId();
+      console.log(parentId, categoryId);
       const currentTemplate = templates.find((t) => t.id === selectedTemplate);
 
       if (!currentTemplate) {
@@ -261,6 +289,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         parentId: parentId || null,
         category: formData.category || "",
         tags: formData.tags || [],
+        parentTagId: Number(categoryId) || "",
         content: currentTemplate.id === "custom-link" ? "dummyContent" : formData.content, // Directly use the HTML content
         metadata: {
           lastUpdated: new Date().toISOString(),
@@ -340,6 +369,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       // Reset form and refresh
       setSelectedTemplate("");
       setSelectedLevels(Array(7).fill(""));
+      setSelectedCategories(Array(7).fill(""));
       setStep(1);
       await fetchPages();
 

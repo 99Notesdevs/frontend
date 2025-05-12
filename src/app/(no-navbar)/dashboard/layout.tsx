@@ -44,6 +44,7 @@ const navigationItems = {
     {
       category: "Content Management",
       items: [
+        { icon: FaPlus, text: "Add Questions", path: "/dashboard/addquestions" },
         { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
         { icon: FaEdit, text: "Edit Articles", path: "/dashboard/edit" },
         { icon: FaPlus, text: "Add Current Affair", path: "/dashboard/current-affair" },

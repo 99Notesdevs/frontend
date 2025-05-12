@@ -23,8 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DraftDialog from "@/components/ui/DraftDialog";
-import Cookies from "js-cookie";
-import { env } from "@/config/env";
 
 const formSchema = z.object({
   title: z.string(),
@@ -67,34 +65,9 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   const [showDraftDialog, setShowDraftDialog] = useState(false);
   const [drafts, setDrafts] = useState<{
     title: string;
-    data: FormData & { imageUrl: string | undefined ,showInNav: boolean | undefined};
+    data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined };
   }[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-    const [showNewCategory, setShowNewCategory] = useState(false);
-  
-    useEffect(() => {
-      fetchCategories();
-    }, []);
-  
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(`${env.API_TEST}/categories`, {
-          headers: { Authorization: `Bearer ${Cookies.get('token')}` },
-        });
-        if (!response.ok) throw new Error("Failed to fetch categories");
-        const { data } = await response.json();
-        console.log("categories data:", data);
-        // Extract just the names from the category objects
-        const categoryNames = data.map((category: any) => category.name);
-        setCategories(categoryNames);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        setAlert({
-          message: "Failed to load categories. Please try again.",
-          type: "error",
-        });
-      }
-    };
+
   useEffect(() => {
     const savedDrafts = localStorage.getItem("upscNotesDrafts");
     if (savedDrafts) {
@@ -121,7 +94,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       const selectedDraft = parsedDrafts.find(
-        (draft: { title: string; data: FormData & { imageUrl: string | undefined ,showInNav: boolean | undefined} }) => draft.title === title
+        (draft: { title: string; data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined } }) => draft.title === title
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
@@ -140,7 +113,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
 
       // Remove any existing draft with the same title
       const filteredDrafts = existingDrafts.filter(
-        (draft: { title: string; data: FormData & { imageUrl: string | undefined ,showInNav: boolean | undefined} }) => draft.title !== draftTitle
+        (draft: { title: string; data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined } }) => draft.title !== draftTitle
       );
 
       // Add the new draft
@@ -288,53 +261,23 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               </FormItem>
             )}
           />
-          {/* Categories */}
-                    <FormField
-                      control={form.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Category</FormLabel>
-                          <FormControl>
-                            <div className="space-y-2">
-                              <Select
-                                onValueChange={(value) => {
-                                  if (value === "new") {
-                                    setShowNewCategory(true);
-                                  } else {
-                                    field.onChange(value);
-                                  }
-                                }}
-                                defaultValue={field.value}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {categories.map((category) => (
-                                    <SelectItem key={category} value={category}>
-                                      {category}
-                                    </SelectItem>
-                                  ))}
-                                  <SelectItem value="new">Add New Category</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              {showNewCategory && (
-                                <div className="mt-2">
-                                  <Input
-                                    placeholder="Enter new category name"
-                                    value={field.value}
-                                    onChange={(e) => field.onChange(e.target.value)}
-                                    onBlur={() => setShowNewCategory(false)}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+          {/* Category */}
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter category"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
           {/* Meta Title */}
           <FormField
             control={form.control}
