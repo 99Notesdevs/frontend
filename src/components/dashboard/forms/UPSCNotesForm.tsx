@@ -233,7 +233,10 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
         />
       )}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(handleFormSubmit)}
+          className="space-y-8"
+        >
           <FormField
             control={form.control}
             name="title"
@@ -556,10 +559,12 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             Save as draft
           </Button>
 
-          <Button type="submit" className="bg-slate-700 hover:bg-slate-900 text-white">
+          <Button
+            type="submit"
+            className="bg-slate-700 hover:bg-slate-900 text-white"
+          >
             Save
           </Button>
-
         </form>
       </Form>
     </div>

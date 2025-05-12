@@ -105,7 +105,8 @@ export function GeneralStudiesForm({
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       const selectedDraft = parsedDrafts.find(
-        (draft: { title: string; data: GeneralStudiesFormValues }) => draft.title === title
+        (draft: { title: string; data: GeneralStudiesFormValues }) =>
+          draft.title === title
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
@@ -125,7 +126,8 @@ export function GeneralStudiesForm({
 
       // Remove any existing draft with the same title
       const filteredDrafts = existingDrafts.filter(
-        (draft: { title: string; data: GeneralStudiesFormValues }) => draft.title !== draftTitle
+        (draft: { title: string; data: GeneralStudiesFormValues }) =>
+          draft.title !== draftTitle
       );
 
       // Add the new draft
@@ -135,7 +137,10 @@ export function GeneralStudiesForm({
       };
 
       const updatedDrafts = [...filteredDrafts, newDraft];
-      localStorage.setItem("generalStudiesDrafts", JSON.stringify(updatedDrafts));
+      localStorage.setItem(
+        "generalStudiesDrafts",
+        JSON.stringify(updatedDrafts)
+      );
 
       setDrafts(updatedDrafts);
       setAlert({
