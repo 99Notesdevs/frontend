@@ -26,12 +26,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TagInput } from "@/components/ui/tags/tag-input";
+import { env } from "@/config/env";
+import Cookies from "js-cookie";
 
 const articleSchema = z.object({
   title: z.string(),
   content: z.string(),
   imageUrl: z.string(),
   tags: z.array(z.string()).optional(),
+  category: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -72,13 +75,32 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
   const [drafts, setDrafts] = useState<{ title: string; data: ArticleFormData }[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [showNewCategory, setShowNewCategory] = useState(false);
 
   useEffect(() => {
-    const savedDrafts = localStorage.getItem("articleDrafts");
-    if (savedDrafts) {
-      setDrafts(JSON.parse(savedDrafts));
-    }
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${env.API_TEST}/categories`, {
+        headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+      });
+      if (!response.ok) throw new Error("Failed to fetch categories");
+      const { data } = await response.json();
+      console.log("categories data:", data);
+      // Extract just the names from the category objects
+      const categoryNames = data.map((category: any) => category.name);
+      setCategories(categoryNames);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setAlert({
+        message: "Failed to load categories. Please try again.",
+        type: "error",
+      });
+    }
+  };
 
   const loadDraft = () => {
     const savedDrafts = localStorage.getItem("articleDrafts");
@@ -184,6 +206,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       content: "",
       tags: [],
       imageUrl: "",
+      category: "",
       metaTitle: "",
       metaDescription: "",
       metaKeywords: "",
@@ -244,6 +267,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       content: data.content,
       imageUrl: data.imageUrl || "",
       tags: data.tags || [],
+      category: data.category || "",
       metaTitle: data.metaTitle,
       metaDescription: data.metaDescription,
       metaKeywords: data.metaKeywords,
@@ -384,6 +408,54 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             )}
           />
 
+          {/* Categories */}
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <FormControl>
+                  <div className="space-y-2">
+                    <Select
+                      onValueChange={(value) => {
+                        if (value === "new") {
+                          setShowNewCategory(true);
+                        } else {
+                          field.onChange(value);
+                        }
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="new">Add New Category</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {showNewCategory && (
+                      <div className="mt-2">
+                        <Input
+                          placeholder="Enter new category name"
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          onBlur={() => setShowNewCategory(false)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Metadata */}
           <div className="grid  gap-6">
             <FormField
@@ -460,7 +532,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                 </FormItem>
               )}
             />
-
+            
             <FormField
               control={form.control}
               name="ogTitle"

@@ -13,6 +13,7 @@ interface Page {
   id: number;
   slug: string;
   title: string;
+  category?: string;
   tags: Array<{
     id: number;
     name: string;
@@ -169,6 +170,7 @@ function PageList() {
             : selectedPage.slug
         ),
         templateId: selectedPage.templateId,
+        category: formData.category,
         parentId: selectedPage.parentId || null,
         imageUrl: formData.imageUrl,
         content: selectedPage.templateId === 'custom-link' ? "dummy" : formData.content,
@@ -237,6 +239,7 @@ function PageList() {
           content: parsedContent || "",
           showInNav: page.showInNav || false,
           imageUrl: parsedimage || undefined,
+          category: page.category || "",
           tags: page.tags.map(tag => tag.name) || [],
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
@@ -261,6 +264,7 @@ function PageList() {
           title: page.title || "",
           content: parsedContent || "",
           showInNav: page.showInNav || false,
+          category: page.category || "",
           imageUrl: parsedimage || undefined,
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
@@ -308,6 +312,7 @@ function PageList() {
           title: page.title || "",
           content: parsedContent || "",
           showInNav: page.showInNav || false,
+          category: page.category || "",
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
           metaKeywords: metadata.metaKeywords || "",
