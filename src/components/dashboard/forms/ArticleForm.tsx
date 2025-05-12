@@ -79,6 +79,13 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const [showNewCategory, setShowNewCategory] = useState(false);
 
   useEffect(() => {
+    const savedDrafts = localStorage.getItem("articleDrafts");
+    if (savedDrafts) {
+      setDrafts(JSON.parse(savedDrafts));
+      if (drafts.length > 0) {
+        setShowDraftDialog(true);
+      }
+    }
     fetchCategories();
   }, []);
 
