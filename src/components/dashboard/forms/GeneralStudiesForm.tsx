@@ -9,6 +9,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import TiptapEditor from "@/components/ui/tiptapeditor";
@@ -25,12 +26,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DraftDialog from "@/components/ui/DraftDialog";
+import { env } from "@/config/env";
+import Cookies from "js-cookie";
 
 const formSchema = z.object({
   title: z.string(),
   content: z.string(),
   imageUrl: z.string(),
   showInNav: z.boolean().default(false),
+  category: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -76,7 +80,32 @@ export function GeneralStudiesForm({
     title: string;
     data: GeneralStudiesFormValues;
   }[]>([]);
-
+   const [categories, setCategories] = useState<string[]>([]);
+      const [showNewCategory, setShowNewCategory] = useState(false);
+    
+      useEffect(() => {
+        fetchCategories();
+      }, []);
+    
+      const fetchCategories = async () => {
+        try {
+          const response = await fetch(`${env.API_TEST}/categories`, {
+            headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+          });
+          if (!response.ok) throw new Error("Failed to fetch categories");
+          const { data } = await response.json();
+          console.log("categories data:", data);
+          // Extract just the names from the category objects
+          const categoryNames = data.map((category: any) => category.name);
+          setCategories(categoryNames);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+          setAlert({
+            message: "Failed to load categories. Please try again.",
+            type: "error",
+          });
+        }
+      };
   useEffect(() => {
     const savedDrafts = localStorage.getItem("generalStudiesDrafts");
     if (savedDrafts) {
@@ -200,6 +229,7 @@ export function GeneralStudiesForm({
       content: "",
       imageUrl: "",
       showInNav: true,
+      category: "",
       metaTitle: "",
       metaDescription: "",
       metaKeywords: "",
@@ -377,7 +407,53 @@ export function GeneralStudiesForm({
               </FormItem>
             )}
           />
-
+          {/* Categories */}
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <Select
+                                onValueChange={(value) => {
+                                  if (value === "new") {
+                                    setShowNewCategory(true);
+                                  } else {
+                                    field.onChange(value);
+                                  }
+                                }}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {categories.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))}
+                                  <SelectItem value="new">Add New Category</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {showNewCategory && (
+                                <div className="mt-2">
+                                  <Input
+                                    placeholder="Enter new category name"
+                                    value={field.value}
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                    onBlur={() => setShowNewCategory(false)}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
           {/* Metadata Fields */}
           <FormField
             control={form.control}

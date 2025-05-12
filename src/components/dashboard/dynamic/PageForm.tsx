@@ -61,6 +61,7 @@ interface PageFormData extends Record<string, any> {
   content?: string;
   imageUrl?: string;
   slug?: string;
+  category?: string;
   link?: string;
   tags?: string[];
   metadata?: {
@@ -258,6 +259,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         link: currentTemplate.id === "custom-link" ? formData.link : "",
         templateId: currentTemplate.id,
         parentId: parentId || null,
+        category: formData.category || "",
         tags: formData.tags || [],
         content: currentTemplate.id === "custom-link" ? "dummyContent" : formData.content, // Directly use the HTML content
         metadata: {
