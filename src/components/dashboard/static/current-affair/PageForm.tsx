@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { GeneralStudiesForm } from '@/components/dashboard/forms';
+import { CurrentAffairPageForm, CurrentAffairPageFormValues } from '@/components/dashboard/forms';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
@@ -561,7 +560,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
                     </div>
 
                     {selectedAffairTemplate === 'article' ? (
-                      <GeneralStudiesForm
+                      <CurrentAffairPageForm   
                         defaultValues={newAffairData}
                         onSubmit={handleCreateAffair}
                         folder={"CurrentAffairs"}
@@ -758,7 +757,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       </div>
 
       {renderStepContent()}
-      <Drafts types={["generalStudiesDrafts","currentArticleDrafts"]} />
+      <Drafts types={["currentAffairPageDrafts","currentArticleDrafts"]} />
     </div>
   );
 }

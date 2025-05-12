@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { GeneralStudiesForm, type GeneralStudiesFormValues } from '@/components/dashboard/forms/GeneralStudiesForm';
+import { CurrentAffairPageForm, type CurrentAffairPageFormValues } from '@/components/dashboard/forms/CurrentAffairPageForm';
 import { CustomLinkForm, type CustomLinkFormData } from '@/components/dashboard/forms/CustomLinkForm';
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
@@ -100,7 +100,7 @@ export default function PageListCurrent() {
         return doc.body.innerHTML; // ⬅️ Only return after finishing all images
       };
 
-  const handleEditSubmit = async (formData: GeneralStudiesFormValues) => {
+  const handleEditSubmit = async (formData: CurrentAffairPageFormValues) => {
     try {
       // Generate slug from title
       const baseSlug = formData.title
@@ -490,7 +490,7 @@ export default function PageListCurrent() {
                   onSubmit={handleCustomLinkSubmit}
                 />
               ) : (
-                <GeneralStudiesForm
+                <CurrentAffairPageForm
                   defaultValues={{
                     title: selectedPage.title,
                     content: selectedPage.content || '',

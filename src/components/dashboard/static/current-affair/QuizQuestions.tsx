@@ -8,8 +8,7 @@ interface QuizQuestion {
   id: number;
   question: string;
   options: string[];
-  correctAnswer: number;
-  explanation: string;
+  answer: number;
 }
 
 interface QuizQuestionsProps {
@@ -43,8 +42,7 @@ export function QuizQuestions({ defaultValue = '', onChange }: QuizQuestionsProp
              typeof question.id === 'number' &&
              typeof question.question === 'string' &&
              Array.isArray(question.options) &&
-             typeof question.correctAnswer === 'number' &&
-             typeof question.explanation === 'string';
+             typeof question.answer === 'number';
     });
 
     console.log('Validated questions:', validatedQuestions);
@@ -69,8 +67,7 @@ export function QuizQuestions({ defaultValue = '', onChange }: QuizQuestionsProp
           id: nextId,
           question: '', 
           options: ['', '', '', ''], // 4 default options
-          correctAnswer: 0,
-          explanation: ''
+          answer: 0,
         }
       ]);
       setNextId(prev => prev + 1);
@@ -97,21 +94,20 @@ export function QuizQuestions({ defaultValue = '', onChange }: QuizQuestionsProp
       });
     };
 
-    const handleCorrectAnswerChange = (questionIndex: number, optionIndex: number) => {
+    const handleAnswerChange = (questionIndex: number, optionIndex: number) => {
       setQuestions(prev => {
         const newQuestions = [...prev];
-        newQuestions[questionIndex].correctAnswer = optionIndex;
+        newQuestions[questionIndex].answer = optionIndex;
         return newQuestions;
       });
     };
 
-    const handleExplanationChange = (questionIndex: number, value: string) => {
-      setQuestions(prev => {
-        const newQuestions = [...prev];
-        newQuestions[questionIndex].explanation = value;
-        return newQuestions;
-      });
-    };
+    useEffect(() => {
+      console.log('Questions changed:', questions);
+      const stringified = JSON.stringify(questions);
+      console.log('Stringified questions:', stringified);
+      onChange(stringified);
+    }, []);
 
     useEffect(() => {
       console.log('Questions changed:', questions);
@@ -161,21 +157,12 @@ export function QuizQuestions({ defaultValue = '', onChange }: QuizQuestionsProp
                   />
                   <input
                     type="radio"
-                    checked={question.correctAnswer === optionIndex}
-                    onChange={() => handleCorrectAnswerChange(questionIndex, optionIndex)}
+                    checked={question.answer === optionIndex}
+                    onChange={() => handleAnswerChange(questionIndex, optionIndex)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                   />
                 </div>
               ))}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Explanation</label>
-              <Input
-                value={question.explanation}
-                onChange={(e) => handleExplanationChange(questionIndex, e.target.value)}
-                placeholder="Enter explanation for the correct answer"
-              />
             </div>
 
             <Button

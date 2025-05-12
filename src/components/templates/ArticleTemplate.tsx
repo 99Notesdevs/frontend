@@ -17,7 +17,7 @@ import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
 // import { LiveChat } from "@/components/livechat/livechat";
 import { Tags } from "@/components/ui/tags/Tags";
-
+import { useRouter } from "next/navigation";
 
 const processContent = async (content: string, isAuthorized: boolean) => {
   const isContentLocked = await isLocked();
@@ -169,6 +169,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     day: 'numeric'
   }) : 'N/A';
 
+  const router = useRouter();
+
   return (
       <>
         <section>
@@ -203,6 +205,16 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </div>
                     </div>
                   )}
+
+                  {/* Practice Questions Button */}
+                  <div className="mt-4">
+                    <button
+                      onClick={() => router.push(`/quiz?categoryId=${page?.categories?.id}`)}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Practice Questions
+                    </button>
+                  </div>
 
                   {/* Article Content */}
                   <div className="bg-white border rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">

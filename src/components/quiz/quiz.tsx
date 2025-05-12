@@ -4,15 +4,15 @@ interface Question {
   id: number;
   question: string;
   options: string[];
-  correctAnswer: number;
-  explanation: string;
+  answer: number;
 }
 
 interface QuizProps {
   questions: Question[];
+  onQuizComplete: () => void;
 }
 
-const Quiz: React.FC<QuizProps> = ({ questions }) => {
+const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
   const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
   const [showResults, setShowResults] = useState(false);
@@ -32,6 +32,7 @@ const Quiz: React.FC<QuizProps> = ({ questions }) => {
 
   const checkResults = () => {
     setShowResults(true);
+    onQuizComplete();
   };
 
   const resetQuiz = () => {
@@ -42,7 +43,7 @@ const Quiz: React.FC<QuizProps> = ({ questions }) => {
 
   const calculateScore = () => {
     return questions.reduce((score, question) => {
-      return score + (selectedOptions[question.id] === question.correctAnswer ? 1 : 0);
+      return score + (selectedOptions[question.id] === question.answer ? 1 : 0);
     }, 0);
   };
 
@@ -77,7 +78,7 @@ const Quiz: React.FC<QuizProps> = ({ questions }) => {
                     <div className="space-y-3">
                       {question.options.map((option, index) => {
                         const isSelected = selectedOptions[question.id] === index;
-                        const isCorrect = index === question.correctAnswer;
+                        const isCorrect = index === question.answer;
                         const isShown = showExplanations[question.id];
                         let className = "flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors";
 
@@ -110,13 +111,6 @@ const Quiz: React.FC<QuizProps> = ({ questions }) => {
                         );
                       })}
                     </div>
-
-                    {showExplanations[question.id] && selectedOptions[question.id] !== undefined && (
-                      <div className="mt-4 p-4 border-2 border-gray-300 rounded-lg bg-gray-50">
-                        <p className="text-lg font-medium mb-2">Explanation:</p>
-                        <p className="text-base text-gray-700">{question.explanation}</p>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
