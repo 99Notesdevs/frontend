@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, ArrowRight, Calendar, Tag as TagIcon } from "lucide-react";
+import { Loader2, ArrowLeft, ArrowRight, Tag as TagIcon } from "lucide-react";
 import { env } from "@/config/env";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +18,6 @@ interface Page {
   tags: Array<{
     id: number;
     name: string;
-    createdAt: string;
-    updatedAt: string;
   }>;
 }
 
@@ -155,7 +153,7 @@ export default function TagPage() {
       </div>
       
       {/* Pages Section */}
-      <section className="mb-12">
+      <section className="mb-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h2 className="text-2xl font-bold text-yellow-500">
             Related Articles
@@ -245,7 +243,7 @@ export default function TagPage() {
 
       {/* Blogs Section */}
       <section>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
           <h2 className="text-2xl font-bold text-yellow-500">
             Related Blogs
           </h2>
@@ -304,14 +302,6 @@ export default function TagPage() {
                   <CardTitle className="text-xl font-bold line-clamp-2 group-hover:text-green-600 transition-colors">
                     {blog.title}
                   </CardTitle>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                    <Calendar className="h-4 w-4" />
-                    {new Date(blog.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </div>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-muted-foreground line-clamp-3">
