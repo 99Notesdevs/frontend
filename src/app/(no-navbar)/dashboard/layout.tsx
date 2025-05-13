@@ -188,9 +188,10 @@ export default function DashboardLayout({
         aria-hidden="true"
       />
       {/* Sidebar */}
+      {/* Sidebar */}
       <aside
-        className={`z-50 w-60 bg-[var(--admin-bg-secondary)] border-r border-[var(--admin-bg-dark)] flex flex-col transition-transform transform lg:translate-x-0 lg:static ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`z-50 w-60 bg-[var(--admin-bg-secondary)] border-r border-[var(--admin-bg-dark)] flex flex-col transition-transform transform fixed h-full lg:translate-x-0 lg:static lg:flex ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
         style={{ minWidth: 240 }}
       >
@@ -337,7 +338,9 @@ export default function DashboardLayout({
         </button>
       )}
       {/* Main content */}
-      <div className="flex-1 min-w-0 overflow-y-auto">{children}</div>
+      <div className="flex-1 min-w-0 overflow-y-auto">
+        {children}
+      </div>
     </div>
   );
 }

@@ -179,53 +179,62 @@ export default function AddQuestionsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="space-y-6">
-        {/* Category Selection */}
-        <div>
-          <Select
-            value={selectedCategory?.toString()}
-            onValueChange={(value) => {
-              setSelectedCategory(Number(value));
-              setPage(1);
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id.toString()}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e0e7ef] py-10 px-2 md:px-6 flex flex-col items-center">
+      <div className="w-full max-w-3xl">
+        <h1 className="text-4xl font-bold text-center [color:var(--admin-bg-dark)] mb-8 drop-shadow-sm tracking-tight">Add & Manage Questions</h1>
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 md:p-14 space-y-10 scale-105 mx-auto">
+          {/* Category Selection */}
+          <div>
+            <label className="block mb-2 text-lg font-bold [color:var(--admin-bg-dark)]">Select Category</label>
+            <Select
+              value={selectedCategory?.toString()}
+              onValueChange={(value) => {
+                setSelectedCategory(Number(value));
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-full bg-white text-white border border-gray-300 font-medium shadow focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition mb-3">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent className="z-50  border border-gray-700 shadow-2xl rounded-lg mt-1 min-w-[200px]">
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()} className="text-white px-4 py-2 hover:bg-[#2d323c] cursor-pointer rounded">
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Question Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingQuestion ? "Edit Question" : "Add New Question"}</CardTitle>
-          </CardHeader>
-          <CardContent>
+          {/* Question Form */}
+          <div>
+            <h2 className="text-xl font-bold [color:var(--admin-bg-dark)] mb-4">{editingQuestion ? "Edit Question" : "Add New Question"}</h2>
             <form onSubmit={editingQuestion ? handleUpdateQuestion : handleCreateQuestion}>
-              <div className="space-y-4">
-                <Input
-                  placeholder="Enter question"
-                  value={newQuestion.question}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
-                />
-                <Input
-                  placeholder="Enter answer"
-                  value={newQuestion.answer}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, answer: e.target.value })}
-                />
+              <div className="space-y-6">
+                <div>
+                  <label className="block mb-1 [color:var(--admin-bg-dark)] font-semibold">Question</label>
+                  <Input
+                    className="bg-white  text-[#1e293b]  border border-gray-200  placeholder:text-gray-400  shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
+                    placeholder="Enter question"
+                    value={newQuestion.question}
+                    onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 [color:var(--admin-bg-dark)] font-semibold">Answer</label>
+                  <Input
+                    className="bg-white  text-[#1e293b] border border-gray-200  placeholder:text-gray-400  shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
+                    placeholder="Enter answer"
+                    value={newQuestion.answer}
+                    onChange={(e) => setNewQuestion({ ...newQuestion, answer: e.target.value })}
+                  />
+                </div>
                 <div className="space-y-2">
-                  <label>Options</label>
+                  <label className="block [color:var(--admin-bg-dark)] font-semibold">Options</label>
                   {newQuestion.options.map((option, index) => (
-                    <div key={index} className="flex gap-2">
+                    <div key={index} className="flex gap-2 items-center">
                       <Input
+                        className="bg-white  text-[#1e293b] border border-gray-200  placeholder:text-gray-400  shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
                         value={option}
                         onChange={(e) => {
                           const newOptions = [...newQuestion.options];
@@ -236,6 +245,7 @@ export default function AddQuestionsPage() {
                       <Button
                         variant="destructive"
                         size="sm"
+                        className="rounded"
                         onClick={(e) => {
                           e.preventDefault();
                           setNewQuestion({
@@ -250,6 +260,8 @@ export default function AddQuestionsPage() {
                   ))}
                   <Button
                     type="button"
+                    variant="secondary"
+                    className="mt-1 rounded bg-slate-300 hover:bg-slate-400"
                     onClick={() =>
                       setNewQuestion({
                         ...newQuestion,
@@ -260,14 +272,15 @@ export default function AddQuestionsPage() {
                     Add Option
                   </Button>
                 </div>
-                <div className="flex gap-2">
-                  <Button type="submit">
+                <div className="flex gap-2 mt-2">
+                  <Button type="submit" className="px-6 py-2 text-base font-semibold rounded bg-[#1e293b] hover:bg-[#334155] text-white transition">
                     {editingQuestion ? "Update Question" : "Add Question"}
                   </Button>
                   {editingQuestion && (
                     <Button
                       type="button"
                       variant="outline"
+                      className="rounded"
                       onClick={handleCancelEdit}
                     >
                       Cancel
@@ -276,68 +289,82 @@ export default function AddQuestionsPage() {
                 </div>
               </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Questions List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Questions</CardTitle>
-          </CardHeader>
-          <CardContent>
+          {/* Questions List */}
+          <div>
+            <h2 className="text-xl font-bold text-[#0f172a] mb-4">Questions</h2>
             <div className="space-y-4">
-              {questions.map((question) => (
-                <div key={question.id} className="flex justify-between items-center p-4 border rounded">
-                  <div>
-                    <p className="font-medium">{question.question}</p>
-                    <p className="text-sm text-gray-500">Category: {categories.find(c => c.id === question.categoryId)?.name}</p>
+              {questions.length === 0 ? (
+                <p className="text-center text-gray-500 ">No questions found for this category.</p>
+              ) : (
+                questions.map((question) => (
+                  <div key={question.id} className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border rounded-xl bg-gray-50 ">
+                    <div className="mb-2 md:mb-0 max-w-xl">
+                      <p className="font-semibold text-[#0f172a] text-lg">{question.question}</p>
+                      <p className="text-sm [color:var(--admin-bg-primary)] ">Category: {categories.find(c => c.id === question.categoryId)?.name}</p>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {question.options.map((opt, idx) => (
+                          <span key={idx} className="px-2 py-0.5 rounded bg-gray-200  text-[#0f172a] text-xs font-medium">
+                            {opt}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="mt-1 text-xs text-green-700 ">Answer: <span className="font-semibold">{question.answer}</span></p>
+                    </div>
+                    <div className="flex gap-2 mt-2 md:mt-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded"
+                        onClick={() => handleEditQuestion(question)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="rounded"
+                        onClick={() => setShowDeleteConfirmation(question.id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditQuestion(question)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setShowDeleteConfirmation(question.id)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Delete Confirmation Dialog */}
-        {showDeleteConfirmation && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg">
-              <h3 className="text-lg font-medium mb-4">Confirm Delete</h3>
-              <p className="mb-4">Are you sure you want to delete this question?</p>
-              <div className="flex gap-2">
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDeleteQuestion(showDeleteConfirmation)}
-                >
-                  Delete
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirmation(null)}
-                >
-                  Cancel
-                </Button>
-              </div>
+                ))
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirmation && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg">
+            <h3 className="text-lg font-medium mb-4">Confirm Delete</h3>
+            <p className="mb-4">Are you sure you want to delete this question?</p>
+            <div className="flex gap-2">
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (typeof showDeleteConfirmation === 'string') {
+                    handleDeleteQuestion(showDeleteConfirmation);
+                  }
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteConfirmation(null)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
+}
+
