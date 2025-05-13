@@ -6,8 +6,7 @@ interface Question {
   id: number;
   question: string;
   options: string[];
-  correctAnswer: number;
-  explanation: string;
+  answer: number;
 }
 
 interface QuizWrapperProps {
@@ -15,5 +14,5 @@ interface QuizWrapperProps {
 }
 
 export default function QuizWrapper({ questions }: QuizWrapperProps) {
-  return <Quiz questions={questions} />
+  return <Quiz questions={questions} onQuizComplete={() => {}} />
 }

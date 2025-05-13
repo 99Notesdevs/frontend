@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import Editor from "@/components/ui/tiptapeditor";
 import {
   Form,
   FormControl,
@@ -12,8 +11,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import TiptapEditor from "@/components/ui/tiptapeditor";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
 import { Label } from "@radix-ui/react-label";
-import { Checkbox } from "@/components/ui/Checkbox";
 import { Alert } from "@/components/ui/alert";
 import {
   Select,
@@ -27,8 +30,8 @@ import DraftDialog from "@/components/ui/DraftDialog";
 const formSchema = z.object({
   title: z.string(),
   content: z.string(),
-  showInNav: z.boolean().default(true),
-  category: z.string().optional(),
+  imageUrl: z.string(),
+  showInNav: z.boolean().default(false),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -45,19 +48,26 @@ const formSchema = z.object({
   schemaData: z.string().optional(),
   header: z.string().optional(),
   body: z.string().optional(),
+  author: z.string().optional(),
 });
 
-type FormData = z.infer<typeof formSchema>;
+export type CurrentAffairPageFormValues = z.infer<typeof formSchema>;
 
-interface UpscNotesFormProps {
-  onSubmit: (data: FormData) => void;
-  initialData?: FormData;
+interface CurrentAffairPageFormProps {
+  onSubmit: (data: CurrentAffairPageFormValues) => void;
+  defaultValues?: Partial<CurrentAffairPageFormValues>;
+  folder: string;
 }
 
-export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
+export function CurrentAffairPageForm({
   onSubmit,
-  initialData,
-}) => {
+  defaultValues,
+  folder,
+}: CurrentAffairPageFormProps) {
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    defaultValues?.imageUrl || null
+  );
+  const [isUploading, setIsUploading] = useState(false);
   const [alert, setAlert] = useState<{
     message: string;
     type: "error" | "success" | "warning";
@@ -65,11 +75,11 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   const [showDraftDialog, setShowDraftDialog] = useState(false);
   const [drafts, setDrafts] = useState<{
     title: string;
-    data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined };
+    data: CurrentAffairPageFormValues;
   }[]>([]);
 
   useEffect(() => {
-    const savedDrafts = localStorage.getItem("upscNotesDrafts");
+    const savedDrafts = localStorage.getItem("currentAffairPageDrafts");
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       setDrafts(parsedDrafts);
@@ -80,7 +90,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   }, []);
 
   const loadDraft = () => {
-    const savedDrafts = localStorage.getItem("upscNotesDrafts");
+    const savedDrafts = localStorage.getItem("currentAffairPageDrafts");
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       if (parsedDrafts.length > 0) {
@@ -90,14 +100,16 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   };
 
   const selectDraft = (title: string) => {
-    const savedDrafts = localStorage.getItem("upscNotesDrafts");
+    const savedDrafts = localStorage.getItem("currentAffairPageDrafts");
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       const selectedDraft = parsedDrafts.find(
-        (draft: { title: string; data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined } }) => draft.title === title
+        (draft: { title: string; data: CurrentAffairPageFormValues }) =>
+          draft.title === title
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
+        setImagePreview(selectedDraft.data.imageUrl);
         setShowDraftDialog(false);
       }
     }
@@ -108,12 +120,13 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     const draftTitle = draftData.title || `Draft ${Date.now()}`;
 
     try {
-      const savedDrafts = localStorage.getItem("upscNotesDrafts");
+      const savedDrafts = localStorage.getItem("currentAffairPageDrafts");
       const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
 
       // Remove any existing draft with the same title
       const filteredDrafts = existingDrafts.filter(
-        (draft: { title: string; data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined } }) => draft.title !== draftTitle
+        (draft: { title: string; data: CurrentAffairPageFormValues }) =>
+          draft.title !== draftTitle
       );
 
       // Add the new draft
@@ -123,7 +136,10 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       };
 
       const updatedDrafts = [...filteredDrafts, newDraft];
-      localStorage.setItem("upscNotesDrafts", JSON.stringify(updatedDrafts));
+      localStorage.setItem(
+        "currentAffairPageDrafts",
+        JSON.stringify(updatedDrafts)
+      );
 
       setDrafts(updatedDrafts);
       setAlert({
@@ -140,28 +156,36 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   };
 
   const startNew = () => {
-    form.reset(initialData || {});
+    form.reset(defaultValues || {});
     setShowDraftDialog(false);
   };
 
-  const form = useForm<FormData>({
+  const form = useForm<CurrentAffairPageFormValues>({
     resolver: (values) => {
       let errors = {};
       const messages = [];
 
-      if (!values.title || values.title.trim() === "") {
-        messages.push("Title is required");
+      if (!values.title || values.title.length < 2) {
+        messages.push("Title must be at least 2 characters");
         errors = {
           ...errors,
           title: { message: "" },
         };
       }
 
-      if (!values.content || values.content.trim() === "") {
-        messages.push("Content is required");
+      if (!values.content || values.content.length < 10) {
+        messages.push("Content must be at least 10 characters");
         errors = {
           ...errors,
           content: { message: "" },
+        };
+      }
+
+      if (!values.imageUrl) {
+        messages.push("Image is required");
+        errors = {
+          ...errors,
+          imageUrl: { message: "" },
         };
       }
 
@@ -176,11 +200,11 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       setAlert(null);
       return { values, errors: {} };
     },
-    defaultValues: initialData || {
+    defaultValues: {
       title: "",
       content: "",
+      imageUrl: "",
       showInNav: true,
-      category: "",
       metaTitle: "",
       metaDescription: "",
       metaKeywords: "",
@@ -195,23 +219,43 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       twitterImage: "",
       canonicalUrl: "",
       schemaData: "",
+      author: "",
       header: "",
       body: "",
+      ...defaultValues,
     },
   });
 
-  const handleFormSubmit = async (data: FormData) => {
-    try {
-      await onSubmit(data);
-      setAlert({
-        message: "Notes saved successfully!",
-        type: "success",
-      });
-    } catch (error) {
-      setAlert({
-        message: "Failed to save notes. Please try again.",
-        type: "error",
-      });
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          // Show a preview of the image
+          const result = reader.result as string;
+          setImagePreview(result);
+          console.log(file);
+
+          // Upload the image to S3
+          const formData = new FormData();
+          formData.append("imageUrl", file);
+
+          const s3Url = await uploadImageToS3(formData, folder); // Call your S3 upload function
+          if (s3Url) {
+            // Update the image field with the S3 URL
+            form.setValue("imageUrl", s3Url, { shouldValidate: true });
+          } else {
+            throw new Error("Failed to upload image to S3");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -233,47 +277,19 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
         />
       )}
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleFormSubmit)}
-          className="space-y-8"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Title */}
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter title" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem>
                 <FormLabel>
-                  Content <span className="text-red-500">*</span>
+                  Title <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Editor content={field.value} onChange={field.onChange} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          {/* Category */}
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
                   <Input
-                    placeholder="Enter category"
+                    placeholder="Enter title"
                     {...field}
                     className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                   />
@@ -281,78 +297,180 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               </FormItem>
             )}
           />
-          {/* Meta Title */}
+
+          {/* Author */}
+          {defaultValues?.author && (
+            <FormField
+              control={form.control}
+              name="author"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-500 font-medium">
+                    Author
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter author"
+                      {...field}
+                      className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
+
+          {/* Image Upload */}
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field: { value, onChange, ...field } }) => (
+              <FormItem>
+                <FormLabel>
+                  Image <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="space-y-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                      {...field}
+                    />
+
+                    {imagePreview ? (
+                      <div className="space-y-2">
+                        <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
+                          <Image
+                            src={imagePreview}
+                            alt="Image preview"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <p className="text-sm text-green-500">
+                          Image uploaded successfully
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No image uploaded</p>
+                    )}
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Main Content */}
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-500 font-medium">
+                  Content <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="border border-blue-100 rounded-lg overflow-hidden">
+                    <TiptapEditor
+                      content={form.getValues("content")}
+                      onChange={(html) => form.setValue("content", html)}
+                    />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Metadata Fields */}
           <FormField
             control={form.control}
             name="metaTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Meta Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter meta title" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Meta Description */}
-          <FormField
-            control={form.control}
-            name="metaDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Meta Description</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter meta description" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Meta Keywords */}
-          <FormField
-            control={form.control}
-            name="metaKeywords"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Meta Keywords</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Meta Title
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter meta keywords (comma-separated)"
+                    placeholder="Enter meta title"
                     {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                   />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Robots */}
+          <FormField
+            control={form.control}
+            name="metaDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-500 font-medium">
+                  Meta Description
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter meta description"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="metaKeywords"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-500 font-medium">
+                  Meta Keywords
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter meta keywords"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="robots"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Robots</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Robots
+                </FormLabel>
                 <FormControl>
                   <Select
                     value={field.value || "noindex,nofollow"}
                     onValueChange={(value) => field.onChange(value)}
                     defaultValue="noindex,nofollow"
                   >
-                    <SelectTrigger className="text-white">
+                    <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-white">
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
                     <SelectContent className="text-white">
                       <SelectItem value="noindex,nofollow">
-                        No index,No follow
+                        No index, No follow
                       </SelectItem>
                       <SelectItem value="index,nofollow">
-                        Index,No follow
+                        Index, No follow
                       </SelectItem>
                       <SelectItem value="noindex,follow">
-                        No index,Follow
+                        No index, Follow
                       </SelectItem>
-                      <SelectItem value="index,follow">Index,Follow</SelectItem>
+                      <SelectItem value="index,follow">
+                        Index, Follow
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -360,144 +478,153 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             )}
           />
 
-          {/* OG Title */}
           <FormField
             control={form.control}
             name="ogTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>OG Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter Open Graph title" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* OG Description */}
-          <FormField
-            control={form.control}
-            name="ogDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OG Description</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  OG Title
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter Open Graph description"
+                    placeholder="Enter OG title"
                     {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
                   />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* OG Image */}
+          <FormField
+            control={form.control}
+            name="ogDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-500 font-medium">
+                  OG Description
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter OG description"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="ogImage"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>OG Image URL</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  OG Image URL
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter Open Graph image URL" {...field} />
+                  <Input
+                    placeholder="Enter OG image URL"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* OG Type */}
-          <FormField
-            control={form.control}
-            name="ogType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OG Type</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter Open Graph type" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Twitter Card */}
-          <FormField
-            control={form.control}
-            name="twitterCard"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Twitter Card</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter Twitter card type" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Twitter Title */}
           <FormField
             control={form.control}
             name="twitterTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Twitter Title</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Twitter Title
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter Twitter title" {...field} />
+                  <Input
+                    placeholder="Enter Twitter title"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Twitter Description */}
           <FormField
             control={form.control}
             name="twitterDescription"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Twitter Description</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Twitter Description
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter Twitter description" {...field} />
+                  <Input
+                    placeholder="Enter Twitter description"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Twitter Image */}
           <FormField
             control={form.control}
             name="twitterImage"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Twitter Image URL</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Twitter Image URL
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter Twitter image URL" {...field} />
+                  <Input
+                    placeholder="Enter Twitter image URL"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Canonical URL */}
           <FormField
             control={form.control}
             name="canonicalUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Canonical URL</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Canonical URL
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter canonical URL" {...field} />
+                  <Input
+                    placeholder="Enter canonical URL"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Schema Data */}
           <FormField
             control={form.control}
             name="schemaData"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Schema Data (JSON-LD)</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Schema Data
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter schema data as JSON" {...field} />
+                  <Input
+                    placeholder="Enter schema data"
+                    {...field}
+                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -539,7 +666,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
                     form.setValue("showInNav", value === "show");
                   }}
                 >
-                  <SelectTrigger className="text-white">
+                  <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-white">
                     <SelectValue placeholder="Show in Navbar" />
                   </SelectTrigger>
                   <SelectContent className="text-white">
@@ -559,16 +686,16 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             Save as draft
           </Button>
 
+          {/* Submit Button */}
           <Button
+            disabled={isUploading}
             type="submit"
-            className="bg-slate-700 hover:bg-slate-900 text-white"
+            className="bg-slate-700 text-white rounded-md hover:bg-slate-800"
           >
-            Save
+            {isUploading ? "Uploading..." : "Save"}
           </Button>
         </form>
       </Form>
     </div>
   );
-};
-
-export default UpscNotesForm;
+}

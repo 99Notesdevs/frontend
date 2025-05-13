@@ -31,6 +31,9 @@ export interface BaseTemplateProps {
     content: TemplateContent;
     imageUrl?: string;
     templateId: string;
+    categories?: {
+      id: string;
+    };
   };
 }
 

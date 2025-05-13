@@ -177,6 +177,15 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                     dangerouslySetInnerHTML={{ __html: content }}
                   />
                 </article>
+                {/* Practice Questions Button */}
+                <div className="mt-4">
+                  <button
+                    onClick={() => window.location.href = `/quiz?categoryId=${page?.categories?.id}`}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Practice Questions
+                  </button>
+                </div>
               </main>
             </div>
           </div>
