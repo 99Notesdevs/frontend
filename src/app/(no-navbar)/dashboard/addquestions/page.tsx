@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Category {
   id: number;
@@ -327,7 +326,7 @@ export default function AddQuestionsPage() {
                           </span>
                         ))}
                       </div>
-                      <p className="mt-1 text-xs text-green-700 ">Answer: <span className="font-semibold">{question.answer}</span></p>
+                      <p className="mt-1 text-xs text-green-700 ">Answer: <span className="font-semibold">{Number(question.answer)+1}</span></p>
                     </div>
                     <div className="flex gap-2 mt-2 md:mt-0">
                       <Button
