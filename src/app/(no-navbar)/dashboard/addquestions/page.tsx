@@ -220,15 +220,6 @@ export default function AddQuestionsPage() {
                     onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
                   />
                 </div>
-                <div>
-                  <label className="block mb-1 [color:var(--admin-bg-dark)] font-semibold">Answer</label>
-                  <Input
-                    className="bg-white  text-[#1e293b] border border-gray-200  placeholder:text-gray-400  shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-                    placeholder="Enter answer"
-                    value={newQuestion.answer}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, answer: e.target.value })}
-                  />
-                </div>
                 <div className="space-y-2">
                   <label className="block [color:var(--admin-bg-dark)] font-semibold">Options</label>
                   {newQuestion.options.map((option, index) => (
@@ -272,8 +263,34 @@ export default function AddQuestionsPage() {
                     Add Option
                   </Button>
                 </div>
+                <div>
+                  <label className="block mb-1 font-semibold">Answer</label>
+                  <Select
+                    value={newQuestion.answer}
+                    onValueChange={(value) => setNewQuestion({ ...newQuestion, answer: value })}
+                    required={newQuestion.options.length >= 4}
+                  >
+                    <SelectTrigger className="w-full bg-white text-white border border-gray-200 font-medium shadow focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition mb-3">
+                      <SelectValue placeholder="Select correct option" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50 border border-gray-700 shadow-2xl bg-white  rounded-lg mt-1 min-w-[200px]">
+  <div className="flex flex-row gap-2 px-2 py-2">
+    {[0,1,2,3].map((idx) => (
+      <SelectItem
+        key={idx}
+        value={idx.toString()}
+        className="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-lg font-bold bg-white text-[var(--admin-bg-dark)] cursor-pointer transition-all data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
+        style={{ minWidth: '2.5rem', minHeight: '2.5rem', padding: 0 }}
+      >
+        {idx+1}
+      </SelectItem>
+    ))}
+  </div>
+</SelectContent>
+                  </Select>
+                </div>
                 <div className="flex gap-2 mt-2">
-                  <Button type="submit" className="px-6 py-2 text-base font-semibold rounded bg-[#1e293b] hover:bg-[#334155] text-white transition">
+                  <Button type="submit" className="px-6 py-2 text-base font-semibold rounded bg-blue-500 hover:bg-blue-600 text-white transition">
                     {editingQuestion ? "Update Question" : "Add Question"}
                   </Button>
                   {editingQuestion && (

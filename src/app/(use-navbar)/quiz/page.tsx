@@ -61,6 +61,29 @@ export default function QuizPage() {
     setShowDoMore(true);
   };
 
+  const handleTryMore = async () => {
+    setIsLoading(true);
+    setShowDoMore(false);
+    setError(null);
+    try {
+      if (!categoryId) throw new Error('Category ID is required');
+      const response = await fetch(`${env.API_TEST}/questions/practice?limit=5&categoryIds=${categoryId}`, {
+        headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || 'Failed to fetch questions');
+      }
+      const { data } = await response.json();
+      const parsedData = data.map((item: any) => ({ ...item, answer: Number(item.answer) }));
+      setQuestions(parsedData);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -98,16 +121,16 @@ export default function QuizPage() {
               />
               {showDoMore && (
                 <div className="mt-8 text-center">
-                  <h3 className="text-xl font-semibold mb-4">Great job!</h3>
-                  <p className="mb-6">Ready for more practice?</p>
-                  <Link
+                  <h3 className="text-2xl font-bold mb-4 text-green-700">Great job!</h3>
+                  <p className="mb-6 text-lg text-gray-700">Want to try more questions in this category?</p>
+                  <a
                     href="http://localhost:5173/category"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-8 py-3 border border-transparent text-lg font-semibold rounded-lg text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 shadow-lg transition-colors"
                   >
                     Try More Questions
-                  </Link>
+                  </a>
                 </div>
               )}
             </>
