@@ -41,7 +41,11 @@ export default function QuizPage() {
         }
 
         const { data } = await response.json();
-        setQuestions(data);
+        const parsedData = data.map((item: any) => ({
+          ...item,
+          answer: Number(item.answer),
+        }));
+        setQuestions(parsedData);
       } catch (error) {
         console.error("Error fetching questions:", error);
         setError(error instanceof Error ? error.message : 'An unexpected error occurred');
