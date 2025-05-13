@@ -206,16 +206,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                   )}
 
-                  {/* Practice Questions Button */}
-                  <div className="mt-4">
-                    <button
-                      onClick={() => router.push(`/quiz?categoryId=${page?.categories?.id}`)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Practice Questions
-                    </button>
-                  </div>
-
                   {/* Article Content */}
                   <div className="bg-white border rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
                     {/* Article Header */}
@@ -292,6 +282,15 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   >
                     {isLiveChatOpen ? "Close Chat" : "Open Chat"}
                   </button> */}
+                  {/* Practice Questions Button */}
+                  <div className="mt-4">
+                    <button
+                      onClick={() => router.push(`/quiz?categoryId=${page?.categories?.id}`)}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Practice Questions
+                    </button>
+                  </div>
                   <Comments parentId={parentId} />
                 </main>
 
