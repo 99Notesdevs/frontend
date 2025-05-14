@@ -17,6 +17,8 @@ interface Question {
   answer: string;
   options: string[];
   categoryId: number;
+  explaination: string;
+  creatorName: string;
 }
 
 export default function AddQuestionsPage() {
@@ -25,12 +27,15 @@ export default function AddQuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
+  const [creatorName, setCreatorName] = useState<string>("");
   const [newQuestion, setNewQuestion] = useState<Question>({
     id: "",
     question: "",
     answer: "",
     options: [] as string[],
-    categoryId: 0
+    categoryId: 0,
+    explaination: "",
+    creatorName: ""
   });
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<string | null>(null);
@@ -39,8 +44,9 @@ export default function AddQuestionsPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        const token = Cookies.get('token');
         const response = await fetch(`${env.API_TEST}/categories`, {
-          headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error("Failed to fetch categories");
         const { data } = await response.json();
@@ -58,8 +64,9 @@ export default function AddQuestionsPage() {
 
     const fetchQuestions = async () => {
       try {
+        const token = Cookies.get('token');
         const response = await fetch(`${env.API_TEST}/questions/practice?categoryIds=${selectedCategory}&limit=${pageSize}`, {
-          headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error("Failed to fetch questions");
         const { data } = await response.json();
@@ -70,6 +77,28 @@ export default function AddQuestionsPage() {
     };
     fetchQuestions();
   }, [selectedCategory, page]);
+
+  // Fetch user name
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const token = Cookies.get('token');
+      const admin = await fetch(`${env.API}/admin/`, {
+        method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+      });
+      if (admin) {
+        const adminData = await admin.json();
+        setNewQuestion(prev => ({
+          ...prev,
+          creatorName: adminData.data.email || ''
+        }));
+        setCreatorName(adminData.data.email || '');
+      }
+    };
+    fetchUserName();
+  }, []);
 
   const handleCreateQuestion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,7 +124,9 @@ export default function AddQuestionsPage() {
         question: "", 
         answer: "", 
         options: [], 
-        categoryId: selectedCategory || 0 
+        categoryId: selectedCategory || 0,
+        explaination: "",
+        creatorName: ""
       });
       setPage(1);
     } catch (error) {
@@ -136,15 +167,19 @@ export default function AddQuestionsPage() {
     if (!editingQuestion) return;
 
     try {
+      const token = Cookies.get('token');
       const response = await fetch(`${env.API_TEST}/questions/${editingQuestion.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${Cookies.get('token')}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(newQuestion),
+        body: JSON.stringify({
+          ...newQuestion,
+          creatorName: creatorName || ''
+        }),
       });
-      
+      console.log("creatorName", creatorName);
       if (!response.ok) throw new Error("Failed to update question");
       
       // Update the question in the list
@@ -159,7 +194,9 @@ export default function AddQuestionsPage() {
         question: "", 
         answer: "", 
         options: [], 
-        categoryId: selectedCategory || 0 
+        categoryId: selectedCategory || 0,
+        explaination: "",
+        creatorName: creatorName || ''
       });
     } catch (error) {
       console.error("Error updating question:", error);
@@ -173,7 +210,9 @@ export default function AddQuestionsPage() {
       question: "", 
       answer: "", 
       options: [], 
-      categoryId: selectedCategory || 0 
+      categoryId: selectedCategory || 0,
+      explaination: "",
+      creatorName: ""
     });
   };
 
@@ -273,20 +312,47 @@ export default function AddQuestionsPage() {
                       <SelectValue placeholder="Select correct option" />
                     </SelectTrigger>
                     <SelectContent className="z-50 border border-gray-700 shadow-2xl bg-white  rounded-lg mt-1 min-w-[200px]">
-  <div className="flex flex-row gap-2 px-2 py-2">
-    {[0,1,2,3].map((idx) => (
-      <SelectItem
-        key={idx}
-        value={idx.toString()}
-        className="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-lg font-bold bg-white text-[var(--admin-bg-dark)] cursor-pointer transition-all data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
-        style={{ minWidth: '2.5rem', minHeight: '2.5rem', padding: 0 }}
-      >
-        {idx+1}
-      </SelectItem>
-    ))}
-  </div>
-</SelectContent>
+                      <div className="flex flex-row gap-2 px-2 py-2">
+                        {[0,1,2,3].map((idx) => (
+                          <SelectItem
+                            key={idx}
+                            value={idx.toString()}
+                            className="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-lg font-bold bg-white text-[var(--admin-bg-dark)] cursor-pointer transition-all data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
+                            style={{ minWidth: '2.5rem', minHeight: '2.5rem', padding: 0 }}
+                          >
+                            {idx+1}
+                          </SelectItem>
+                        ))}
+                      </div>
+                    </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="explanation" className="block text-sm font-medium text-gray-700">
+                      Explanation
+                    </label>
+                    <textarea
+                      id="explanation"
+                      value={newQuestion.explaination}
+                      onChange={(e) => setNewQuestion({...newQuestion, explaination: e.target.value})}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      rows={3}
+                      placeholder="Add detailed explanation for the answer"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="creatorName" className="block text-sm font-medium text-gray-700">
+                      Created By
+                    </label>
+                    <input
+                      type="text"
+                      id="creatorName"
+                      value={newQuestion.creatorName}
+                      readOnly
+                      className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm"
+                    />
+                  </div>
                 </div>
                 <div className="flex gap-2 mt-2">
                   <Button type="submit" className="px-6 py-2 text-base font-semibold rounded bg-blue-500 hover:bg-blue-600 text-white transition">
@@ -383,4 +449,3 @@ export default function AddQuestionsPage() {
     </div>
   );
 }
-

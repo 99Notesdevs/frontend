@@ -12,6 +12,8 @@ interface Question {
   question: string;
   options: string[];
   answer: number;
+  explaination: string;
+  creatorName: string;
 }
 
 export default function QuizPage() {
@@ -44,6 +46,8 @@ export default function QuizPage() {
         const parsedData = data.map((item: any) => ({
           ...item,
           answer: Number(item.answer),
+          explaination: item.explaination || "",
+          creatorName: item.creatorName || "",
         }));
         setQuestions(parsedData);
       } catch (error) {

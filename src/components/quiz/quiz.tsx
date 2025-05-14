@@ -5,6 +5,8 @@ interface Question {
   question: string;
   options: string[];
   answer: number;
+  explaination: string;
+  creatorName: string;
 }
 
 interface QuizProps {
@@ -121,6 +123,22 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
                             </label>
                           );
                         })}
+                        
+                        {showExplanations[question.id] && (
+                          <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r">
+                            {question.explaination && (
+                              <div className="mb-2">
+                                <p className="font-semibold text-blue-800">Explanation:</p>
+                                <p className="text-blue-700">{question.explaination}</p>
+                              </div>
+                            )}
+                            {question.creatorName && (
+                              <p className="text-sm text-gray-600 italic">
+                                Added by: {question.creatorName}
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
