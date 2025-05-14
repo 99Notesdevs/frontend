@@ -21,6 +21,8 @@ interface Question {
   creatorName: string;
 }
 
+import { useRef } from "react";
+
 export default function AddQuestionsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -134,12 +136,17 @@ export default function AddQuestionsPage() {
     }
   };
 
+  const formRef = useRef<HTMLDivElement>(null);
+
   const handleEditQuestion = (question: Question) => {
     setEditingQuestion(question);
     setNewQuestion({
       ...question,
       categoryId: question.categoryId
     });
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const handleDeleteQuestion = async (questionId: string) => {
@@ -219,8 +226,8 @@ export default function AddQuestionsPage() {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e0e7ef] py-10 px-2 md:px-6 flex flex-col items-center">
       <div className="w-full max-w-3xl">
-        <h1 className="text-4xl font-bold text-center [color:var(--admin-bg-dark)] mb-8 drop-shadow-sm tracking-tight">Add & Manage Questions</h1>
-        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 md:p-14 space-y-10 scale-105 mx-auto">
+        <h1 className="text-4xl font-bold text-center [color:var(--admin-bg-dark)] mb-10 drop-shadow-sm tracking-tight">Add & Manage Questions</h1>
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 md:p-14 space-y-10 scale-105 mx-auto mt-5">
           {/* Category Selection */}
           <div>
             <label className="block mb-2 text-lg font-bold [color:var(--admin-bg-dark)]">Select Category</label>
@@ -245,7 +252,7 @@ export default function AddQuestionsPage() {
           </div>
 
           {/* Question Form */}
-          <div>
+          <div ref={formRef}>
             <h2 className="text-xl font-bold [color:var(--admin-bg-dark)] mb-4">{editingQuestion ? "Edit Question" : "Add New Question"}</h2>
             <form onSubmit={editingQuestion ? handleUpdateQuestion : handleCreateQuestion}>
               <div className="space-y-6">
@@ -261,32 +268,35 @@ export default function AddQuestionsPage() {
                 <div className="space-y-2">
                   <label className="block [color:var(--admin-bg-dark)] font-semibold">Options</label>
                   {newQuestion.options.map((option, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                      <Input
-                        className="bg-white  text-[#1e293b] border border-gray-200  placeholder:text-gray-400  shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-                        value={option}
-                        onChange={(e) => {
-                          const newOptions = [...newQuestion.options];
-                          newOptions[index] = e.target.value;
-                          setNewQuestion({ ...newQuestion, options: newOptions });
-                        }}
-                      />
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="rounded"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setNewQuestion({
-                            ...newQuestion,
-                            options: newQuestion.options.filter((_, i) => i !== index)
-                          });
-                        }}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
+  <div key={index} className="flex gap-2 items-center">
+    <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 font-bold text-sm border border-gray-300">
+      {index + 1}
+    </span>
+    <Input
+      className="bg-white text-[#1e293b] border border-gray-200 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
+      value={option}
+      onChange={(e) => {
+        const newOptions = [...newQuestion.options];
+        newOptions[index] = e.target.value;
+        setNewQuestion({ ...newQuestion, options: newOptions });
+      }}
+    />
+    <Button
+      variant="destructive"
+      size="sm"
+      className="rounded"
+      onClick={(e) => {
+        e.preventDefault();
+        setNewQuestion({
+          ...newQuestion,
+          options: newQuestion.options.filter((_, i) => i !== index)
+        });
+      }}
+    >
+      Remove
+    </Button>
+  </div>
+))}
                   <Button
                     type="button"
                     variant="secondary"
@@ -312,35 +322,39 @@ export default function AddQuestionsPage() {
                       <SelectValue placeholder="Select correct option" />
                     </SelectTrigger>
                     <SelectContent className="z-50 border border-gray-700 shadow-2xl bg-white  rounded-lg mt-1 min-w-[200px]">
-                      <div className="flex flex-row gap-2 px-2 py-2">
-                        {[0,1,2,3].map((idx) => (
-                          <SelectItem
-                            key={idx}
-                            value={idx.toString()}
-                            className="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-lg font-bold bg-white text-[var(--admin-bg-dark)] cursor-pointer transition-all data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
-                            style={{ minWidth: '2.5rem', minHeight: '2.5rem', padding: 0 }}
-                          >
-                            {idx+1}
-                          </SelectItem>
-                        ))}
-                      </div>
-                    </SelectContent>
+  <div className="flex flex-row gap-2 px-2 py-2">
+    {newQuestion.options.map((_, idx) => (
+      <SelectItem
+        key={idx}
+        value={idx.toString()}
+        className="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-lg font-bold bg-white text-[var(--admin-bg-dark)] cursor-pointer transition-all data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
+        style={{ minWidth: '2.5rem', minHeight: '2.5rem', padding: 0 }}
+      >
+        {idx+1}
+      </SelectItem>
+    ))}
+  </div>
+</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-4">
-                  <div>
-                    <label htmlFor="explanation" className="block text-sm font-medium text-gray-700">
-                      Explanation
-                    </label>
-                    <textarea
-                      id="explanation"
-                      value={newQuestion.explaination}
-                      onChange={(e) => setNewQuestion({...newQuestion, explaination: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      rows={3}
-                      placeholder="Add detailed explanation for the answer"
-                    />
-                  </div>
+                  <div className=" border border-slate-300 rounded-xl p-4 mb-2 shadow-sm">
+  <label htmlFor="explanation" className="flex items-center gap-2 text-base font-semibold text-slate-700 mb-1">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1 4v-4m0 0V9a4 4 0 10-8 0v1a4 4 0 004 4h1m4 0h1a4 4 0 004-4v-1a4 4 0 00-8 0v1a4 4 0 004 4z" /></svg>
+    Explanation
+  </label>
+  <textarea
+    id="explanation"
+    value={newQuestion.explaination}
+    onChange={(e) => setNewQuestion({...newQuestion, explaination: e.target.value})}
+    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm focus:border-slate-500 focus:ring-2 focus:ring-slate-200 transition sm:text-sm"
+    rows={3}
+    maxLength={400}
+    placeholder="Add detailed explanation for the answer"
+    style={{ resize: 'vertical', minHeight: 60 }}
+  />
+  <div className="text-xs text-slate-700 mt-1 text-right">{newQuestion.explaination.length}/400 characters</div>
+</div>
                   <div>
                     <label htmlFor="creatorName" className="block text-sm font-medium text-gray-700">
                       Created By
@@ -398,7 +412,7 @@ export default function AddQuestionsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="rounded"
+                        className="rounded bg-blue-600 hover:bg-blue-700"
                         onClick={() => handleEditQuestion(question)}
                       >
                         Edit
@@ -406,7 +420,7 @@ export default function AddQuestionsPage() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="rounded"
+                        className="rounded bg-red-600 hover:bg-red-700"
                         onClick={() => setShowDeleteConfirmation(question.id)}
                       >
                         Delete
