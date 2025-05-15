@@ -7,6 +7,8 @@ interface Question {
   question: string;
   options: string[];
   answer: number;
+  explaination: string;
+  creatorName: string;
 }
 
 interface QuizWrapperProps {
