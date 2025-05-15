@@ -67,7 +67,7 @@ export default function AddQuestionsPage() {
     const fetchQuestions = async () => {
       try {
         const token = Cookies.get('token');
-        const response = await fetch(`${env.API_TEST}/questions/practice?categoryIds=${selectedCategory}&limit=${pageSize}`, {
+        const response = await fetch(`${env.API_TEST}/questions/practice?categoryId=${selectedCategory}&limit=${pageSize}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error("Failed to fetch questions");

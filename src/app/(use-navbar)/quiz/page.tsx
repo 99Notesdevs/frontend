@@ -31,7 +31,7 @@ export default function QuizPage() {
           throw new Error('Category ID is required');
         }
 
-        const response = await fetch(`${env.API_TEST}/questions/practice?limit=5&categoryIds=${categoryId}`, {
+        const response = await fetch(`${env.API_TEST}/questions/practice?limit=5&categoryId=${categoryId}`, {
           headers: {
             Authorization: `Bearer ${Cookies.get('token')}`,
           },
