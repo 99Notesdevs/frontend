@@ -268,8 +268,8 @@ export default function Navbar({ navigation }: NavbarProps) {
                   <Image
                     src={logo}
                     alt="99Notes"
-                    width={90}
-                    height={75}
+                    width={120}
+                    height={40}
                     className="h-12 w-auto object-contain"
                     priority
                   />

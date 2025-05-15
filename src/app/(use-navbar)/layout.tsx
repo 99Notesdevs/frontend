@@ -27,6 +27,9 @@ export default async function RootLayout({
 
   return (
     <html>
+      <head>
+        <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
+      </head>
       <body className={inter.className}>
         <GlobalScriptsLoader />
         <Suspense
