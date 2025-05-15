@@ -22,7 +22,7 @@ const BlogsPage: React.FC = () => {
   const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
 
   const fetchBlogs = async (searchTerm: string = "") => {
     try {

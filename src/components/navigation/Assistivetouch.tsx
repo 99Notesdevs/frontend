@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TableOfContents } from './TableOfContents';
 import { SidebarNavigation } from './SidebarNavigation';
-import { Menu, List, Navigation2, X } from 'lucide-react';
+import { List, Navigation2, X } from 'lucide-react';
 
 interface AssistiveTouchProps {
   content: string;
@@ -143,30 +143,63 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
       >
         {isOpen && (
           <div
-            className={`flex flex-col items-end space-y-2 absolute ${
-              expandDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
-            }`}
+            className={`flex flex-col items-end space-y-2 absolute ${expandDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
+              }`}
           >
             <button
-              className="bg-black/50 hover:bg-black/60 border border-black/30 text-white p-2.5 rounded-full shadow-lg backdrop-blur-md hover:scale-110 transition-all duration-200 active:scale-95"
-              onClick={() => handleComponentClick('toc')}
-            >
-              <List className="w-4 h-4" />
-            </button>
-            <button
-              className="bg-black/50 hover:bg-black/60 border border-black/30 text-white p-2.5 rounded-full shadow-lg backdrop-blur-md hover:scale-110 transition-all duration-200 active:scale-95"
-              onClick={() => handleComponentClick('nav')}
-            >
-              <Navigation2 className="w-4 h-4" />
-            </button>
+  className="bg-gray-100 hover:bg-gray-200 text-[var(--text-tertiary)] p-2.5 rounded-full shadow-xl transition-colors duration-200"
+  onClick={() => handleComponentClick('toc')}
+>
+  <List className="w-4 h-4" />
+</button>
+<button
+  className="bg-gray-100 hover:bg-gray-200 text-[var(--text-tertiary)] p-2.5 rounded-full shadow-xl transition-colors duration-200"
+  onClick={() => handleComponentClick('nav')}
+>
+  <Navigation2 className="w-4 h-4" />
+</button>
           </div>
         )}
 
         <button
-          className="relative w-12 h-12 rounded-full bg-black/70 border border-white/10 shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-2xl"
+          onClick={handleAssistiveClick}
+          className="inline-flex items-center justify-center p-3 rounded-full text-[var(--text-tertiary)] bg-blue-200 hover:text-[var(--text-tertiary)] hover:bg-blue-300 focus:outline-none transition-colors shadow-xl"
+          aria-label={isOpen ? 'Close assistive menu' : 'Open assistive menu'}
         >
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/5 via-transparent to-transparent" />
-          <Menu className="w-4 h-4 text-white z-10" />
+          <span className="sr-only">{isOpen ? 'Close assistive menu' : 'Open assistive menu'}</span>
+          {isOpen ? (
+            <svg
+              className="block h-7 w-7"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="block h-7 w-7"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          )}
         </button>
       </div>
 
