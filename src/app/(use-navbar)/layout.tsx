@@ -28,7 +28,8 @@ export default async function RootLayout({
   return (
     <html>
       <head>
-        <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
+
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={inter.className}>
         <GlobalScriptsLoader />
