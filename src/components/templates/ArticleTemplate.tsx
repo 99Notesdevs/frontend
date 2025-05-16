@@ -228,7 +228,14 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      <Link href={`${env.API}/author/${page.author.id}`}>{page.author.name}</Link>
+                      {page.author && (
+                        <Link href={`${env.API}/author/${page.author.id}`}>{page.author.name}</Link>
+                      )}
+                      {page.admin && (
+                        <span className="text-[var(--text-tertiary)]">
+                          {page.admin.name}
+                        </span>
+                      )}
                     </div>
 
                     <WhatsApp />
