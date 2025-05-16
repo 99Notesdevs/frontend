@@ -25,6 +25,7 @@ interface Question {
   categoryId: number;
   explaination: string;
   creatorName: string;
+  multipleCorrectType: boolean;
 }
 
 import { useRef } from "react";
@@ -44,6 +45,7 @@ export default function AddQuestionsPage() {
     categoryId: 0,
     explaination: "",
     creatorName: "",
+    multipleCorrectType: false
   });
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<
@@ -126,6 +128,7 @@ export default function AddQuestionsPage() {
         body: JSON.stringify({
           ...newQuestion,
           categoryId: selectedCategory,
+          multipleCorrectType: newQuestion.multipleCorrectType
         }),
       });
 
@@ -140,6 +143,7 @@ export default function AddQuestionsPage() {
         categoryId: selectedCategory || 0,
         explaination: "",
         creatorName: creatorName || "",
+        multipleCorrectType: false
       });
       setPage(1);
     } catch (error) {
@@ -154,6 +158,7 @@ export default function AddQuestionsPage() {
     setNewQuestion({
       ...question,
       categoryId: question.categoryId,
+      multipleCorrectType: question.multipleCorrectType
     });
     if (formRef.current) {
       formRef.current.scrollIntoView({ behavior: "smooth" });
@@ -199,6 +204,7 @@ export default function AddQuestionsPage() {
           body: JSON.stringify({
             ...newQuestion,
             creatorName: creatorName || "",
+            multipleCorrectType: newQuestion.multipleCorrectType
           }),
         }
       );
@@ -222,6 +228,7 @@ export default function AddQuestionsPage() {
         categoryId: selectedCategory || 0,
         explaination: "",
         creatorName: creatorName || "",
+        multipleCorrectType: false
       });
     } catch (error) {
       console.error("Error updating question:", error);
@@ -238,6 +245,7 @@ export default function AddQuestionsPage() {
       categoryId: selectedCategory || 0,
       explaination: "",
       creatorName: "",
+      multipleCorrectType: false
     });
   };
 
@@ -357,37 +365,46 @@ export default function AddQuestionsPage() {
                     Add Option
                   </Button>
                 </div>
-                <div>
-                  <label className="block mb-1 font-semibold">Answer</label>
-                  <Select
-                    value={newQuestion.answer}
-                    onValueChange={(value) =>
-                      setNewQuestion({ ...newQuestion, answer: value })
-                    }
-                    required={newQuestion.options.length >= 4}
-                  >
-                    <SelectTrigger className="w-full bg-white text-white border border-gray-200 font-medium shadow focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition mb-3">
-                      <SelectValue placeholder="Select correct option" />
-                    </SelectTrigger>
-                    <SelectContent className="z-50 border border-gray-700 shadow-2xl bg-white  rounded-lg mt-1 min-w-[200px]">
-                      <div className="flex flex-row gap-2 px-2 py-2">
-                        {newQuestion.options.map((_, idx) => (
-                          <SelectItem
-                            key={idx}
-                            value={idx.toString()}
-                            className="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-lg font-bold bg-white text-[var(--admin-bg-dark)] cursor-pointer transition-all data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
-                            style={{
-                              minWidth: "2.5rem",
-                              minHeight: "2.5rem",
-                              padding: 0,
-                            }}
-                          >
-                            {idx + 1}
-                          </SelectItem>
-                        ))}
-                      </div>
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={newQuestion.multipleCorrectType}
+                      onChange={(e) => {
+                        setNewQuestion({
+                          ...newQuestion,
+                          multipleCorrectType: e.target.checked
+                        });
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <label className="text-sm font-medium text-gray-700">
+                      Allow multiple correct answers
+                    </label>
+                  </div>
+                  <div>
+                    <label className="block mb-1 font-semibold">Answer</label>
+                    <Input
+                      className="bg-white text-[#1e293b] border border-gray-200 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
+                      type="text"
+                      placeholder={newQuestion.multipleCorrectType 
+                        ? "Enter comma-separated answer numbers (e.g., 1,3,4)"
+                        : "Enter answer number"}
+                      value={newQuestion.answer}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setNewQuestion({
+                          ...newQuestion,
+                          answer: value
+                        });
+                      }}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {newQuestion.multipleCorrectType
+                        ? "Enter comma-separated numbers for multiple correct answers (e.g., 1,3,4)"
+                        : "Enter the number that corresponds to the correct answer"}
+                    </p>
+                  </div>
                 </div>
                 <div className="space-y-4">
                   <div className=" border border-slate-300 rounded-xl p-4 mb-2 shadow-sm">
@@ -506,7 +523,7 @@ export default function AddQuestionsPage() {
                       <p className="mt-1 text-xs text-green-700 ">
                         Answer:{" "}
                         <span className="font-semibold">
-                          {Number(question.answer) + 1}
+                          {question.answer}
                         </span>
                       </p>
                     </div>

@@ -23,32 +23,40 @@ const plusJakarta = Plus_Jakarta_Sans({
 const navigationItems = {
   admin: [
     {
-      category: "Employee Management",
+      category: "Admin",
       items: [
         { icon: FaEdit, text: "Manage Employees", path: "/dashboard/manageemployees" },
-        { icon: FaPlus, text: "Add Admin", path: "/dashboard/addadmin" }
-      ]
-    },
-    {
-      category: "User Management",
-      items: [
-        { icon: FaEdit, text: "Manage Users", path: "/dashboard/manageusers" }
-      ]
-    },
-    {
-      category: "Admin Permissions",
-      items: [
+        { icon: FaPlus, text: "Add Admin", path: "/dashboard/addadmin" },
+        { icon: FaEdit, text: "Manage Users", path: "/dashboard/manageusers" },
+        { icon: FaEdit, text: "Manage Subscriptions", path: "/dashboard/subscription" },
         { icon: FaEdit, text: "Admin Permissions", path: "/dashboard/adminpermissions" }
       ]
     },
     {
-      category: "Content Management",
+      category: "Test Management",
       items: [
         { icon: FaPlus, text: "Add Questions", path: "/dashboard/addquestions" },
+      ]
+    },
+    {
+      category: "Article Management",
+      items: [
         { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
         { icon: FaEdit, text: "Edit Articles", path: "/dashboard/edit" },
+        { icon: FaEdit, text: "Sort Articles", path: "/dashboard/sort" },
+      ]
+    },
+    {
+      category: "Current Affairs Management",
+      items: [
         { icon: FaPlus, text: "Add Current Affair", path: "/dashboard/current-affair" },
         { icon: FaEdit, text: "Edit Current Affairs", path: "/dashboard/editcurrent" },
+        { icon: FaEdit, text: "Sort Current Affairs", path: "/dashboard/sortCurrent" }
+      ]
+    },
+    {
+      category: "Blogs Management",
+      items: [
         { icon: FaPlus, text: "Add Blogs", path: "/dashboard/blogs" },
         { icon: FaEdit, text: "Manage Blogs", path: "/dashboard/editblogs" }
       ]
@@ -59,19 +67,6 @@ const navigationItems = {
         { icon: FaEdit, text: "Edit About99", path: "/dashboard/update-about" },
         { icon: FaEdit, text: "Edit Home", path: "/dashboard/update-home" },
         { icon: FaEdit, text: "Manage Forms", path: "/dashboard/forms" }
-      ]
-    },
-    {
-      category: "Content Organization",
-      items: [
-        { icon: FaEdit, text: "Sort Articles", path: "/dashboard/sort" },
-        { icon: FaEdit, text: "Sort Current Affairs", path: "/dashboard/sortCurrent" }
-      ]
-    },
-    {
-      category: "Subscription",
-      items: [
-        { icon: FaEdit, text: "Manage Subscriptions", path: "/dashboard/subscription" }
       ]
     },
     {

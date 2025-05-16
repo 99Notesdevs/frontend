@@ -18,6 +18,7 @@ import { isLocked } from "@/lib/islocked";
 // import { LiveChat } from "@/components/livechat/livechat";
 import { Tags } from "@/components/ui/tags/Tags";
 import { useRouter } from "next/navigation";
+import { Link } from "lucide-react";
 
 const processContent = async (content: string, isAuthorized: boolean) => {
   const isContentLocked = await isLocked();
@@ -227,10 +228,14 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      {" "}
-                      {/* {page.createdAt
-                        ? new Date(page.createdAt).toLocaleDateString()
-                        : "N/A"} */}
+                      {page.author && (
+                        <Link href={`${env.API}/author/${page.author.id}`}>{page.author.name}</Link>
+                      )}
+                      {page.admin && (
+                        <span className="text-[var(--text-tertiary)]">
+                          {page.admin.name}
+                        </span>
+                      )}
                     </div>
 
                     <WhatsApp />
