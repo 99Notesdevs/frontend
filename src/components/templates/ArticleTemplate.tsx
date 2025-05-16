@@ -227,7 +227,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      {" "}
+                      /** add author name and link to author */
                       {/* {page.createdAt
                         ? new Date(page.createdAt).toLocaleDateString()
                         : "N/A"} */}
