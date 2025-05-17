@@ -119,6 +119,10 @@ export default function AddQuestionsPage() {
     e.preventDefault();
     try {
       console.log(newQuestion);
+      const answer = newQuestion.multipleCorrectType 
+        ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
+        : (parseInt(newQuestion.answer) - 1).toString();
+      
       const response = await fetch(`${env.API_TEST}/questions`, {
         method: "POST",
         headers: {
@@ -127,6 +131,7 @@ export default function AddQuestionsPage() {
         },
         body: JSON.stringify({
           ...newQuestion,
+          answer,
           categoryId: selectedCategory,
           multipleCorrectType: newQuestion.multipleCorrectType
         }),
@@ -193,6 +198,10 @@ export default function AddQuestionsPage() {
 
     try {
       const token = Cookies.get("token");
+      const answer = newQuestion.multipleCorrectType 
+        ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
+        : (parseInt(newQuestion.answer) - 1).toString();
+      
       const response = await fetch(
         `${env.API_TEST}/questions/${editingQuestion.id}`,
         {
@@ -203,6 +212,7 @@ export default function AddQuestionsPage() {
           },
           body: JSON.stringify({
             ...newQuestion,
+            answer,
             creatorName: creatorName || "",
             multipleCorrectType: newQuestion.multipleCorrectType
           }),
