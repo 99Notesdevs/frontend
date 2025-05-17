@@ -173,37 +173,43 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const addTable = () => {
+  const addTable = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
     setIsOpen(false);
     setShowTemplates(false);
   };
 
-  const addRowAfter = () => {
+  const addRowAfter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().addRowAfter().run();
     setIsOpen(false);
     setShowTemplates(false);
   };
 
-  const addColumnAfter = () => {
+  const addColumnAfter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().addColumnAfter().run();
     setIsOpen(false);
     setShowTemplates(false);
   };
 
-  const deleteRow = () => {
+  const deleteRow = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().deleteRow().run();
     setIsOpen(false);
     setShowTemplates(false);
   };
 
-  const deleteColumn = () => {
+  const deleteColumn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().deleteColumn().run();
     setIsOpen(false);
     setShowTemplates(false);
   };
 
-  const deleteTable = () => {
+  const deleteTable = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().deleteTable().run();
     setIsOpen(false);
     setShowTemplates(false);
@@ -215,7 +221,8 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     setShowTemplates(false);
   };
 
-  const toggleMenu = () => {
+  const toggleMenu = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     if (!isOpen) {
       setShowTemplates(false);
     }
@@ -228,14 +235,15 @@ const TableMenu = ({ editor }: TableMenuProps) => {
         onClick={toggleMenu}
         className={cn(
           "p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-900 flex items-center gap-1",
-          editor.isActive("table") && "bg-gray-100 text-blue-600",
+          editor.isActive("table") && "bg-gray-100 text-blue-600"
         )}
         title="Table"
       >
         <TableIcon className="w-5 h-5" />
         {editor.isActive("table") && (
-          <ChevronDown className="w-3 h-3 transition-transform duration-200" 
-            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          <ChevronDown
+            className="w-3 h-3 transition-transform duration-200"
+            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
           />
         )}
       </button>
@@ -245,6 +253,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
             {!editor.isActive("table") && (
               <>
                 <button
+                  type="button"
                   onClick={addTable}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -253,18 +262,30 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                 </button>
                 <div className="relative">
                   <button
-                    onClick={() => setShowTemplates(!showTemplates)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowTemplates(!showTemplates);
+                    }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center justify-between"
                   >
                     <span>Insert Template</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${showTemplates ? 'rotate-180' : ''}`} />
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${
+                        showTemplates ? "rotate-180" : ""
+                      }`}
+                    />
                   </button>
                   {showTemplates && (
                     <div className="absolute left-full top-0 ml-1 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
                       {TABLE_DESIGNS.map((template, index) => (
                         <button
+                          type="button"
                           key={index}
-                          onClick={() => insertTableTemplate(template.html)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            insertTableTemplate(template.html);
+                          }}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                         >
                           {template.name}
@@ -278,6 +299,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
             {editor.isActive("table") && (
               <>
                 <button
+                  type="button"
                   onClick={addRowAfter}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -285,6 +307,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Add Row
                 </button>
                 <button
+                  type="button"
                   onClick={addColumnAfter}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -292,6 +315,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Add Column
                 </button>
                 <button
+                  type="button"
                   onClick={deleteRow}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -299,6 +323,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Delete Row
                 </button>
                 <button
+                  type="button"
                   onClick={deleteColumn}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -306,6 +331,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Delete Column
                 </button>
                 <button
+                  type="button"
                   onClick={deleteTable}
                   className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 hover:text-red-900 flex items-center gap-2 border-t border-gray-100 mt-1 pt-2"
                 >
