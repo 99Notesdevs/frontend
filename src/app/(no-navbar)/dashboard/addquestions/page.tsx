@@ -53,7 +53,7 @@ export default function AddQuestionsPage() {
       try {
         const token = Cookies.get("token");
         const response = await fetch(
-          `${env.API_TEST}/questions/practice?categoryId=${selectedCategory}&limit=${pageSize}`,
+          `${env.API_TEST}/questions/?categoryId=${selectedCategory}&limit=${pageSize}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

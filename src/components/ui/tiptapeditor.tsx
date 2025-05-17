@@ -40,6 +40,7 @@ import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { Iframe } from "./Iframe";
+import { TABLE_DESIGNS } from "./tableDesigns";
 
 const lowlight = createLowlight(common);
 
@@ -157,12 +158,14 @@ interface TableMenuProps {
 
 const TableMenu = ({ editor }: TableMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setShowTemplates(false);
       }
     };
 
@@ -170,68 +173,133 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const addTable = () => {
+  const addTable = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
     setIsOpen(false);
+    setShowTemplates(false);
   };
 
-  const addRowAfter = () => {
+  const addRowAfter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().addRowAfter().run();
     setIsOpen(false);
+    setShowTemplates(false);
   };
 
-  const addColumnAfter = () => {
+  const addColumnAfter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().addColumnAfter().run();
     setIsOpen(false);
+    setShowTemplates(false);
   };
 
-  const deleteRow = () => {
+  const deleteRow = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().deleteRow().run();
     setIsOpen(false);
+    setShowTemplates(false);
   };
 
-  const deleteColumn = () => {
+  const deleteColumn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().deleteColumn().run();
     setIsOpen(false);
+    setShowTemplates(false);
   };
 
-  const deleteTable = () => {
+  const deleteTable = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     editor.chain().focus().deleteTable().run();
     setIsOpen(false);
+    setShowTemplates(false);
+  };
+
+  const insertTableTemplate = (html: string) => {
+    editor.chain().focus().insertContent(html).run();
+    setIsOpen(false);
+    setShowTemplates(false);
+  };
+
+  const toggleMenu = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!isOpen) {
+      setShowTemplates(false);
+    }
+    setIsOpen(!isOpen);
   };
 
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleMenu}
         className={cn(
           "p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-900 flex items-center gap-1",
-          editor.isActive("table") && "bg-gray-100 text-blue-600",
+          editor.isActive("table") && "bg-gray-100 text-blue-600"
         )}
         title="Table"
       >
         <TableIcon className="w-5 h-5" />
         {editor.isActive("table") && (
-          <ChevronDown className="w-3 h-3 transition-transform duration-200" 
-            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          <ChevronDown
+            className="w-3 h-3 transition-transform duration-200"
+            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
           />
         )}
       </button>
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+        <div className="absolute z-50 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
           <div className="py-1" role="menu" aria-orientation="vertical">
             {!editor.isActive("table") && (
-              <button
-                onClick={addTable}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
-              >
-                <TableIcon className="w-4 h-4" />
-                Insert Table
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={addTable}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
+                >
+                  <TableIcon className="w-4 h-4" />
+                  Insert Basic Table
+                </button>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowTemplates(!showTemplates);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center justify-between"
+                  >
+                    <span>Insert Template</span>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${
+                        showTemplates ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {showTemplates && (
+                    <div className="absolute left-full top-0 ml-1 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                      {TABLE_DESIGNS.map((template, index) => (
+                        <button
+                          type="button"
+                          key={index}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            insertTableTemplate(template.html);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          {template.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
             )}
             {editor.isActive("table") && (
               <>
                 <button
+                  type="button"
                   onClick={addRowAfter}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -239,6 +307,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Add Row
                 </button>
                 <button
+                  type="button"
                   onClick={addColumnAfter}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -246,6 +315,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Add Column
                 </button>
                 <button
+                  type="button"
                   onClick={deleteRow}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -253,6 +323,7 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Delete Row
                 </button>
                 <button
+                  type="button"
                   onClick={deleteColumn}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
                 >
@@ -260,8 +331,9 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Delete Column
                 </button>
                 <button
+                  type="button"
                   onClick={deleteTable}
-                  className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 hover:text-red-900 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 hover:text-red-900 flex items-center gap-2 border-t border-gray-100 mt-1 pt-2"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Table
@@ -473,21 +545,31 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       // Switching to HTML mode - preserve table styles
       const content = editor.getHTML();
       // Process content to ensure table styles are preserved
-      const processedContent = content.replace(
-        /<table([^>]*)>/g,
-        (match, attrs) => {
-          // Keep existing style attribute if present
-          if (attrs.includes('style=')) return match;
-          return `<table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;"${attrs}>`;
-        }
-      ).replace(
-        /<t[hd]([^>]*)>/g,
-        (match, attrs) => {
-          // Keep existing style attribute if present
-          if (attrs.includes('style=')) return match;
-          return `<td style="border: 1px solid #e5e7eb; padding: 0.5rem;"${attrs}>`;
-        }
-      );
+      const processedContent = content
+        .replace(
+          /<table([^>]*)>/g,
+          (match, attrs) => {
+            // Keep existing style attribute if present
+            if (attrs.includes('style=')) return match;
+            return `<table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; margin: 0;"${attrs}>`;
+          }
+        )
+        .replace(
+          /<t[hd]([^>]*)>/g,
+          (match, attrs) => {
+            // Keep existing style attribute if present
+            if (attrs.includes('style=')) return match;
+            return `<td style="border: 1px solid #e5e7eb; padding: 4px 6px; margin: 0; line-height: 1.2;"${attrs}>`;
+          }
+        )
+        .replace(
+          /<th([^>]*)>/g,
+          (match, attrs) => {
+            // Keep existing style attribute if present
+            if (attrs.includes('style=')) return match;
+            return `<th style="border: 1px solid #e5e7eb; padding: 4px 6px; background-color: #f9fafb; margin: 0; line-height: 1.2;"${attrs}>`;
+          }
+        );
       setHtmlContent(processedContent);
     } else {
       // Switching back to rich text mode - preserve custom styles
