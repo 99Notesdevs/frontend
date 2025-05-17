@@ -3,6 +3,14 @@ export interface Page {
   title: string;
   content: string;
   image: string;
+  author?: {
+    id: string;
+    name: string;
+  };
+  admin?: {
+    id: string;
+    name: string;
+  };
   metadata: string;
   slug: string;
   tags: Array<{ name: string }>;
