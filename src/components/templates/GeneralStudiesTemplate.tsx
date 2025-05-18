@@ -210,15 +210,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                       />
                     </CardContent>
                   </Card>
-                  {/* Practice Questions Button */}
-                  <div className="mt-4">
-                    <button
-                      onClick={() => window.location.href = `/quiz?categoryId=${page?.categories?.id}`}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Practice Questions
-                    </button>
-                  </div>
+
                 </div>
 
                 {/* Right Sidebar */}
@@ -226,10 +218,12 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                   {/* Search Bar */}
                   <div
                     className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-4 sm:p-6 
-                transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
+                    transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
                   >
                     <SearchBar />
                   </div>
+
+                 
 
                   {/* Sticky Container */}
                   <div className="relative">
@@ -244,6 +238,27 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                           <TableOfContents content={mainContent} />
                         </div>
                       </div>
+
+                       {/* Practice Questions Section */}
+                  <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6">
+                    <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] border-b-2 border-[var(--border-light)] pb-3 flex items-center gap-2">
+                      <span className="text-[var(--primary)]">📝</span>
+                      <span>Practice Questions</span>
+                    </h3>
+                    <p className="text-gray-600 mb-4 text-sm">Test your knowledge with these practice questions based on this article.</p>
+                    <div className="text-center">
+                      <button
+                        onClick={() => window.location.href = `/quiz?categoryId=${page?.categories?.id}`}
+                        className="group relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50"
+                      >
+                        <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-700 to-blue-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></span>
+                        <svg className="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <span className="relative">Start Practicing</span>
+                      </button>
+                    </div>
+                  </div>
 
                       {/* Social Media Section */}
                       <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6">
