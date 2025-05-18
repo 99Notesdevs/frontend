@@ -36,6 +36,9 @@ const navigationItems = {
       category: "Test Management",
       items: [
         { icon: FaPlus, text: "Add Questions", path: "/dashboard/addquestions" },
+        { icon: FaPlus, text: "Add Test Forms", path: "/dashboard/addtestForms" },
+        { icon: FaPlus, text: "Test Forms", path: "/dashboard/testForms" },
+        { icon: FaPlus, text: "Add Test", path: "/dashboard/addtest" },
       ]
     },
     {

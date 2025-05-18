@@ -2,15 +2,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
+import CategorySelect from "@/components/testUtils/CategorySelect";
 
 interface Category {
   id: number;
@@ -31,7 +25,6 @@ interface Question {
 import { useRef } from "react";
 
 export default function AddQuestionsPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [page, setPage] = useState(1);
@@ -51,24 +44,6 @@ export default function AddQuestionsPage() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<
     string | null
   >(null);
-
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const token = Cookies.get("token");
-        const response = await fetch(`${env.API_TEST}/categories`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) throw new Error("Failed to fetch categories");
-        const { data } = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   // Fetch questions for selected category
   useEffect(() => {
@@ -267,33 +242,10 @@ export default function AddQuestionsPage() {
         </h1>
         <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 md:p-14 space-y-10 scale-105 mx-auto mt-5">
           {/* Category Selection */}
-          <div>
-            <label className="block mb-2 text-lg font-bold [color:var(--admin-bg-dark)]">
-              Select Category
-            </label>
-            <Select
-              value={selectedCategory?.toString()}
-              onValueChange={(value) => {
-                setSelectedCategory(Number(value));
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="w-full bg-white text-white border border-gray-300 font-medium shadow focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition mb-3">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent className="z-50  border border-gray-700 shadow-2xl rounded-lg mt-1 min-w-[200px]">
-                {categories.map((category) => (
-                  <SelectItem
-                    key={category.id}
-                    value={category.id.toString()}
-                    className="text-white px-4 py-2 hover:bg-[#2d323c] cursor-pointer rounded"
-                  >
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <CategorySelect
+            selectedCategoryId={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
 
           {/* Question Form */}
           <div ref={formRef}>
@@ -516,8 +468,8 @@ export default function AddQuestionsPage() {
                       <p className="text-sm [color:var(--admin-bg-primary)] ">
                         Category:{" "}
                         {
-                          categories.find((c) => c.id === question.categoryId)
-                            ?.name
+                          // categories.find((c) => c.id === question.categoryId)
+                          //   ?.name
                         }
                       </p>
                       <div className="mt-1 flex flex-wrap gap-2">
