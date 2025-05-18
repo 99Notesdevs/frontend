@@ -242,7 +242,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     <div className="text-center mb-8 sm:mb-12"></div>
 
                     <div
-                      className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
+                      className="prose prose-sm sm:prose-base lg:prose-lg max-w-none w-full overflow-x-auto
                     prose-headings:font-semibold
                     prose-headings:tracking-normal
                     prose-headings:text-left
@@ -275,7 +275,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     prose-a:hover:border-[var(--accent-link)]
                     
                     prose-blockquote:border-l-[var(--action-primary)]
-                    prose-blockquote:bg-[var(--bg-subtle)]"
+                    prose-blockquote:bg-[var(--bg-subtle)]
+                    
+                    /* Custom styles for tables and iframes */
+                    prose-table:block prose-table:w-full prose-table:overflow-x-auto
+                    prose-iframe:max-w-full prose-iframe:w-full prose-iframe:aspect-video"
                     >
                       {mainContentFinal}
                     </div>
@@ -292,7 +296,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 </main>
 
                 {/* Right Sidebar */}
-                <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
+                <aside className="lg:col-span-4 space-y-4 sm:space-y-6 w-full">
                   {/* Sidebar content - No longer conditionally hidden */}
                   <div>
                     {/* Search Bar */}
@@ -312,24 +316,26 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </div>
                     </div>
 
-                    {/* Practice Questions Section */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-6 mb-6">
-                      <h3 className="text-xl font-semibold mb-4 text-[var(--surface-darker)] border-b-2 border-[var(--info-surface)] pb-3 flex items-center gap-2">
-                        <span className="text-[var(--action-primary)]">📝</span>
-                        <span>Practice Questions</span>
-                      </h3>
-                      <p className="text-[var(--text-tertiary)] mb-4 text-sm">Test your knowledge with these practice questions based on this article.</p>
-                      <div className="text-center">
-                        <button
-                          onClick={() => router.push(`/quiz?categoryId=${page?.categories?.id}`)}
-                          className="group relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50"
-                        >
-                          <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-700 to-blue-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></span>
-                          <svg className="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                          </svg>
-                          <span className="relative">Start Practicing</span>
-                        </button>
+                    {/* Practice Questions Section - Sticky Footer */}
+                    <div className="sticky bottom-6 mt-6">
+                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-6">
+                        <h3 className="text-xl font-semibold mb-2 text-[var(--surface-darker)] flex items-center gap-2">
+                          <span className="text-yellow-500">📝</span>
+                          <span>Practice Questions</span>
+                        </h3>
+                        <p className="text-[var(--text-tertiary)] mb-4 text-sm">Test your knowledge with these practice questions based on this article.</p>
+                        <div className="text-center">
+                          <button
+                            onClick={() => router.push(`/quiz?categoryId=${page?.categories?.id}`)}
+                            className="group relative w-full inline-flex items-center justify-center px-4 py-3 overflow-hidden font-medium text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50"
+                          >
+                            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-yellow-500 to-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></span>
+                            <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <span className="relative group-hover:text-white transition-colors duration-200">Start Practicing</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
 

@@ -99,14 +99,21 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                 {/* Left Column - Main Image and Content */}
                 <div className="lg:col-span-8 space-y-4 sm:space-y-6">
                   {/* Main Topic Image */}
-                  <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-8 sm:mb-10 transform transition-all hover:scale-[1.02]">
-                    <div className="relative w-full h-64 md:h-96">
+                  <Card className="border-0 shadow-xl bg-white/90 overflow-hidden mb-8 sm:mb-10 w-full">
+                    <div className="relative w-full min-h-[300px] h-[60vh] max-h-[800px]">
                       <Image
                         src={`${pageImage || "/"}`}
                         alt={title}
                         fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover w-full h-full"
+                        sizes="100vw"
+                        priority
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: 'center',
+                          width: '100%',
+                          height: '100%'
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                         {/* <div className="p-8">
