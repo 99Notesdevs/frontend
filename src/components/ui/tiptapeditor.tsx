@@ -794,10 +794,19 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
           }}
         />
       ) : (
-        <EditorContent
-          editor={editor}
-          className="prose prose-slate max-w-none p-4"
-        />
+        <div className="w-full overflow-x-auto">
+          <EditorContent
+            editor={editor}
+            className="prose prose-slate max-w-full p-4 w-full"
+            style={{
+              '--tw-prose-pre-bg': 'transparent',
+              '--tw-prose-pre-border': '1px solid #e5e7eb',
+              '--tw-prose-pre-padding': '1rem',
+              '--tw-prose-pre-code-padding': '0',
+              '--tw-prose-pre-code-bg': 'transparent',
+            } as React.CSSProperties}
+          />
+        </div>
       )}
     </div>
   );

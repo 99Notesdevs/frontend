@@ -20,11 +20,60 @@ interface TestFormData {
   id?: number
 }
 
+interface ModalProps {
+  isOpen: boolean
+  onClose: () => void
+  message: string
+  type: 'success' | 'error'
+}
+
+const Modal = ({ isOpen, onClose, message, type }: ModalProps) => {
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-96 max-w-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            {type === 'success' ? (
+              <svg className="w-6 h-6 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+            <h2 className={`text-lg font-semibold ${type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+              {type === 'success' ? 'Success' : 'Error'}
+            </h2>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <p className="text-gray-600 text-center mb-4">{message}</p>
+        <button
+          onClick={onClose}
+          className={`w-full py-2 px-4 rounded-lg ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'} hover:opacity-90 transition-opacity`}
+        >
+          {type === 'success' ? 'Continue' : 'Close'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function EditTest() {
   const router = useRouter()
   const params = useParams()
   const [testData, setTestData] = useState<TestFormData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
+  const [modalType, setModalType] = useState<'success' | 'error'>('error')
 
   useEffect(() => {
     const fetchTest = async () => {
@@ -37,18 +86,18 @@ export default function EditTest() {
         })
 
         if (!response.ok) throw new Error('Failed to fetch test')
-        const { data } = await response.json()
+        const data = await response.json()
         setTestData(data)
       } catch (error) {
-        console.error('Error:', error)
-        alert('Failed to fetch test')
+        console.error('Error fetching test:', error)
+        router.push('/dashboard/testForms')
       } finally {
         setLoading(false)
       }
     }
 
     fetchTest()
-  }, [params.id])
+  }, [params.id, router])
 
   const handleSubmit = async (data: TestFormData) => {
     try {
@@ -63,22 +112,41 @@ export default function EditTest() {
       })
 
       if (!response.ok) throw new Error('Failed to update test')
-      router.push('/dashboard/testSeries')
+      
+      setModalMessage('Test updated successfully!')
+      setModalType('success')
+      setShowModal(true)
+      
+      const timer = setTimeout(() => {
+        router.push('/dashboard/testForms')
+      }, 2000)
+      
+      return Promise.resolve()
     } catch (error) {
       console.error('Error:', error)
-      alert('Failed to update test')
+      setModalMessage('Failed to update test')
+      setModalType('error')
+      setShowModal(true)
+      return Promise.reject(error)
+    }
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
+    if (modalType === 'success') {
+      router.push('/dashboard/testForms')
     }
   }
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div className="bg-gray-200 rounded p-6">
-            <div className="h-4 bg-gray-300 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading test details...</p>
+            </div>
           </div>
         </div>
       </div>
