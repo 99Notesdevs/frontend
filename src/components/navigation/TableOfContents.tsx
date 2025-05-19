@@ -35,7 +35,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
     const elements = Array.from(
-      doc.querySelectorAll("h1, h2, h3, h4, h5, h6")
+      doc.querySelectorAll("h2")
     ).map((element, index) => {
       // Generate a clean ID from the heading text
       const text = element.textContent || '';
