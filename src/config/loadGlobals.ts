@@ -4,7 +4,7 @@ const loadGlobals = async () => {
   try {
     const response = await fetch(`${env.API}/admin/ops`);
     const data = await response.json();
-    const { globalHeadScripts, globalBodyScripts } = data.data;
+    const { globalHeadScripts, globalBodyScripts, globalCss } = data.data;
 
     const bodyScripts = globalBodyScripts[0]?.split('||')?.map((script: string) => script.trim());
     const headScripts = globalHeadScripts[0]?.split('||')?.map((script: string) => script.trim());
@@ -29,6 +29,14 @@ const loadGlobals = async () => {
         document.body.appendChild(scriptElement);
       });
     }
+
+    const cssVars = Object.entries(JSON.parse(globalCss))
+      .map(([key, value]) => `--${key}: ${value};`)
+      .join("\n");
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = `:root {\n${cssVars}\n}`;
+    document.head.appendChild(styleElement);
+
   } catch (error) {
     console.error('Error loading global scripts:', error);
   }
