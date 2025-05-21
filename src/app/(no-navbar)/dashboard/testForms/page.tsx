@@ -87,7 +87,8 @@ export default function TestForms() {
         })
 
         if (!response.ok) throw new Error('Failed to fetch tests')
-        const data = await response.json()
+        const testsData = await response.json()
+        const data = testsData.data
         // Ensure data is an array
         if (Array.isArray(data)) {
           setTests(data)
