@@ -26,6 +26,7 @@ interface TestFormProps {
   onSubmit: (data: TestSeriesData) => Promise<void>
   onCancel?: () => void
   questionIds?: number[]
+  mode?: 'add' | 'edit'
 }
 
 interface TestFormData {
@@ -47,7 +48,7 @@ interface SimpleTestFormProps {
   onCancel?: () => void
 }
 
-export default function TestForm({ initialData, onSubmit, onCancel, questionIds }: TestFormProps) {
+export default function TestForm({ initialData, onSubmit, onCancel, questionIds, mode = 'add' }: TestFormProps) {
   const [testSeriesData, setTestSeriesData] = useState<TestSeriesData>({
     name: '',
     correctAttempted: 0,
@@ -213,9 +214,9 @@ export default function TestForm({ initialData, onSubmit, onCancel, questionIds 
         )}
         <button
           type="submit"
-          className="px-6 py-2 text-base font-semibold rounded bg-blue-500 hover:bg-blue-600 text-white transition"
+          className="px-6 py-2 text-base font-semibold rounded bg-slate-600 hover:bg-slate-700 text-white transition"
         >
-          {initialData ? 'Update Test Series' : 'Create Test Series'}
+          {mode === 'edit' ? 'Update Test Series' : 'Create Test Series'}
         </button>
       </div>
     </form>

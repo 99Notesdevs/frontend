@@ -340,7 +340,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
 
                     {/* Social Media Section */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6">
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
                       <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
                         <span className="text-[var(--action-primary)]">🌐</span>
                         <span>Connect With Us</span>

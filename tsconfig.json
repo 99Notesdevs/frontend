@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(use-navbar)/tag/[slug]"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(use-navbar)/tag/[slug]", "src/app/(no-navbar)/dashboard/update-css"],
   "exclude": ["node_modules"]
 }
