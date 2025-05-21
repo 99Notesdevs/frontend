@@ -20,6 +20,9 @@ interface Question {
   explaination: string;
   creatorName: string;
   multipleCorrectType: boolean;
+  pyq: boolean;
+  year: number | null;
+  acceptance: number | null;
 }
 
 import { useRef } from "react";
@@ -38,7 +41,10 @@ export default function AddQuestionsPage() {
     categoryId: 0,
     explaination: "",
     creatorName: "",
-    multipleCorrectType: false
+    multipleCorrectType: false,
+    pyq: false,
+    year: null,
+    acceptance: null
   });
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<
@@ -123,7 +129,10 @@ export default function AddQuestionsPage() {
         categoryId: selectedCategory || 0,
         explaination: "",
         creatorName: creatorName || "",
-        multipleCorrectType: false
+        multipleCorrectType: false,
+        pyq: false,
+        year: null,
+        acceptance: null
       });
       setPage(1);
     } catch (error) {
@@ -213,7 +222,10 @@ export default function AddQuestionsPage() {
         categoryId: selectedCategory || 0,
         explaination: "",
         creatorName: creatorName || "",
-        multipleCorrectType: false
+        multipleCorrectType: false,
+        pyq: false,
+        year: null,
+        acceptance: null
       });
     } catch (error) {
       console.error("Error updating question:", error);
@@ -230,7 +242,10 @@ export default function AddQuestionsPage() {
       categoryId: selectedCategory || 0,
       explaination: "",
       creatorName: "",
-      multipleCorrectType: false
+      multipleCorrectType: false,
+      pyq: false,
+      year: null,
+      acceptance: null
     });
   };
 
@@ -422,6 +437,58 @@ export default function AddQuestionsPage() {
                       value={newQuestion.creatorName}
                       readOnly
                       className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="pyq"
+                      checked={newQuestion.pyq}
+                      onChange={(e) =>
+                        setNewQuestion({ ...newQuestion, pyq: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <label htmlFor="pyq" className="text-sm font-medium text-gray-700">
+                      Previous Year Question (PYQ)
+                    </label>
+                  </div>
+
+                  <div>
+                    <label htmlFor="year" className="block text-sm font-medium text-gray-700">
+                      Year
+                    </label>
+                    <input
+                      type="number"
+                      id="year"
+                      value={newQuestion.year || ''}
+                      onChange={(e) =>
+                        setNewQuestion({ ...newQuestion, year: e.target.value ? parseInt(e.target.value) : null })
+                      }
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="e.g., 2023"
+                      min="1900"
+                      max="2100"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="acceptance" className="block text-sm font-medium text-gray-700">
+                      Acceptance Rate (%)
+                    </label>
+                    <input
+                      type="number"
+                      id="acceptance"
+                      value={newQuestion.acceptance || ''}
+                      onChange={(e) =>
+                        setNewQuestion({ ...newQuestion, acceptance: e.target.value ? parseInt(e.target.value) : null })
+                      }
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="e.g., 75"
+                      min="0"
+                      max="100"
                     />
                   </div>
                 </div>
