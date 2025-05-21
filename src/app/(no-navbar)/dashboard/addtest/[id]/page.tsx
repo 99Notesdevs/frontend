@@ -86,7 +86,8 @@ export default function EditTest() {
         })
 
         if (!response.ok) throw new Error('Failed to fetch test')
-        const data = await response.json()
+        const testData = await response.json()
+        const data = testData.data
         setTestData(data)
       } catch (error) {
         console.error('Error fetching test:', error)

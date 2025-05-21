@@ -5,7 +5,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "@/styles/globals.css";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { FaPlus, FaEdit } from "react-icons/fa";
+import { FaPlus, FaEdit, FaAdjust, FaAirbnb, FaTextHeight } from "react-icons/fa";
 import { isAuth, AuthResponse } from "@/lib/isAuth";
 import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
@@ -36,8 +36,9 @@ const navigationItems = {
       category: "Test Management",
       items: [
         { icon: FaPlus, text: "Add Questions", path: "/dashboard/addquestions" },
-        { icon: FaPlus, text: "Add Test Series", path: "/dashboard/testSeries" },
-        { icon: FaPlus, text: "Test Forms", path: "/dashboard/testForms" },
+        { icon: FaPlus, text: "Add Test Series", path: "/dashboard/addtestSeries" },
+        { icon: FaAdjust, text: "Test Forms", path: "/dashboard/testForms" },
+        { icon: FaAdjust, text: "Test Series", path: "/dashboard/testSeries" },
         { icon: FaPlus, text: "Add Test", path: "/dashboard/addtest" },
       ]
     },
