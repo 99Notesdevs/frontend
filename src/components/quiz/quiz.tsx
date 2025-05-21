@@ -4,7 +4,7 @@ interface Question {
   id: number;
   question: string;
   options: string[];
-  answer: number;
+  answer: string;
   explaination: string;
   creatorName: string;
 }
@@ -19,7 +19,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
   const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
   const [showResults, setShowResults] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-
   const handleOptionSelect = (questionId: number, optionIndex: number) => {
     if (showResults) return;
     setSelectedOptions(prev => ({
@@ -55,7 +54,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
 
   const calculateScore = () => {
     return questions.reduce((score, question) => {
-      return score + (selectedOptions[question.id] === question.answer ? 1 : 0);
+      return score + (selectedOptions[question.id] === Number(question.answer) ? 1 : 0);
     }, 0);
   };
 
@@ -92,7 +91,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
                       <div className="space-y-3">
                         {question.options.map((option, index) => {
                           const isSelected = selectedOptions[question.id] === index;
-                          const isCorrect = index === question.answer;
+                          const isCorrect = index === Number(question.answer);
                           const isShown = showExplanations[question.id];
                           let className = "flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors text-lg font-medium";
                           if (isShown) {
