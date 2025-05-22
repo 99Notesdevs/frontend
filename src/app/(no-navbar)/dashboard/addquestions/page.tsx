@@ -47,9 +47,10 @@ export default function AddQuestionsPage() {
     acceptance: null
   });
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<
-    string | null
-  >(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean;
+    questionId: string | null;
+  }>({ isOpen: false, questionId: null });
 
   // Fetch questions for selected category
   useEffect(() => {
@@ -154,25 +155,31 @@ export default function AddQuestionsPage() {
     }
   };
 
-  const handleDeleteQuestion = async (questionId: string) => {
+  const handleDeleteQuestion = async () => {
+    if (!deleteConfirmation.questionId) return;
+    
     try {
-      const response = await fetch(`${env.API_TEST}/questions/${questionId}`, {
-        method: "DELETE",
+      const response = await fetch(`${env.API_TEST}/questions/${deleteConfirmation.questionId}`, {
+        method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
+          'Authorization': `Bearer ${Cookies.get('token')}`,
         },
       });
 
-      if (!response.ok) throw new Error("Failed to delete question");
+      if (!response.ok) throw new Error('Failed to delete question');
 
-      // Remove deleted question from the list
-      setQuestions((prevQuestions) =>
-        prevQuestions.filter((q) => q.id !== questionId)
-      );
-      setShowDeleteConfirmation(null);
+      // Remove the question from the local state
+      setQuestions(prev => prev.filter(q => q.id !== deleteConfirmation.questionId));
+      
+      // Close the confirmation dialog
+      setDeleteConfirmation({ isOpen: false, questionId: null });
+      
+      // Show success message
+      alert('Question deleted successfully');
     } catch (error) {
-      console.error("Error deleting question:", error);
-      setShowDeleteConfirmation(null);
+      console.error('Error deleting question:', error);
+      alert('Failed to delete question');
+      setDeleteConfirmation({ isOpen: false, questionId: null });
     }
   };
 
@@ -436,66 +443,85 @@ export default function AddQuestionsPage() {
                       id="creatorName"
                       value={newQuestion.creatorName}
                       readOnly
-                      className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm"
+                      className="mt-1 block w-full shadow-sm sm:text-sm"
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4 mt-4">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="pyq"
-                      checked={newQuestion.pyq}
-                      onChange={(e) =>
-                        setNewQuestion({ ...newQuestion, pyq: e.target.checked })
-                      }
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label htmlFor="pyq" className="text-sm font-medium text-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-indigo-300 transition-colors">
+                    <div className="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        id="pyq"
+                        checked={newQuestion.pyq}
+                        onChange={(e) =>
+                          setNewQuestion({ ...newQuestion, pyq: e.target.checked })
+                        }
+                        className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors cursor-pointer"
+                      />
+                    </div>
+                    <label htmlFor="pyq" className="text-sm font-medium text-gray-700 cursor-pointer select-none">
                       Previous Year Question (PYQ)
                     </label>
                   </div>
 
-                  <div>
+                  <div className="space-y-1">
                     <label htmlFor="year" className="block text-sm font-medium text-gray-700">
-                      Year
+                      Year <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="number"
-                      id="year"
-                      value={newQuestion.year || ''}
-                      onChange={(e) =>
-                        setNewQuestion({ ...newQuestion, year: e.target.value ? parseInt(e.target.value) : null })
-                      }
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="e.g., 2023"
-                      min="1900"
-                      max="2100"
-                    />
+                    <div className="relative rounded-md shadow-sm">
+                      <input
+                        type="number"
+                        id="year"
+                        value={newQuestion.year || ''}
+                        onChange={(e) =>
+                          setNewQuestion({ ...newQuestion, year: e.target.value ? parseInt(e.target.value) : null })
+                        }
+                        className="block w-full rounded-md border-gray-300 pl-4 pr-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm"
+                        placeholder="e.g., 2023"
+                        min="1900"
+                        max="2100"
+                        required
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500 sm:text-sm">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">Between 1900-2100</p>
                   </div>
 
-                  <div>
+                  <div className="space-y-1">
                     <label htmlFor="acceptance" className="block text-sm font-medium text-gray-700">
-                      Acceptance Rate (%)
+                      Acceptance Rate
                     </label>
-                    <input
-                      type="number"
-                      id="acceptance"
-                      value={newQuestion.acceptance || ''}
-                      onChange={(e) =>
-                        setNewQuestion({ ...newQuestion, acceptance: e.target.value ? parseInt(e.target.value) : null })
-                      }
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="e.g., 75"
-                      min="0"
-                      max="100"
-                    />
+                    <div className="relative rounded-md shadow-sm">
+                      <input
+                        type="number"
+                        id="acceptance"
+                        value={newQuestion.acceptance || ''}
+                        onChange={(e) =>
+                          setNewQuestion({ ...newQuestion, acceptance: e.target.value ? parseInt(e.target.value) : null })
+                        }
+                        className="block w-full rounded-md border-gray-300 pl-4 pr-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm"
+                        placeholder="e.g., 75"
+                        min="0"
+                        max="100"
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500 sm:text-sm">%</span>
+                      </div>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">0-100%</p>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-2">
                   <Button
                     type="submit"
-                    className="px-6 py-2 text-base font-semibold rounded bg-blue-500 hover:bg-blue-600 text-white transition"
+                    className="px-6 py-2 text-base font-semibold rounded bg-slate-600 hover:bg-slate-700 text-white transition"
                   >
                     {editingQuestion ? "Update Question" : "Add Question"}
                   </Button>
@@ -569,7 +595,10 @@ export default function AddQuestionsPage() {
                         variant="destructive"
                         size="sm"
                         className="rounded bg-red-600 hover:bg-red-700"
-                        onClick={() => setShowDeleteConfirmation(question.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteConfirmation({ isOpen: true, questionId: question.id });
+                        }}
                       >
                         Delete
                       </Button>
@@ -581,35 +610,32 @@ export default function AddQuestionsPage() {
           </div>
         </div>
       </div>
+
       {/* Delete Confirmation Dialog */}
-      {showDeleteConfirmation && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg">
-            <h3 className="text-lg font-medium mb-4">Confirm Delete</h3>
-            <p className="mb-4">
-              Are you sure you want to delete this question?
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  if (typeof showDeleteConfirmation === "string") {
-                    handleDeleteQuestion(showDeleteConfirmation);
-                  }
-                }}
-              >
-                Delete
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirmation(null)}
+      {deleteConfirmation.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Question</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to delete this question? This action cannot be undone.</p>
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmation({ isOpen: false, questionId: null })}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Cancel
-              </Button>
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteQuestion}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
