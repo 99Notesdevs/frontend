@@ -6,7 +6,7 @@ interface Question {
   id: number;
   question: string;
   options: string[];
-  answer: number;
+  answer: string;
   explaination: string;
   creatorName: string;
 }

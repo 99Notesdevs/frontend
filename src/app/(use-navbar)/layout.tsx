@@ -5,7 +5,6 @@ import Footer from "@/components/Footer/Footer";
 import { getNavigationTree, getFooterLinks } from "@/lib/navigation";
 import { Suspense } from "react";
 import GlobalScriptsLoader from "@/components/GlobalScriptsLoader";
-import DynamicThemeLoader from "@/components/GlobalCSSLoad";
 
 const inter = Inter({
   subsets: ["latin"]

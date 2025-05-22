@@ -1,120 +1,124 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import dynamic from 'next/dynamic';
-import { 
-  Loader2, 
-  RefreshCw, 
-  Eye, 
-  Code, 
-  Save, 
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import dynamic from "next/dynamic";
+import {
+  Loader2,
+  RefreshCw,
+  Eye,
+  Code,
+  Save,
   AlertCircle,
   Info,
   CheckCircle2,
-  AlertTriangle
-} from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-
-// Note: Tooltip and Separator components are not available in the project
-// Consider installing @radix-ui/react-tooltip and @radix-ui/react-separator if needed
+  AlertTriangle,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { env } from "@/config/env";
+import Cookies from "js-cookie";
 
 // Dynamically import the code editor to avoid SSR issues
 const CodeEditor = dynamic(
-  () => import('@uiw/react-textarea-code-editor').then((mod) => mod.default),
+  () => import("@uiw/react-textarea-code-editor").then((mod) => mod.default),
   { ssr: false }
 );
 
-// Initial CSS state
-const DEFAULT_CSS = `/* Your global CSS will appear here */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+// Utility: Convert CSS variable object to :root CSS string
+function cssVarsObjectToRootString(vars: Record<string, string>): string {
+  return `:root {\n${Object.entries(vars)
+    .map(([key, value]) => `  --${key}: ${value};`)
+    .join("\n")}\n}`;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}`;
 
 export default function UpdateCssPage() {
-  const [css, setCss] = useState('');
-  const [originalCss, setOriginalCss] = useState('');
+  const [css, setCss] = useState<string | Record<string, string>>("");
+  const [originalCss, setOriginalCss] = useState<
+    string | Record<string, string>
+  >("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('editor');
+  const [activeTab, setActiveTab] = useState("editor");
   const previewRef = useRef<HTMLIFrameElement>(null);
 
   // Fetch current CSS on component mount
   useEffect(() => {
     const fetchCurrentCss = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch('/api/admin/css');
+        const response = await fetch(`${env.API}/admin/ops`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Cookies.get("token")}`,
+            },
+          }
+        );
         if (response.ok) {
           const data = await response.json();
-          const currentCss = data.css || DEFAULT_CSS;
+          // Accepts either a CSS string or an object of variables
+          console.log("Fetched CSS:", data);
+          const currentCss = JSON.parse(data.data.globalCss) || "";
           setCss(currentCss);
           setOriginalCss(currentCss);
         } else {
-          setCss(DEFAULT_CSS);
-          setOriginalCss(DEFAULT_CSS);
+          setCss("");
+          setOriginalCss("");
         }
       } catch (error) {
-        console.error('Failed to fetch CSS:', error);
-        toast.error('Failed to load current CSS. Using default CSS.');
-        setCss(DEFAULT_CSS);
-        setOriginalCss(DEFAULT_CSS);
+        console.error("Failed to fetch CSS:", error);
+        toast.error("Failed to load current CSS. Using default CSS.");
+        setCss("");
+        setOriginalCss("");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchCurrentCss();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update preview when CSS changes
   useEffect(() => {
-    if (activeTab === 'preview' && previewRef.current) {
+    if (activeTab === "preview" && previewRef.current) {
       updatePreview();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [css, activeTab]);
 
   const updatePreview = () => {
     if (!previewRef.current) return;
-    
-    const previewDocument = previewRef.current.contentDocument || 
-                          (previewRef.current as any).contentWindow.document;
-    
+    const previewDocument =
+      previewRef.current.contentDocument ||
+      (previewRef.current as any).contentWindow.document;
+
     if (previewDocument) {
+      let cssString = "";
+      if (typeof css === "object" && css !== null) {
+        cssString = cssVarsObjectToRootString(css);
+      } else {
+        cssString = css as string;
+      }
+
       previewDocument.open();
       previewDocument.write(`
         <!DOCTYPE html>
         <html>
           <head>
-            <style>${css}</style>
+            <style>
+              ${cssString}
+            </style>
           </head>
           <body class="p-6">
             <h1 class="text-2xl font-bold mb-4">Preview</h1>
@@ -156,31 +160,37 @@ export default function UpdateCssPage() {
   };
 
   const handleSave = async () => {
-    if (!css.trim()) {
-      toast.error('CSS cannot be empty');
+    const cssToSave =
+      typeof css === "object" && css !== null
+        ? cssVarsObjectToRootString(css)
+        : css;
+
+    if (!cssToSave || !cssToSave.trim()) {
+      toast.error("CSS cannot be empty");
       return;
     }
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/admin/css', {
-        method: 'POST',
+      const response = await fetch(`${env.API}/admin/ops`, {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("token")}`,
         },
-        body: JSON.stringify({ css }),
+        body: JSON.stringify({ globalCss: JSON.stringify(css) }),
       });
 
       if (response.ok) {
         setOriginalCss(css);
-        toast.success('CSS updated successfully');
+        toast.success("CSS updated successfully");
       } else {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to update CSS');
+        throw new Error(error.message || "Failed to update CSS");
       }
     } catch (error: any) {
-      console.error('Error updating CSS:', error);
-      toast.error(error.message || 'Failed to update CSS');
+      console.error("Error updating CSS:", error);
+      toast.error(error.message || "Failed to update CSS");
     } finally {
       setIsSaving(false);
     }
@@ -188,7 +198,7 @@ export default function UpdateCssPage() {
 
   const handleReset = () => {
     setCss(originalCss);
-    toast.success('Changes reverted');
+    toast.success("Changes reverted");
   };
 
   if (isLoading) {
@@ -210,8 +220,8 @@ export default function UpdateCssPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="lg"
               onClick={handleReset}
               disabled={css === originalCss || isSaving}
@@ -221,9 +231,9 @@ export default function UpdateCssPage() {
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline">Reset</span>
             </Button>
-            
-            <Button 
-              onClick={handleSave} 
+
+            <Button
+              onClick={handleSave}
               disabled={css === originalCss || isSaving}
               size="lg"
               className="gap-2 transition-all"
@@ -242,7 +252,7 @@ export default function UpdateCssPage() {
             </Button>
           </div>
         </div>
-        
+
         <div className="flex items-center text-sm text-muted-foreground gap-4">
           <div className="flex items-center gap-1">
             {isSaving ? (
@@ -253,7 +263,11 @@ export default function UpdateCssPage() {
               <Info className="h-4 w-4 text-amber-500" />
             )}
             <span>
-              {isSaving ? 'Saving...' : css === originalCss ? 'All changes saved' : 'You have unsaved changes'}
+              {isSaving
+                ? "Saving..."
+                : css === originalCss
+                ? "All changes saved"
+                : "You have unsaved changes"}
             </span>
           </div>
           <span>•</span>
@@ -264,29 +278,29 @@ export default function UpdateCssPage() {
         </div>
       </div>
 
-      <Tabs 
-        value={activeTab} 
+      <Tabs
+        value={activeTab}
         onValueChange={setActiveTab}
         className="w-full space-y-4"
         defaultValue="editor"
       >
         <TabsList className="w-full justify-start rounded-xl p-1 h-auto bg-muted/50">
-          <TabsTrigger 
-            value="editor" 
+          <TabsTrigger
+            value="editor"
             className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2"
           >
             <Code className="h-4 w-4" />
             <span>Editor</span>
           </TabsTrigger>
-          <TabsTrigger 
-            value="preview" 
+          <TabsTrigger
+            value="preview"
             className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2"
           >
             <Eye className="h-4 w-4" />
             <span>Preview</span>
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="editor" className="mt-0">
           <Card className="overflow-hidden border-0 shadow-sm">
             <CardHeader className="px-6 py-4 border-b">
@@ -294,17 +308,22 @@ export default function UpdateCssPage() {
                 <div>
                   <CardTitle className="text-lg">CSS Editor</CardTitle>
                   <CardDescription>
-                    Edit your global styles. Changes will be applied after saving.
+                    Edit your global styles. Changes will be applied after
+                    saving.
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="h-8 gap-1.5 text-xs hover:bg-accent/90 hover:text-accent-foreground"
                     onClick={() => {
-                      navigator.clipboard.writeText(css);
-                      toast.success('CSS copied to clipboard');
+                      navigator.clipboard.writeText(
+                        typeof css === "object" && css !== null
+                          ? cssVarsObjectToRootString(css)
+                          : css
+                      );
+                      toast.success("CSS copied to clipboard");
                     }}
                     title="Copy CSS to clipboard"
                   >
@@ -316,19 +335,26 @@ export default function UpdateCssPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-[calc(100vh-300px)] min-h-[400px] overflow-auto">
-                {typeof window !== 'undefined' && (
+                {typeof window !== "undefined" && (
                   <CodeEditor
-                    value={css}
+                    value={
+                      typeof css === "object" && css !== null
+                        ? cssVarsObjectToRootString(css)
+                        : css
+                    }
                     language="css"
                     placeholder="/* Enter your CSS here... */"
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCss(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      setCss(e.target.value)
+                    }
                     padding={20}
                     style={{
                       fontSize: 14,
-                      backgroundColor: '#0f172a',
-                      fontFamily: 'var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                      minHeight: '100%',
-                      lineHeight: '1.5',
+                      backgroundColor: "#0f172a",
+                      fontFamily:
+                        "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+                      minHeight: "100%",
+                      lineHeight: "1.5",
                     }}
                     data-color-mode="dark"
                   />
@@ -337,9 +363,19 @@ export default function UpdateCssPage() {
             </CardContent>
             <CardFooter className="px-6 py-3 border-t bg-muted/20 text-xs text-muted-foreground flex justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-medium">{css.length} characters</span>
+                <span className="font-medium">
+                  {typeof css === "string"
+                    ? css.length
+                    : Object.keys(css).length}{" "}
+                  characters
+                </span>
                 <span>•</span>
-                <span>{css.split('\n').length} lines</span>
+                <span>
+                  {typeof css === "string"
+                    ? css.split("\n").length
+                    : Object.keys(css).length}{" "}
+                  lines
+                </span>
               </div>
               <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
                 <AlertCircle className="h-3.5 w-3.5" />
@@ -348,7 +384,7 @@ export default function UpdateCssPage() {
             </CardFooter>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="preview" className="mt-0">
           <Card className="overflow-hidden border-0 shadow-sm h-[calc(100vh-220px)] min-h-[500px]">
             <CardHeader className="px-6 py-4 border-b">
@@ -358,8 +394,7 @@ export default function UpdateCssPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0 h-full">
-              <div className="relative h-full
-                after:absolute after:inset-0 after:bg-[rad-gradient(transparent_65%,hsl(var(--background))_95%)] after:pointer-events-none">
+              <div className="relative h-full after:absolute after:inset-0 after:bg-[rad-gradient(transparent_65%,hsl(var(--background))_95%)] after:pointer-events-none">
                 <iframe
                   ref={previewRef}
                   className="w-full h-full border-0"
@@ -371,7 +406,7 @@ export default function UpdateCssPage() {
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
@@ -380,19 +415,28 @@ export default function UpdateCssPage() {
           </div>
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
             <li>• Use the preview tab to see changes in real-time</li>
-            <li>• Changes are automatically saved when you click outside the editor</li>
-            <li>• Use <code className="px-1.5 py-0.5 bg-muted rounded text-xs">Ctrl+Space</code> for autocomplete</li>
+            <li>
+              • Changes are automatically saved when you click outside the
+              editor
+            </li>
+            <li>
+              • Use{" "}
+              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                Ctrl+Space
+              </code>{" "}
+              for autocomplete
+            </li>
           </ul>
         </div>
-        
+
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-500" />
             <h3 className="font-medium">Warning</h3>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            Be cautious when modifying global styles as they affect the entire application. 
-            Always test changes in preview before saving.
+            Be cautious when modifying global styles as they affect the entire
+            application. Always test changes in preview before saving.
           </p>
         </div>
       </div>
