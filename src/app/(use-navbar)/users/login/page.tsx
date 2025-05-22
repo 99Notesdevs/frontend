@@ -74,6 +74,12 @@ const Login = () => {
         }
         const cookie = data.split(' ')[1];
         Cookies.set('token', cookie, { expires: 5 });
+        const userData = await axios.get(`${env.API}/user`, {
+          headers: {
+            "Authorization": `Bearer ${cookie}`
+          }
+        });
+        localStorage.setItem("userId", userData.data.data.id);
         router.push('/users/dashboard');
         showToast("Login successful!", "success");
       } else {

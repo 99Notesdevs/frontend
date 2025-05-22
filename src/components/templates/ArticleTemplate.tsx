@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { ArticleTemplateProps } from "./types";
-import { Badge } from "@/components/ui/badge";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import SearchBar from "@/components/Navbar/SearchBar";
 import Image from "next/image";
@@ -19,11 +18,12 @@ import { isLocked } from "@/lib/islocked";
 import { Tags } from "@/components/ui/tags/Tags";
 import { useRouter } from "next/navigation";
 import { Link } from "lucide-react";
+import Bookmark from "../ui/Bookmark";
 
 const processContent = async (content: string, isAuthorized: boolean) => {
   const isContentLocked = await isLocked();
   return content.replace(/<lock>\s*([^]*?)\s*<\/lock>/g, (lockedContent) => {
-    return   isAuthorized || !isContentLocked
+    return isAuthorized || !isContentLocked
       ? lockedContent
       : `<div class="locked-content">
            <p>${lockedContent}</p>
@@ -33,7 +33,7 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 };
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
-  console.log("page",page);
+  console.log("page", page);
   const { title, content, metadata } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
@@ -51,7 +51,22 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const bodyScripts =
     parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
+    const bookmarkBy = (page as any)?.bookmarkBy || [];
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
+    useEffect(() => {
+      // Only run on client
+      if (typeof window === "undefined") return;
+      const userId = localStorage.getItem("userId");
+      if (!userId || !Array.isArray(bookmarkBy) || bookmarkBy.length === 0) {
+        setIsBookmarked(false);
+        return;
+      }
+      const found = bookmarkBy.some(
+        (item: any) => String(item.id) === String(userId)
+      );
+      setIsBookmarked(found);
+    }, [bookmarkBy]);
   // useEffect(() => {
   //   const handleToggleChat = (event: CustomEvent) => {
   //     setIsLiveChatOpen(event.detail.isOpen);
@@ -164,85 +179,89 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // @ts-ignore
   const displayImage = page.imageUrl || (coverImage as string);
 
-  const formattedDate = page.createdAt ? new Date(page.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }) : 'N/A';
+  const formattedDate = page.createdAt
+    ? new Date(page.createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "N/A";
 
   const router = useRouter();
 
   return (
-      <>
-        <section>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: jsonLD }}
-          />
-        </section>
-        <main>
-          <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
-            {/* Assistive Touch */}
-            <AssistiveTouch content={mainContentFinal} />
+    <>
+      <section>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLD }}
+        />
+      </section>
+      <main>
+        <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
+          {/* Assistive Touch */}
+          <AssistiveTouch content={mainContentFinal} />
 
-            <div
-              className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-10 py-4 sm:py-6
+          <div
+            className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-10 py-4 sm:py-6
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4">
-                {/* Main Content Column */}
-                <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-6">
-                  {/* Featured Image */}
-                  {displayImage && (
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
-                      <div className="relative w-full h-[300px] md:h-[400px]">
-                        <Image
-                          src={`${displayImage}`}
-                          alt={title}
-                          fill
-                          className="object-cover w-full"
-                          priority
-                        />
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4">
+              {/* Main Content Column */}
+              <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-6">
+                {/* Featured Image */}
+                {displayImage && (
+                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+                    <div className="relative w-full h-[300px] md:h-[400px]">
+                      <Image
+                        src={`${displayImage}`}
+                        alt={title}
+                        fill
+                        className="object-cover w-full"
+                        priority
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Article Content */}
+                <div className="bg-white border rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+                  {/* Article Header */}
+                  <div className="text-center mb-6">
+                    {page.parent && (
+                      <div className="mb-4">
+                        <a
+                          href={`/${page.parent.slug}`}
+                          className="text-[var(--action-primary)] hover:text-[var(--accent-link)] transition-colors"
+                        >
+                          {page.parent.title}
+                        </a>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Article Content */}
-                  <div className="bg-white border rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
-                    {/* Article Header */}
-                    <div className="text-center mb-6">
-                      {page.parent && (
-                        <div className="mb-4">
-                          <a
-                            href={`/${page.parent.slug}`}
-                            className="text-[var(--action-primary)] hover:text-[var(--accent-link)] transition-colors"
-                          >
-                            {page.parent.title}
-                          </a>
-                        </div>
-                      )}
+                    <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-2">
+                      {parsedMetadata.metaTitle || "Untitled Article"}
+                    </h1>
+                  </div>
 
-                      <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-2">
-                        {parsedMetadata.metaTitle || "Untitled Article"}
-                      </h1>
-                    </div>
+                  <div className="text-xs text-[var(--text-tertiary)] mb-4">
+                    {page.author && (
+                      <Link href={`${env.API}/author/${page.author.id}`}>
+                        {page.author.name}
+                      </Link>
+                    )}
+                    {page.admin && (
+                      <span className="text-[var(--text-tertiary)]">
+                        {page.admin.name}
+                      </span>
+                    )}
+                  </div>
 
-                    <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                      {page.author && (
-                        <Link href={`${env.API}/author/${page.author.id}`}>{page.author.name}</Link>
-                      )}
-                      {page.admin && (
-                        <span className="text-[var(--text-tertiary)]">
-                          {page.admin.name}
-                        </span>
-                      )}
-                    </div>
+                  <WhatsApp />
+                  <div className="text-center mb-8 sm:mb-12"></div>
 
-                    <WhatsApp />
-                    <div className="text-center mb-8 sm:mb-12"></div>
-
-                    <div
-                      className="prose prose-sm sm:prose-base lg:prose-lg max-w-none w-full overflow-x-auto
+                  <div
+                    className="prose prose-sm sm:prose-base lg:prose-lg max-w-none w-full overflow-x-auto
                     prose-headings:font-semibold
                     prose-headings:tracking-normal
                     prose-headings:text-left
@@ -280,105 +299,135 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     /* Custom styles for tables and iframes */
                     prose-table:block prose-table:w-full prose-table:overflow-x-auto
                     prose-iframe:max-w-full prose-iframe:w-full prose-iframe:aspect-video"
-                    >
-                      {mainContentFinal}
-                    </div>
-                    <Tags tags={page.tags} />
+                  >
+                    {mainContentFinal}
                   </div>
-                  {/* <button 
+                  <Tags tags={page.tags} />
+                </div>
+                {/* <button 
                     onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
                     className="px-4 py-2 bg-[var(--info-surface)] text-[var(--text-strong)] rounded-lg hover:bg-[var(--info-surface-hover)] transition-colors"
                   >
                     {isLiveChatOpen ? "Close Chat" : "Open Chat"}
                   </button> */}
 
-                  <Comments parentId={parentId} />
-                </main>
+                {isAuthorized && <Comments parentId={parentId} />}
+                {isAuthorized && (
+                  <Bookmark
+                    articleId={page.id}
+                    initialBookmarked={isBookmarked}
+                  />
+                )}
+              </main>
 
-                {/* Right Sidebar */}
-                <aside className="lg:col-span-4 space-y-4 sm:space-y-6 w-full">
-                  {/* Sidebar content - No longer conditionally hidden */}
-                  <div>
-                    {/* Search Bar */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                        transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
-                      <SearchBar />
-                    </div>
+              {/* Right Sidebar */}
+              <aside className="lg:col-span-4 space-y-4 sm:space-y-6 w-full">
+                {/* Sidebar content - No longer conditionally hidden */}
+                <div>
+                  {/* Search Bar */}
+                  <div
+                    className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                        transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
+                  >
+                    <SearchBar />
+                  </div>
 
-                    {/* TOC Section */}
-                    <div className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                        transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6">
-                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
-                        Table of Contents
-                      </h3>
-                      <div className="pr-2">
-                        <TableOfContents content={mainContentFinal} />
-                      </div>
-                    </div>
-
-                    {/* Practice Questions Section - Sticky Footer */}
-                    <div className="sticky bottom-6 mt-6">
-                      <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-6">
-                        <h3 className="text-xl font-semibold mb-2 text-[var(--surface-darker)] flex items-center gap-2">
-                          <span className="text-yellow-500">📝</span>
-                          <span>Practice Questions</span>
-                        </h3>
-                        <p className="text-[var(--text-tertiary)] mb-4 text-sm">Test your knowledge with these practice questions based on this article.</p>
-                        <div className="text-center">
-                          <button
-                            onClick={() => router.push(`/quiz?categoryId=${page?.categories?.id}`)}
-                            className="group relative w-full inline-flex items-center justify-center px-4 py-3 overflow-hidden font-medium text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50"
-                          >
-                            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-yellow-500 to-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></span>
-                            <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                            <span className="relative group-hover:text-white transition-colors duration-200">Start Practicing</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Social Media Section */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
-                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
-                        <span className="text-[var(--action-primary)]">🌐</span>
-                        <span>Connect With Us</span>
-                      </h3>
-                      <div className="space-y-4 sm:space-y-6">
-                        <SocialMedia />
-                      </div>
-                    </div>
-
-                    {/* Contact Form Section */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
-                      <ContactForm />
-                    </div>
-
-                    {/* Ads Section */}
-                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
-                      <Ads imageUrl="/" altText="ads" />
-                    </div>
-                    
-                      {/* Tags Section */}
-                    <div>
-                      {tags && tags.length > 0 && (
-                        <Tags tags={tags.map((tag: string) => ({ name: tag }))} />
-                      )}
+                  {/* TOC Section */}
+                  <div
+                    className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                        transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
+                  >
+                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
+                      Table of Contents
+                    </h3>
+                    <div className="pr-2">
+                      <TableOfContents content={mainContentFinal} />
                     </div>
                   </div>
-                </aside>
 
-                {/* LiveChat Component */}
-                {/* <div className={`${isLiveChatOpen ? 'block' : 'hidden'} fixed inset-0 z-[99999] lg:z-[99999]`}>
+                  {/* Practice Questions Section - Sticky Footer */}
+                  <div className="sticky bottom-6 mt-6">
+                    <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-6">
+                      <h3 className="text-xl font-semibold mb-2 text-[var(--surface-darker)] flex items-center gap-2">
+                        <span className="text-yellow-500">📝</span>
+                        <span>Practice Questions</span>
+                      </h3>
+                      <p className="text-[var(--text-tertiary)] mb-4 text-sm">
+                        Test your knowledge with these practice questions based
+                        on this article.
+                      </p>
+                      <div className="text-center">
+                        <button
+                          onClick={() =>
+                            router.push(
+                              `/quiz?categoryId=${page?.categories?.id}`
+                            )
+                          }
+                          className="group relative w-full inline-flex items-center justify-center px-4 py-3 overflow-hidden font-medium text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50"
+                        >
+                          <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-yellow-500 to-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></span>
+                          <svg
+                            className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white transition-colors duration-200"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                            ></path>
+                          </svg>
+                          <span className="relative group-hover:text-white transition-colors duration-200">
+                            Start Practicing
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Social Media Section */}
+                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
+                      <span className="text-[var(--action-primary)]">🌐</span>
+                      <span>Connect With Us</span>
+                    </h3>
+                    <div className="space-y-4 sm:space-y-6">
+                      <SocialMedia />
+                    </div>
+                  </div>
+
+                  {/* Contact Form Section */}
+                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                    <ContactForm />
+                  </div>
+
+                  {/* Ads Section */}
+                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                    <Ads imageUrl="/" altText="ads" />
+                  </div>
+
+                  {/* Tags Section */}
+                  <div>
+                    {tags && tags.length > 0 && (
+                      <Tags tags={tags.map((tag: string) => ({ name: tag }))} />
+                    )}
+                  </div>
+                </div>
+              </aside>
+
+              {/* LiveChat Component */}
+              {/* <div className={`${isLiveChatOpen ? 'block' : 'hidden'} fixed inset-0 z-[99999] lg:z-[99999]`}>
                   <div className="absolute inset-0 bg-black/20" onClick={() => setIsLiveChatOpen(false)}></div>
                   <div className="absolute right-4 bottom-[15vh] h-[70vh] md:h-[60vh] w-[90%] sm:w-[400px] z-max">
                     <LiveChat id={page.id} />
                   </div>
                 </div> */}
 
-                {/* LiveChat Toggle Button */}
-                {/* <button 
+              {/* LiveChat Toggle Button */}
+              {/* <button 
                   onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
                   className="fixed bottom-6 right-6 z-max bg-blue-500 text-white rounded-full p-4 shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center gap-2"
                 >
@@ -398,12 +447,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </>
                   )}
                 </button> */}
-              </div>
             </div>
           </div>
-        </main>
-        
-      </>
+        </div>
+      </main>
+    </>
   );
 };
 
