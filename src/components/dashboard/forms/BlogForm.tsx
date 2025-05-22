@@ -72,10 +72,12 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [drafts, setDrafts] = useState<{
-    title: string;
-    data: BlogFormValues & { showInNav: boolean };
-  }[]>([]);
+  const [drafts, setDrafts] = useState<
+    {
+      title: string;
+      data: BlogFormValues & { showInNav: boolean };
+    }[]
+  >([]);
 
   // Check for saved drafts on component load
   useEffect(() => {
@@ -100,7 +102,8 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
 
       // Remove any existing draft with the same title
       const filteredDrafts = existingDrafts.filter(
-        (draft: { title: string; data: BlogFormValues }) => draft.title !== draftTitle
+        (draft: { title: string; data: BlogFormValues }) =>
+          draft.title !== draftTitle
       );
 
       // Add the new draft
@@ -143,7 +146,8 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       const selectedDraft = parsedDrafts.find(
-        (draft: { title: string; data: BlogFormValues }) => draft.title === title
+        (draft: { title: string; data: BlogFormValues }) =>
+          draft.title === title
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
@@ -517,19 +521,39 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                     <SelectTrigger className="text-white">
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
-                    <SelectContent className="text-white">
-                      <SelectItem value="noindex,nofollow">
-                        No index, No follow
-                      </SelectItem>
-                      <SelectItem value="index,nofollow">
-                        Index, No follow
+                    <SelectContent className="text-white max-h-60 overflow-y-auto">
+                      <SelectItem value="index,follow">
+                        Index & Follow (Default)
                       </SelectItem>
                       <SelectItem value="noindex,follow">
-                        No index, Follow
+                        No Index, Follow
                       </SelectItem>
-                      <SelectItem value="index,follow">
-                        Index, Follow
+                      <SelectItem value="index,nofollow">
+                        Index, No Follow
                       </SelectItem>
+                      <SelectItem value="noindex,nofollow">
+                        No Index & No Follow
+                      </SelectItem>
+                      <SelectItem value="noarchive">No Archive</SelectItem>
+                      <SelectItem value="nosnippet">No Snippet</SelectItem>
+                      <SelectItem value="data-nosnippet">
+                        Data No Snippet
+                      </SelectItem>
+                      <SelectItem value="max-snippet:0">
+                        Max Snippet: None
+                      </SelectItem>
+                      <SelectItem value="max-snippet:-1">
+                        Max Snippet: Unlimited
+                      </SelectItem>
+                      <SelectItem value="max-snippet:50">
+                        Max Snippet: 50 Characters
+                      </SelectItem>
+                      <SelectItem value="noimageindex">
+                        No Image Index
+                      </SelectItem>
+                      <SelectItem value="nocache">No Cache</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="all">All</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

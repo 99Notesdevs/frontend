@@ -72,7 +72,9 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [drafts, setDrafts] = useState<{ title: string; data: ArticleFormData }[]>([]);
+  const [drafts, setDrafts] = useState<
+    { title: string; data: ArticleFormData }[]
+  >([]);
 
   useEffect(() => {
     const savedDrafts = localStorage.getItem("articleDrafts");
@@ -99,7 +101,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       const selectedDraft = parsedDrafts.find(
-        (draft: { title: string; data: ArticleFormData }) => draft.title === title
+        (draft: { title: string; data: ArticleFormData }) =>
+          draft.title === title
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
@@ -117,7 +120,10 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
 
       // Check if draft with same title exists, update it if it does
-      const existingIndex = existingDrafts.findIndex((draft: { title: string; data: ArticleFormData }) => draft.title === title);
+      const existingIndex = existingDrafts.findIndex(
+        (draft: { title: string; data: ArticleFormData }) =>
+          draft.title === title
+      );
       if (existingIndex !== -1) {
         existingDrafts[existingIndex] = { title, data: draftData };
       } else {
@@ -459,33 +465,53 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                   <FormLabel>Robots</FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value || "noindex,nofollow"}
+                      value={field.value || "index,follow"}
                       onValueChange={(value) => field.onChange(value)}
-                      defaultValue="noindex,nofollow"
+                      defaultValue="index,follow"
                     >
                       <SelectTrigger className="text-white">
-                        <SelectValue placeholder="No index, No follow" />
+                        <SelectValue placeholder="noindex, nofollow" />
                       </SelectTrigger>
-                      <SelectContent className="text-white">
-                        <SelectItem value="noindex,nofollow">
-                          No index, No follow
-                        </SelectItem>
-                        <SelectItem value="index,nofollow">
-                          Index, No follow
+                      <SelectContent className="text-white max-h-60 overflow-y-auto">
+                        <SelectItem value="index,follow">
+                          Index & Follow (Default)
                         </SelectItem>
                         <SelectItem value="noindex,follow">
-                          No index, Follow
+                          No Index, Follow
                         </SelectItem>
-                        <SelectItem value="index,follow">
-                          Index, Follow
+                        <SelectItem value="index,nofollow">
+                          Index, No Follow
                         </SelectItem>
+                        <SelectItem value="noindex,nofollow">
+                          No Index & No Follow
+                        </SelectItem>
+                        <SelectItem value="noarchive">No Archive</SelectItem>
+                        <SelectItem value="nosnippet">No Snippet</SelectItem>
+                        <SelectItem value="data-nosnippet">
+                          Data No Snippet
+                        </SelectItem>
+                        <SelectItem value="max-snippet:0">
+                          Max Snippet: None
+                        </SelectItem>
+                        <SelectItem value="max-snippet:-1">
+                          Max Snippet: Unlimited
+                        </SelectItem>
+                        <SelectItem value="max-snippet:50">
+                          Max Snippet: 50 Characters
+                        </SelectItem>
+                        <SelectItem value="noimageindex">
+                          No Image Index
+                        </SelectItem>
+                        <SelectItem value="nocache">No Cache</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="all">All</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="ogTitle"

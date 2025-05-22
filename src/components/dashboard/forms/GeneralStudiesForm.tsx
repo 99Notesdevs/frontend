@@ -74,10 +74,12 @@ export function GeneralStudiesForm({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [drafts, setDrafts] = useState<{
-    title: string;
-    data: GeneralStudiesFormValues;
-  }[]>([]);
+  const [drafts, setDrafts] = useState<
+    {
+      title: string;
+      data: GeneralStudiesFormValues;
+    }[]
+  >([]);
 
   useEffect(() => {
     const savedDrafts = localStorage.getItem("generalStudiesDrafts");
@@ -478,19 +480,39 @@ export function GeneralStudiesForm({
                     <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-white">
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
-                    <SelectContent className="text-white">
-                      <SelectItem value="noindex,nofollow">
-                        No index, No follow
-                      </SelectItem>
-                      <SelectItem value="index,nofollow">
-                        Index, No follow
+                    <SelectContent className="text-white max-h-60 overflow-y-auto">
+                      <SelectItem value="index,follow">
+                        Index & Follow (Default)
                       </SelectItem>
                       <SelectItem value="noindex,follow">
-                        No index, Follow
+                        No Index, Follow
                       </SelectItem>
-                      <SelectItem value="index,follow">
-                        Index, Follow
+                      <SelectItem value="index,nofollow">
+                        Index, No Follow
                       </SelectItem>
+                      <SelectItem value="noindex,nofollow">
+                        No Index & No Follow
+                      </SelectItem>
+                      <SelectItem value="noarchive">No Archive</SelectItem>
+                      <SelectItem value="nosnippet">No Snippet</SelectItem>
+                      <SelectItem value="data-nosnippet">
+                        Data No Snippet
+                      </SelectItem>
+                      <SelectItem value="max-snippet:0">
+                        Max Snippet: None
+                      </SelectItem>
+                      <SelectItem value="max-snippet:-1">
+                        Max Snippet: Unlimited
+                      </SelectItem>
+                      <SelectItem value="max-snippet:50">
+                        Max Snippet: 50 Characters
+                      </SelectItem>
+                      <SelectItem value="noimageindex">
+                        No Image Index
+                      </SelectItem>
+                      <SelectItem value="nocache">No Cache</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="all">All</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

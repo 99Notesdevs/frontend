@@ -63,10 +63,15 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [drafts, setDrafts] = useState<{
-    title: string;
-    data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined };
-  }[]>([]);
+  const [drafts, setDrafts] = useState<
+    {
+      title: string;
+      data: FormData & {
+        imageUrl: string | undefined;
+        showInNav: boolean | undefined;
+      };
+    }[]
+  >([]);
 
   useEffect(() => {
     const savedDrafts = localStorage.getItem("upscNotesDrafts");
@@ -94,7 +99,13 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
       const selectedDraft = parsedDrafts.find(
-        (draft: { title: string; data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined } }) => draft.title === title
+        (draft: {
+          title: string;
+          data: FormData & {
+            imageUrl: string | undefined;
+            showInNav: boolean | undefined;
+          };
+        }) => draft.title === title
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
@@ -113,7 +124,13 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
 
       // Remove any existing draft with the same title
       const filteredDrafts = existingDrafts.filter(
-        (draft: { title: string; data: FormData & { imageUrl: string | undefined, showInNav: boolean | undefined } }) => draft.title !== draftTitle
+        (draft: {
+          title: string;
+          data: FormData & {
+            imageUrl: string | undefined;
+            showInNav: boolean | undefined;
+          };
+        }) => draft.title !== draftTitle
       );
 
       // Add the new draft
@@ -342,17 +359,39 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
                     <SelectTrigger className="text-white">
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
-                    <SelectContent className="text-white">
-                      <SelectItem value="noindex,nofollow">
-                        No index,No follow
-                      </SelectItem>
-                      <SelectItem value="index,nofollow">
-                        Index,No follow
+                    <SelectContent className="text-white max-h-60 overflow-y-auto">
+                      <SelectItem value="index,follow">
+                        Index & Follow (Default)
                       </SelectItem>
                       <SelectItem value="noindex,follow">
-                        No index,Follow
+                        No Index, Follow
                       </SelectItem>
-                      <SelectItem value="index,follow">Index,Follow</SelectItem>
+                      <SelectItem value="index,nofollow">
+                        Index, No Follow
+                      </SelectItem>
+                      <SelectItem value="noindex,nofollow">
+                        No Index & No Follow
+                      </SelectItem>
+                      <SelectItem value="noarchive">No Archive</SelectItem>
+                      <SelectItem value="nosnippet">No Snippet</SelectItem>
+                      <SelectItem value="data-nosnippet">
+                        Data No Snippet
+                      </SelectItem>
+                      <SelectItem value="max-snippet:0">
+                        Max Snippet: None
+                      </SelectItem>
+                      <SelectItem value="max-snippet:-1">
+                        Max Snippet: Unlimited
+                      </SelectItem>
+                      <SelectItem value="max-snippet:50">
+                        Max Snippet: 50 Characters
+                      </SelectItem>
+                      <SelectItem value="noimageindex">
+                        No Image Index
+                      </SelectItem>
+                      <SelectItem value="nocache">No Cache</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="all">All</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

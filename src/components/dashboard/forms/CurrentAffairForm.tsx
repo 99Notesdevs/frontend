@@ -64,10 +64,15 @@ export function CurrentAffairForm({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [drafts, setDrafts] = useState<{
-    title: string;
-    data: CurrentAffairFormValues & { imageUrl: string | undefined ,showInNav: boolean | undefined};
-  }[]>([]);
+  const [drafts, setDrafts] = useState<
+    {
+      title: string;
+      data: CurrentAffairFormValues & {
+        imageUrl: string | undefined;
+        showInNav: boolean | undefined;
+      };
+    }[]
+  >([]);
 
   useEffect(() => {
     const savedDrafts = localStorage.getItem("currentAffairDrafts");
@@ -94,7 +99,12 @@ export function CurrentAffairForm({
     const savedDrafts = localStorage.getItem("currentAffairDrafts");
     if (savedDrafts) {
       const parsedDrafts = JSON.parse(savedDrafts);
-      const selectedDraft = parsedDrafts.find((draft: { title: string; data: CurrentAffairFormValues & { imageUrl: string | undefined } }) => draft.title === title);
+      const selectedDraft = parsedDrafts.find(
+        (draft: {
+          title: string;
+          data: CurrentAffairFormValues & { imageUrl: string | undefined };
+        }) => draft.title === title
+      );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
         setShowDraftDialog(false);
@@ -111,7 +121,12 @@ export function CurrentAffairForm({
       const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
 
       // Remove any existing draft with the same title
-      const filteredDrafts = existingDrafts.filter((draft: { title: string; data: CurrentAffairFormValues & { imageUrl: string | undefined } }) => draft.title !== draftTitle);
+      const filteredDrafts = existingDrafts.filter(
+        (draft: {
+          title: string;
+          data: CurrentAffairFormValues & { imageUrl: string | undefined };
+        }) => draft.title !== draftTitle
+      );
 
       // Add the new draft
       const newDraft = {
@@ -120,8 +135,11 @@ export function CurrentAffairForm({
       };
 
       const updatedDrafts = [...filteredDrafts, newDraft];
-      localStorage.setItem("currentAffairDrafts", JSON.stringify(updatedDrafts));
-      
+      localStorage.setItem(
+        "currentAffairDrafts",
+        JSON.stringify(updatedDrafts)
+      );
+
       setDrafts(updatedDrafts);
       setAlert({
         message: "Draft saved successfully!",
@@ -295,6 +313,61 @@ export function CurrentAffairForm({
 
           <FormField
             control={form.control}
+            name="robots"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Robots</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value || "noindex,nofollow"}
+                    onValueChange={(value) => field.onChange(value)}
+                    defaultValue="noindex,nofollow"
+                  >
+                    <SelectTrigger className="text-white">
+                      <SelectValue placeholder="No index, No follow" />
+                    </SelectTrigger>
+                    <SelectContent className="text-white max-h-60 overflow-y-auto">
+                      <SelectItem value="index,follow">
+                        Index & Follow (Default)
+                      </SelectItem>
+                      <SelectItem value="noindex,follow">
+                        No Index, Follow
+                      </SelectItem>
+                      <SelectItem value="index,nofollow">
+                        Index, No Follow
+                      </SelectItem>
+                      <SelectItem value="noindex,nofollow">
+                        No Index & No Follow
+                      </SelectItem>
+                      <SelectItem value="noarchive">No Archive</SelectItem>
+                      <SelectItem value="nosnippet">No Snippet</SelectItem>
+                      <SelectItem value="data-nosnippet">
+                        Data No Snippet
+                      </SelectItem>
+                      <SelectItem value="max-snippet:0">
+                        Max Snippet: None
+                      </SelectItem>
+                      <SelectItem value="max-snippet:-1">
+                        Max Snippet: Unlimited
+                      </SelectItem>
+                      <SelectItem value="max-snippet:50">
+                        Max Snippet: 50 Characters
+                      </SelectItem>
+                      <SelectItem value="noimageindex">
+                        No Image Index
+                      </SelectItem>
+                      <SelectItem value="nocache">No Cache</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="all">All</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="ogTitle"
             render={({ field }) => (
               <FormItem>
@@ -460,7 +533,10 @@ export function CurrentAffairForm({
             Save as Draft
           </Button>
 
-          <Button type="submit" className="bg-slate-700 hover:bg-slate-900 text-white">
+          <Button
+            type="submit"
+            className="bg-slate-700 hover:bg-slate-900 text-white"
+          >
             Submit
           </Button>
         </form>
