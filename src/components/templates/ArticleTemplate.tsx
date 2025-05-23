@@ -312,12 +312,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </button> */}
 
                 {isAuthorized && <Comments parentId={parentId} />}
-                {isAuthorized && (
-                  <Bookmark
-                    articleId={page.id}
-                    initialBookmarked={isBookmarked}
-                  />
-                )}
               </main>
 
               {/* Right Sidebar */}
@@ -326,10 +320,17 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 <div>
                   {/* Search Bar */}
                   <div
-                    className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                    className="flex justify-left bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
                         transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
-                  >
+                  ><div className="w-full mr-2">
                     <SearchBar />
+                  </div>
+                    {isAuthorized && (
+                  <Bookmark
+                    articleId={page.id}
+                    initialBookmarked={isBookmarked}
+                  />
+                )}
                   </div>
 
                   {/* TOC Section */}
