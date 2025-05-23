@@ -55,8 +55,8 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center pr-15">
-      <div className={`relative group bg-white border border-black w-full`}>
+    <div className="relative flex flex-col items-center">
+      <div className={`relative group bg-white border border-[var(--border-light)] rounded-xl w-full`}>
         <input
           type="text"
           placeholder="Search notes, subjects..."
