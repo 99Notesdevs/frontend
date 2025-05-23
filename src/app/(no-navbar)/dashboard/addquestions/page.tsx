@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
 import CategorySelect from "@/components/testUtils/CategorySelect";
-
+import TiptapEditor from "@/components/ui/tiptapeditor";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
 interface Category {
   id: number;
   name: string;
@@ -33,7 +34,10 @@ export default function AddQuestionsPage() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [creatorName, setCreatorName] = useState<string>("");
+  // At the top of your component with other hooks
+const formRef = useRef<HTMLDivElement>(null);
   const [newQuestion, setNewQuestion] = useState<Question>({
+    
     id: "",
     question: "",
     answer: "",
@@ -46,6 +50,10 @@ export default function AddQuestionsPage() {
     year: null,
     acceptance: null
   });
+  const [toast, setToast] = useState<{
+      message: string;
+      type: "success" | "error";
+    } | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     isOpen: boolean;
@@ -96,11 +104,54 @@ export default function AddQuestionsPage() {
     };
     fetchUserName();
   }, []);
+  // Handle image uploads in content
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+  const handleImageUpload = async (content: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+    const imgTags = doc.querySelectorAll("img");
 
+    for (const img of imgTags) {
+      const src = img.getAttribute("src");
+      if (!src) continue;
+
+      const isBlob = src.startsWith("blob:");
+      const isBase64 = src.startsWith("data:image");
+
+      if (isBlob || isBase64) {
+        try {
+          const response = await fetch(src);
+          const blob = await response.blob();
+
+          const formData = new FormData();
+          formData.append("imageUrl", blob, "image.png");
+
+          const url = (await uploadImageToS3(formData, "ContentImages")) || "error";
+          img.setAttribute("src", url);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error("Error uploading image:", error.message);
+          }
+          showToast("Failed to upload image. Please try again.", "error");
+        }
+      }
+    }
+
+    return doc.body.innerHTML;
+  };
   const handleCreateQuestion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      console.log(newQuestion);
+      // Process all rich text fields for images
+      const processedQuestion = await handleImageUpload(newQuestion.question);
+      const processedOptions = await Promise.all(
+        newQuestion.options.map(option => handleImageUpload(option))
+      );
+      const processedExplanation = await handleImageUpload(newQuestion.explaination);
+  
       const answer = newQuestion.multipleCorrectType 
         ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
         : (parseInt(newQuestion.answer) - 1).toString();
@@ -113,14 +164,17 @@ export default function AddQuestionsPage() {
         },
         body: JSON.stringify({
           ...newQuestion,
+          question: processedQuestion,
+          options: processedOptions,
+          explaination: processedExplanation,
           answer,
           categoryId: selectedCategory,
           multipleCorrectType: newQuestion.multipleCorrectType
         }),
       });
-
+  
       if (!response.ok) throw new Error("Failed to create question");
-
+  
       // Reset form and fetch updated questions
       setNewQuestion({
         id: "",
@@ -140,18 +194,31 @@ export default function AddQuestionsPage() {
       console.error("Error creating question:", error);
     }
   };
-
-  const formRef = useRef<HTMLDivElement>(null);
-
-  const handleEditQuestion = (question: Question) => {
-    setEditingQuestion(question);
-    setNewQuestion({
-      ...question,
-      categoryId: question.categoryId,
-      multipleCorrectType: question.multipleCorrectType
-    });
-    if (formRef.current) {
-      formRef.current.scrollIntoView({ behavior: "smooth" });
+  
+  const handleEditQuestion = async (question: Question) => {
+    try {
+      // Process all rich text fields for images
+      const processedQuestion = await handleImageUpload(question.question);
+      const processedOptions = await Promise.all(
+        question.options.map(option => handleImageUpload(option))
+      );
+      const processedExplanation = await handleImageUpload(question.explaination);
+  
+      setEditingQuestion(question);
+      setNewQuestion({
+        ...question,
+        question: processedQuestion,
+        options: processedOptions,
+        explaination: processedExplanation,
+        categoryId: question.categoryId,
+        multipleCorrectType: question.multipleCorrectType
+      });
+      
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    } catch (error) {
+      console.error("Error processing question data:", error);
     }
   };
 
@@ -284,15 +351,10 @@ export default function AddQuestionsPage() {
                   <label className="block mb-1 [color:var(--admin-bg-dark)] font-semibold">
                     Question
                   </label>
-                  <Input
-                    className="bg-white  text-[#1e293b]  border border-gray-200  placeholder:text-gray-400  shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-                    placeholder="Enter question"
-                    value={newQuestion.question}
-                    onChange={(e) =>
-                      setNewQuestion({
-                        ...newQuestion,
-                        question: e.target.value,
-                      })
+                  <TiptapEditor
+                    content={newQuestion.question}
+                    onChange={(content) => 
+                      setNewQuestion({ ...newQuestion, question: content })
                     }
                   />
                 </div>
@@ -305,17 +367,11 @@ export default function AddQuestionsPage() {
                       <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 font-bold text-sm border border-gray-300">
                         {index + 1}
                       </span>
-                      <Input
-                        className="bg-white text-[#1e293b] border border-gray-200 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-                        value={option}
-                        onChange={(e) => {
-                          const newOptions = [...newQuestion.options];
-                          newOptions[index] = e.target.value;
-                          setNewQuestion({
-                            ...newQuestion,
-                            options: newOptions,
-                          });
-                        }}
+                      <TiptapEditor
+                        content={option}
+                        onChange={(content) => 
+                          setNewQuestion({ ...newQuestion, options: newQuestion.options.map((_, i) => i === index ? content : _) })
+                        }
                       />
                       <Button
                         variant="destructive"
@@ -412,24 +468,15 @@ export default function AddQuestionsPage() {
                       </svg>
                       Explanation
                     </label>
-                    <textarea
-                      id="explanation"
-                      value={newQuestion.explaination}
-                      onChange={(e) =>
+                    <TiptapEditor
+                      content={newQuestion.explaination}
+                      onChange={(content) =>
                         setNewQuestion({
                           ...newQuestion,
-                          explaination: e.target.value,
+                          explaination: content,
                         })
                       }
-                      className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm focus:border-slate-500 focus:ring-2 focus:ring-slate-200 transition sm:text-sm"
-                      rows={3}
-                      maxLength={400}
-                      placeholder="Add detailed explanation for the answer"
-                      style={{ resize: "vertical", minHeight: 60 }}
                     />
-                    <div className="text-xs text-slate-700 mt-1 text-right">
-                      {newQuestion.explaination.length}/400 characters
-                    </div>
                   </div>
                   <div>
                     <label
