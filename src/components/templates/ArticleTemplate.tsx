@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ArticleTemplateProps } from "./types";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import SearchBar from "@/components/Navbar/SearchBar";
@@ -19,6 +19,17 @@ import { Tags } from "@/components/ui/tags/Tags";
 import { useRouter } from "next/navigation";
 import { Link } from "lucide-react";
 import Bookmark from "../ui/Bookmark";
+import Quiz from '@/components/quiz/quiz';
+
+interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  answer: string;
+  explaination: string;
+  creatorName: string;
+  year?: number;
+}
 
 const processContent = async (content: string, isAuthorized: boolean) => {
   const isContentLocked = await isLocked();
@@ -67,6 +78,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
       );
       setIsBookmarked(found);
     }, [bookmarkBy]);
+
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [currentQuestions, setCurrentQuestions] = useState<Question[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   // useEffect(() => {
   //   const handleToggleChat = (event: CustomEvent) => {
   //     setIsLiveChatOpen(event.detail.isOpen);
@@ -78,6 +94,47 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   //     window.removeEventListener('toggleChat', handleToggleChat as EventListener);
   //   };
   // }, []);
+  const fetchQuestions = useCallback(async () => {
+    if (!page?.id) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const limit = page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
+      const response = await fetch(
+        `${env.API_TEST}/questions/practice?categoryId=${page.categories?.id}&limit=${limit}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${Cookies.get('token')}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch questions');
+      }
+
+      const { data } = await response.json();
+      setCurrentQuestions(data);
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+      setError('Failed to load questions. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page?.id, page?.questionNumber]);
+
+  const handleStartQuiz = async () => {
+    if (!showQuiz) {
+      await fetchQuestions();
+    }
+    setShowQuiz(!showQuiz);
+  };
+
+  const handleQuizComplete = () => {
+    setShowQuiz(false);
+  };
 
   useEffect(() => {
     // Inject head scripts
@@ -186,8 +243,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
         day: "numeric",
       })
     : "N/A";
-
-  const router = useRouter();
 
   return (
     <>
@@ -359,11 +414,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </p>
                       <div className="text-center">
                         <button
-                          onClick={() =>
-                            router.push(
-                              `/quiz?categoryId=${page?.categories?.id}`
-                            )
-                          }
+                          onClick={handleStartQuiz}
                           className="group relative w-full inline-flex items-center justify-center px-4 py-3 overflow-hidden font-medium text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50"
                         >
                           <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-yellow-500 to-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></span>
@@ -388,6 +439,28 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </div>
                     </div>
                   </div>
+
+                  {showQuiz ? (
+                    <div className="mt-6 p-4 bg-white rounded-lg shadow">
+                      {isLoading ? (
+                        <div className="text-center py-4">Loading questions...</div>
+                      ) : error ? (
+                        <div className="text-red-500 text-center py-4">{error}</div>
+                      ) : (
+                        <Quiz 
+                          questions={currentQuestions} 
+                          onQuizComplete={handleQuizComplete} 
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="mt-6 p-6 bg-white rounded-lg shadow">
+                      <h3 className="text-xl font-semibold mb-4">Test Your Knowledge</h3>
+                      <p className="text-gray-600 mb-4">
+                        Test your knowledge with these practice questions based on this article.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Social Media Section */}
                   <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">

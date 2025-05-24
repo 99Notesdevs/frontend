@@ -50,6 +50,7 @@ const formSchema = z.object({
   header: z.string().optional(),
   body: z.string().optional(),
   author: z.string().optional(),
+  questionNumber: z.number().optional(),
 });
 
 export type GeneralStudiesFormValues = z.infer<typeof formSchema>;
@@ -226,6 +227,7 @@ export function GeneralStudiesForm({
       author: "",
       header: "",
       body: "",
+      questionNumber: undefined,
       ...defaultValues,
     },
   });
@@ -691,6 +693,19 @@ export function GeneralStudiesForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Body</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="questionNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Practice Questions Number(Not Required)</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>

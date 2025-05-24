@@ -45,6 +45,7 @@ const formSchema = z.object({
   schemaData: z.string().optional(),
   header: z.string().optional(),
   body: z.string().optional(),
+  questionNumber: z.number().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -214,6 +215,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       schemaData: "",
       header: "",
       body: "",
+      questionNumber: undefined,
     },
   });
 
@@ -561,6 +563,19 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Body</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="questionNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Practice Questions Number(Not Required)</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
