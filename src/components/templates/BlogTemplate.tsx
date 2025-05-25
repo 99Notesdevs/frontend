@@ -8,6 +8,9 @@ import { Tags } from "@/components/ui/tags/Tags";
 
 export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
   const { title, content, metadata, imageUrl, slug } = page;
+  const displayImagearray = JSON.parse(imageUrl || "") ;
+  const displayImage = displayImagearray[0];
+  const displayImageAlt = displayImagearray[1];
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
   const { tags } = parsedMetadata || {};
@@ -80,8 +83,8 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
                     <div className="w-full">
                       <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] bg-gray-50">
                         <Image
-                          src={imageUrl}
-                          alt={title}
+                          src={`${displayImage}`}
+                          alt={displayImageAlt}
                           fill
                           className="object-cover rounded-t-xl"
                           priority
