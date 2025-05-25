@@ -51,9 +51,10 @@ const formRef = useRef<HTMLDivElement>(null);
     acceptance: null
   });
   const [toast, setToast] = useState<{
-      message: string;
-      type: "success" | "error";
-    } | null>(null);
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     isOpen: boolean;
@@ -61,6 +62,16 @@ const formRef = useRef<HTMLDivElement>(null);
   }>({ isOpen: false, questionId: null });
 
   // Fetch questions for selected category
+  // Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   useEffect(() => {
     if (!selectedCategory) return;
 
@@ -105,10 +116,6 @@ const formRef = useRef<HTMLDivElement>(null);
     fetchUserName();
   }, []);
   // Handle image uploads in content
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
   const handleImageUpload = async (content: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
@@ -135,7 +142,7 @@ const formRef = useRef<HTMLDivElement>(null);
           if (error instanceof Error) {
             console.error("Error uploading image:", error.message);
           }
-          showToast("Failed to upload image. Please try again.", "error");
+          setToast({ message: "Failed to upload image. Please try again.", type: "error" });
         }
       }
     }
@@ -144,6 +151,10 @@ const formRef = useRef<HTMLDivElement>(null);
   };
   const handleCreateQuestion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
     try {
       // Process all rich text fields for images
       const processedQuestion = await handleImageUpload(newQuestion.question);
@@ -173,9 +184,20 @@ const formRef = useRef<HTMLDivElement>(null);
         }),
       });
   
-      if (!response.ok) throw new Error("Failed to create question");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create question");
+      }
+      
+      const createdQuestion = await response.json();
+      
+      // Update the questions list with the new question
+      setQuestions(prevQuestions => [createdQuestion.data, ...prevQuestions]);
+      
+      // Show success message
+      setToast({ message: "Question added successfully!", type: "success" });
   
-      // Reset form and fetch updated questions
+      // Reset form
       setNewQuestion({
         id: "",
         question: "",
@@ -189,9 +211,20 @@ const formRef = useRef<HTMLDivElement>(null);
         year: null,
         acceptance: null
       });
-      setPage(1);
+      
+      // Scroll to the top of the questions list
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+      
     } catch (error) {
       console.error("Error creating question:", error);
+      setToast({
+        message: error instanceof Error ? error.message : "Failed to add question. Please try again.",
+        type: "error"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -324,12 +357,40 @@ const formRef = useRef<HTMLDivElement>(null);
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e0e7ef] py-10 px-2 md:px-6 flex flex-col items-center">
+    <div className="min-h-screen w-full bg-gray-50 py-10 px-2 md:px-6 flex flex-col items-center relative">
+      {/* Toast Notification */}
+      {toast && (
+        <div 
+          className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium ${
+            toast.type === 'success' ? 'bg-slate-500' : 'bg-red-500'
+          } transition-opacity duration-300`}
+        >
+          {toast.message}
+        </div>
+      )}
+      <style jsx global>{`
+        .tiptap-editor-container {
+          max-height: 250px;
+          min-height: 100px;
+          overflow-y: auto;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.375rem;
+          padding: 0.5rem;
+          background: white;
+        }
+        .tiptap-editor-container .ProseMirror {
+          outline: none;
+          min-height: 100%;
+        }
+        .tiptap-editor-container .ProseMirror > * + * {
+          margin-top: 0.75em;
+        }
+      `}</style>
       <div className="w-full max-w-3xl">
-        <h1 className="text-4xl font-bold text-center [color:var(--admin-bg-dark)] mb-10 drop-shadow-sm tracking-tight">
+        <h1 className="text-4xl font-bold text-center [color:var(--admin-bg-dark)] drop-shadow-sm tracking-tight">
           Add & Manage Questions
         </h1>
-        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 md:p-14 space-y-10 scale-105 mx-auto mt-5">
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 md:p-14 space-y-10 scale-105 mx-auto mt-20">
           {/* Category Selection */}
           <CategorySelect
             selectedCategoryId={selectedCategory}
@@ -351,12 +412,14 @@ const formRef = useRef<HTMLDivElement>(null);
                   <label className="block mb-1 [color:var(--admin-bg-dark)] font-semibold">
                     Question
                   </label>
-                  <TiptapEditor
-                    content={newQuestion.question}
-                    onChange={(content) => 
-                      setNewQuestion({ ...newQuestion, question: content })
-                    }
-                  />
+                  <div className="tiptap-editor-container custom-tiptap-editor">
+                    <TiptapEditor
+                      content={newQuestion.question}
+                      onChange={(content) =>
+                        setNewQuestion({ ...newQuestion, question: content })
+                      }
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block [color:var(--admin-bg-dark)] font-semibold">
@@ -367,12 +430,14 @@ const formRef = useRef<HTMLDivElement>(null);
                       <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 font-bold text-sm border border-gray-300">
                         {index + 1}
                       </span>
-                      <TiptapEditor
-                        content={option}
-                        onChange={(content) => 
-                          setNewQuestion({ ...newQuestion, options: newQuestion.options.map((_, i) => i === index ? content : _) })
-                        }
-                      />
+                      <div className="tiptap-editor-container flex-1">
+                        <TiptapEditor
+                          content={option}
+                          onChange={(content) => 
+                            setNewQuestion({ ...newQuestion, options: newQuestion.options.map((_, i) => i === index ? content : _) })
+                          }
+                        />
+                      </div>
                       <Button
                         variant="destructive"
                         size="sm"
@@ -468,15 +533,17 @@ const formRef = useRef<HTMLDivElement>(null);
                       </svg>
                       Explanation
                     </label>
-                    <TiptapEditor
-                      content={newQuestion.explaination}
-                      onChange={(content) =>
-                        setNewQuestion({
-                          ...newQuestion,
-                          explaination: content,
-                        })
-                      }
-                    />
+                    <div className="tiptap-editor-container">
+                      <TiptapEditor
+                        content={newQuestion.explaination}
+                        onChange={(content) =>
+                          setNewQuestion({
+                            ...newQuestion,
+                            explaination: content,
+                          })
+                        }
+                      />
+                    </div>
                   </div>
                   <div>
                     <label
@@ -599,37 +666,47 @@ const formRef = useRef<HTMLDivElement>(null);
                 questions.map((question) => (
                   <div
                     key={question.id}
-                    className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border rounded-xl bg-gray-50 "
+                    className="flex flex-col md:flex-row justify-between gap-4 p-6 border rounded-xl bg-white hover:bg-gray-50 transition-colors duration-200"
                   >
-                    <div className="mb-2 md:mb-0 max-w-xl">
-                      <p className="font-semibold text-[#0f172a] text-lg">
-                        {question.question}
-                      </p>
-                      <p className="text-sm [color:var(--admin-bg-primary)] ">
-                        Category:{" "}
-                        {
-                          // categories.find((c) => c.id === question.categoryId)
-                          //   ?.name
-                        }
-                      </p>
-                      <div className="mt-1 flex flex-wrap gap-2">
-                        {question.options.map((opt, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 rounded bg-gray-200  text-[#0f172a] text-xs font-medium"
-                          >
-                            {opt}
-                          </span>
-                        ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="mb-3">
+                        <div 
+                          className="text-[#0f172a] text-base leading-relaxed [&_table]:border [&_table]:border-gray-200 [&_table]:rounded [&_table]:overflow-hidden [&_table]:w-full [&_td]:p-3 [&_th]:p-3 [&_th]:bg-gray-50 [&_tr:not(:last-child)]:border-b [&_tr:not(:last-child)]:border-gray-100"
+                          dangerouslySetInnerHTML={{ __html: question.question }}
+                        />
                       </div>
-                      <p className="mt-1 text-xs text-green-700 ">
-                        Answer:{" "}
-                        <span className="font-semibold">
-                          {question.answer}
+                      <div className="mt-4 flex flex-wrap items-center gap-4">
+                        <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                          Category:{" "}
+                          {
+                            // categories.find((c) => c.id === question.categoryId)
+                            //   ?.name
+                          }
                         </span>
-                      </p>
+                        <div className="mt-3">
+                          <div className="text-xs font-medium text-gray-500 mb-1">Options:</div>
+                          <div className="flex flex-wrap gap-2">
+                            {question.options.map((opt, idx) => (
+                              <div 
+                                key={idx}
+                                className="px-3 py-1.5 rounded-md bg-gray-50 text-[#0f172a] text-sm border border-gray-200 max-w-full overflow-hidden"
+                                title={opt.replace(/<[^>]*>?/gm, '')}
+                                dangerouslySetInnerHTML={{ __html: opt }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-3 bg-green-50 rounded-md border border-green-100">
+                        <p className="text-sm text-green-700 font-medium">
+                          Answer:{" "}
+                          <span className="font-semibold">
+                            {question.answer}
+                          </span>
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex gap-2 mt-2 md:mt-0">
+                    <div className="flex flex-col sm:flex-row gap-2 mt-4 md:mt-0 md:ml-4">
                       <Button
                         variant="outline"
                         size="sm"
@@ -680,6 +757,23 @@ const formRef = useRef<HTMLDivElement>(null);
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg text-white ${
+          toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        }`}>
+          <div className="flex items-center">
+            <span>{toast.message}</span>
+            <button 
+              onClick={() => setToast(null)}
+              className="ml-4 text-white hover:text-gray-200"
+            >
+              ✕
+            </button>
           </div>
         </div>
       )}
