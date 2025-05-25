@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { BaseTemplateProps } from "./types";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
@@ -8,7 +8,18 @@ import { TableOfContents } from "@/components/navigation/TableOfContents";
 import SearchBar from "@/components/Navbar/SearchBar";
 import SocialMedia from "@/components/navigation/socialmedia";
 import Ads from "../navigation/Ads";
-
+import Quiz from '@/components/quiz/quiz';
+import { env } from "@/config/env";
+import Cookies from "js-cookie";
+interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  answer: string;
+  explaination: string;
+  creatorName: string;
+  year?: number;
+}
 interface GeneralStudiesContent {
   title: string;
   content: string;
@@ -33,7 +44,50 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   const bodyScripts =
     parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
-
+    const [showQuiz, setShowQuiz] = useState(false);
+    const [currentQuestions, setCurrentQuestions] = useState<Question[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const fetchQuestions = useCallback(async () => {
+      if (!page?.id) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const limit = page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
+        const response = await fetch(
+          `${env.API_TEST}/questions/practice?categoryId=${page.categories?.id}&limit=${limit}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${Cookies.get('token')}`,
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error('Failed to fetch questions');
+        }
+  
+        const { data } = await response.json();
+        setCurrentQuestions(data);
+      } catch (err) {
+        console.error('Error fetching questions:', err);
+        setError('Failed to load questions. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    }, [page?.id, page?.questionNumber]);
+    const handleStartQuiz = async () => {
+      if (!showQuiz) {
+        await fetchQuestions();
+      }
+      setShowQuiz(!showQuiz);
+    };
+  
+    const handleQuizComplete = () => {
+      setShowQuiz(false);
+    };
   useEffect(() => {
     // Inject head scripts
     if (headScripts) {
@@ -254,17 +308,51 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                     </h3>
                     <p className="text-gray-600 mb-4 text-sm">Test your knowledge with these practice questions based on this article.</p>
                     <div className="text-center">
-                      <button
-                        onClick={() => window.location.href = `/quiz?categoryId=${page?.categories?.id}`}
-                        className="group relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50"
-                      >
-                        <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-700 to-blue-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></span>
-                        <svg className="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <span className="relative">Start Practicing</span>
-                      </button>
+                        <button
+                          onClick={handleStartQuiz}
+                          className="group relative w-full inline-flex items-center justify-center px-4 py-3 overflow-hidden font-medium text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50"
+                        >
+                          <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-yellow-500 to-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></span>
+                          <svg
+                            className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white transition-colors duration-200"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                            ></path>
+                          </svg>
+                          <span className="relative group-hover:text-white transition-colors duration-200">
+                            Start Practicing
+                          </span>
+                        </button>
+                      </div>
+                    {showQuiz ? (
+                    <div className="mt-6 p-4 bg-white rounded-lg shadow">
+                      {isLoading ? (
+                        <div className="text-center py-4">Loading questions...</div>
+                      ) : error ? (
+                        <div className="text-red-500 text-center py-4">{error}</div>
+                      ) : (
+                        <Quiz 
+                          questions={currentQuestions} 
+                          onQuizComplete={handleQuizComplete} 
+                        />
+                      )}
                     </div>
+                  ) : (
+                    <div className="mt-6 p-6 bg-white rounded-lg shadow">
+                      <h3 className="text-xl font-semibold mb-4">Test Your Knowledge</h3>
+                      <p className="text-gray-600 mb-4">
+                        Test your knowledge with these practice questions based on this article.
+                      </p>
+                    </div>
+                  )}
                   </div>
 
                       {/* Social Media Section */}

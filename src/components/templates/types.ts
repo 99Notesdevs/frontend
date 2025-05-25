@@ -2,6 +2,7 @@ export interface Page {
   id: string;
   title: string;
   content: string;
+  questionNumber?: number;
   image: string;
   author?: {
     id: string;

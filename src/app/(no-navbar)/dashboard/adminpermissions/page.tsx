@@ -11,7 +11,7 @@ export default function AdminPermissions() {
     const [error, setError] = useState<string | null>(null);
     const [headerScript, setHeaderScript] = useState<string>("");
     const [footerScript, setFooterScript] = useState<string>("");
-
+    const [practiceQuestions, setPracticeQuestions] = useState<number>(0);
     const fetchAdminOps = async () => {
         try {
             const response = await axios.get(`${env.API}/admin/ops`);
@@ -20,6 +20,7 @@ export default function AdminPermissions() {
                 setIsContentLocked(data.globalRestrictions);
                 setHeaderScript(data.globalHeadScripts?.join('\n') || "");
                 setFooterScript(data.globalBodyScripts?.join('\n') || "");
+                setPracticeQuestions(data.practiceQuestions);
             }
         } catch (error) {
             console.error("Error fetching admin ops:", error);
@@ -109,7 +110,33 @@ export default function AdminPermissions() {
             setIsLoading(false);
         }
     };
-
+    const updatePracticeQuestions = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await axios.put(`${env.API}/admin/ops`, {
+                practiceQuestions: practiceQuestions
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('token')}`
+                }
+            });
+            if (response.data.success) {
+                // Refresh practice questions
+                const ops = await axios.get(`${env.API}/admin/ops`);
+                if (ops.data.success) {
+                    setPracticeQuestions(ops.data.data.practiceQuestions);
+                }
+            } else {
+                throw new Error('Failed to update practice questions');
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <div className="p-6 space-y-10 sm:mt-5 lg:mt-2">
             <h1 className="text-3xl font-bold mb-4 text-center">Admin Permissions</h1>
@@ -176,6 +203,29 @@ export default function AdminPermissions() {
                     } font-medium`}
                 >
                     {isLoading ? 'Saving...' : 'Save Footer Scripts'}
+                </button>
+            </div>
+
+            {/* Practice Questions Section */}
+            <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Practice Questions</h2>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Number of Practice Questions
+                </label>
+                <input
+                    type="number"
+                    value={practiceQuestions}
+                    onChange={(e) => setPracticeQuestions(Number(e.target.value))}
+                    className="w-full p-4 border rounded-lg border-slate-300 bg-white"
+                />
+                <button
+                    onClick={updatePracticeQuestions}
+                    disabled={isLoading}
+                    className={`px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 ${
+                        isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                    } font-medium`}
+                >
+                    {isLoading ? 'Saving...' : 'Save Practice Questions'}
                 </button>
             </div>
 

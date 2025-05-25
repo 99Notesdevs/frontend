@@ -50,6 +50,7 @@ const articleSchema = z.object({
   header: z.string().optional(),
   body: z.string().optional(),
   showInNav: z.boolean().default(false),
+  questionNumber: z.number().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -213,6 +214,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       header: "",
       body: "",
       showInNav: true,
+      questionNumber: undefined,
     },
   });
 
@@ -274,6 +276,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       header: data.header,
       body: data.body,
       showInNav: data.showInNav,
+      questionNumber: data.questionNumber,
     };
     onSubmit(transformedData);
   };
@@ -661,6 +664,19 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Body</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="questionNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Practice Questions Number(Not Required)</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
