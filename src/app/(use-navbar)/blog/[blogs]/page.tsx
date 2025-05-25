@@ -11,7 +11,7 @@ async function getPage(
   slug: string
 ): Promise<BaseTemplateProps["page"] | null> {
   try {
-    const normalizedSlug = slug.replace(/\s+/g, '-'); // Normalize slug by replacing spaces with hyphens
+    const normalizedSlug = slug.replace(/\s+/g, "-"); // Normalize slug by replacing spaces with hyphens
     console.log("NORMALIZED SLUG", normalizedSlug);
     const response = await fetch(`${env.API}/blog/slug/${normalizedSlug}`);
     const res = await response.json();
@@ -32,19 +32,23 @@ type Params = Promise<{
   blogs: string;
 }>;
 
-export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
-  const { blogs: slug } = await params;  // Await params first
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  const { blogs: slug } = await params; // Await params first
   const page = await getPage(slug);
-  
+
   if (!page || !page.metadata) {
     return {
       title: "Page Not Found",
       description: "The requested page could not be found.",
     };
   }
-  
+
   const JSONMetaData = JSON.parse(page.metadata);
-  
+
   return {
     title: JSONMetaData.metaTitle || "Default Title",
     description: JSONMetaData.metaDescription || "Default description",
@@ -83,8 +87,8 @@ export async function generateMetadata({params}: {params: Params}): Promise<Meta
 }
 
 export default async function Page({ params }: { params: Params }) {
-  const { blogs: slug } = await params;  // Await params first
-  const normalizedSlug = slug.replace(/\s+/g, '-');
+  const { blogs: slug } = await params; // Await params first
+  const normalizedSlug = slug.replace(/\s+/g, "-");
   const page = await getPage(normalizedSlug);
   const tags = page?.tags;
   if (!page) {
@@ -92,25 +96,26 @@ export default async function Page({ params }: { params: Params }) {
   }
 
   const { title, content, metadata, imageUrl, id } = page;
-  const parsedMetadata = typeof metadata === 'string' ? JSON.parse(metadata) : metadata || {};
+  const parsedMetadata =
+    typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
   const jsonLD = parsedMetadata.schemaData;
-  const displayImage = imageUrl || parsedMetadata.coverImage as string;
+  const displayImagearray = JSON.parse(imageUrl as string) || (parsedMetadata.coverImage as string);
+  const displayImage = displayImagearray[0];
+  const displayImageAlt = displayImagearray[1];
 
   return (
     <>
       <section>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLD || '' }}
+          dangerouslySetInnerHTML={{ __html: jsonLD || "" }}
         />
       </section>
       <main>
         <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
           {/* Assistive Touch */}
-          <AssistiveTouch content={content || ''} />
-          <div
-            className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-2 lg:px-8 py-4 sm:py-6"
-          >
+          <AssistiveTouch content={content || ""} />
+          <div className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-2 lg:px-8 py-4 sm:py-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-5">
               {/* Main Content Column */}
               <main className="lg:col-start-1 lg:col-span-9 space-y-4 sm:space-y-6">
@@ -121,7 +126,7 @@ export default async function Page({ params }: { params: Params }) {
                       <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] bg-gray-50">
                         <Image
                           src={displayImage}
-                          alt={title || 'Blog Post'}
+                          alt={displayImageAlt}
                           fill
                           className="object-cover rounded-t-xl"
                           priority
@@ -242,14 +247,11 @@ export default async function Page({ params }: { params: Params }) {
                         margin: 0 auto;
                       }"
                     >
-                      <div dangerouslySetInnerHTML={{ __html: content || '' }}></div>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: content || "" }}
+                      ></div>
                     </div>
-                    <div>
-                      {tags && tags.length > 0 && (
-                        
-                        <Tags tags={tags} />
-                      )}
-                    </div>
+                    <div>{tags && tags.length > 0 && <Tags tags={tags} />}</div>
                   </div>
                 </div>
               </main>

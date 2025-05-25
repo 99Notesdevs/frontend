@@ -10,6 +10,7 @@ interface Blog {
   content: string;
   metadata: string;
   imageUrl: string;
+  alt: string;
 }
 
 interface BlogCardProps {
@@ -22,7 +23,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
       <div className="relative h-[160px] w-full overflow-hidden">
         <Image
           src={blog.imageUrl}
-          alt={blog.title}
+          alt={blog.alt || 'Blog Image'}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"

@@ -12,6 +12,7 @@ interface Blog {
   createdAt: string;
   content: string;
   slug: string;
+  alt: string;
 }
 
 const BlogsPage: React.FC = () => {
@@ -167,7 +168,8 @@ const BlogsPage: React.FC = () => {
                     slug: blog.slug,
                     content: blog.content,
                     metadata: blog.metadata, 
-                    imageUrl: blog.imageUrl,
+                    imageUrl: JSON.parse(blog.imageUrl)[0],
+                    alt: JSON.parse(blog.imageUrl)[1]
                   }}
                 />
               </div>
