@@ -10,6 +10,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import TiptapEditor from "@/components/ui/tiptapeditor";
@@ -66,9 +67,27 @@ export function GeneralStudiesForm({
   defaultValues,
   folder,
 }: GeneralStudiesFormProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    defaultValues?.imageUrl || null
-  );
+    const parseImageUrl = (url: string | undefined): [string, string] => {
+      try {
+        return JSON.parse(url || '[]') as [string, string];
+      } catch (error) {
+        return ["", ""];
+      }
+    };
+  
+    const getImageUrl = (url: string | undefined): string => {
+      const [imageUrl] = parseImageUrl(url);
+      return imageUrl;
+    };
+  
+    const getImageAlt = (url: string | undefined): string => {
+      const [, altText] = parseImageUrl(url);
+      return altText;
+    };
+  
+    const [imagePreview, setImagePreview] = useState<string | null>(
+      defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null
+    );
   const [isUploading, setIsUploading] = useState(false);
   const [alert, setAlert] = useState<{
     message: string;
@@ -113,7 +132,7 @@ export function GeneralStudiesForm({
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
-        setImagePreview(selectedDraft.data.imageUrl);
+        setImagePreview(getImageUrl(selectedDraft.data.imageUrl));
         setShowDraftDialog(false);
       }
     }
@@ -163,7 +182,6 @@ export function GeneralStudiesForm({
     form.reset(defaultValues || {});
     setShowDraftDialog(false);
   };
-
   const form = useForm<GeneralStudiesFormValues>({
     resolver: (values) => {
       let errors = {};
@@ -207,7 +225,7 @@ export function GeneralStudiesForm({
     defaultValues: {
       title: "",
       content: "",
-      imageUrl: "",
+      imageUrl: JSON.stringify(["", ""]), // Default empty values as stringified array
       showInNav: true,
       category: "",
       metaTitle: "",
@@ -250,10 +268,11 @@ export function GeneralStudiesForm({
 
           const s3Url = await uploadImageToS3(formData, folder); // Call your S3 upload function
           if (s3Url) {
-            // Update the image field with the S3 URL
-            form.setValue("imageUrl", s3Url, { shouldValidate: true });
+            form.setValue("imageUrl", JSON.stringify([s3Url, ""]), { shouldValidate: true });
           } else {
-            throw new Error("Failed to upload image to S3");
+            form.setValue("imageUrl", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
+              shouldValidate: true,
+            });
           }
         } catch (error) {
           console.error("Error uploading image:", error);
@@ -330,43 +349,85 @@ export function GeneralStudiesForm({
           <FormField
             control={form.control}
             name="imageUrl"
-            render={({ field: { value, onChange, ...field } }) => (
-              <FormItem>
-                <FormLabel>
-                  Image <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <div className="space-y-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                      {...field}
-                    />
-
-                    {imagePreview ? (
-                      <div className="space-y-2">
-                        <div className="relative w-full h-48 rounded-lg overflow-hidden border border-blue-100">
-                          <Image
-                            src={imagePreview}
-                            alt="Image preview"
-                            fill
-                            className="object-cover"
+            render={({ field }) => (
+              <div className="space-y-4">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field: imageField }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Image URL <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            value={getImageUrl(imageField.value)}
+                            onChange={(e) => {
+                              const [imageUrl, altText] = parseImageUrl(imageField.value);
+                              imageField.onChange(JSON.stringify([e.target.value, altText]));
+                            }}
                           />
-                        </div>
-                        <p className="text-sm text-green-500">
-                          Image uploaded successfully
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">No image uploaded</p>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </div>
-                </FormControl>
-              </FormItem>
-            )}
-          />
+                  />
+                </div>
+
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field: altField }) => (
+                      <FormItem>
+                        <FormLabel>Image Alt Text</FormLabel>
+                        <FormControl>
+                          <Input
+                            value={getImageAlt(altField.value)}
+                            onChange={(e) => {
+                              const [imageUrl, altText] = parseImageUrl(altField.value);
+                              altField.onChange(JSON.stringify([imageUrl, e.target.value]));
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Describe the image for accessibility. This will be used
+                          as the alt text.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+          
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="border-[var(--admin-border)]"
+                          />
+          
+                          {imagePreview ? (
+                            <div className="space-y-2">
+                              <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
+                                <Image
+                                  src={imagePreview}
+                                  alt="Image preview"
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                              <p className="text-sm text-green-500">
+                                Image uploaded successfully
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500">No image uploaded</p>
+                          )}
+                        </div>
+                      )}
+                    />
 
           {/* Category */}
           <FormField

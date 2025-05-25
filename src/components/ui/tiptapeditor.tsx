@@ -101,6 +101,18 @@ const TableStyles = Extension.create({
   },
 });
 
+// Custom Image extension with alt text support
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      alt: {
+        default: null,
+      },
+    };
+  },
+});
+
 const PRESET_COLORS = [
   '#000000', // Black
   '#343A40', // Dark Gray
@@ -461,17 +473,23 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       const file = e.target.files[0];
       const reader = new FileReader();
 
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         if (event.target?.result && editor) {
+          const alt = window.prompt('Enter alt text for the image (optional)') || '';
           editor
             .chain()
             .focus()
-            .setImage({ src: event.target.result as string })
+            .setImage({ 
+              src: event.target.result as string,
+              alt: alt
+            })
             .run();
         }
       };
 
       reader.readAsDataURL(file);
+      // Reset the input value to allow selecting the same file again
+      e.target.value = '';
     }
   };
 
@@ -486,7 +504,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       CodeBlockLowlight.configure({ lowlight }),
       Link.configure({ openOnClick: false }),
-      Image,
+      CustomImage, // Use our custom image extension instead of Image
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Color,
       TextStyle,

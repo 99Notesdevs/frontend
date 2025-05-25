@@ -34,7 +34,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   // @ts-ignore
   const jsonLD = JSON.parse(metadata).schemaData;
   // Default image if none is provided
-  const pageImage = imageUrl || null;
+  const pageImagearray = JSON.parse(imageUrl || "") ;
+  const pageImage = pageImagearray[0];
+  const pageImageAlt = pageImagearray[1];
 
   const parsedMetadata = JSON.parse(metadata);
   const headScripts =
@@ -157,7 +159,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                     <div className="relative w-full min-h-[300px] h-[60vh] max-h-[800px]">
                       <Image
                         src={`${pageImage || "/"}`}
-                        alt={title}
+                        alt={pageImageAlt}
                         fill
                         className="object-cover w-full h-full"
                         sizes="100vw"
@@ -212,7 +214,9 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                             childContent = {};
                           }
 
-                          const childImage = child.imageUrl || "/public/";
+                          const childImagearray = JSON.parse(child.imageUrl || "") ;
+                          const childImage = childImagearray[0];
+                          const childImageAlt = childImagearray[1];
 
                           return (
                             <Link
@@ -223,8 +227,8 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                               <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/90">
                                 <div className="relative w-full h-48 ">
                                   <Image
-                                    src={childImage}
-                                    alt={child.title}
+                                    src={`${childImage}`}
+                                    alt={childImageAlt}
                                     fill
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 33vw"

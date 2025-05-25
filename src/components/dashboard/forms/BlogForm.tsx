@@ -10,6 +10,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/tags/tag-input";
@@ -61,9 +62,27 @@ interface BlogFormProps {
 }
 
 export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    defaultValues?.imageUrl || null
-  );
+    const parseImageUrl = (url: string | undefined): [string, string] => {
+      try {
+        return JSON.parse(url || '[]') as [string, string];
+      } catch (error) {
+        return ["", ""];
+      }
+    };
+  
+    const getImageUrl = (url: string | undefined): string => {
+      const [imageUrl] = parseImageUrl(url);
+      return imageUrl;
+    };
+  
+    const getImageAlt = (url: string | undefined): string => {
+      const [, altText] = parseImageUrl(url);
+      return altText;
+    };
+  
+    const [imagePreview, setImagePreview] = useState<string | null>(
+      defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null
+    );
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -139,7 +158,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       }
     }
   };
-
+  
   // Select draft function
   const selectDraft = (title: string) => {
     const savedDrafts = localStorage.getItem("blogDrafts");
@@ -151,7 +170,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       );
       if (selectedDraft) {
         form.reset(selectedDraft.data);
-        setImagePreview(selectedDraft.data.imageUrl);
+        setImagePreview(getImageUrl(selectedDraft.data.imageUrl));
         setShowDraftDialog(false);
       }
     }
@@ -190,12 +209,6 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           ...errors,
           imageUrl: { message: "Image is required" },
         };
-      } else if (!values.imageUrl.match(/^https?:\/\/.+$/)) {
-        messages.push("Please provide a valid image URL");
-        errors = {
-          ...errors,
-          imageUrl: { message: "Please provide a valid image URL" },
-        };
       }
 
       if (!values.slug) {
@@ -220,7 +233,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     defaultValues: defaultValues || {
       title: "",
       content: "",
-      imageUrl: "",
+      imageUrl: JSON.stringify(["", ""]), // Default empty values as stringified array
       tags: [],
       slug: "",
       metaTitle: "",
@@ -260,9 +273,11 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
 
           const s3Url = await uploadImageToS3(formData, "Blogs");
           if (s3Url) {
-            form.setValue("imageUrl", s3Url, { shouldValidate: true });
+            form.setValue("imageUrl", JSON.stringify([s3Url, ""]), { shouldValidate: true });
           } else {
-            throw new Error("Failed to upload image to S3");
+            form.setValue("imageUrl", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
+              shouldValidate: true,
+            });
           }
         } catch (error) {
           console.error("Error uploading image:", error);
@@ -375,54 +390,86 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
             )}
           />
 
-          <FormField
+<FormField
             control={form.control}
             name="imageUrl"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <FormLabel>
-                  Image <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <div className="flex flex-col gap-4">
-                    {imagePreview ? (
-                      <div className="space-y-2">
-                        <div className="relative h-48 w-full">
-                          <Image
-                            src={imagePreview}
-                            alt="Blog image preview"
-                            fill
-                            className="object-cover rounded-lg"
-                            priority
+            render={({ field }) => (
+              <div className="space-y-4">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field: imageField }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Image URL <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            value={getImageUrl(imageField.value)}
+                            onChange={(e) => {
+                              const [imageUrl, altText] = parseImageUrl(imageField.value);
+                              imageField.onChange(JSON.stringify([e.target.value, altText]));
+                            }}
                           />
-                        </div>
-                        <p className="text-sm text-green-500">
-                          Image uploaded successfully
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">No image uploaded</p>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                      disabled={isUploading}
-                    />
-                    {isUploading && (
-                      <div className="text-sm text-blue-500 mt-2">
-                        Uploading image...
-                      </div>
+                  />
+                </div>
+
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field: altField }) => (
+                      <FormItem>
+                        <FormLabel>Image Alt Text</FormLabel>
+                        <FormControl>
+                          <Input
+                            value={getImageAlt(altField.value)}
+                            onChange={(e) => {
+                              const [imageUrl, altText] = parseImageUrl(altField.value);
+                              altField.onChange(JSON.stringify([imageUrl, e.target.value]));
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Describe the image for accessibility. This will be used
+                          as the alt text.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
                     )}
+                  />
+                </div>
+
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="border-[var(--admin-border)]"
+                />
+
+                {imagePreview ? (
+                  <div className="space-y-2">
+                    <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
+                      <Image
+                        src={imagePreview}
+                        alt="Image preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="text-sm text-green-500">
+                      Image uploaded successfully
+                    </p>
                   </div>
-                </FormControl>
-                {fieldState.error?.message && (
-                  <div className="text-red-600 font-semibold text-sm mt-1">
-                    {fieldState.error.message}
-                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No image uploaded</p>
                 )}
-              </FormItem>
+              </div>
             )}
           />
 

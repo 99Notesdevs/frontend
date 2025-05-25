@@ -234,8 +234,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
   // Use either the content image or the metadata coverImage
   // @ts-ignore
-  const displayImage = page.imageUrl || (coverImage as string);
-
+  const displayImagearray = JSON.parse(page.imageUrl) || (coverImage as string);
+  const displayImage = displayImagearray[0];
+  const displayImageAlt = displayImagearray[1];
   const formattedDate = page.createdAt
     ? new Date(page.createdAt).toLocaleDateString("en-US", {
         year: "numeric",
@@ -270,7 +271,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     <div className="relative w-full h-[300px] md:h-[400px]">
                       <Image
                         src={`${displayImage}`}
-                        alt={title}
+                        alt={displayImageAlt}
                         fill
                         className="object-cover w-full"
                         priority
