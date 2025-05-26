@@ -14,6 +14,12 @@ interface QuizProps {
   onQuizComplete: () => void;
 }
 
+// Helper function to strip HTML tags from text
+const stripHtml = (html: string): string => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>?/gm, '');
+};
+
 const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
   const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
@@ -36,19 +42,23 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       setShowResults(true);
-      onQuizComplete();
     }
+  };
+
+  const handlePracticeMore = () => {
+    window.location.href = 'http://localhost:5173/tests';
   };
 
   const checkResults = () => {
     setShowResults(true);
-    onQuizComplete();
   };
 
   const resetQuiz = () => {
     setSelectedOptions({});
     setShowExplanations({});
     setShowResults(false);
+    setCurrentQuestion(0);
+    onQuizComplete();
     setCurrentQuestion(0);
   };
 
@@ -64,17 +74,29 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
       <div className="space-y-8">
         {showResults ? (
           <div className="border-2 border-yellow-400 rounded-2xl shadow-lg bg-white p-8">
-            <div className="flex flex-col items-center justify-center min-h-[200px]">
-              <h2 className="text-2xl font-bold mb-4 text-green-700">Quiz Results</h2>
-              <div className="text-4xl font-extrabold text-green-600 mb-8">
-                Score: {calculateScore()} / {questions.length}
+            <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6">
+              <h2 className="text-3xl font-bold text-green-700">Quiz Completed!</h2>
+              <div className="text-5xl font-extrabold text-green-600">
+                {calculateScore()} / {questions.length}
               </div>
-              <button
-                onClick={resetQuiz}
-                className="px-8 py-3 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition-colors shadow-md"
-              >
-                Try Again
-              </button>
+              <p className="text-lg text-gray-700">
+                {calculateScore() >= questions.length / 2 ? '🎉 Great job! ' : 'Keep practicing! '}
+                You answered {calculateScore()} out of {questions.length} questions correctly.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                <button
+                  onClick={resetQuiz}
+                  className="px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition-colors shadow-md"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={handlePracticeMore}
+                  className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                >
+                  Practice More
+                </button>
+              </div>
             </div>
           </div>
         ) : (
@@ -87,7 +109,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
                 return (
                   <div key={question.id} className="mb-8">
                     <div className="bg-white border-2 border-yellow-400 rounded-2xl shadow p-8">
-                      <h2 className="text-xl font-bold text-center mb-6 text-yellow-800">Q{currentQuestion + 1}. {question.question}</h2>
+                      <h2 className="text-xl font-bold text-center mb-6 text-yellow-800">Q{currentQuestion + 1}. {stripHtml(question.question)}</h2>
                       <div className="space-y-3">
                         {question.options.map((option, index) => {
                           const isSelected = selectedOptions[question.id] === index;
@@ -118,7 +140,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
                                 className="mr-3 w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-yellow-500"
                                 disabled={isShown}
                               />
-                              <span>{index + 1}. {option}</span>
+                              <span>{index + 1}. {stripHtml(option)}</span>
                             </label>
                           );
                         })}
@@ -128,13 +150,8 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
                             {question.explaination && (
                               <div className="mb-2">
                                 <p className="font-semibold text-blue-800">Explanation:</p>
-                                <p className="text-blue-700">{question.explaination}</p>
+                                <p className="text-blue-700">{stripHtml(question.explaination)}</p>
                               </div>
-                            )}
-                            {question.creatorName && (
-                              <p className="text-sm text-gray-600 italic">
-                                Added by: {question.creatorName}
-                              </p>
                             )}
                           </div>
                         )}
@@ -147,7 +164,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onQuizComplete }) => {
             <div className="flex justify-between mt-6">
               <div />
               <button
-                onClick={handleNext}
+                onClick={currentQuestion === questions.length - 1 ? checkResults : handleNext}
                 disabled={selectedOptions[questions[currentQuestion].id] === undefined}
                 className={`px-8 py-3 rounded-lg transition-colors font-bold shadow-md ${
                   selectedOptions[questions[currentQuestion].id] === undefined

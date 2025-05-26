@@ -96,7 +96,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // }, []);
   const fetchQuestions = useCallback(async () => {
     if (!page?.id) return;
-    
+
     setIsLoading(true);
     setError(null);
     
@@ -441,7 +441,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                   </div>
 
-                  {showQuiz ? (
+                  {showQuiz && (
                     <div className="mt-6 p-4 bg-white rounded-lg shadow">
                       {isLoading ? (
                         <div className="text-center py-4">Loading questions...</div>
@@ -453,13 +453,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                           onQuizComplete={handleQuizComplete} 
                         />
                       )}
-                    </div>
-                  ) : (
-                    <div className="mt-6 p-6 bg-white rounded-lg shadow">
-                      <h3 className="text-xl font-semibold mb-4">Test Your Knowledge</h3>
-                      <p className="text-gray-600 mb-4">
-                        Test your knowledge with these practice questions based on this article.
-                      </p>
                     </div>
                   )}
 

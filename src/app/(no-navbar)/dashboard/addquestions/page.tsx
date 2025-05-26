@@ -676,13 +676,6 @@ const formRef = useRef<HTMLDivElement>(null);
                         />
                       </div>
                       <div className="mt-4 flex flex-wrap items-center gap-4">
-                        <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                          Category:{" "}
-                          {
-                            // categories.find((c) => c.id === question.categoryId)
-                            //   ?.name
-                          }
-                        </span>
                         <div className="mt-3">
                           <div className="text-xs font-medium text-gray-500 mb-1">Options:</div>
                           <div className="flex flex-wrap gap-2">
@@ -697,7 +690,7 @@ const formRef = useRef<HTMLDivElement>(null);
                           </div>
                         </div>
                       </div>
-                      <div className="mt-4 p-3 bg-green-50 rounded-md border border-green-100">
+                      <div className="mt-4 p-3 bg-green-50 rounded-md border border-green-100 mb-2">
                         <p className="text-sm text-green-700 font-medium">
                           Answer:{" "}
                           <span className="font-semibold">
@@ -705,6 +698,16 @@ const formRef = useRef<HTMLDivElement>(null);
                           </span>
                         </p>
                       </div>
+                      {question.pyq && question.year && (
+                          <div className="p-3 bg-blue-50 rounded-md border border-blue-100">
+                            <p className="text-sm text-blue-700 font-medium">
+                              PYQ Year:{" "}
+                              <span className="font-semibold">
+                                {question.year}
+                              </span>
+                            </p>
+                          </div>
+                        )}
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 mt-4 md:mt-0 md:ml-4">
                       <Button
