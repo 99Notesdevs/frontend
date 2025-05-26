@@ -64,27 +64,30 @@ export function CurrentArticleForm({
   onSubmit,
   defaultValues,
 }: CurrentArticleFormProps) {
-    const parseImageUrl = (url: string | undefined): [string, string] => {
-      try {
-        return JSON.parse(url || '[]') as [string, string];
-      } catch (error) {
-        return ["", ""];
-      }
-    };
-  
-    const getImageUrl = (url: string | undefined): string => {
-      const [imageUrl] = parseImageUrl(url);
-      return imageUrl;
-    };
-  
-    const getImageAlt = (url: string | undefined): string => {
-      const [, altText] = parseImageUrl(url);
-      return altText;
-    };
-  
-    const [imagePreview, setImagePreview] = useState<string | null>(
-      defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null
-    );
+  const parseImageUrl = (url: string | undefined): [string, string] => {
+    try {
+      return JSON.parse(url || "[]") as [string, string];
+    } catch (error) {
+      return ["", ""];
+    }
+  };
+
+  const getImageUrl = (url: string | undefined): string => {
+    const [imageUrl] = parseImageUrl(url);
+    return imageUrl;
+  };
+
+  const getImageAlt = (url: string | undefined): string => {
+    const [, altText] = parseImageUrl(url);
+    return altText;
+  };
+
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null
+  );
+  const [ogimagePreview, setOgImagePreview] = useState<string | null>(
+    defaultValues?.ogImage ? getImageUrl(defaultValues.ogImage) : null
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [alert, setAlert] = useState<{
     message: string;
@@ -240,6 +243,7 @@ export function CurrentArticleForm({
   });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
@@ -257,11 +261,17 @@ export function CurrentArticleForm({
 
           const s3Url = await uploadImageToS3(formData, "CurrentArticle"); // Call your S3 upload function
           if (s3Url) {
-            form.setValue("imageUrl", JSON.stringify([s3Url, ""]), { shouldValidate: true });
-          } else {
-            form.setValue("imageUrl", JSON.stringify(["www.google.com/fallbackUrl", ""]), {
+            form.setValue("imageUrl", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
             });
+          } else {
+            form.setValue(
+              "imageUrl",
+              JSON.stringify(["www.google.com/fallbackUrl", ""]),
+              {
+                shouldValidate: true,
+              }
+            );
           }
         } catch (error) {
           console.error("Error uploading image:", error);
@@ -272,6 +282,45 @@ export function CurrentArticleForm({
       reader.readAsDataURL(file);
     }
   };
+
+  const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      const file = e.target.files?.[0];
+      if (file) {
+        setIsUploading(true);
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          try {
+            const result = reader.result as string;
+            setOgImagePreview(result);
+  
+            const formData = new FormData();
+            formData.append("imageUrl", file);
+  
+            const s3Url = await uploadImageToS3(formData, "BlogOGImages");
+            if (s3Url) {
+              form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+                shouldValidate: true,
+              });
+            } else {
+              form.setValue(
+                "ogImage",
+                JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+                {
+                  shouldValidate: true,
+                }
+              );
+              throw new Error("Failed to upload image to S3");
+            }
+          } catch (error) {
+            console.error("Error uploading image:", error);
+          } finally {
+            setIsUploading(false);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
   return (
     <div className="relative">
@@ -353,14 +402,18 @@ export function CurrentArticleForm({
                           <Input
                             value={getImageAlt(altField.value)}
                             onChange={(e) => {
-                              const [imageUrl, altText] = parseImageUrl(altField.value);
-                              altField.onChange(JSON.stringify([imageUrl, e.target.value]));
+                              const [imageUrl, altText] = parseImageUrl(
+                                altField.value
+                              );
+                              altField.onChange(
+                                JSON.stringify([imageUrl, e.target.value])
+                              );
                             }}
                           />
                         </FormControl>
                         <FormDescription>
-                          Describe the image for accessibility. This will be used
-                          as the alt text.
+                          Describe the image for accessibility. This will be
+                          used as the alt text.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -607,19 +660,34 @@ export function CurrentArticleForm({
             control={form.control}
             name="ogImage"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  OG Image URL
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter OG image URL"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              <div className="space-y-4">
+                <FormLabel>OG Image</FormLabel>
+                <Input {...field} />
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleOGUpload}
+                  className="border-[var(--admin-border)]"
+                />
+
+                {ogimagePreview ? (
+                  <div className="space-y-2">
+                    <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
+                      <Image
+                        src={ogimagePreview}
+                        alt="Image preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="text-sm text-green-500">
+                      Image uploaded successfully
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No image uploaded</p>
+                )}
+              </div>
             )}
           />
 

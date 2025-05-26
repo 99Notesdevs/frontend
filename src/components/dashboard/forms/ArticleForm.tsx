@@ -86,6 +86,9 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(
     initialData?.imageUrl ? getImageUrl(initialData.imageUrl) : null
   );
+  const [ogimagePreview, setOgImagePreview] = useState<string | null>(
+    initialData?.ogImage ? getImageUrl(initialData.ogImage) : null
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [alert, setAlert] = useState<{
     message: string;
@@ -242,6 +245,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
@@ -261,6 +265,45 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             form.setValue("imageUrl", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
               shouldValidate: true,
             });
+            throw new Error("Failed to upload image to S3");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const result = reader.result as string;
+          setOgImagePreview(result);
+
+          const formData = new FormData();
+          formData.append("imageUrl", file);
+
+          const s3Url = await uploadImageToS3(formData, "ArticleOGImages");
+          if (s3Url) {
+            form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+              shouldValidate: true,
+            });
+          } else {
+            form.setValue(
+              "ogImage",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
+                shouldValidate: true,
+              }
+            );
             throw new Error("Failed to upload image to S3");
           }
         } catch (error) {
@@ -357,14 +400,18 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                           <Input
                             value={getImageAlt(altField.value)}
                             onChange={(e) => {
-                              const [imageUrl, altText] = parseImageUrl(altField.value);
-                              altField.onChange(JSON.stringify([imageUrl, e.target.value]));
+                              const [imageUrl, altText] = parseImageUrl(
+                                altField.value
+                              );
+                              altField.onChange(
+                                JSON.stringify([imageUrl, e.target.value])
+                              );
                             }}
                           />
                         </FormControl>
                         <FormDescription>
-                          Describe the image for accessibility. This will be used
-                          as the alt text.
+                          Describe the image for accessibility. This will be
+                          used as the alt text.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -584,12 +631,34 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
               control={form.control}
               name="ogImage"
               render={({ field }) => (
-                <FormItem>
+                <div className="space-y-4">
                   <FormLabel>OG Image</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
+                  <Input {...field} />
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleOGUpload}
+                    className="border-[var(--admin-border)]"
+                  />
+
+                  {ogimagePreview ? (
+                    <div className="space-y-2">
+                      <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
+                        <Image
+                          src={ogimagePreview}
+                          alt="Image preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <p className="text-sm text-green-500">
+                        Image uploaded successfully
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No image uploaded</p>
+                  )}
+                </div>
               )}
             />
 
