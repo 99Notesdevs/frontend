@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Label } from "@radix-ui/react-label";
-import { Checkbox } from "@/components/ui/Checkbox";
+import Image from "next/image";
 import { Alert } from "@/components/ui/alert";
 import {
   Select,
@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DraftDialog from "@/components/ui/DraftDialog";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
 
 const formSchema = z.object({
   title: z.string(),
@@ -73,7 +74,21 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       };
     }[]
   >([]);
+  const parseImageUrl = (url: string | undefined): [string, string] => {
+    try {
+      return JSON.parse(url || "[]") as [string, string];
+    } catch (error) {
+      return ["", ""];
+    }
+  };
 
+  const getImageUrl = (url: string | undefined): string => {
+    const [imageUrl] = parseImageUrl(url);
+    return imageUrl;
+  };
+  const [ogimagePreview, setOgImagePreview] = useState<string | null>(
+    initialData?.ogImage ? getImageUrl(initialData.ogImage) : null
+  );
   useEffect(() => {
     const savedDrafts = localStorage.getItem("upscNotesDrafts");
     if (savedDrafts) {
@@ -233,6 +248,43 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       });
     }
   };
+
+  const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          try {
+            const result = reader.result as string;
+            setOgImagePreview(result);
+  
+            const formData = new FormData();
+            formData.append("imageUrl", file);
+  
+            const s3Url = await uploadImageToS3(formData, "BlogOGImages");
+            if (s3Url) {
+              form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+                shouldValidate: true,
+              });
+            } else {
+              form.setValue(
+                "ogImage",
+                JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+                {
+                  shouldValidate: true,
+                }
+              );
+              throw new Error("Failed to upload image to S3");
+            }
+          } catch (error) {
+            console.error("Error uploading image:", error);
+          } finally {
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
   return (
     <div className="relative">
@@ -437,12 +489,34 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             control={form.control}
             name="ogImage"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>OG Image URL</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter Open Graph image URL" {...field} />
-                </FormControl>
-              </FormItem>
+              <div className="space-y-4">
+                <FormLabel>OG Image</FormLabel>
+                <Input {...field} />
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleOGUpload}
+                  className="border-[var(--admin-border)]"
+                />
+
+                {ogimagePreview ? (
+                  <div className="space-y-2">
+                    <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
+                      <Image
+                        src={ogimagePreview}
+                        alt="Image preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="text-sm text-green-500">
+                      Image uploaded successfully
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No image uploaded</p>
+                )}
+              </div>
             )}
           />
 
