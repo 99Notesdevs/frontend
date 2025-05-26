@@ -53,6 +53,7 @@ const Login = () => {
     const data = await res.json();
     console.log(data);
     if (data.token) {
+      Cookies.set("token", data.token?.split(" ")[1]);
       localStorage.setItem("token", data.token);
       router.push("/users/dashboard");
     }
