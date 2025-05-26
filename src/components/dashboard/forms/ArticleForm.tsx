@@ -350,30 +350,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                   <FormField
                     control={form.control}
                     name="imageUrl"
-                    render={({ field: imageField }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Image URL <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            value={getImageUrl(imageField.value)}
-                            onChange={(e) => {
-                              const [imageUrl, altText] = parseImageUrl(imageField.value);
-                              imageField.onChange(JSON.stringify([e.target.value, altText]));
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="imageUrl"
                     render={({ field: altField }) => (
                       <FormItem>
                         <FormLabel>Image Alt Text</FormLabel>
