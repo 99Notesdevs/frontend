@@ -1,19 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async redirects() {
-    // Only apply the redirect in production environment
-    if (process.env.NODE_ENV === "development") {
-      return []; // No redirects in development
-    } else {
-      return [
-        {
-          source: "/",
-          destination: "/blog",
-          permanent: true, // Set to true for a 308 permanent redirect
-        },
-      ];
-    }
-  },
   reactStrictMode: true,
   images: {
     remotePatterns: [
