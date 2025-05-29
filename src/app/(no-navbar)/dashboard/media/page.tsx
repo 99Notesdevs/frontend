@@ -8,8 +8,10 @@ import Cookies from "js-cookie";
 
 const MediaLibrary = () => {
   const [mediaFiles, setMediaFiles] = useState<string[]>([]);
-  const [filteredMediaFiles, setFilteredMediaFiles] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [filteredMediaFiles, setFilteredMediaFiles] = useState<string[]>([
+    "https://99notes-media-files.s3.ap-south-1.amazonaws.com/Blogs/c3c31dd4-c81a-4cb7-9b05-0b60d32debf6.png",
+  ]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]); 
   const [currentPage, setCurrentPage] = useState(1); 
@@ -35,7 +37,7 @@ const MediaLibrary = () => {
       }
     };
 
-    fetchMediaFiles();
+    // fetchMediaFiles();
   }, []);
 
   const handleFilterChange = (filter: string) => {
