@@ -32,6 +32,8 @@ import {
   Trash2,
   ChevronDown,
   Palette,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React, { useState, useEffect, useRef } from "react";
@@ -227,6 +229,124 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     setShowTemplates(false);
   };
 
+  const increaseRowHeight = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const { from, to } = editor.state.selection;
+    const transactions: any[] = [];
+    
+    editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
+      if (node.type.name === 'tableRow') {
+        const currentHeight = node.attrs.style?.match(/height:\s*(\d+px)/)?.[1] || '24px';
+        const newHeight = `${Math.min(parseInt(currentHeight) + 10, 200)}px`;
+        
+        transactions.push(
+          editor.state.tr.setNodeMarkup(pos, null, {
+            ...node.attrs,
+            style: `height: ${newHeight};`
+          })
+        );
+      }
+    });
+    
+    transactions.forEach((tr: any) => editor.view.dispatch(tr));
+  };
+
+  const decreaseRowHeight = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const { from, to } = editor.state.selection;
+    const transactions: any[] = [];
+    
+    editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
+      if (node.type.name === 'tableRow') {
+        const currentHeight = node.attrs.style?.match(/height:\s*(\d+px)/)?.[1] || '24px';
+        const newHeight = `${Math.max(parseInt(currentHeight) - 10, 10)}px`;
+        
+        transactions.push(
+          editor.state.tr.setNodeMarkup(pos, null, {
+            ...node.attrs,
+            style: `height: ${newHeight};`
+          })
+        );
+      }
+    });
+    
+    transactions.forEach((tr: any) => editor.view.dispatch(tr));
+  };
+
+  const increaseColumnWidth = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const { from, to } = editor.state.selection;
+    const transactions: any[] = [];
+    
+    editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
+      if (node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
+        const currentStyle = node.attrs.style || '';
+        const currentWidth = currentStyle.match(/width:\s*(\d+px)/)?.[1] || '100px';
+        const newWidth = `${Math.min(parseInt(currentWidth) + 20, 500)}px`;
+        const newStyle = currentStyle 
+          ? currentStyle.replace(/width:\s*\d+px/, `width: ${newWidth}`)
+          : `width: ${newWidth};`;
+        
+        if (!currentStyle.includes('width:')) {
+          // If width style doesn't exist, add it
+          transactions.push(
+            editor.state.tr.setNodeMarkup(pos, null, {
+              ...node.attrs,
+              style: `${node.attrs.style || ''} width: ${newWidth};`.trim()
+            })
+          );
+        } else {
+          // If width style exists, replace it
+          transactions.push(
+            editor.state.tr.setNodeMarkup(pos, null, {
+              ...node.attrs,
+              style: newStyle
+            })
+          );
+        }
+      }
+    });
+    
+    transactions.forEach((tr: any) => editor.view.dispatch(tr));
+  };
+
+  const decreaseColumnWidth = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const { from, to } = editor.state.selection;
+    const transactions: any[] = [];
+    
+    editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
+      if (node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
+        const currentStyle = node.attrs.style || '';
+        const currentWidth = currentStyle.match(/width:\s*(\d+px)/)?.[1] || '100px';
+        const newWidth = `${Math.max(parseInt(currentWidth) - 20, 50)}px`;
+        const newStyle = currentStyle 
+          ? currentStyle.replace(/width:\s*\d+px/, `width: ${newWidth}`)
+          : `width: ${newWidth};`;
+        
+        if (!currentStyle.includes('width:')) {
+          // If width style doesn't exist, add it
+          transactions.push(
+            editor.state.tr.setNodeMarkup(pos, null, {
+              ...node.attrs,
+              style: `${node.attrs.style || ''} width: ${newWidth};`.trim()
+            })
+          );
+        } else {
+          // If width style exists, replace it
+          transactions.push(
+            editor.state.tr.setNodeMarkup(pos, null, {
+              ...node.attrs,
+              style: newStyle
+            })
+          );
+        }
+      }
+    });
+    
+    transactions.forEach((tr: any) => editor.view.dispatch(tr));
+  };
+
   const insertTableTemplate = (html: string) => {
     editor.chain().focus().insertContent(html).run();
     setIsOpen(false);
@@ -326,6 +446,48 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   <ColumnsIcon className="w-4 h-4" />
                   Add Column
                 </button>
+                <div className="border-t border-gray-100 my-1">
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500">Row Height</div>
+                  <div className="flex">
+                    <button
+                      type="button"
+                      onClick={decreaseRowHeight}
+                      className="flex-1 text-center px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      title="Decrease Row Height"
+                    >
+                      <Minus className="w-3 h-3 mx-auto" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={increaseRowHeight}
+                      className="flex-1 text-center px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      title="Increase Row Height"
+                    >
+                      <Plus className="w-3 h-3 mx-auto" />
+                    </button>
+                  </div>
+                </div>
+                <div className="border-t border-gray-100 my-1">
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500">Column Width</div>
+                  <div className="flex">
+                    <button
+                      type="button"
+                      onClick={decreaseColumnWidth}
+                      className="flex-1 text-center px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      title="Decrease Column Width"
+                    >
+                      <Minus className="w-3 h-3 mx-auto" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={increaseColumnWidth}
+                      className="flex-1 text-center px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      title="Increase Column Width"
+                    >
+                      <Plus className="w-3 h-3 mx-auto" />
+                    </button>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={deleteRow}
