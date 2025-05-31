@@ -304,7 +304,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     )}
 
                     <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-2">
-                      {parsedMetadata.metaTitle || "Untitled Article"}
+                      {parsedMetadata.metaTitle || title || "Untitled Article"}
                     </h1>
                   </div>
 
