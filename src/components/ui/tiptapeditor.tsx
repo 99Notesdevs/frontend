@@ -24,6 +24,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  AlignJustify,
   Undo,
   Redo,
   Table as TableIcon,
@@ -103,14 +104,180 @@ const TableStyles = Extension.create({
   },
 });
 
-// Custom Image extension with alt text support
+// Custom Image extension with resizing and text wrapping support
 const CustomImage = Image.extend({
+  name: 'resizableImage',
+  
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      HTMLAttributes: {
+        class: 'floating-image',
+      },
+    };
+  },
+  
   addAttributes() {
     return {
       ...this.parent?.(),
       alt: {
         default: null,
       },
+      width: {
+        default: '100%',
+        renderHTML: attributes => ({
+          width: attributes.width,
+        }),
+      },
+      height: {
+        default: 'auto',
+        renderHTML: attributes => ({
+          height: attributes.height,
+        }),
+      },
+      float: {
+        default: 'none',
+        renderHTML: attributes => ({
+          'data-float': attributes.float,
+        }),
+      },
+      margin: {
+        default: '0 16px 16px 0',
+        renderHTML: attributes => ({
+          'data-margin': attributes.margin,
+        }),
+      },
+    };
+  },
+  
+  renderHTML({ HTMLAttributes }) {
+    const { float = 'none', margin = '0 16px 16px 0' } = HTMLAttributes;
+    const imgStyle = `
+      max-width: 100%;
+      height: auto;
+      display: block;
+    `;
+    
+    const containerStyle = `
+      display: inline-block;
+      margin: ${margin};
+      float: ${float};
+      position: relative;
+      max-width: 100%;
+    `;
+    
+    return ['div', 
+      { 
+        'data-type': 'image-container',
+        'data-float': float,
+        style: containerStyle.trim()
+      },
+      ['img', mergeAttributes(HTMLAttributes, { 
+        'data-drag-handle': '',
+        'data-resizable': 'true',
+        style: imgStyle.trim(),
+        class: 'floating-image',
+      })]
+    ];
+  },
+  
+  addNodeView() {
+    return ({ node, getPos, editor }) => {
+      // Create the image element
+      const img = document.createElement('img');
+      const { src, alt, width, height, float = 'none' } = node.attrs;
+      
+      // Set up the image
+      img.src = src;
+      img.alt = alt || '';
+      img.style.width = width || '70%';
+      img.style.height = height || 'auto';
+      img.style.maxWidth = '100%';
+      img.style.display = 'block';
+      img.className = 'floating-image';
+      
+      // Create the resize handle
+      const resizeHandle = document.createElement('div');
+      resizeHandle.className = 'resize-handle';
+      
+      // Create the container for the image and resize handle
+      const container = document.createElement('div');
+      container.className = 'resizable-image-container';
+      container.setAttribute('data-type', 'image-container');
+      container.setAttribute('data-float', float);
+      container.style.float = float;
+      container.style.maxWidth = '100%';
+      container.style.display = 'inline-block';
+      container.style.verticalAlign = 'middle';
+      
+      // Add elements to the container
+      container.appendChild(img);
+      container.appendChild(resizeHandle);
+      
+      // Resize functionality
+      let isResizing = false;
+      let startX: number, startY: number, startWidth: number, startHeight: number;
+      
+      const onMouseDown = (e: MouseEvent) => {
+        if (e.target === resizeHandle) {
+          e.preventDefault();
+          e.stopPropagation();
+          isResizing = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startWidth = parseInt(document.defaultView?.getComputedStyle(img).width || '0', 10);
+          startHeight = parseInt(document.defaultView?.getComputedStyle(img).height || '0', 10);
+          
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        }
+      };
+      
+      const onMouseMove = (e: MouseEvent) => {
+        if (!isResizing) return;
+        
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        
+        const newWidth = startWidth + dx;
+        const newHeight = startHeight + dy;
+        
+        img.style.width = `${newWidth}px`;
+        img.style.height = `${newHeight}px`;
+      };
+      
+      const onMouseUp = () => {
+        if (!isResizing) return;
+        
+        isResizing = false;
+        
+        // Update the node with new dimensions
+        const { view } = editor;
+        const { state } = view;
+        const pos = getPos();
+        
+        if (typeof pos === 'number') {
+          view.dispatch(
+            state.tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              width: img.style.width,
+              height: img.style.height,
+            })
+          );
+        }
+        
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+      
+      container.addEventListener('mousedown', onMouseDown);
+      
+      return {
+        dom: container,
+        destroy: () => {
+          container.removeEventListener('mousedown', onMouseDown);
+        },
+      };
     };
   },
 });
@@ -625,6 +792,68 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const [htmlContent, setHtmlContent] = useState("");
   const [currentSize, setCurrentSize] = useState("Normal");
   const imageInputRef = React.useRef<HTMLInputElement>(null);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const [altText, setAltText] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  
+  // Add styles for the resizable image
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .resizable-image-container {
+        position: relative;
+        display: inline-block;
+        max-width: 100%;
+        margin: 0.5rem 0;
+      }
+      
+      .resize-handle {
+        position: absolute;
+        right: -8px;
+        bottom: -8px;
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        border-radius: 50%;
+        cursor: nwse-resize;
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 2px solid white;
+      }
+      
+      .resizable-image-container:hover .resize-handle {
+        opacity: 1;
+      }
+      
+      .resizable-image-container img {
+        max-width: 100%;
+        height: auto;
+        transition: box-shadow 0.2s ease;
+      }
+      
+      .resizable-image-container:hover img {
+        box-shadow: 0 0 0 2px #3b82f6;
+      }
+      
+      .resizable-image-container.resizing img {
+        user-select: none;
+        pointer-events: none;
+      }
+      
+      .resizable-image-container.resizing .resize-handle {
+        opacity: 1;
+        background: #1d4ed8;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   const addImage = () => {
     imageInputRef.current?.click();
@@ -634,24 +863,57 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     if (e.target.files?.length) {
       const file = e.target.files[0];
       const reader = new FileReader();
-
-      reader.onload = async (event) => {
-        if (event.target?.result && editor) {
-          const alt = window.prompt('Enter alt text for the image (optional)') || '';
-          editor
-            .chain()
-            .focus()
-            .setImage({ 
-              src: event.target.result as string,
-              alt: alt
-            })
-            .run();
+      
+      reader.onloadstart = () => setIsUploading(true);
+      
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setImageSrc(event.target.result as string);
+          setImageDialogOpen(true);
+          setAltText('');
         }
+      };
+      
+      reader.onloadend = () => setIsUploading(false);
+      
+      reader.onerror = () => {
+        console.error('Error reading file');
+        setIsUploading(false);
       };
 
       reader.readAsDataURL(file);
-      // Reset the input value to allow selecting the same file again
-      e.target.value = '';
+    }
+  };
+  
+  const handleAddImage = () => {
+    if (!editor || !imageSrc) return;
+    
+    editor
+      .chain()
+      .focus()
+      .setImage({ 
+        src: imageSrc,
+        alt: altText
+      })
+      .run();
+      
+    // Reset the dialog
+    setImageDialogOpen(false);
+    setImageSrc('');
+    setAltText('');
+    
+    // Reset the input value to allow selecting the same file again
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
+    }
+  };
+  
+  const handleCancelImage = () => {
+    setImageDialogOpen(false);
+    setImageSrc('');
+    setAltText('');
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
     }
   };
 
@@ -666,8 +928,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       CodeBlockLowlight.configure({ lowlight }),
       Link.configure({ openOnClick: false }),
-      CustomImage, // Use our custom image extension instead of Image
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      CustomImage, // Use our custom resizable image extension
+      TextAlign.configure({ types: ["heading", "paragraph", "image"] }),
       Color,
       TextStyle,
       FontSize,
@@ -703,9 +965,19 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       }
     },
     editorProps: {
+      handleDOMEvents: {
+        // Prevent default image dragging behavior
+        dragstart: (view: any, event: Event) => {
+          const target = event.target as HTMLElement;
+          if (target?.closest('.resizable-image-container')) {
+            event.preventDefault();
+            return true;
+          }
+          return false;
+        },
+      },
       attributes: {
-        class:
-          "prose prose-slate max-w-none focus:outline-none min-h-[300px] p-4 text-gray-900 overflow-y-auto h-[600px]",
+        class: 'prose prose-slate max-w-none focus:outline-none min-h-[300px] p-4 text-gray-900 overflow-y-auto h-[600px]',
       },
     },
   });
@@ -824,6 +1096,40 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     return html.replace(/></g, ">\n<");
   };
 
+  // Image alignment handler
+  const setImageAlignment = (float: string) => {
+    const { state } = editor;
+    const { selection } = state;
+    const { $from } = selection;
+    const node = $from.nodeAfter || $from.nodeBefore;
+
+    if (node && node.type.name === 'resizableImage') {
+      editor.chain().focus().updateAttributes('resizableImage', { float }).run();
+    }
+  };
+
+  // Get current image alignment
+  const getImageAlignment = () => {
+    const { state } = editor;
+    const { selection } = state;
+    const { $from } = selection;
+    const node = $from.nodeAfter || $from.nodeBefore;
+
+    if (node && node.type.name === 'resizableImage') {
+      return node.attrs.float || 'none';
+    }
+    return 'none';
+  };
+
+  // Check if cursor is on an image
+  const isImageSelected = () => {
+    const { state } = editor;
+    const { selection } = state;
+    const { $from } = selection;
+    const node = $from.nodeAfter || $from.nodeBefore;
+    return node && node.type.name === 'resizableImage';
+  };
+
   return (
     <div className="border border-input rounded-lg">
       <input
@@ -833,6 +1139,61 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         accept="image/*"
         className="hidden"
       />
+      
+      {/* Image Dialog */}
+      {imageDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-medium mb-4">Add Image</h3>
+            
+            <div className="mb-4">
+              {imageSrc && (
+                <div className="mb-4 border rounded-md overflow-hidden">
+                  <img 
+                    src={imageSrc} 
+                    alt="Preview" 
+                    className="max-h-48 w-full object-contain"
+                  />
+                </div>
+              )}
+              
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Alt Text (for accessibility)
+              </label>
+              <input
+                type="text"
+                value={altText}
+                onChange={(e) => setAltText(e.target.value)}
+                placeholder="Describe the image for accessibility"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                autoFocus
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Alt text improves accessibility for users with screen readers.
+              </p>
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={handleCancelImage}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={isUploading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleAddImage}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                disabled={isUploading}
+              >
+                {isUploading ? 'Uploading...' : 'Add Image'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="border-b border-input bg-transparent p-1 flex items-center gap-1 flex-wrap">
         <ToolbarButton
           onClick={toggleHtmlMode}
@@ -940,22 +1301,36 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               isActive={editor.isActive({ textAlign: "right" })}
             />
             <ToolbarButton
-              onClick={() => editor.chain().focus().undo().run()}
-              disabled={!editor?.can().undo()}
-              icon={<Undo className="w-5 h-5" />}
-              label="Undo"
+              onClick={() => editor.commands.setTextAlign("justify")}
+              icon={<AlignJustify className="w-5 h-5" />}
+              label="Justify"
+              isActive={editor.isActive({ textAlign: "justify" })}
             />
-            <ToolbarButton
-              onClick={() => editor.chain().focus().redo().run()}
-              disabled={!editor?.can().redo()}
-              icon={<Redo className="w-5 h-5" />}
-              label="Redo"
-            />
-            <ToolbarButton
-              onClick={setIframe}
-              icon={<span className="w-5 h-5">Iframe</span>}
-              label="Embed Iframe"
-            />
+            
+            {/* Image Alignment Controls - Only show when an image is selected */}
+            {isImageSelected() && (
+              <div className="flex items-center ml-2 border-l pl-2">
+                <span className="text-xs text-muted-foreground mr-2">Image:</span>
+                <ToolbarButton
+                  onClick={() => setImageAlignment('left')}
+                  isActive={getImageAlignment() === 'left'}
+                  icon={<AlignLeft className="w-4 h-4" />}
+                  label="Float Left"
+                />
+                <ToolbarButton
+                  onClick={() => setImageAlignment('none')}
+                  isActive={getImageAlignment() === 'none'}
+                  icon={<AlignCenter className="w-4 h-4" />}
+                  label="Center"
+                />
+                <ToolbarButton
+                  onClick={() => setImageAlignment('right')}
+                  isActive={getImageAlignment() === 'right'}
+                  icon={<AlignRight className="w-4 h-4" />}
+                  label="Float Right"
+                />
+              </div>
+            )}
           </>
         )}
       </div>
