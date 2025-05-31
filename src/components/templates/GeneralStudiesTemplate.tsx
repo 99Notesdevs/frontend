@@ -184,7 +184,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                     <div className="mb-8 sm:mb-10">
                       <div className="flex flex-col items-center mb-6 sm:mb-8">
                         <h2 className="text-2xl font-medium text-[var(--primary)] mb-1 text-center">
-                          {JSON.parse(metadata).metaTitle || "Related Topics"}
+                          {JSON.parse(metadata).metaTitle || title || "Related Topics"}
                         </h2>
                         <p className="text-[var(--text-tertiary)] text-sm mb-1 text-center">
                           {JSON.parse(metadata).metaDescription ||
