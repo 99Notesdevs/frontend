@@ -65,8 +65,8 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
         className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
       >
         <Image
-          src={item.imageUrl}
-          alt={item.title}
+          src={JSON.parse(item.imageUrl)[0]}
+          alt={JSON.parse(item.imageUrl)[1]}
           width={500}
           height={192}
           className="w-full h-48 object-cover"
@@ -144,8 +144,8 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
                   className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
                 >
                   <Image
-                    src={page?.imageUrl || "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"}
-                    alt={page.title}
+                    src={JSON.parse(page?.imageUrl)[0] || "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"}
+                    alt={JSON.parse(page?.imageUrl)[1]}
                     width={500}
                     height={192}
                     className="w-full h-48 object-cover"
