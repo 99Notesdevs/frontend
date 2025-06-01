@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TagInput } from "@/components/ui/tags/tag-input";
-import { FAQEditor } from "./FAQEditor";
+import { FAQEditor } from "../../FAQp/FAQEditor";
 
 const articleSchema = z.object({
   title: z.string(),
