@@ -1,0 +1,221 @@
+"use client";
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus, Trash2 } from 'lucide-react';
+
+interface SubQuestion {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  subQuestions: SubQuestion[];
+}
+
+export interface FAQEditorProps {
+  value?: string;
+  onChange: (value: string) => void;
+}
+
+export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
+  const [faqs, setFaqs] = useState<FAQItem[]>([]);
+  const [isAdding, setIsAdding] = useState<{ [key: string]: boolean }>({});
+
+  // Parse the initial value
+  useEffect(() => {
+    if (value) {
+      try {
+        const parsed = JSON.parse(value);
+        // Add IDs to items if they don't exist
+        const faqData = (parsed.general || []).map((item: any) => ({
+          ...item,
+          id: item.id || Date.now().toString(),
+          subQuestions: (item.subQuestions || []).map((sub: any) => ({
+            ...sub,
+            id: sub.id || Date.now().toString()
+          }))
+        }));
+        setFaqs(faqData);
+      } catch (error) {
+        console.error('Failed to parse FAQ data', error);
+      }
+    }
+  }, [value]);
+
+  // Update the parent form when FAQs change
+  useEffect(() => {
+    const faqData = { general: faqs };
+    onChange(JSON.stringify(faqData));
+  }, [faqs, onChange]);
+
+  const addFAQ = useCallback(() => {
+    setFaqs(prev => [...prev, { 
+      id: Date.now().toString(),
+      question: '', 
+      answer: '', 
+      subQuestions: [] 
+    }]);
+  }, []);
+
+  const addSubQuestion = useCallback((parentId: string) => {
+    if (isAdding[parentId]) return;
+    
+    setIsAdding(prev => ({ ...prev, [parentId]: true }));
+    
+    setFaqs(prev => 
+      prev.map(item => 
+        item.id === parentId 
+          ? {
+              ...item,
+              subQuestions: [
+                ...item.subQuestions,
+                { 
+                  id: Date.now().toString(),
+                  question: '', 
+                  answer: '' 
+                }
+              ]
+            }
+          : item
+      )
+    );
+    
+    setTimeout(() => {
+      setIsAdding(prev => ({ ...prev, [parentId]: false }));
+    }, 300);
+  }, [isAdding]);
+
+  const updateFAQ = useCallback((id: string, field: 'question' | 'answer', value: string, isSubQuestion = false, subId?: string) => {
+    setFaqs(prev => 
+      isSubQuestion && subId
+        ? prev.map(item => ({
+            ...item,
+            subQuestions: item.subQuestions.map(sub => 
+              sub.id === subId ? { ...sub, [field]: value } : sub
+            )
+          }))
+        : prev.map(item => 
+            item.id === id ? { ...item, [field]: value } : item
+          )
+    );
+  }, []);
+
+  const deleteFAQ = useCallback((id: string, isSubQuestion = false, parentId?: string) => {
+    setFaqs(prev => 
+      isSubQuestion && parentId
+        ? prev.map(item => ({
+            ...item,
+            subQuestions: item.subQuestions.filter(sub => sub.id !== id)
+          }))
+        : prev.filter(item => item.id !== id)
+    );
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-4">
+        {faqs.length > 0 ? (
+          faqs.map((item, index) => (
+            <div key={item.id} className="border rounded-lg p-4 bg-white">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-gray-700">{index + 1}.</span>
+                  <Input
+                    value={item.question}
+                    onChange={(e) => updateFAQ(item.id, 'question', e.target.value)}
+                    placeholder="Enter question"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteFAQ(item.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+                
+                <Input
+                  value={item.answer}
+                  onChange={(e) => updateFAQ(item.id, 'answer', e.target.value)}
+                  placeholder="Enter answer"
+                  className="w-full ml-6"
+                />
+                
+                <div className="flex justify-between items-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addSubQuestion(item.id)}
+                    className="text-sm"
+                    disabled={isAdding[item.id]}
+                  >
+                    <Plus size={14} className="mr-1" /> 
+                    {isAdding[item.id] ? 'Adding...' : 'Add Sub-question'}
+                  </Button>
+                </div>
+                
+                {item.subQuestions.length > 0 && (
+                  <div className="mt-3 ml-6 space-y-3 border-l-2 border-gray-100 pl-4">
+                    {item.subQuestions.map((subItem, subIndex) => (
+                      <div key={subItem.id} className="space-y-2 p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">{subIndex + 1}.</span>
+                          <Input
+                            value={subItem.question}
+                            onChange={(e) => updateFAQ(subItem.id, 'question', e.target.value, true, subItem.id)}
+                            placeholder="Enter sub-question"
+                            className="flex-1 text-sm"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteFAQ(subItem.id, true, item.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                        <Input
+                          value={subItem.answer}
+                          onChange={(e) => updateFAQ(subItem.id, 'answer', e.target.value, true, subItem.id)}
+                          placeholder="Enter answer"
+                          className="w-full text-sm ml-6"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-6 text-gray-500 rounded-lg border-2 border-dashed">
+            No questions added yet. Click the button below to add one.
+          </div>
+        )}
+      </div>
+      
+      <Button
+        type="button"
+        variant="outline"
+        onClick={addFAQ}
+        className="w-full"
+      >
+        <Plus size={16} className="mr-2" /> Add Question
+      </Button>
+    </div>
+  );
+};
+
+export default FAQEditor;
