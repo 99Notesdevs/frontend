@@ -71,6 +71,7 @@ interface PageFormData extends Record<string, any> {
   link?: string;
   tags?: string[];
   questionNumber?: number;
+  FAQ?:string;
   parentTagId?: string;
   metadata?: {
     metaTitle?: string;
@@ -291,6 +292,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         category: formData.category || "",
         tags: formData.tags || [],
         parentTagId: Number(categoryId) || "",
+        FAQ: formData.FAQ || "",
         questionNumber: Number(formData.questionNumber) || undefined,
         content: currentTemplate.id === "custom-link" ? "dummyContent" : formData.content, // Directly use the HTML content
         metadata: {

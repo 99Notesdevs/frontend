@@ -20,6 +20,7 @@ interface Page {
     createdAt: string;
     updatedAt: string;
   }>;
+  FAQ: string;
   templateId: string;
   showInNav: boolean;
   updatedAt: string;
@@ -172,6 +173,7 @@ function PageList() {
         templateId: selectedPage.templateId,
         category: formData.category,
         parentId: selectedPage.parentId || null,
+        FAQ: formData.FAQ,
         imageUrl: formData.imageUrl,
         content: selectedPage.templateId === 'custom-link' ? "dummy" : formData.content,
         link: selectedPage.templateId === 'custom-link' ? formData.link : null,
@@ -238,6 +240,7 @@ function PageList() {
           title: page.title || "",
           content: parsedContent || "",
           showInNav: page.showInNav || false,
+          FAQ: page.FAQ || "",
           imageUrl: parsedimage || undefined,
           category: page.categories?.name || "",
           tags: page.tags.map(tag => tag.name) || [],

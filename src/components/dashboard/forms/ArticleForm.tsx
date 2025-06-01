@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TagInput } from "@/components/ui/tags/tag-input";
+import { FAQEditor } from "./FAQEditor";
 
 const articleSchema = z.object({
   title: z.string(),
@@ -52,6 +53,7 @@ const articleSchema = z.object({
   body: z.string().optional(),
   showInNav: z.boolean().default(false),
   questionNumber: z.number().optional(),
+  FAQ: z.string().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -237,6 +239,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       body: "",
       showInNav: true,
       questionNumber: undefined,
+      FAQ: "",
     },
   });
 
@@ -341,6 +344,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       body: data.body,
       showInNav: data.showInNav,
       questionNumber: data.questionNumber,
+      FAQ: data.FAQ,
     };
     onSubmit(transformedData);
   };
@@ -363,10 +367,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         />
       )}
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleSubmitForm)}
-          className="space-y-6"
-        >
+        <form onSubmit={form.handleSubmit(handleSubmitForm)} className="space-y-8">
           {/* Title */}
           <FormField
             control={form.control}
@@ -813,6 +814,31 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+            </div>
+
+            {/* FAQ Editor Section */}
+            <div className="space-y-4">
+              <div>
+                <Label>FAQs</Label>
+                <FormField
+                  control={form.control}
+                  name="FAQ"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <FAQEditor
+                          value={field.value}
+                          onChange={(value) => field.onChange(value)}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Add frequently asked questions in a structured format.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
           </div>
