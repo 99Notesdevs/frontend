@@ -20,6 +20,7 @@ export interface Page {
   template: Template;
   parent: Page | null;
   children: Page[];
+  FAQ?: string; // FAQ data as stringified JSON
 }
 
 export interface Template {

@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { Link } from "lucide-react";
 import Bookmark from "../ui/Bookmark";
 import Quiz from '@/components/quiz/quiz';
+import FAQPage from "@/components/FAQp/faqp";
 
 interface Question {
   id: number;
@@ -368,6 +369,11 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
                   <Tags tags={page.tags} />
                 </div>
+                {page.FAQ && (
+                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
+                    <FAQPage data={page.FAQ} />
+                  </div>
+                )}
                 {/* <button 
                     onClick={() => setIsLiveChatOpen(!isLiveChatOpen)}
                     className="px-4 py-2 bg-[var(--info-surface)] text-[var(--text-strong)] rounded-lg hover:bg-[var(--info-surface-hover)] transition-colors"
