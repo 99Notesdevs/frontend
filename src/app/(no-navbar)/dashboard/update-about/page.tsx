@@ -188,7 +188,7 @@ export default function UpdateAboutPage() {
 
   const handleSave = async () => {
     try {
-      await axios.put(`${env.API}/about-99-notes`, { title: title, content: JSON.stringify(tempContent) }, { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
+      await axios.put(`${env.API}/about-99-notes/1`, { title: title, content: JSON.stringify(tempContent) }, { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
       setContent(tempContent as Content);
       setTitle(title);
       setEditingSection(null);
