@@ -361,3 +361,130 @@ h6 {
   padding: 0;
   vertical-align: middle;
 }
+
+/* Enhanced Tiptap Editor Link Preview */
+a[data-description] {
+  position: relative;
+  color: #2563eb;
+  text-decoration: none;
+  border-bottom: 1px solid #93c5fd;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+a[data-description]:hover {
+  color: #1d4ed8;
+  border-bottom-color: #60a5fa;
+}
+
+/* Main preview container */
+a[data-description]::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 50;
+  pointer-events: none;
+  border: 1px solid #e5e7eb;
+  padding: 0;
+  margin: 0;
+}
+
+/* Preview content */
+a[data-description]::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 51;
+  pointer-events: none;
+  text-align: left;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: normal;
+  box-sizing: border-box;
+}
+
+/* Title */
+a[data-description]::before {
+  content: attr(data-title);
+  font-weight: 600;
+  color: #111827;
+  font-size: 15px;
+  margin-bottom: 8px;
+  display: block;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Description */
+a[data-description]::after {
+  content: attr(data-description);
+  font-weight: 400;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  padding: 0 16px 16px;
+  white-space: normal;
+}
+
+/* Arrow pointer */
+a[data-description]:hover::before,
+a[data-description]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+a[data-description]:hover::after {
+  transform: translateX(-50%) translateY(0);
+  margin-top: 30px; /* Space for title */
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  a[data-description] {
+    color: #60a5fa;
+    border-bottom-color: #1e40af;
+  }
+
+  a[data-description]:hover {
+    color: #3b82f6;
+  }
+
+  a[data-description]::before,
+  a[data-description]::after {
+    background: #1f2937;
+    color: #f3f4f6;
+    border-color: #374151;
+  }
+
+  a[data-description]::before {
+    color: #ffffff;
+    border-bottom-color: #374151;
+  }
+}

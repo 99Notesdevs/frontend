@@ -282,6 +282,29 @@ const CustomImage = Image.extend({
   },
 });
 
+// Custom Link extension with title and description support
+const CustomLink = Link.extend({
+  addAttributes() {
+    return {
+      href: {
+        default: null,
+      },
+      title: {
+        default: null,
+      },
+      'data-description': {
+        default: null,
+      },
+      'data-title': {
+        default: null,
+      },
+    };
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['a', HTMLAttributes, 0];
+  },
+});
+
 const PRESET_COLORS = [
   '#000000', // Black
   '#343A40', // Dark Gray
@@ -927,7 +950,12 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       }),
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       CodeBlockLowlight.configure({ lowlight }),
-      Link.configure({ openOnClick: false }),
+      CustomLink.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-500 underline hover:text-blue-700',
+        },
+      }),
       CustomImage, // Use our custom resizable image extension
       TextAlign.configure({ types: ["heading", "paragraph", "image"] }),
       Color,
@@ -1082,10 +1110,34 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
 
   const setLink = () => {
     if (!editor) return;
-    const url = window.prompt("Enter URL");
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
+    
+    const previousUrl = editor.getAttributes('link').href || '';
+    const previousTitle = editor.getAttributes('link').title || '';
+    const previousDescription = editor.getAttributes('link')['data-description'] || '';
+
+    const url = window.prompt('URL', previousUrl);
+    if (url === null) return;
+    
+    const title = window.prompt('Link Title', previousTitle) || '';
+    const description = window.prompt('Link Description', previousDescription) || '';
+
+    // Remove the link if the URL is empty
+    if (url === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+      return;
     }
+
+    // Update the link with all attributes
+    editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink({ 
+        href: url,
+        'data-title': title,
+        'data-description': description 
+      } as any) // Type assertion to bypass TypeScript error
+      .run();
   };
 
   if (!editor) {
