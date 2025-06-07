@@ -99,7 +99,16 @@ const MediaLibrary = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto min-h-screen">
+      {/* Backdrop for loading state */}
+      {uploading && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-3"></div>
+            <p className="text-gray-700 font-medium">Uploading image...</p>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <h1 className="text-3xl font-extrabold tracking-tight text-gray-800">
           Media Library
@@ -178,12 +187,12 @@ const MediaLibrary = () => {
         ))}
 
         */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+      <div className="w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
           {currentMediaFiles.map((url, index) => (
             <div
               key={index}
-              className="relative group bg-white border border-gray-200 rounded-xl shadow transition overflow-hidden flex items-center justify-center aspect-square"
+              className="relative group bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden aspect-square transform hover:-translate-y-1"
             >
               {/* Checkbox for selection */}
               <input
@@ -220,13 +229,16 @@ const MediaLibrary = () => {
                 </svg>
               </button>
 
-              <Image
-                src={url}
-                alt={`Media ${index + 1}`}
-                fill
-                className="object-cover w-full h-full transition-transform duration-200 group-hover:scale-105"
-                style={{ minWidth: "100%", minHeight: "100%" }}
-              />
+              <div className="w-full h-full relative">
+                <Image
+                  src={url}
+                  alt={`Media ${index + 1}`}
+                  fill
+                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  priority={index < 6} // Load first 6 images with priority
+                />
+              </div>
               {selectedFiles.includes(url) && (
                 <div className="absolute inset-0 bg-blue-600 bg-opacity-60 flex items-center justify-center pointer-events-none z-10">
                   <span className="text-white text-lg font-bold drop-shadow">
@@ -234,14 +246,17 @@ const MediaLibrary = () => {
                   </span>
                 </div>
               )}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none truncate">
-                {url}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                <p className="truncate text-xs font-medium">{url.split('/').pop()}</p>
+                <p className="text-xs text-gray-300 truncate">
+                  {new URL(url).hostname}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="flex flex-wrap justify-center items-center mt-8 gap-2">
+      <div className="flex flex-wrap justify-center items-center mt-10 gap-2">
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index}
