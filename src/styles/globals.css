@@ -378,78 +378,205 @@ a[data-description]:hover {
 }
 
 /* Main preview container */
+a[data-description] {
+  position: relative;
+  display: inline-block;
+}
+
 a[data-description]::after {
-  content: '';
+  content: attr(data-title) '\A' attr(data-description);
+  white-space: pre-wrap;
   position: absolute;
   bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
+  left: 0;
+  width: 320px;
+  max-width: calc(100vw - 40px);
   background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s ease;
-  z-index: 50;
-  pointer-events: none;
-  border: 1px solid #e5e7eb;
-  padding: 0;
-  margin: 0;
-}
-
-/* Preview content */
-a[data-description]::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
   padding: 16px;
-  background: white;
-  border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
-  z-index: 51;
-  pointer-events: none;
+  z-index: 1000;
+  pointer-events: auto;
+  border: 1px solid #e5e7eb;
   text-align: left;
-  color: #4b5563;
   font-size: 14px;
   line-height: 1.5;
+  max-height: 250px;
+  overflow-y: auto;
   white-space: normal;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Title */
-a[data-description]::before {
-  content: attr(data-title);
-  font-weight: 600;
-  color: #111827;
-  font-size: 15px;
-  margin-bottom: 8px;
-  display: block;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-/* Description */
+/* Default positioning - center aligned */
 a[data-description]::after {
-  content: attr(data-description);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Left edge detection - show preview to the right */
+a[data-description][data-position="left"]::after {
+  left: 0;
+  transform: none;
+  margin-left: 0;
+}
+
+/* Right edge detection - show preview to the left */
+a[data-description][data-position="right"]::after {
+  left: auto;
+  right: 0;
+  transform: none;
+  margin-right: 0;
+}
+
+/* Style for the title in the preview */
+a[data-description]::after {
+  /* Title styling */
+  font-weight: bold;
+  color: #111827;
+}
+
+/* Style for the description in the preview */
+a[data-description]::after {
+  /* Description styling */
   font-weight: 400;
   color: #4b5563;
-  font-size: 14px;
-  line-height: 1.5;
-  max-height: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  line-clamp: 4;
-  -webkit-box-orient: vertical;
-  padding: 0 16px 16px;
+}
+
+/* Adjust for left edge */
+@media (max-width: 400px) {
+  a[data-description]::before,
+  a[data-description]::after {
+    left: 0;
+    transform: none;
+    margin-left: 10px;
+    margin-right: 10px;
+    max-width: calc(100vw - 40px);
+  }
+  a[data-description]::after {
+    left: 0;
+    transform: none;
+    margin-left: 10px;
+  }
+  
+  a[data-description]::before {
+    left: 0;
+    transform: none;
+    margin-left: 10px;
+    border-radius: 0 8px 0 0;
+  }
+  
+  a[data-description]:hover::after,
+  a[data-description]::after:hover {
+    transform: none;
+    margin-left: 10px;
+  }
+  
+  a[data-description]:hover::before,
+  a[data-description]::before:hover {
+    transform: none;
+    margin-left: 10px;
+  }
+}
+
+/* Responsive adjustments */
+@media (min-width: 401px) and (max-width: 800px) {
+  /* Ensure preview stays within viewport */
+  a[data-description]::after {
+    max-width: min(320px, calc(100vw - 40px));
+    width: auto;
+  }
+  
+  /* Adjust border radius for edge cases */
+  a[data-description][data-position="left"]::after {
+    border-radius: 0 8px 8px 8px;
+  }
+  
+  a[data-description][data-position="right"]::after {
+    border-radius: 8px 0 8px 8px;
+  }
+}
+
+/* Style the description container */
+a[data-description]::after {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.6;
   white-space: normal;
+  text-align: left;
+}
+
+/* Style the title (first line) */
+a[data-description]::after {
+  content: attr(data-title) '\A' attr(data-description);
+  white-space: pre-line;
+}
+
+a[data-description]::after::first-line {
+  display: block;
+  font-weight: 700;
+  color: #111827;
+  font-size: 17px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Ensure the description starts on a new line */
+a[data-description]::after span {
+  display: block;
+  margin-top: 8px;
+}
+
+/* Add a bit of space between paragraphs in the description */
+a[data-description]::after p {
+  margin: 0 0 8px 0;
+}
+
+a[data-description]::after p:last-child {
+  margin-bottom: 0;
+}
+
+/* Hover states */
+/* Show on hover */
+a[data-description]:hover::before,
+a[data-description]::before:hover,
+a[data-description]:hover::after,
+a[data-description]::after:hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hover states for different positions */
+a[data-description]:hover::after,
+a[data-description]::after:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Center-aligned previews */
+a[data-description]:not([data-position]):hover::after,
+a[data-description]:not([data-position])::after:hover {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Keep the preview open when hovering over the link or the preview */
+a[data-description]:hover::before,
+a[data-description]:hover::after,
+a[data-description]::before:hover,
+a[data-description]::after:hover {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Arrow pointer */
@@ -457,16 +584,24 @@ a[data-description]:hover::before,
 a[data-description]:hover::after {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(-5px);
+  transform: translateY(-5px);
+}
+
+/* Reset transform for right/left aligned */
+@media (max-width: 800px) {
+  a[data-description]:hover::before,
+  a[data-description]:hover::after {
+    transform: translateY(-5px);
+  }
 }
 
 a[data-description]:hover::after {
-  transform: translateX(-50%) translateY(0);
-  margin-top: 30px; /* Space for title */
+  transform: translateY(0);
+  margin-top: 0; /* No extra margin needed as title is inside */
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   a[data-description] {
     color: #60a5fa;
     border-bottom-color: #1e40af;
@@ -487,4 +622,4 @@ a[data-description]:hover::after {
     color: #ffffff;
     border-bottom-color: #374151;
   }
-}
+} */

@@ -31,7 +31,7 @@ export function Tags({ tags }: TagsProps) {
           >
             <Badge
               variant="secondary"
-              className="bg-[var(--bg-subtle)] text-[var(--action-primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer px-4 py-2 text-base"
+              className="bg-yellow-50 text-[var(--primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer px-4 py-2 text-base"
             >
               {tag.name}
             </Badge>
