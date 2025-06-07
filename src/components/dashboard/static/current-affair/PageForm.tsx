@@ -228,7 +228,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "CurrentAffairs");
+          const s3Url = await uploadImageToS3(formData, "CurrentAffairs", file.name);
           if (s3Url) {
             setNewAffairData(prev => ({ ...prev, imageUrl: s3Url }));
           } else {

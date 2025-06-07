@@ -5,6 +5,7 @@ import axios from "axios";
 import { env } from "@/config/env";
 import LoadingSpinner from "@/components/Loading/loading";
 import Cookies from "js-cookie";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
 
 const MediaLibrary = () => {
   const [mediaFiles, setMediaFiles] = useState<string[]>([]);
@@ -13,7 +14,11 @@ const MediaLibrary = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]); 
   const [currentPage, setCurrentPage] = useState(1); 
-  const [filter, setFilter] = useState("all"); 
+  const [filter, setFilter] = useState("all");
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [selectedFolder, setSelectedFolder] =
+    useState<string>("GeneralStudies");
+  const [uploading, setUploading] = useState(false);
   const itemsPerPage = 20; 
 
   useEffect(() => {
@@ -96,7 +101,29 @@ const MediaLibrary = () => {
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-800">Media Library</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-gray-800">
+          Media Library
+        </h1>
+        <button
+          onClick={() => setUploadDialogOpen(true)}
+          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow-md"
+        >
+          <span>Upload Image</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15.232 5.232l3.536 3.536M9 13h6m2 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h6"
+            />
+          </svg>
+        </button>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <select
             value={filter}
@@ -135,11 +162,13 @@ const MediaLibrary = () => {
               alt={`Media ${index + 1}`}
               fill
               className="object-cover w-full h-full transition-transform duration-200 group-hover:scale-105"
-              style={{ minWidth: '100%', minHeight: '100%' }}
+              style={{ minWidth: "100%", minHeight: "100%" }}
             />
             {selectedFiles.includes(url) && (
               <div className="absolute inset-0 bg-blue-600 bg-opacity-60 flex items-center justify-center pointer-events-none z-10">
-                <span className="text-white text-lg font-bold drop-shadow">Selected</span>
+                <span className="text-white text-lg font-bold drop-shadow">
+                  Selected
+                </span>
               </div>
             )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none truncate">
@@ -163,6 +192,60 @@ const MediaLibrary = () => {
           </button>
         ))}
       </div>
+      {uploadDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setUploadDialogOpen(false)}
+            >
+              ×
+            </button>
+            <h2 className="text-lg font-bold mb-4">Upload Image</h2>
+            <label className="block mb-2 font-medium">Choose Folder</label>
+            <select
+              value={selectedFolder}
+              onChange={(e) => setSelectedFolder(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 mb-4 w-full"
+            >
+              <option value="GeneralStudies">General Studies</option>
+              <option value="CurrentArticle">Current Article</option>
+              <option value="CurrentAffairs">Current Affairs</option>
+              <option value="CurrentAffairImages">Current Affair Images</option>
+              <option value="ContentImages">Content Images</option>
+              <option value="BlogsContent">Blogs Content</option>
+              <option value="Blogs">Blogs</option>
+              <option value="ArticlesType">Articles Type</option>
+            </select>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                setUploading(true);
+                try {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const formData = new FormData();
+                    formData.append("imageUrl", file);
+                    formData.append("fileName", file.name);
+                    await uploadImageToS3(formData, selectedFolder, file.name);
+                    setUploadDialogOpen(false);
+                    // Optionally, refresh media files:
+                    // fetchMediaFiles();
+                  }
+                } catch (err) {
+                  alert("Failed to upload image.");
+                } finally {
+                  setUploading(false);
+                }
+              }}
+              className="mb-4"
+              disabled={uploading}
+            />
+            {uploading && <p className="text-blue-500">Uploading...</p>}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

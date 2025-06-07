@@ -267,7 +267,7 @@ export function CurrentAffairPageForm({
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, folder); // Call your S3 upload function
+          const s3Url = await uploadImageToS3(formData, folder, file.name); // Call your S3 upload function
           if (s3Url) {
             form.setValue("imageUrl", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
@@ -306,7 +306,7 @@ export function CurrentAffairPageForm({
             const formData = new FormData();
             formData.append("imageUrl", file);
   
-            const s3Url = await uploadImageToS3(formData, "BlogOGImages");
+            const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
             if (s3Url) {
               form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
                 shouldValidate: true,

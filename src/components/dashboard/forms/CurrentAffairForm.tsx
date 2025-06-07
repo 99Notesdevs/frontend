@@ -183,7 +183,7 @@ export function CurrentAffairForm({
             const formData = new FormData();
             formData.append("imageUrl", file);
   
-            const s3Url = await uploadImageToS3(formData, "BlogOGImages");
+            const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
             if (s3Url) {
               form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
                 shouldValidate: true,

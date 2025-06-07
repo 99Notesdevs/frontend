@@ -261,7 +261,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "ArticlesType");
+          const s3Url = await uploadImageToS3(formData, "ArticlesType", file.name);
           if (s3Url) {
             form.setValue("imageUrl", JSON.stringify([s3Url, ""]), { shouldValidate: true });
           } else {
@@ -294,7 +294,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "ArticleOGImages");
+          const s3Url = await uploadImageToS3(formData, "ArticleOGImages", file.name);
           if (s3Url) {
             form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
