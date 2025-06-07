@@ -150,8 +150,8 @@ const MediaLibrary = () => {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-        {currentMediaFiles.map((url, index) => (
+      {/*
+                  {currentMediaFiles.map((url, index) => (
           <div
             key={index}
             className="relative group bg-white border border-gray-200 rounded-xl shadow hover:shadow-lg transition overflow-hidden flex items-center justify-center aspect-square cursor-pointer"
@@ -165,8 +165,8 @@ const MediaLibrary = () => {
               style={{ minWidth: "100%", minHeight: "100%" }}
             />
             {selectedFiles.includes(url) && (
-              <div className="absolute inset-0 bg-blue-600 bg-opacity-60 flex items-center justify-center pointer-events-none z-10">
-                <span className="text-white text-lg font-bold drop-shadow">
+              <div className="">
+                <span className="">
                   Selected
                 </span>
               </div>
@@ -176,6 +176,70 @@ const MediaLibrary = () => {
             </div>
           </div>
         ))}
+
+        */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+          {currentMediaFiles.map((url, index) => (
+            <div
+              key={index}
+              className="relative group bg-white border border-gray-200 rounded-xl shadow transition overflow-hidden flex items-center justify-center aspect-square"
+            >
+              {/* Checkbox for selection */}
+              <input
+                type="checkbox"
+                checked={selectedFiles.includes(url)}
+                onChange={() => toggleFileSelection(url)}
+                className="absolute top-2 left-2 z-20 w-5 h-5 accent-blue-500 rounded border border-gray-300 bg-white shadow"
+                onClick={(e) => e.stopPropagation()}
+              />
+
+              {/* Copy URL icon */}
+              <button
+                className="absolute top-2 right-2 z-20 bg-white bg-opacity-80 rounded-full p-1 hover:bg-blue-100 transition"
+                title="Copy URL"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(url);
+                }}
+              >
+                {/* Simple link icon (SVG) */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.828 10.172a4 4 0 010 5.656m1.415-1.414a2 2 0 000-2.828m-6.364 6.364a4 4 0 010-5.656m-1.415 1.414a2 2 0 000 2.828M12 8v4m0 0v4m0-4h4m-4 0H8"
+                  />
+                </svg>
+              </button>
+
+              <Image
+                src={url}
+                alt={`Media ${index + 1}`}
+                fill
+                className="object-cover w-full h-full transition-transform duration-200 group-hover:scale-105"
+                style={{ minWidth: "100%", minHeight: "100%" }}
+              />
+              {selectedFiles.includes(url) && (
+                <div className="absolute inset-0 bg-blue-600 bg-opacity-60 flex items-center justify-center pointer-events-none z-10">
+                  <span className="text-white text-lg font-bold drop-shadow">
+                    Selected
+                  </span>
+                </div>
+              )}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none truncate">
+                {url}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex flex-wrap justify-center items-center mt-8 gap-2">
         {Array.from({ length: totalPages }, (_, index) => (
