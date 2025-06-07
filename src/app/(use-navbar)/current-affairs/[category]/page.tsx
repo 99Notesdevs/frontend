@@ -225,8 +225,8 @@ const CurrentAffairsSectionPage = async ({
           {currentAffair?.imageUrl && (
             <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden">
               <Image
-                src={currentAffair.imageUrl}
-                alt={currentAffair.title}
+                src={JSON.parse(currentAffair.imageUrl)[0]}
+                alt={JSON.parse(currentAffair.imageUrl)[1]}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"

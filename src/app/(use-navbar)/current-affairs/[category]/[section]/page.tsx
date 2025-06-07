@@ -6,6 +6,7 @@ import { Metadata } from "next";
 import QuizWrapper from "@/components/quiz/QuizWrapper";
 import Whatsapp from "@/components/ui/whatsapp";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
+import { Tag } from "lucide-react";
 
 // Define types for the data
 interface CurrentAffairArticle {
@@ -118,6 +119,8 @@ const CurrentAffairArticlePage = async ({
                         {category}
                       </Link>
                     </div>
+
+                    
                   
                   {article?.metadata && (
                     <>
@@ -131,6 +134,21 @@ const CurrentAffairArticlePage = async ({
                         year: 'numeric'
                       }).replace(/\//g, '/') : 'N/A'}
                     </p>
+                    
+                    {/* Tags */}
+                    {article.metadata && JSON.parse(article.metadata).tags?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 justify-center my-4">
+                        {JSON.parse(article.metadata).tags.map((tag: string, index: number) => (
+                          <span 
+                            key={index}
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
                     <div className="mt-7"><Whatsapp /></div>
                     </>
                   )}
