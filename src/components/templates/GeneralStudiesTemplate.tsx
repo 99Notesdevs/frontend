@@ -11,6 +11,7 @@ import Ads from "../navigation/Ads";
 import Quiz from '@/components/quiz/quiz';
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
+import Breadcrumb from "@/components/ui/breadcrumb";
 interface Question {
   id: number;
   question: string;
@@ -163,6 +164,10 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
         <main>
           <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
             <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-0 md:px-6 lg:px-8 py-4 sm:py-8">
+              <Breadcrumb
+            containerClasses="bg-muted/40 px-1 py-2 rounded-md"
+            activeClasses="font-semibold"
+          />
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                 {/* Left Column - Main Image and Content */}
                 <div className="lg:col-span-8 space-y-4 sm:space-y-6">

@@ -14,6 +14,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
+import Breadcrumb from "@/components/ui/breadcrumb";
 // import { LiveChat } from "@/components/livechat/livechat";
 import { Tags } from "@/components/ui/tags/Tags";
 import { useRouter } from "next/navigation";
@@ -63,22 +64,22 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const bodyScripts =
     parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
-    const bookmarkBy = (page as any)?.bookmarkBy || [];
-    const [isBookmarked, setIsBookmarked] = useState(false);
+  const bookmarkBy = (page as any)?.bookmarkBy || [];
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
-    useEffect(() => {
-      // Only run on client
-      if (typeof window === "undefined") return;
-      const userId = localStorage.getItem("userId");
-      if (!userId || !Array.isArray(bookmarkBy) || bookmarkBy.length === 0) {
-        setIsBookmarked(false);
-        return;
-      }
-      const found = bookmarkBy.some(
-        (item: any) => String(item.id) === String(userId)
-      );
-      setIsBookmarked(found);
-    }, [bookmarkBy]);
+  useEffect(() => {
+    // Only run on client
+    if (typeof window === "undefined") return;
+    const userId = localStorage.getItem("userId");
+    if (!userId || !Array.isArray(bookmarkBy) || bookmarkBy.length === 0) {
+      setIsBookmarked(false);
+      return;
+    }
+    const found = bookmarkBy.some(
+      (item: any) => String(item.id) === String(userId)
+    );
+    setIsBookmarked(found);
+  }, [bookmarkBy]);
 
   const [showQuiz, setShowQuiz] = useState(true);
   const [currentQuestions, setCurrentQuestions] = useState<Question[]>([]);
@@ -90,7 +91,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   //   };
 
   //   window.addEventListener('toggleChat', handleToggleChat as EventListener);
-    
+
   //   return () => {
   //     window.removeEventListener('toggleChat', handleToggleChat as EventListener);
   //   };
@@ -100,7 +101,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const limit = page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
       const response = await fetch(
@@ -248,10 +249,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const displayImageAlt = displayImagearray[1];
   const formattedDate = page.createdAt
     ? new Date(page.createdAt).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
     : "N/A";
 
   return (
@@ -271,6 +272,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-10 py-4 sm:py-6
         transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
           >
+            <Breadcrumb
+              containerClasses="bg-muted/40 px-4 py-2 rounded-md"
+              activeClasses="font-semibold"
+            />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-4">
               {/* Main Content Column */}
               <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-6">
@@ -288,7 +293,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                   </div>
                 )}
-
+                <Tags tags={page.tags} />
                 {/* Article Content */}
                 <div className="bg-white border rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
                   {/* Article Header */}
@@ -367,7 +372,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   >
                     {mainContentFinal}
                   </div>
-                  <Tags tags={page.tags} />
                 </div>
                 {page.FAQ && (
                   <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
@@ -393,14 +397,14 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     className="flex justify-left bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
                         transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
                   ><div className="w-full mr-2">
-                    <SearchBar />
-                  </div>
+                      <SearchBar />
+                    </div>
                     {isAuthorized && (
-                  <Bookmark
-                    articleId={page.id}
-                    initialBookmarked={isBookmarked}
-                  />
-                )}
+                      <Bookmark
+                        articleId={page.id}
+                        initialBookmarked={isBookmarked}
+                      />
+                    )}
                   </div>
 
                   {/* TOC Section */}
@@ -430,7 +434,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                         </h3>
                         <p className="text-white/90 text-sm mt-1">Test your knowledge with these practice questions</p>
                       </div>
-                      
+
                       <div className="p-3">
                         {isLoading ? (
                           <div className="flex flex-col items-center justify-center py-8">
@@ -448,7 +452,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                               </div>
                               <div className="ml-3">
                                 <p className="text-sm text-red-700">{error}</p>
-                                <button 
+                                <button
                                   onClick={fetchQuestions}
                                   className="mt-2 text-sm font-medium text-red-700 hover:text-red-600 underline"
                                 >
@@ -459,14 +463,14 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                           </div>
                         ) : (
                           <div className="animate-fade-in">
-                            <Quiz 
-                              questions={currentQuestions} 
-                              onQuizComplete={handleQuizComplete} 
+                            <Quiz
+                              questions={currentQuestions}
+                              onQuizComplete={handleQuizComplete}
                             />
                           </div>
                         )}
                       </div>
-                      
+
                       {!isLoading && !error && (
                         <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center">
                           <div className="flex items-center text-sm text-gray-500">
@@ -475,7 +479,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                             </svg>
                             {currentQuestions.length} Questions
                           </div>
-                          <button 
+                          <button
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             className="text-sm font-medium text-yellow-600 hover:text-yellow-700 flex items-center"
                           >

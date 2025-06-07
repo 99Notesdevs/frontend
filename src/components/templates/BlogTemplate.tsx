@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { useEffect } from "react";
 import { RelatedTopics } from "../Blogs/relatedTopics";
 import { Tags } from "@/components/ui/tags/Tags";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
   const { title, content, metadata, imageUrl, slug } = page;
@@ -74,6 +75,10 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
       <main>
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white relative w-full overflow-x-hidden">
           <div className="w-full max-w-[1400px] xl:max-w-6.5xl mx-auto px-2 lg:px-8 py-4 sm:py-6">
+            <Breadcrumb
+            containerClasses="bg-muted/40 px-4 py-2 rounded-md"
+            activeClasses="font-semibold"
+          />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 mt-5">
               {/* Main Content Column */}
               <main className="lg:col-start-1 lg:col-span-9 space-y-4 sm:space-y-6">
