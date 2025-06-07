@@ -27,11 +27,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TagInput } from "@/components/ui/tags/tag-input";
 import DraftDialog from "@/components/ui/DraftDialog";
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   content: z.string().min(10, "Content must be at least 10 characters"),
+  tags: z.array(z.string()).optional(),
   imageUrl: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -219,6 +221,7 @@ export function CurrentArticleForm({
     defaultValues: {
       title: "",
       content: "",
+      tags: [],
       imageUrl: JSON.stringify(["", ""]), // Default empty values as stringified array
       metaTitle: "",
       metaDescription: "",
@@ -558,6 +561,30 @@ export function CurrentArticleForm({
             )}
           />
 
+          {/* Tags */}
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field: { onChange, value, ...field } }) => (
+              <FormItem>
+                <FormLabel className="text-gray-500 font-medium">
+                  Tags
+                </FormLabel>
+                <FormControl>
+                  <div className="space-y-2">
+                    <TagInput
+                      value={value || []}
+                      onChange={onChange}
+                      placeholder="Add tags..."
+                      className="w-full"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="robots"
@@ -616,6 +643,7 @@ export function CurrentArticleForm({
             )}
           />
 
+          
           <FormField
             control={form.control}
             name="ogTitle"

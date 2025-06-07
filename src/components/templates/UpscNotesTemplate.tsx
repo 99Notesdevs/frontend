@@ -5,6 +5,7 @@ import SidebarNavigation from "@/components/navigation/SidebarNavigation";
 import SocialMedia from "@/components/navigation/socialmedia";
 import { BaseTemplateProps } from "./types";
 import Ads from "../navigation/Ads";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
@@ -81,6 +82,10 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
           {/* Responsive container */}
           <div className="max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-8 pt-4 lg:pt-7 lg:py-10">
+          <Breadcrumb
+            containerClasses="bg-muted/40 px-4 rounded-md"
+            activeClasses="font-semibold"
+          />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-4 lg:mt-7">
               {/* Adjust sidebar width */}
               <aside className="lg:col-span-4 order-2 lg:order-1 mb-6 lg:mb-0">

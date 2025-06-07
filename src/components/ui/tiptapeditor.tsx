@@ -282,6 +282,29 @@ const CustomImage = Image.extend({
   },
 });
 
+// Custom Link extension with title and description support
+const CustomLink = Link.extend({
+  addAttributes() {
+    return {
+      href: {
+        default: null,
+      },
+      title: {
+        default: null,
+      },
+      'data-description': {
+        default: null,
+      },
+      'data-title': {
+        default: null,
+      },
+    };
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['a', HTMLAttributes, 0];
+  },
+});
+
 const PRESET_COLORS = [
   '#000000', // Black
   '#343A40', // Dark Gray
@@ -788,6 +811,12 @@ const FONT_SIZES = {
 };
 
 const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkData, setLinkData] = useState({
+    url: '',
+    title: '',
+    description: ''
+  });
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [htmlContent, setHtmlContent] = useState("");
   const [currentSize, setCurrentSize] = useState("Normal");
@@ -927,7 +956,12 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       }),
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       CodeBlockLowlight.configure({ lowlight }),
-      Link.configure({ openOnClick: false }),
+      CustomLink.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-500 underline hover:text-blue-700',
+        },
+      }),
       CustomImage, // Use our custom resizable image extension
       TextAlign.configure({ types: ["heading", "paragraph", "image"] }),
       Color,
@@ -1080,12 +1114,46 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       .run();
   };
 
+  const handleLinkSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editor) return;
+
+    const { url, title, description } = linkData;
+
+    // Remove the link if the URL is empty
+    if (url === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else {
+      // Update the link with all attributes
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .setLink({ 
+          href: url,
+          'data-title': title,
+          'data-description': description 
+        } as any)
+        .run();
+    }
+    
+    setLinkDialogOpen(false);
+  };
+
   const setLink = () => {
     if (!editor) return;
-    const url = window.prompt("Enter URL");
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
-    }
+    
+    const previousUrl = editor.getAttributes('link').href || '';
+    const previousTitle = editor.getAttributes('link').title || '';
+    const previousDescription = editor.getAttributes('link')['data-description'] || '';
+    
+    setLinkData({
+      url: previousUrl,
+      title: previousTitle,
+      description: previousDescription
+    });
+    
+    setLinkDialogOpen(true);
   };
 
   if (!editor) {
@@ -1141,6 +1209,75 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       />
       
       {/* Image Dialog */}
+      {/* Link Dialog */}
+      {linkDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-medium mb-4">Add/Edit Link</h3>
+            <form onSubmit={handleLinkSubmit}>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
+                    URL <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="url"
+                    type="url"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="https://example.com"
+                    value={linkData.url}
+                    onChange={(e) => setLinkData({...linkData, url: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                    Title
+                  </label>
+                  <input
+                    id="title"
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Link title (optional)"
+                    value={linkData.title}
+                    onChange={(e) => setLinkData({...linkData, title: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Link description (optional)"
+                    value={linkData.description}
+                    onChange={(e) => setLinkData({...linkData, description: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setLinkDialogOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLinkSubmit}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Apply
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
       {imageDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
