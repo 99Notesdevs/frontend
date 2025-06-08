@@ -72,7 +72,12 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
     const callback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          setActiveId(entry.target.id);
+          const id = entry.target.id;
+          setActiveId(id);
+          // Update URL hash without triggering scroll
+          if (window.location.hash !== `#${id}`) {
+            window.history.replaceState({}, '', `#${id}`);
+          }
         }
       });
     };
@@ -119,6 +124,9 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                   if (target) {
                     // Close the TOC
                     closeToc();
+                    
+                    // Update the URL with the hash without page reload
+                    window.history.pushState({}, '', `#${heading.id}`);
                     
                     // Calculate the offset for the navbar
                     const navbar = document.querySelector('nav');
