@@ -23,7 +23,7 @@ interface Question {
   multipleCorrectType: boolean;
   pyq: boolean;
   year: number | null;
-  acceptance: number | null;
+  rating: number | null;
 }
 
 import { useRef } from "react";
@@ -48,7 +48,7 @@ const formRef = useRef<HTMLDivElement>(null);
     multipleCorrectType: false,
     pyq: false,
     year: null,
-    acceptance: null
+    rating: null
   });
   const [toast, setToast] = useState<{
     message: string;
@@ -209,7 +209,7 @@ const formRef = useRef<HTMLDivElement>(null);
         multipleCorrectType: false,
         pyq: false,
         year: null,
-        acceptance: null
+        rating: null
       });
       
       // Scroll to the top of the questions list
@@ -332,7 +332,7 @@ const formRef = useRef<HTMLDivElement>(null);
         multipleCorrectType: false,
         pyq: false,
         year: null,
-        acceptance: null
+        rating: null
       });
     } catch (error) {
       console.error("Error updating question:", error);
@@ -352,7 +352,7 @@ const formRef = useRef<HTMLDivElement>(null);
       multipleCorrectType: false,
       pyq: false,
       year: null,
-      acceptance: null
+      rating: null
     });
   };
 
@@ -609,16 +609,16 @@ const formRef = useRef<HTMLDivElement>(null);
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="acceptance" className="block text-sm font-medium text-gray-700">
-                      Acceptance Rate
+                    <label htmlFor="rating" className="block text-sm font-medium text-gray-700">
+                      Rating
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <input
                         type="number"
-                        id="acceptance"
-                        value={newQuestion.acceptance || ''}
+                        id="rating"
+                        value={newQuestion.rating || ''}
                         onChange={(e) =>
-                          setNewQuestion({ ...newQuestion, acceptance: e.target.value ? parseInt(e.target.value) : null })
+                          setNewQuestion({ ...newQuestion, rating: e.target.value ? parseInt(e.target.value) : null })
                         }
                         className="block w-full rounded-md border-gray-300 pl-4 pr-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm"
                         placeholder="e.g., 75"
