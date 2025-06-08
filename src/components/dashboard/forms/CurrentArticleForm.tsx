@@ -270,7 +270,7 @@ export function CurrentArticleForm({
           } else {
             form.setValue(
               "imageUrl",
-              JSON.stringify(["www.google.com/fallbackUrl", ""]),
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
               {
                 shouldValidate: true,
               }
