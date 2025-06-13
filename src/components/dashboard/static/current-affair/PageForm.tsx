@@ -365,30 +365,31 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setError(null);
       setIsLoading(prev => ({ ...prev, creatingArticle: true, formSubmitting: true }));
       
+      
       // Validate all required fields
       if (!data.title) {
         throw new Error('Title is required');
       }
-
+      
       if (!selectedAffairId) {
         throw new Error('Please select a current affair');
       }
-
+      
       const selectedAffair = currentAffairs.find(
         affair => affair.id.toString() === selectedAffairId
       );
-
+      
       if (!selectedAffair) {
         throw new Error('Selected current affair not found');
       }
-
+      
       // Create slug from title with current-affairs prefix
       const articleBaseSlug = data.title
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
       const articleSlug = `${selectedAffair.slug}/${articleBaseSlug}`;
-
+      
       // Handle content based on template type
       let content = '';
       if (selectedTemplate === 'article') {
@@ -397,7 +398,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       else{
         content = "dummy";
       }
-
+      
       const articlePayload = {
         title: data.title,
         content,
@@ -427,7 +428,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           body: data.body,
         })
       };
-
+      
       const response = await fetch(`${env.API}/currentArticle`, {
         method: 'POST',
         headers: {
@@ -436,9 +437,31 @@ export function PageForm({ editPage = null }: PageFormProps) {
         },
         body: JSON.stringify(articlePayload)
       });
-
+      
       if (!response.ok) {
         throw new Error('Failed to create article');
+      }
+      // Create blogs first if they exist
+      if (data.blogs && data.blogs.length > 0) {
+        // Process each blog individually
+        for (const blog of data.blogs) {
+          const response = await fetch(`${env.API}/currentBlog`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              ...blog,
+              parentSlug: articleSlug,
+              author: data.author
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to create blog: ${blog.title}`);
+          }
+        }
       }
 
       showToast('Article created successfully!', 'success');

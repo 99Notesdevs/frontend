@@ -18,6 +18,16 @@ interface CurrentAffairType {
   slug: string;
   author: string;
   link: string | null;
+  blogs: {
+    id: string;
+    title: string;
+    content: string;
+    slug: string;
+    author: string;
+    parentSlug: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
   parentSlug: string;
   metadata?: string;
   createdAt: Date;
@@ -86,7 +96,6 @@ export default function ArticlesPage() {
         },
         body: JSON.stringify(updateData)
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to update article');
@@ -373,6 +382,8 @@ export default function ArticlesPage() {
                     title: selectedPage.title,
                     content: selectedPage.content || '',
                   author: selectedPage.author || '',
+                  blogs: selectedPage.blogs || [],  
+                  slug: selectedPage.slug || '',
                   imageUrl: selectedPage.imageUrl || '',
                   metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
                   metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',

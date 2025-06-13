@@ -7,8 +7,20 @@ import QuizWrapper from "@/components/quiz/QuizWrapper";
 import Whatsapp from "@/components/ui/whatsapp";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { Tag } from "lucide-react";
+import { Tags } from "@/components/ui/tags/Tags";
 
 // Define types for the data
+interface CurrentAffairBlog {
+  id: number;
+  title: string;
+  content?: string;
+  slug: string;
+  tags?: string[];
+  author?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  parentSlug?: string;
+}
 interface CurrentAffairArticle {
   id: number;
   title: string;
@@ -20,7 +32,7 @@ interface CurrentAffairArticle {
   updatedAt?: string;
   parentSlug?: string;
   parentId?: number;
-
+  blogs?: CurrentAffairBlog[];
   quizQuestions?: string;
 }
 
@@ -88,6 +100,7 @@ const CurrentAffairArticlePage = async ({
   
   // Fetch the article
   const article = await fetchArticle(category, articleSlug);
+  console.log(article);
   const quizQuestions =  JSON.parse(article?.quizQuestions || "[]");
   // @ts-ignore
   const jsonLD = JSON.parse(article?.metadata).schemaData || "{}";
@@ -105,6 +118,7 @@ const CurrentAffairArticlePage = async ({
 
         {article ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
             {/* Main content column - adjusting padding top for mobile */}
             <div className="lg:col-span-8 xl:col-span-8 pt-4 lg:pt-[50px]">
               <div className="bg-white border rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 mb-4">
@@ -153,7 +167,8 @@ const CurrentAffairArticlePage = async ({
                     </>
                   )}
                 </div>
-                <div
+                <div 
+                  key={1235}
                   className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
                   prose-headings:font-semibold
                   prose-headings:tracking-normal
@@ -221,9 +236,36 @@ const CurrentAffairArticlePage = async ({
                     <p>No content available for this article.</p>
                   )}
                 </div>
+                <div>ok</div>
+                {article.blogs && article.blogs.length > 0 && (
+                  <div className="mt-12 space-y-12">
+                    {article.blogs.map((blog) => (
+                      <article 
+                        key={blog.id}
+                        className="prose prose-sm sm:prose-base lg:prose-lg max-w-none pt-8 border-t border-gray-200"
+                      >
+                        
+                        {blog.content && (
+                          <div 
+                            className="text-gray-700"
+                            dangerouslySetInnerHTML={{ __html: blog.content }} 
+                          />
+                        )}
+                        
+                        {blog.tags && blog.tags.length > 0 && (
+                          <div className="mt-8">
+                            <Tags tags={blog.tags.map((tag: any) => ({ name: typeof tag === 'string' ? tag : tag.name || '' }))} />
+                          </div>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-
+            
+            {/* Blogs Section - Integrated with content */}
+            
             {/* Right Sidebar - increasing width */}
             <div className="lg:col-span-4 hidden lg:block space-y-4 sm:space-y-6 mt-12">
               {/* Sticky Container */}
@@ -236,12 +278,14 @@ const CurrentAffairArticlePage = async ({
                     Table of Contents
                   </h3>
                   <div className="pr-2">
-                    <TableOfContents content={article?.content} />
+                    <TableOfContents 
+                      content={article?.content || ''} 
+                    />
                   </div>
                 </div>
               </div>
+              </div>
             </div>
-          </div>
           </div>        ) : (
           <div className="text-center py-16 bg-white/80 backdrop-blur-sm rounded-2xl
             shadow-xl max-w-2xl mx-auto border border-gray-200">
