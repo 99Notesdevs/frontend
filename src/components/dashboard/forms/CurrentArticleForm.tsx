@@ -29,12 +29,15 @@ import {
 } from "@/components/ui/select";
 import { TagInput } from "@/components/ui/tags/tag-input";
 import DraftDialog from "@/components/ui/DraftDialog";
+import { Plus, X, Pencil, Trash2 } from "lucide-react";
+import { BlogsManager, Blog } from "@/components/dashboard/static/current-affair/BlogsManager";
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   content: z.string().min(10, "Content must be at least 10 characters"),
   tags: z.array(z.string()).optional(),
   imageUrl: z.string().optional(),
+  slug: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -53,6 +56,7 @@ const formSchema = z.object({
   header: z.string().optional(),
   body: z.string().optional(),
   author: z.string().optional(),
+  blogs: z.array(z.any()).optional(),
 });
 
 export type CurrentArticleFormValues = z.infer<typeof formSchema>;
@@ -96,16 +100,38 @@ export function CurrentArticleForm({
     type: "success" | "error";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [drafts, setDrafts] = useState<
-    {
-      title: string;
-      data: CurrentArticleFormValues & {
-        imageUrl: string | undefined;
-        showInNav: boolean | undefined;
-        quizQuestions: string;
-      };
-    }[]
-  >([]);
+  const [drafts, setDrafts] = useState<{
+    title: string;
+    data: any;
+  }[]>([]);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      tags: [],
+      blogs: [],
+      ...defaultValues,
+    },
+  });
+
+  const handleBlogsChange = (blogs: Blog[]) => {
+    // Ensure we're only storing the necessary blog data
+    const normalizedBlogs = blogs.map(blog => ({
+      id: blog.id,
+      title: blog.title,
+      content: blog.content,
+      slug: blog.slug,
+      tags: blog.tags?.map(tag => typeof tag === 'string' ? tag : tag || '') || [],
+      author: blog.author,
+      parentSlug: blog.parentSlug,
+      createdAt: blog.createdAt,
+      updatedAt: blog.updatedAt
+    }));
+    
+    form.setValue("blogs", normalizedBlogs);
+  };
 
   useEffect(() => {
     const savedDrafts = localStorage.getItem("currentArticleDrafts");
@@ -117,7 +143,10 @@ export function CurrentArticleForm({
       }
     }
   }, []);
-
+  const slug = defaultValues?.slug || form.watch("title")
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
   const loadDraft = () => {
     const savedDrafts = localStorage.getItem("currentArticleDrafts");
     if (savedDrafts) {
@@ -137,7 +166,6 @@ export function CurrentArticleForm({
           draft.title === title
       );
       if (selectedDraft) {
-        // The quiz questions are already in JSON string format
         const draftData = {
           ...selectedDraft.data,
         };
@@ -155,21 +183,29 @@ export function CurrentArticleForm({
     try {
       const draftTitle = form.getValues("title") || "Untitled Draft";
       const draftData = form.getValues();
-
+      const currentBlogs = form.getValues("blogs") || [];
+  
       const savedDrafts = localStorage.getItem("currentArticleDrafts");
       const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
-
-      // Remove any existing draft with the same title
+  
       const filteredDrafts = existingDrafts.filter(
         (draft: { title: string; data: CurrentArticleFormValues }) =>
           draft.title !== draftTitle
       );
-
-      // Add the new draft with all form data
+  
       const newDraft = {
         title: draftTitle,
         data: {
           ...draftData,
+          blogs: currentBlogs.map(blog => ({
+            ...blog,
+            // Ensure tags are in the correct format (array of strings)
+            tags: blog.tags?.map((tag: any) => {
+              if (typeof tag === 'string') return tag;
+              if (tag && typeof tag === 'object' && 'name' in tag) return tag.name;
+              return String(tag);
+            }).filter(Boolean) || []
+          })),
           imageUrl: draftData.imageUrl || imagePreview,
           showInNav: false,
           quizQuestions:
@@ -183,20 +219,16 @@ export function CurrentArticleForm({
                 explanation: "",
               },
             ]),
-        } as CurrentArticleFormValues & {
-          imageUrl: string | undefined;
-          showInNav: boolean | undefined;
-          quizQuestions: string;
         },
       };
-
+  
       console.log("newDraft", newDraft);
       const updatedDrafts = [...filteredDrafts, newDraft];
       localStorage.setItem(
         "currentArticleDrafts",
         JSON.stringify(updatedDrafts)
       );
-
+  
       setDrafts(updatedDrafts);
       setAlert({
         message: "Draft saved successfully!",
@@ -216,35 +248,6 @@ export function CurrentArticleForm({
     setShowDraftDialog(false);
   };
 
-  const form = useForm<CurrentArticleFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      content: "",
-      tags: [],
-      imageUrl: JSON.stringify(["", ""]), // Default empty values as stringified array
-      metaTitle: "",
-      metaDescription: "",
-      metaKeywords: "",
-      quizQuestions: "",
-      robots: "",
-      ogTitle: "",
-      ogDescription: "",
-      ogImage: "",
-      ogType: "",
-      twitterCard: "",
-      twitterTitle: "",
-      twitterDescription: "",
-      twitterImage: "",
-      canonicalUrl: "",
-      schemaData: "",
-      header: "",
-      body: "",
-      author: "",
-      ...defaultValues,
-    },
-  });
-
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const file = e.target.files?.[0];
@@ -253,16 +256,14 @@ export function CurrentArticleForm({
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
-          // Show a preview of the image
           const result = reader.result as string;
           setImagePreview(result);
           console.log(file);
 
-          // Upload the image to S3
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "CurrentArticle", file.name); // Call your S3 upload function
+          const s3Url = await uploadImageToS3(formData, "CurrentArticle", file.name);
           if (s3Url) {
             form.setValue("imageUrl", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
@@ -287,43 +288,43 @@ export function CurrentArticleForm({
   };
 
   const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const file = e.target.files?.[0];
-      if (file) {
-        setIsUploading(true);
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          try {
-            const result = reader.result as string;
-            setOgImagePreview(result);
-  
-            const formData = new FormData();
-            formData.append("imageUrl", file);
-  
-            const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
-            if (s3Url) {
-              form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+    e.preventDefault();
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const result = reader.result as string;
+          setOgImagePreview(result);
+
+          const formData = new FormData();
+          formData.append("imageUrl", file);
+
+          const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
+          if (s3Url) {
+            form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+              shouldValidate: true,
+            });
+          } else {
+            form.setValue(
+              "ogImage",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
                 shouldValidate: true,
-              });
-            } else {
-              form.setValue(
-                "ogImage",
-                JSON.stringify(["/www.google.com/fallbackUrl", ""]),
-                {
-                  shouldValidate: true,
-                }
-              );
-              throw new Error("Failed to upload image to S3");
-            }
-          } catch (error) {
-            console.error("Error uploading image:", error);
-          } finally {
-            setIsUploading(false);
+              }
+            );
+            throw new Error("Failed to upload image to S3");
           }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="relative">
@@ -643,7 +644,6 @@ export function CurrentArticleForm({
             )}
           />
 
-          
           <FormField
             control={form.control}
             name="ogTitle"
@@ -844,6 +844,24 @@ export function CurrentArticleForm({
               </FormItem>
             )}
           />
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Blogs</h3>
+            <BlogsManager
+              initialBlogs={(form.watch("blogs") || []).map(blog => ({
+                ...blog,
+                // Ensure tags are in the correct format (array of strings)
+                tags: blog.tags?.map((tag: any) => {
+                  if (typeof tag === 'string') return tag;
+                  if (tag && typeof tag === 'object' && 'name' in tag) return tag.name;
+                  return String(tag);
+                }).filter(Boolean) || []
+              }))}
+              onChange={handleBlogsChange}
+              currentAffairSlug={slug}
+              currentAffairAuthor={form.watch("author")}
+            />
+          </div>
 
           <Button
             type="button"
