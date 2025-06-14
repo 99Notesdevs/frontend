@@ -209,7 +209,18 @@ const MediaLibrary = () => {
                 title="Copy URL"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText(url);
+                  if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url);
+                  } else {
+                    // Fallback for older browsers
+                    const tempInput = document.createElement("input");
+                    tempInput.value = url;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+                    alert("URL copied to clipboard!");
+                  }
                 }}
               >
                 {/* Simple link icon (SVG) */}
@@ -230,14 +241,41 @@ const MediaLibrary = () => {
               </button>
 
               <div className="w-full h-full relative">
-                <Image
-                  src={url}
-                  alt={`Media ${index + 1}`}
-                  fill
-                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority={index < 6} // Load first 6 images with priority
-                />
+                {!url.toLowerCase().endsWith(".pdf") ? (
+                  <Image
+                    src={url}
+                    alt={`Media ${index + 1}`}
+                    fill
+                    className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    priority={index < 6} // Load first 6 images with priority
+                  />
+                ) : (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center justify-center w-full h-full"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-16 w-16 text-red-500 mb-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    <span className="text-xs text-gray-700 font-semibold">
+                      View PDF
+                    </span>
+                  </a>
+                )}
               </div>
               {selectedFiles.includes(url) && (
                 <div className="absolute inset-0 bg-blue-600 bg-opacity-60 flex items-center justify-center pointer-events-none z-10">
@@ -247,7 +285,9 @@ const MediaLibrary = () => {
                 </div>
               )}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-                <p className="truncate text-xs font-medium">{url.split('/').pop()}</p>
+                <p className="truncate text-xs font-medium">
+                  {url.split("/").pop()}
+                </p>
                 <p className="text-xs text-gray-300 truncate">
                   {new URL(url).hostname}
                 </p>
@@ -298,7 +338,7 @@ const MediaLibrary = () => {
             </select>
             <input
               type="file"
-              accept="image/*"
+              accept="*/*"
               onChange={async (e) => {
                 setUploading(true);
                 try {
