@@ -209,7 +209,18 @@ const MediaLibrary = () => {
                 title="Copy URL"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText(url);
+                  if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url);
+                  } else {
+                    // Fallback for older browsers
+                    const tempInput = document.createElement("input");
+                    tempInput.value = url;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+                    alert("URL copied to clipboard!");
+                  }
                 }}
               >
                 {/* Simple link icon (SVG) */}
