@@ -67,28 +67,6 @@ export function BlogsManager({
 
       // If we're editing an existing blog, update it
       if (isEditing) {
-        const response = await fetch(`${env.API}/currentBlog/${isEditing}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(blogData)
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to update blog');
-        }
-
-        const updatedBlogs = blogs.map(blog => 
-          blog.id === isEditing ? { ...blog, ...blogData } : blog
-        );
-        
-        setBlogs(updatedBlogs);
-        onChange(updatedBlogs);
-      } 
-      // Otherwise, create a new blog
-      else {
         const response = await fetch(`${env.API}/currentBlog`, {
           method: 'POST',
           headers: {
@@ -102,8 +80,16 @@ export function BlogsManager({
           throw new Error('Failed to add blog');
         }
 
-        const newBlog = await response.json();
-        const updatedBlogs = [...blogs, { ...newBlog, ...blogData }];
+        const updatedBlogs = blogs.map(blog => 
+          blog.id === isEditing ? { ...blog, ...blogData } : blog
+        );
+        
+        setBlogs(updatedBlogs);
+        onChange(updatedBlogs);
+      } 
+      // Otherwise, create a new blog
+      else {
+        const updatedBlogs = [...blogs, { ...currentBlog, ...blogData }];
         
         setBlogs(updatedBlogs);
         onChange(updatedBlogs);
