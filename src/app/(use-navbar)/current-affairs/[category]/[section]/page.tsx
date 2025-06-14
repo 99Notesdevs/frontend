@@ -10,12 +10,19 @@ import { Tag } from "lucide-react";
 import { Tags } from "@/components/ui/tags/Tags";
 
 // Define types for the data
+interface Tag {
+  id?: number;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface CurrentAffairBlog {
   id: number;
   title: string;
   content?: string;
   slug: string;
-  tags?: string[];
+  tags?: (string | Tag)[];
   author?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -26,6 +33,7 @@ interface CurrentAffairArticle {
   title: string;
   content?: string;
   slug: string;
+  tags?: string[];
   author?: string;
   metadata?: string;
   createdAt?: string;
@@ -236,28 +244,49 @@ const CurrentAffairArticlePage = async ({
                     <p>No content available for this article.</p>
                   )}
                 </div>
-                <div>ok</div>
+
+                {/* Blog content with tags */}
                 {article.blogs && article.blogs.length > 0 && (
                   <div className="mt-12 space-y-12">
-                    {article.blogs.map((blog) => (
-                      <article 
-                        key={blog.id}
-                        className="prose prose-sm sm:prose-base lg:prose-lg max-w-none pt-8 border-t border-gray-200"
-                      >
-                        
-                        {blog.content && (
-                          <div 
-                            className="text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: blog.content }} 
-                          />
-                        )}
-                        
-                        {blog.tags && blog.tags.length > 0 && (
-                          <div className="mt-8">
-                            <Tags tags={blog.tags.map((tag: any) => ({ name: typeof tag === 'string' ? tag : tag.name || '' }))} />
-                          </div>
-                        )}
-                      </article>
+                    {article.blogs.map((blog, index) => (
+                      <div key={blog.id} id={`blog-${index}`}>
+                        <article 
+                          className="prose prose-sm sm:prose-base lg:prose-lg max-w-none pt-8 border-t border-gray-200"
+                        >
+                          {blog.tags && blog.tags.length > 0 && (
+                            <div className="mb-4 flex flex-wrap gap-2">
+                              {blog.tags.map((tag, i) => (
+                                <span 
+                                  key={i}
+                                  className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                                >
+                                  {typeof tag === 'string' ? tag : tag.name || ''}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {blog.content && (
+                            <div 
+                              className="text-gray-700"
+                              dangerouslySetInnerHTML={{ 
+                                __html: blog.content.replace(
+                                  /<h2[^>]*>([\s\S]*?)<\/h2>/g, 
+                                  (match, content) => {
+                                    const cleanText = content
+                                      .toLowerCase()
+                                      .replace(/[^\w\s]/g, '')
+                                      .replace(/\s+/g, '-')
+                                      .replace(/-+/g, '-')
+                                      .replace(/^-+|-+$/g, '');
+                                    const id = cleanText || `blog-${index}-heading`;
+                                    return `<h2 id="${id}">${content}</h2>`;
+                                  }
+                                ) 
+                              }} 
+                            />
+                          )}
+                        </article>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -271,22 +300,25 @@ const CurrentAffairArticlePage = async ({
               {/* Sticky Container */}
               <div className="relative">
                 {/* TOC Section */}
-              <div className="sticky top-8 space-y-4 sm:space-y-6">
-                <div className="bg-white border border-blue-100 rounded-lg shadow-lg p-4 sm:p-6 
-                  transition-all duration-300 hover:shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-blue-200 pb-2">
-                    Table of Contents
-                  </h3>
-                  <div className="pr-2">
-                    <TableOfContents 
-                      content={article?.content || ''} 
-                    />
+                {article.blogs && article.blogs.length > 0 && (
+                  <div className="sticky top-8 space-y-4 sm:space-y-6">
+                    <div className="bg-white border border-blue-100 rounded-lg shadow-lg p-4 sm:p-6 transition-all duration-300 hover:shadow-xl">
+                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-blue-200 pb-2">
+                        Table of Contents
+                      </h3>
+                      <TableOfContents 
+                        content={article.content || ''}
+                        blogs={article.blogs?.map(blog => ({
+                          content: blog.content || ''
+                        })) || []}
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
+                )}
               </div>
             </div>
-          </div>        ) : (
+          </div>
+        ) : (
           <div className="text-center py-16 bg-white/80 backdrop-blur-sm rounded-2xl
             shadow-xl max-w-2xl mx-auto border border-gray-200">
             <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>

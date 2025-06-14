@@ -261,6 +261,49 @@ h6 {
   min-width: 0;
 }
 
+/* Heading highlight animation */
+.highlight-heading {
+  position: relative;
+  animation: highlight-fade 2s ease-in-out;
+}
+
+@keyframes highlight-fade {
+  0% {
+    background-color: rgba(253, 230, 138, 0.5);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Ensure headings have pointer cursor and proper spacing */
+.prose h2 {
+  cursor: pointer;
+  position: relative;
+  padding-left: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.prose h2:hover {
+  color: var(--action-primary);
+}
+
+/* Add a subtle indicator for TOC-linked headings */
+.prose h2::before {
+  content: '#';
+  position: absolute;
+  left: 0;
+  color: var(--action-primary);
+  opacity: 0;
+  transform: translateX(-0.5rem);
+  transition: all 0.2s ease;
+}
+
+.prose h2:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 /* Floating image styles */
 .ProseMirror .floating-image {
   display: block;

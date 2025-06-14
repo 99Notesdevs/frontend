@@ -53,7 +53,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
   // const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [mainContentFinal, setMainContentFinal] = useState(content || "");
+  const [mainContentFinal, setMainContentFinal] = useState("");
   const token = Cookies.get("token");
   // @ts-ignore
   const jsonLD = parsedMetadata.schemaData;
@@ -218,16 +218,46 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     checkAuthorization();
   }, [token]);
 
+  // Process content and add IDs to headings
+  const processContentWithIds = useCallback((html: string): string => {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Process h2 headings
+      const headings = doc.querySelectorAll('h2');
+      headings.forEach((heading, index) => {
+        const text = heading.textContent || '';
+        const id = text
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '') || `heading-${index}`;
+        
+        heading.id = id;
+      });
+      
+      return doc.body.innerHTML;
+    } catch (error) {
+      console.error('Error processing content:', error);
+      return html;
+    }
+  }, []);
+
   useEffect(() => {
     const processContentAsync = async () => {
-      if (isAuthorized !== null) {
-        const result = await processContent(content || "", isAuthorized);
-        setMainContentFinal(result);
+      if (isAuthorized !== null && content) {
+        // First process the locked content
+        let processedContent = await processContent(content, isAuthorized);
+        // Then add IDs to headings
+        processedContent = processContentWithIds(processedContent);
+        setMainContentFinal(processedContent);
       }
     };
 
     processContentAsync();
-  }, [isAuthorized, content]);
+  }, [isAuthorized, content, processContentWithIds]);
 
   if (isAuthorized === null) {
     return (
@@ -369,9 +399,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     /* Custom styles for tables and iframes */
                     prose-table:block prose-table:w-full prose-table:overflow-x-auto
                     prose-iframe:max-w-full prose-iframe:w-full prose-iframe:aspect-video"
-                  >
-                    {mainContentFinal}
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: mainContentFinal }}
+                  />
                 </div>
                 {page.FAQ && (
                   <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
