@@ -1,3 +1,9 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import axios from 'axios';
+import { env } from '@/config/env';
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import StudyMaterials from "@/components/StudyMaterials/Studymaterials";
 import CurrentAffairs from "@/components/CurrentAffairs/CurrentAffairs";
@@ -6,8 +12,6 @@ import FAQ from "@/components/common/FAQ/FAQ";
 import ContactMap from "@/components/common/Contact/ContactMap";
 import Reason99notes from "@/components/CoachingInfo/Reason99notes";
 import Slider from "@/components/About/Slider";
-import axios from "axios";
-import { env } from "@/config/env";
 
 interface HomeProps {
   Hero:{
@@ -50,31 +54,76 @@ interface HomeProps {
  }
 }
 
-export const dynamic = "force-dynamic";
+export default function Home() {
+  const [homeData, setHomeData] = useState<HomeProps | null>(null);
+  const [coreMemberImages, setCoreMemberImages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function Home() {
-  const response = await axios.get(`${env.API}/about-99-notes/coreMembers`);
-  const coreMemberImages = response.data.data;
-  
-  const data = await axios.get(`${env.API}/about-99-notes/home`);
-  const pageData = data.data.data; // Get the nested data object
-  const homeData : HomeProps = JSON.parse(pageData.content);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [membersResponse, homeResponse] = await Promise.all([
+          axios.get(`${env.API}/about-99-notes/coreMembers`),
+          axios.get(`${env.API}/about-99-notes/home`)
+        ]);
+        
+        setCoreMemberImages(membersResponse.data.data);
+        const pageData = homeResponse.data.data;
+        setHomeData(JSON.parse(pageData.content));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading || !homeData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen">
       {/* Hero Section with Contact Form */}
-      <section className="container w-full max-w-[2000px] px-6 lg:px-18">
+      <section className="container w-full max-w-[2000px] px-6 lg:px-18 mt-8 md:mt-0">
           <div className="md:flex justify-evenly items-center gap-20">
             {/* Left Column - Text Content */}
-            <div className="space-y-7 max-w-lg md:max-w-[320px] lg:max-w-lg">
-              <div className="space-y-4">
-                <h1 className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans">
-                  <span className="block" dangerouslySetInnerHTML={{ __html: homeData.Hero.title }}></span>
-                </h1>
+            <motion.div 
+              className="space-y-7 max-w-lg md:max-w-[320px] lg:max-w-lg"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <div className="space-y-4 overflow-hidden">
+                <motion.h1 
+                  className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+                >
+                  <motion.span 
+                    className="block" 
+                    dangerouslySetInnerHTML={{ __html: homeData.Hero.title }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+                  />
+                </motion.h1>
               </div>
-              <p className="text-base font-semibold text-[var(--text-strong)] leading-relaxed font-opensans">
+              <motion.p 
+                className="text-base font-semibold text-[var(--text-strong)] leading-relaxed font-opensans"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+              >
                 {homeData.Hero.description}
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
 
             {/* Right Column - Contact Form */}
             <div className="mt-12 mb-5 w-full max-w-lg md:max-w-[320px] lg:max-w-lg lg:ml-7">

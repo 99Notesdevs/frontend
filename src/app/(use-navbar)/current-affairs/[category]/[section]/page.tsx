@@ -161,12 +161,17 @@ const CurrentAffairArticlePage = async ({
                     {article.metadata && JSON.parse(article.metadata).tags?.length > 0 && (
                       <div className="flex flex-wrap gap-2 justify-center my-4">
                         {JSON.parse(article.metadata).tags.map((tag: string, index: number) => (
-                          <span 
+                          <Link
                             key={index}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800"
+                            href={`/tag/${encodeURIComponent(tag)}`}
+                            className="group"
                           >
-                            {tag}
-                          </span>
+                            <span 
+                              className="inline-block bg-yellow-50 text-[var(--primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer px-3 py-1 text-sm font-medium rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          </Link>
                         ))}
                       </div>
                     )}
@@ -255,14 +260,22 @@ const CurrentAffairArticlePage = async ({
                         >
                           {blog.tags && blog.tags.length > 0 && (
                             <div className="mb-4 flex flex-wrap gap-2">
-                              {blog.tags.map((tag, i) => (
-                                <span 
-                                  key={i}
-                                  className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
-                                >
-                                  {typeof tag === 'string' ? tag : tag.name || ''}
-                                </span>
-                              ))}
+                              {blog.tags.map((tag, i) => {
+                                const tagName = typeof tag === 'string' ? tag : tag.name || '';
+                                return (
+                                  <Link
+                                    key={i}
+                                    href={`/tag/${encodeURIComponent(tagName)}`}
+                                    className="group"
+                                  >
+                                    <span 
+                                      className="inline-block bg-yellow-50 text-[var(--primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer px-3 py-1 text-sm font-medium rounded-full"
+                                    >
+                                      {tagName}
+                                    </span>
+                                  </Link>
+                                );
+                              })}
                             </div>
                           )}
                           {blog.content && (

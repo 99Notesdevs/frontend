@@ -56,7 +56,7 @@ const FAQPage: React.FC<FAQProps> = ({ data }) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-3xl mx-auto px-4 py-5">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2 text-center">FAQ</h1>
+        <h2 className="text-4xl font-bold text-gray-900 mb-2 text-center">FAQ</h2>
         <p className="text-gray-600 text-center mb-12">Find answers to commonly asked questions</p>
         
         <div className="space-y-6">
@@ -69,9 +69,9 @@ const FAQPage: React.FC<FAQProps> = ({ data }) => {
                 className="w-full px-8 py-6 text-left focus:outline-none flex justify-between items-center group"
                 onClick={() => toggleQuestion(index)}
               >
-                <span className="text-lg text-gray-800 group-hover:text-indigo-600 transition-colors duration-200">
+                <h2 className="text-lg text-gray-800 group-hover:text-indigo-600 transition-colors duration-200 m-0">
                   {faq.question}
-                </span>
+                </h2>
                 <span 
                   className={`transform transition-transform duration-300 text-gray-400 group-hover:text-indigo-600 ${
                     openQuestion === index ? 'rotate-180' : ''
