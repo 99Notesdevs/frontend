@@ -37,21 +37,40 @@ interface Blog {
   }>;
 }
 
+interface CurrentArticleBlog {
+  id: number;
+  slug: string;
+  title: string;
+  content: string;
+  parentSlug: string;
+  createdAt: string;
+  updatedAt: string;
+  tags: Array<{
+    id: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+}
 export default function TagPage() {
   const [pages, setPages] = useState<Page[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [currentBlog, setCurrentBlog] = useState<CurrentArticleBlog | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState({
     pages: 1,
-    blogs: 1
+    blogs: 1,
+    currentBlog: 1
   });
   const [totalPages, setTotalPages] = useState({
     pages: 1,
-    blogs: 1
+    blogs: 1,
+    currentBlog: 1
   });
   const [totalItems, setTotalItems] = useState({
     pages: 0,
-    blogs: 0
+    blogs: 0,
+    currentBlog: 0
   });
   const router = useRouter();
   const pathname = usePathname();
@@ -71,13 +90,19 @@ export default function TagPage() {
         const blogsCountResponse = await fetch(`${env.API}/tag/blogs/count/${slug}`);
         const blogsCountData = await blogsCountResponse.json();
         
+        //Fetch currentBlog Count
+        const currentBlogCountResponse = await fetch(`${env.API}/tag/currentBlog/count/${slug}`);
+        const currentBlogCountData = await currentBlogCountResponse.json();
+        
         setTotalItems({
           pages: pagesCountData.data,
-          blogs: blogsCountData.data
+          blogs: blogsCountData.data,
+          currentBlog: currentBlogCountData.data
         });
         setTotalPages({
           pages: Math.ceil(pagesCountData.data / itemsPerPage),
-          blogs: Math.ceil(blogsCountData.data / itemsPerPage)
+          blogs: Math.ceil(blogsCountData.data / itemsPerPage),
+          currentBlog: Math.ceil(currentBlogCountData.data / itemsPerPage)
         });
       } catch (error) {
         console.error('Error fetching counts:', error);
@@ -97,6 +122,12 @@ export default function TagPage() {
         const responseBlogs = await fetch(`${env.API}/tag/blogs/${slug}?skip=${skipBlogs}&take=${itemsPerPage}`);
         const dataBlogs = await responseBlogs.json();
         setBlogs(dataBlogs.data);
+
+        // Fetch currentBlog
+        const skipCurrentBlog = (currentPage.currentBlog - 1) * itemsPerPage;
+        const responseCurrentBlog = await fetch(`${env.API}/tag/currentBlog/${slug}?skip=${skipCurrentBlog}&take=${itemsPerPage}`);
+        const dataCurrentBlog = await responseCurrentBlog.json();
+        setCurrentBlog(dataCurrentBlog.data);
       } catch (error) {
         console.error('Error fetching content:', error);
       } finally {
@@ -115,7 +146,7 @@ export default function TagPage() {
     router.push(`/blog/${slug}`);
   };
 
-  const handlePageChange = (type: 'pages' | 'blogs', page: number) => {
+  const handlePageChange = (type: 'pages' | 'blogs' | 'currentBlog', page: number) => {
     setCurrentPage(prev => ({ ...prev, [type]: page }));
     setLoading(true); // Show loading state while fetching new page
   };
@@ -134,7 +165,7 @@ export default function TagPage() {
   );
 
   // Empty state component
-  const EmptyState = ({ type }: { type: 'pages' | 'blogs' }) => (
+  const EmptyState = ({ type }: { type: 'pages' | 'blogs' | 'current affairs' }) => (
     <div className="text-center py-12 border rounded-lg">
       <TagIcon className="mx-auto h-12 w-12 text-gray-400" />
       <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No {type} found</h3>
@@ -327,6 +358,91 @@ export default function TagPage() {
           </div>
         ) : (
           <EmptyState type="blogs" />
+        )}
+      </section>
+      {/* Current Affairs Section */}
+      <section className="mb-12">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h2 className="text-2xl font-bold text-yellow-500">
+            Related Current Affairs
+          </h2>
+          {totalPages.currentBlog > 1 && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange('currentBlog', currentPage.currentBlog - 1)}
+                disabled={currentPage.currentBlog === 1 || loading}
+                className="h-8 w-8 p-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage.currentBlog} of {totalPages.currentBlog}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange('currentBlog', currentPage.currentBlog + 1)}
+                disabled={currentPage.currentBlog === totalPages.currentBlog || loading || !currentBlog}
+                className="h-8 w-8 p-0"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+        
+        {loading ? (
+          <div className="grid grid-cols-1 gap-6">
+            <CardSkeleton />
+          </div>
+        ) : currentBlog ? (
+          <Card 
+            className="group h-full flex flex-col hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+            onClick={() => router.push(`/${currentBlog.parentSlug}/#${currentBlog.slug}`)}
+          >
+            <CardHeader className="flex-1">
+              <CardTitle className="text-xl font-bold line-clamp-2 group-hover:text-green-600 transition-colors">
+                {currentBlog.title}
+              </CardTitle>
+              {currentBlog.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {currentBlog.tags.map((tag) => (
+                    <span 
+                      key={tag.id}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      <TagIcon className="h-3 w-3 mr-1" />
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </CardHeader>
+            <CardContent className="flex-1">
+              <div 
+                className="prose max-w-none line-clamp-3 text-muted-foreground"
+                dangerouslySetInnerHTML={{ __html: currentBlog.content }}
+              />
+            </CardContent>
+            <CardFooter className="border-t py-3">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="ml-auto group-hover:text-green-600 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/${currentBlog.parentSlug}/#${currentBlog.slug}`);
+                }}
+              >
+                Read More
+                <ArrowRight className="ml-1 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Button>
+            </CardFooter>
+          </Card>
+        ) : (
+          <EmptyState type="current affairs" />
         )}
       </section>
     </div>
