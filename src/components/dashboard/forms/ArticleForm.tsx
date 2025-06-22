@@ -34,7 +34,7 @@ const articleSchema = z.object({
   content: z.string(),
   imageUrl: z.string(), // Will store stringified array
   tags: z.array(z.string()).optional(),
-  category: z.string().optional(),
+  category: z.array(z.string()).optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -215,33 +215,45 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       setAlert(null);
       return { values, errors: {} };
     },
-    defaultValues: initialData || {
-      title: "",
-      content: "",
-      imageUrl: JSON.stringify(["", ""]), // Default empty values as stringified array
-      tags: [],
-      category: "",
-      metaTitle: "",
-      metaDescription: "",
-      metaKeywords: "",
-      robots: "",
-      ogTitle: "",
-      ogDescription: "",
-      ogImage: "",
-      ogType: "",
-      twitterCard: "",
-      twitterTitle: "",
-      twitterDescription: "",
-      twitterImage: "",
-      canonicalUrl: "",
-      schemaData: "",
-      header: "",
-      body: "",
-      showInNav: true,
-      questionNumber: undefined,
-      FAQ: "",
+    defaultValues: {
+      ...initialData,
+      category: initialData?.category || [],
     },
   });
+
+  const [currentSubcategory, setCurrentSubcategory] = useState("");
+  //@ts-ignore
+  const [mainCategory, setMainCategory] = useState(initialData?.category?.[0]?.name || "");
+  //@ts-ignore
+  const [subcategories, setSubcategories] = useState<string[]>(initialData?.category?.slice(1).map((cat) => cat.name) || []);
+
+  const addSubcategory = () => {
+    if (currentSubcategory.trim()) {
+      setSubcategories([...subcategories, currentSubcategory.trim()]);
+      setCurrentSubcategory("");
+    }
+  };
+
+  const removeSubcategory = (index: number) => {
+    setSubcategories(subcategories.filter((_, i) => i !== index));
+  };
+
+  const handleMainCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMainCategory(e.target.value);
+    form.setValue("category", [e.target.value]);
+  };
+
+  const handleSubmitForm = (data: ArticleFormData) => {
+    const transformedData = {
+      ...data,
+      category: [
+        mainCategory,  // First item is the main category
+        ...subcategories  // Followed by subcategories
+      ].filter(Boolean) as string[],
+    };
+    
+    onSubmit(transformedData);
+  };
 
   const handleEditorChange = (content: string) => {
     form.setValue("content", content, { shouldValidate: true });
@@ -317,36 +329,6 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleSubmitForm = (data: ArticleFormData) => {
-    const transformedData = {
-      title: data.title,
-      content: data.content,
-      imageUrl: data.imageUrl, // Send as stringified array
-      tags: data.tags || [],
-      category: data.category || "",
-      metaTitle: data.metaTitle,
-      metaDescription: data.metaDescription,
-      metaKeywords: data.metaKeywords,
-      robots: data.robots,
-      ogTitle: data.ogTitle,
-      ogDescription: data.ogDescription,
-      ogImage: data.ogImage,
-      ogType: data.ogType,
-      twitterCard: data.twitterCard,
-      twitterTitle: data.twitterTitle,
-      twitterDescription: data.twitterDescription,
-      twitterImage: data.twitterImage,
-      canonicalUrl: data.canonicalUrl,
-      schemaData: data.schemaData,
-      header: data.header,
-      body: data.body,
-      showInNav: data.showInNav,
-      questionNumber: data.questionNumber,
-      FAQ: data.FAQ,
-    };
-    onSubmit(transformedData);
   };
 
   return (
@@ -487,23 +469,48 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             )}
           />
 
-          {/* Category */}
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter category"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          {/* Categories */}
+          <div className="space-y-4">
+            <div>
+              <Label>Main Category</Label>
+              <div className="mb-4">
+                <Input
+                  value={mainCategory}
+                  onChange={handleMainCategoryChange}
+                  placeholder="Enter main category"
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>Subcategories</Label>
+              <div className="flex gap-2 mb-2">
+                <Input
+                  value={currentSubcategory}
+                  onChange={(e) => setCurrentSubcategory(e.target.value)}
+                  placeholder="Add subcategory"
+                />
+                <Button type="button" onClick={addSubcategory}>
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {subcategories.map((sub, index) => (
+                  <div key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center">
+                    {sub}
+                    <button
+                      type="button"
+                      onClick={() => removeSubcategory(index)}
+                      className="ml-2 text-gray-500 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* Metadata */}
           <div className="grid  gap-6">

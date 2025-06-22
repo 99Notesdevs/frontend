@@ -29,7 +29,7 @@ const formSchema = z.object({
   title: z.string(),
   content: z.string(),
   showInNav: z.boolean().default(true),
-  category: z.string().optional(),
+  category: z.array(z.string()).optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -213,7 +213,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       title: "",
       content: "",
       showInNav: true,
-      category: "",
+      category: [],
       metaTitle: "",
       metaDescription: "",
       metaKeywords: "",
@@ -233,10 +233,39 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       questionNumber: undefined,
     },
   });
+  const [currentSubcategory, setCurrentSubcategory] = useState("");
+  //@ts-ignore
+  const [mainCategory, setMainCategory] = useState(initialData?.category?.[0]?.name || "");
+  //@ts-ignore
+  const [subcategories, setSubcategories] = useState<string[]>(initialData?.category?.slice(1).map((cat) => cat.name) || []);
+
+  const addSubcategory = () => {
+    if (currentSubcategory.trim()) {
+      setSubcategories([...subcategories, currentSubcategory.trim()]);
+      setCurrentSubcategory("");
+    }
+  };
+
+  const removeSubcategory = (index: number) => {
+    setSubcategories(subcategories.filter((_, i) => i !== index));
+  };
+
+  const handleMainCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMainCategory(e.target.value);
+    form.setValue("category", [e.target.value]);
+  };
 
   const handleFormSubmit = async (data: FormData) => {
     try {
-      await onSubmit(data);
+      const transformedData = {
+        ...data,
+        category: [
+          mainCategory,  // First item is the main category
+          ...subcategories  // Followed by subcategories
+        ].filter(Boolean) as string[],
+      };
+      
+      await onSubmit(transformedData);
       setAlert({
         message: "Notes saved successfully!",
         type: "success",
@@ -335,23 +364,49 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               </FormItem>
             )}
           />
-          {/* Category */}
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter category"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+                    {/* Categories */}
+                    <div className="space-y-4">
+            <div>
+              <Label>Main Category</Label>
+              <div className="mb-4">
+                <Input
+                  value={mainCategory}
+                  onChange={handleMainCategoryChange}
+                  placeholder="Enter main category"
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>Subcategories</Label>
+              <div className="flex gap-2 mb-2">
+                <Input
+                  value={currentSubcategory}
+                  onChange={(e) => setCurrentSubcategory(e.target.value)}
+                  placeholder="Add subcategory"
+                />
+                <Button type="button" onClick={addSubcategory}>
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {subcategories.map((sub, index) => (
+                  <div key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center">
+                    {sub}
+                    <button
+                      type="button"
+                      onClick={() => removeSubcategory(index)}
+                      className="ml-2 text-gray-500 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Meta Title */}
           <FormField
             control={form.control}
