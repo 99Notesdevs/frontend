@@ -46,7 +46,7 @@ interface Page {
         name: string;
         pageId: string;
         parentTagId: string;
-    };
+    }[];
 }
 
 interface PageWithRelations extends Page {
@@ -67,7 +67,7 @@ interface PageFormData extends Record<string, any> {
   content?: string;
   imageUrl?: string;
   slug?: string;
-  category?: string;
+  category?: string[];
   link?: string;
   tags?: string[];
   questionNumber?: number;
@@ -160,7 +160,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     
     // Get the selected page to get its category ID
     const selectedPage = pages.find(p => p.id === value);
-    const category = selectedPage?.categories?.id;
+    const category = selectedPage?.categories?.[0]?.id;
     
     newLevels[level] = value === "_none" ? "" : value;
     newCategories[level] = category?.toString() || "";
@@ -289,7 +289,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         link: currentTemplate.id === "custom-link" ? formData.link : "",
         templateId: currentTemplate.id,
         parentId: parentId || null,
-        category: formData.category || "",
+        category: formData.category || [],
         tags: formData.tags || [],
         parentTagId: Number(categoryId) || "",
         FAQ: formData.FAQ || "",
