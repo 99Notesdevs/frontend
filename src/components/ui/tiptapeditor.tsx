@@ -825,6 +825,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const [imageSrc, setImageSrc] = useState<string>('');
   const [altText, setAltText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [htmlCursor, setHtmlCursor] = useState(0); // For HTML textarea cursor
+  const [tiptapSelection, setTiptapSelection] = useState<{ from: number; to: number } | null>(null); // For Tiptap selection
   
   // Add styles for the resizable image
   useEffect(() => {
@@ -1024,18 +1026,38 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     }
   }, [editor, content]);
 
+  // Helper: Get plain text up to a position in HTML
+  function getTextUpToHtmlPos(html: string, pos: number) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html.slice(0, pos), 'text/html');
+    return doc.body.textContent?.length || 0;
+  }
+
+  // Helper: Find HTML position for a given text offset
+  function findHtmlPosForTextOffset(html: string, offset: number) {
+    let textCount = 0;
+    for (let i = 0; i < html.length; i++) {
+      if (html[i] === '<') {
+        // Skip tag
+        while (i < html.length && html[i] !== '>') i++;
+      } else {
+        textCount++;
+        if (textCount === offset) return i + 1;
+      }
+    }
+    return html.length;
+  }
+
+  // When switching to HTML mode, store Tiptap selection and set textarea cursor
   const toggleHtmlMode = () => {
     if (!editor) return;
-
     if (!isHtmlMode) {
-      // Switching to HTML mode - preserve table styles
+      // Switching to HTML mode
       const content = editor.getHTML();
-      // Process content to ensure table styles are preserved
       const processedContent = content
         .replace(
           /<table([^>]*)>/g,
           (match, attrs) => {
-            // Keep existing style attribute if present
             if (attrs.includes('style=')) return match;
             return `<table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; margin: 0;"${attrs}>`;
           }
@@ -1043,7 +1065,6 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         .replace(
           /<t[hd]([^>]*)>/g,
           (match, attrs) => {
-            // Keep existing style attribute if present
             if (attrs.includes('style=')) return match;
             return `<td style="border: 1px solid #e5e7eb; padding: 4px 6px; margin: 0; line-height: 1.2;"${attrs}>`;
           }
@@ -1051,14 +1072,31 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         .replace(
           /<th([^>]*)>/g,
           (match, attrs) => {
-            // Keep existing style attribute if present
             if (attrs.includes('style=')) return match;
             return `<th style="border: 1px solid #e5e7eb; padding: 4px 6px; background-color: #f9fafb; margin: 0; line-height: 1.2;"${attrs}>`;
           }
         );
       setHtmlContent(processedContent);
+      // Store Tiptap selection
+      const { from, to } = editor.state.selection;
+      setTiptapSelection({ from, to });
+      // Map Tiptap selection to HTML cursor
+      const plainText = editor.getText();
+      const htmlPos = findHtmlPosForTextOffset(processedContent, from);
+      setTimeout(() => {
+        setHtmlCursor(htmlPos);
+      }, 0);
     } else {
-      // Switching back to rich text mode - preserve custom styles
+      // Switching back to rich text mode
+      // Store HTML cursor
+      const textarea = document.getElementById('tiptap-html-textarea') as HTMLTextAreaElement;
+      const cursor = textarea ? textarea.selectionStart : 0;
+      setHtmlCursor(cursor);
+      // Map HTML cursor to text offset
+      const textOffset = getTextUpToHtmlPos(htmlContent, cursor);
+      setTimeout(() => {
+        setTiptapSelection({ from: textOffset, to: textOffset });
+      }, 0);
       const contentWithPreservedStyles = htmlContent.replace(
         /<table[^>]*style="([^"]*)"[^>]*>/g,
         (match, style) => {
@@ -1070,6 +1108,26 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     }
     setIsHtmlMode(!isHtmlMode);
   };
+
+  // Set textarea cursor after switching to HTML mode
+  useEffect(() => {
+    if (isHtmlMode && typeof htmlCursor === 'number') {
+      const textarea = document.getElementById('tiptap-html-textarea') as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.setSelectionRange(htmlCursor, htmlCursor);
+        textarea.focus();
+      }
+    }
+  }, [isHtmlMode, htmlCursor]);
+
+  // Set Tiptap selection after switching back to rich text mode
+  useEffect(() => {
+    if (!isHtmlMode && tiptapSelection && editor) {
+      editor.commands.focus(tiptapSelection.from);
+      // Optionally, set selection range if needed
+      // editor.view.dispatch(editor.state.tr.setSelection(TextSelection.create(editor.state.doc, tiptapSelection.from, tiptapSelection.to)));
+    }
+  }, [isHtmlMode, tiptapSelection, editor]);
 
   const setFontSize = (sizeName: string) => {
     if (!editor) return;
@@ -1474,6 +1532,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
 
       {isHtmlMode ? (
         <textarea
+          id="tiptap-html-textarea"
           className="w-full min-h-[500px] p-4 font-mono text-sm focus:outline-none resize-none"
           value={formatHTML(htmlContent)}
           onChange={(e) => {
