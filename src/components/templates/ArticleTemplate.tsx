@@ -294,13 +294,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
         />
       </section>
       <main>
-        <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
+        <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
           {/* Assistive Touch */}
           <AssistiveTouch content={mainContentFinal} />
 
           <div
-            className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-10 py-4 sm:py-6
-        transition-all duration-300 md:peer-checked:pl-[280px] lg:peer-checked:pl-[320px]"
+            className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-10 py-4 sm:py-6"
           >
             <Breadcrumb
               containerClasses="bg-muted/40 px-4 py-2 rounded-md"
@@ -325,82 +324,13 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 )}
                 <Tags tags={page.tags} />
                 {/* Article Content */}
-                <div className="bg-white border rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
-                  {/* Article Header */}
-                  <div className="text-center mb-6">
-                    {page.parent && (
-                      <div className="mb-4">
-                        <a
-                          href={`/${page.parent.slug}`}
-                          className="text-[var(--action-primary)] hover:text-[var(--accent-link)] transition-colors"
-                        >
-                          {page.parent.title}
-                        </a>
-                      </div>
-                    )}
-
-                    <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-2">
-                      {parsedMetadata.metaTitle || title || "Untitled Article"}
-                    </h1>
+                <div className="bg-white shadow-xl w-full mb-8 sm:mb-10">
+                  <div className="p-5 sm:p-10">
+                    <div
+                      className="prose prose-lg max-w-none"
+                      dangerouslySetInnerHTML={{ __html: mainContentFinal }}
+                    />
                   </div>
-
-                  <div className="text-xs text-[var(--text-tertiary)] mb-4">
-                    {page.author && (
-                      <Link href={`${env.API}/author/${page.author.id}`}>
-                        {page.author.name}
-                      </Link>
-                    )}
-                    {page.admin && (
-                      <span className="text-[var(--text-tertiary)]">
-                        {page.admin.name}
-                      </span>
-                    )}
-                  </div>
-
-                  <WhatsApp />
-                  <div className="text-center mb-8 sm:mb-12"></div>
-
-                  <div
-                    className="prose prose-sm sm:prose-base lg:prose-lg max-w-none w-full overflow-x-auto
-                    prose-headings:font-semibold
-                    prose-headings:tracking-normal
-                    prose-headings:text-left
-                    prose-headings:relative
-                    prose-headings:mb-6
-                    
-                    prose-h1:text-3xl sm:prose-h1:text-4xl
-                    prose-h1:font-bold
-                    prose-h1:text-[var(--surface-dark)]
-                    prose-h1:leading-tight
-                    
-                    prose-h2:text-2xl sm:prose-h2:text-3xl
-                    prose-h2:text-[var(--text-strong)]
-                    prose-h2:pb-2
-                    prose-h2:after:content-['']
-                    prose-h2:after:block
-                    prose-h2:after:w-16
-                    prose-h2:after:h-[2px]
-                    prose-h2:after:mt-2
-                    prose-h2:after:bg-[var(--primary)]
-                    prose-h2:after:rounded-full
-                    
-                    prose-h3:text-xl sm:prose-h3:text-2xl
-                    prose-h3:text-[var(--text-tertiary)]
-                    
-                    prose-p:text-[var(--text-tertiary)]
-                    prose-strong:text-[var(--surface-dark)]
-                    prose-a:text-[var(--action-primary)]
-                    prose-a:border-[var(--info-surface)]
-                    prose-a:hover:border-[var(--accent-link)]
-                    
-                    prose-blockquote:border-l-[var(--action-primary)]
-                    prose-blockquote:bg-[var(--bg-subtle)]
-                    
-                    /* Custom styles for tables and iframes */
-                    prose-table:block prose-table:w-full prose-table:overflow-x-auto
-                    prose-iframe:max-w-full prose-iframe:w-full prose-iframe:aspect-video"
-                    dangerouslySetInnerHTML={{ __html: mainContentFinal }}
-                  />
                 </div>
                 {page.FAQ && (
                   <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
