@@ -260,11 +260,11 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       const transformedData = {
         ...data,
         category: [
-          mainCategory,  // First item is the main category
-          ...subcategories  // Followed by subcategories
+          mainCategory, // First item is the main category
+          ...subcategories, // Followed by subcategories
         ].filter(Boolean) as string[],
       };
-      
+
       await onSubmit(transformedData);
       setAlert({
         message: "Notes saved successfully!",
@@ -279,41 +279,56 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   };
 
   const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const file = e.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          try {
-            const result = reader.result as string;
-            setOgImagePreview(result);
-  
-            const formData = new FormData();
-            formData.append("imageUrl", file);
-  
-            const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
-            if (s3Url) {
-              form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+    e.preventDefault();
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const result = reader.result as string;
+          setOgImagePreview(result);
+
+          const formData = new FormData();
+          formData.append("imageUrl", file);
+
+          const s3Url = await uploadImageToS3(
+            formData,
+            "BlogOGImages",
+            file.name
+          );
+          if (s3Url) {
+            form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+              shouldValidate: true,
+            });
+          } else {
+            form.setValue(
+              "ogImage",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
                 shouldValidate: true,
-              });
-            } else {
-              form.setValue(
-                "ogImage",
-                JSON.stringify(["/www.google.com/fallbackUrl", ""]),
-                {
-                  shouldValidate: true,
-                }
-              );
-              throw new Error("Failed to upload image to S3");
-            }
-          } catch (error) {
-            console.error("Error uploading image:", error);
-          } finally {
+              }
+            );
+            throw new Error("Failed to upload image to S3");
           }
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        } finally {
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const draftData = form.getValues();
+      if (draftData.title && draftData.title.trim().length > 0) {
+        saveDraft();
       }
-    };
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [form]);
 
   return (
     <div className="relative">
@@ -364,8 +379,8 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               </FormItem>
             )}
           />
-                    {/* Categories */}
-                    <div className="space-y-4">
+          {/* Categories */}
+          <div className="space-y-4">
             <div>
               <Label>Main Category</Label>
               <div className="mb-4">
@@ -392,7 +407,10 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               </div>
               <div className="flex flex-wrap gap-2">
                 {subcategories.map((sub, index) => (
-                  <div key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center">
+                  <div
+                    key={index}
+                    className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center"
+                  >
                     {sub}
                     <button
                       type="button"

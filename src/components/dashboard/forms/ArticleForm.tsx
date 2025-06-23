@@ -69,7 +69,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
 }) => {
   const parseImageUrl = (url: string | undefined): [string, string] => {
     try {
-      return JSON.parse(url || '[]') as [string, string];
+      return JSON.parse(url || "[]") as [string, string];
     } catch (error) {
       return ["", ""];
     }
@@ -247,11 +247,11 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     const transformedData = {
       ...data,
       category: [
-        mainCategory,  // First item is the main category
-        ...subcategories  // Followed by subcategories
+        mainCategory, // First item is the main category
+        ...subcategories, // Followed by subcategories
       ].filter(Boolean) as string[],
     };
-    
+
     onSubmit(transformedData);
   };
 
@@ -273,13 +273,23 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "ArticlesType", file.name);
+          const s3Url = await uploadImageToS3(
+            formData,
+            "ArticlesType",
+            file.name
+          );
           if (s3Url) {
-            form.setValue("imageUrl", JSON.stringify([s3Url, ""]), { shouldValidate: true });
-          } else {
-            form.setValue("imageUrl", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
+            form.setValue("imageUrl", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
             });
+          } else {
+            form.setValue(
+              "imageUrl",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
+                shouldValidate: true,
+              }
+            );
             throw new Error("Failed to upload image to S3");
           }
         } catch (error) {
@@ -291,7 +301,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const file = e.target.files?.[0];
@@ -306,7 +316,11 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "ArticleOGImages", file.name);
+          const s3Url = await uploadImageToS3(
+            formData,
+            "ArticleOGImages",
+            file.name
+          );
           if (s3Url) {
             form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
@@ -331,6 +345,17 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     }
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const draftData = form.getValues();
+      if (draftData.title && draftData.title.trim().length > 0) {
+        saveDraft();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [form]);
+
   return (
     <div className="relative">
       <DraftDialog
@@ -349,7 +374,10 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         />
       )}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmitForm)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(handleSubmitForm)}
+          className="space-y-8"
+        >
           {/* Title */}
           <FormField
             control={form.control}
@@ -497,7 +525,10 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
               </div>
               <div className="flex flex-wrap gap-2">
                 {subcategories.map((sub, index) => (
-                  <div key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center">
+                  <div
+                    key={index}
+                    className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center"
+                  >
                     {sub}
                     <button
                       type="button"

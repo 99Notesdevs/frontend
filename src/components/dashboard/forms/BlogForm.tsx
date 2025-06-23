@@ -313,7 +313,11 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
+          const s3Url = await uploadImageToS3(
+            formData,
+            "BlogOGImages",
+            file.name
+          );
           if (s3Url) {
             form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
@@ -356,6 +360,17 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       });
     }
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const draftData = form.getValues();
+      if (draftData.title && draftData.title.trim().length > 0) {
+        saveDraft();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [form]);
 
   return (
     <div className="relative">
