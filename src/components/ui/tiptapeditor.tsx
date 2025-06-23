@@ -1343,7 +1343,15 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       )}
       
       {imageDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onKeyDown={(e) => { if (e.key === 'Escape') {
+            handleCancelImage();
+          } else if (e.key === 'Enter') {
+            handleAddImage();
+          }}}
+          tabIndex={-1}
+        >
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-medium mb-4">Add Image</h3>
             
@@ -1366,8 +1374,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter image name"
-                autoFocus
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                autoFocus
               />
               
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1379,7 +1387,6 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                 onChange={(e) => setAltText(e.target.value)}
                 placeholder="Describe the image for accessibility"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                autoFocus
               />
               <p className="mt-1 text-xs text-gray-500">
                 Alt text improves accessibility for users with screen readers.
