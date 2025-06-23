@@ -80,6 +80,7 @@ export default function PageForm({ editPage = null }: PageFormProps) {
         console.log("I was here");
         const isBlob = src.startsWith("blob:");
         const isBase64 = src.startsWith("data:image");
+        const fileName = (img.getAttribute("title") || `${Date.now()}`) + ".png";
   
         if (isBlob || isBase64) {
           try {
@@ -89,7 +90,7 @@ export default function PageForm({ editPage = null }: PageFormProps) {
             const formData = new FormData();
             formData.append("imageUrl", blob, "image.png");
   
-            const url = (await uploadImageToS3(formData, "BlogsContent")) || "error";
+            const url = (await uploadImageToS3(formData, "BlogsContent", fileName)) || "error";
             img.setAttribute("src", url);
           } catch (error: unknown) {
             if (error instanceof Error) {

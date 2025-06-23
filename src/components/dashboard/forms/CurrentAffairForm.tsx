@@ -171,41 +171,45 @@ export function CurrentAffairForm({
   };
 
   const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const file = e.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          try {
-            const result = reader.result as string;
-            setOgImagePreview(result);
-  
-            const formData = new FormData();
-            formData.append("imageUrl", file);
-  
-            const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
-            if (s3Url) {
-              form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+    e.preventDefault();
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const result = reader.result as string;
+          setOgImagePreview(result);
+
+          const formData = new FormData();
+          formData.append("imageUrl", file);
+
+          const s3Url = await uploadImageToS3(
+            formData,
+            "BlogOGImages",
+            file.name
+          );
+          if (s3Url) {
+            form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+              shouldValidate: true,
+            });
+          } else {
+            form.setValue(
+              "ogImage",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
                 shouldValidate: true,
-              });
-            } else {
-              form.setValue(
-                "ogImage",
-                JSON.stringify(["/www.google.com/fallbackUrl", ""]),
-                {
-                  shouldValidate: true,
-                }
-              );
-              throw new Error("Failed to upload image to S3");
-            }
-          } catch (error) {
-            console.error("Error uploading image:", error);
-          } finally {
+              }
+            );
+            throw new Error("Failed to upload image to S3");
           }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        } finally {
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const startNew = () => {
     form.reset(defaultValues || {});
@@ -270,6 +274,17 @@ export function CurrentAffairForm({
   const handleSubmit = (data: CurrentAffairFormValues) => {
     onSubmit(data);
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const draftData = form.getValues();
+      if (draftData.title && draftData.title.trim().length > 0) {
+        saveDraft();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [form]);
 
   return (
     <div className="relative">

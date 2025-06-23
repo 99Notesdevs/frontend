@@ -253,9 +253,9 @@ export function GeneralStudiesForm({
   });
   const [currentSubcategory, setCurrentSubcategory] = useState("");
   //@ts-ignore
-  const [mainCategory, setMainCategory] = useState(initialData?.category?.[0]?.name || "");
+  const [mainCategory, setMainCategory] = useState(defaultValues?.category?.[0]?.name || "");
   //@ts-ignore
-  const [subcategories, setSubcategories] = useState<string[]>(initialData?.category?.slice(1).map((cat) => cat.name) || []);
+  const [subcategories, setSubcategories] = useState<string[]>(defaultValues?.category?.slice(1).map((cat) => cat.name) || []);
 
   const addSubcategory = () => {
     if (currentSubcategory.trim()) {
@@ -277,11 +277,11 @@ export function GeneralStudiesForm({
     const transformedData = {
       ...data,
       category: [
-        mainCategory,  // First item is the main category
-        ...subcategories  // Followed by subcategories
+        mainCategory, // First item is the main category
+        ...subcategories, // Followed by subcategories
       ].filter(Boolean) as string[],
     };
-    
+
     onSubmit(transformedData);
   };
 
@@ -327,43 +327,58 @@ export function GeneralStudiesForm({
   };
 
   const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const file = e.target.files?.[0];
-      if (file) {
-        setIsUploading(true);
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          try {
-            const result = reader.result as string;
-            setOgImagePreview(result);
-  
-            const formData = new FormData();
-            formData.append("imageUrl", file);
-  
-            const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name);
-            if (s3Url) {
-              form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+    e.preventDefault();
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const result = reader.result as string;
+          setOgImagePreview(result);
+
+          const formData = new FormData();
+          formData.append("imageUrl", file);
+
+          const s3Url = await uploadImageToS3(
+            formData,
+            "BlogOGImages",
+            file.name
+          );
+          if (s3Url) {
+            form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
+              shouldValidate: true,
+            });
+          } else {
+            form.setValue(
+              "ogImage",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
                 shouldValidate: true,
-              });
-            } else {
-              form.setValue(
-                "ogImage",
-                JSON.stringify(["/www.google.com/fallbackUrl", ""]),
-                {
-                  shouldValidate: true,
-                }
-              );
-              throw new Error("Failed to upload image to S3");
-            }
-          } catch (error) {
-            console.error("Error uploading image:", error);
-          } finally {
-            setIsUploading(false);
+              }
+            );
+            throw new Error("Failed to upload image to S3");
           }
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const draftData = form.getValues();
+      if (draftData.title && draftData.title.trim().length > 0) {
+        saveDraft();
       }
-    };
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [form]);
 
   return (
     <div className="relative">
@@ -383,7 +398,10 @@ export function GeneralStudiesForm({
         />
       )}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmitForm)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(handleSubmitForm)}
+          className="space-y-8"
+        >
           {/* Title */}
           <FormField
             control={form.control}
@@ -490,8 +508,8 @@ export function GeneralStudiesForm({
             )}
           />
 
-           {/* Categories */}
-           <div className="space-y-4">
+          {/* Categories */}
+          <div className="space-y-4">
             <div>
               <Label>Main Category</Label>
               <div className="mb-4">
@@ -504,7 +522,7 @@ export function GeneralStudiesForm({
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <Label>Subcategories</Label>
               <div className="flex gap-2 mb-2">
                 <Input
@@ -518,7 +536,10 @@ export function GeneralStudiesForm({
               </div>
               <div className="flex flex-wrap gap-2">
                 {subcategories.map((sub, index) => (
-                  <div key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center">
+                  <div
+                    key={index}
+                    className="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center"
+                  >
                     {sub}
                     <button
                       type="button"
@@ -530,7 +551,7 @@ export function GeneralStudiesForm({
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Main Content */}

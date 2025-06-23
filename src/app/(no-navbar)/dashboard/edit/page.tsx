@@ -117,9 +117,9 @@ function PageList() {
       for (const img of imgTags) {
         const src = img.getAttribute("src");
         if (!src) continue;
-        console.log("I was here");
         const isBlob = src.startsWith("blob:");
         const isBase64 = src.startsWith("data:image");
+        const fileNmae = (img.getAttribute("title") || `${Date.now()}`) + ".png";
   
         if (isBlob || isBase64) {
           try {
@@ -130,7 +130,7 @@ function PageList() {
             formData.append("imageUrl", blob, "image.png");
   
             const url =
-              (await uploadImageToS3(formData, "ContentImages")) || "error";
+              (await uploadImageToS3(formData, "ContentImages", fileNmae)) || "error";
             img.setAttribute("src", url);
           } catch (error: unknown) {
             if (error instanceof Error) {
