@@ -123,6 +123,7 @@ const CustomImage = Image.extend({
       alt: {
         default: null,
       },
+      title: { default: null },
       width: {
         default: '100%',
         renderHTML: attributes => ({
@@ -177,6 +178,7 @@ const CustomImage = Image.extend({
         'data-resizable': 'true',
         style: imgStyle.trim(),
         class: 'floating-image',
+        title: HTMLAttributes.title || '',
       })]
     ];
   },
@@ -824,6 +826,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>('');
   const [altText, setAltText] = useState('');
+  const [name, setName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [htmlCursor, setHtmlCursor] = useState(0); // For HTML textarea cursor
   const [tiptapSelection, setTiptapSelection] = useState<{ from: number; to: number } | null>(null); // For Tiptap selection
@@ -924,7 +927,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       .focus()
       .setImage({ 
         src: imageSrc,
-        alt: altText
+        alt: altText,
+        title: name
       })
       .run();
       
@@ -932,6 +936,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     setImageDialogOpen(false);
     setImageSrc('');
     setAltText('');
+    setName('');
     
     // Reset the input value to allow selecting the same file again
     if (imageInputRef.current) {
@@ -943,6 +948,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     setImageDialogOpen(false);
     setImageSrc('');
     setAltText('');
+    setName('');
     if (imageInputRef.current) {
       imageInputRef.current.value = '';
     }
@@ -1351,6 +1357,18 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                   />
                 </div>
               )}
+
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Image Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter image name"
+                autoFocus
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
               
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Alt Text (for accessibility)

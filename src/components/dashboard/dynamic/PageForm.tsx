@@ -24,6 +24,7 @@ import {
   Checkbox,
 } from "@/components/ui/Checkbox";
 import Drafts from "@/components/ui/drafts";
+import { date } from "zod";
 
 interface TemplateType {
   id: string;
@@ -218,9 +219,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
     for (const img of imgTags) {
       const src = img.getAttribute("src");
       if (!src) continue;
-      console.log("I was here");
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
+      const fileName = (img.getAttribute("title") || `${Date.now()}`) + '.png';
 
       if (isBlob || isBase64) {
         try {
@@ -230,7 +231,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
           const formData = new FormData();
           formData.append("imageUrl", blob, "image.png");
 
-          const url = (await uploadImageToS3(formData, "ContentImages")) || "error";
+          const url = (await uploadImageToS3(formData, "ContentImages", fileName)) || "error";
           img.setAttribute("src", url);
         } catch (error: unknown) {
           if (error instanceof Error) {
