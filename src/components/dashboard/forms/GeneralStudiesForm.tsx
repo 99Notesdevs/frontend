@@ -522,7 +522,7 @@ export function GeneralStudiesForm({
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <Label>Subcategories</Label>
               <div className="flex gap-2 mb-2">
                 <Input
@@ -551,7 +551,7 @@ export function GeneralStudiesForm({
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Main Content */}

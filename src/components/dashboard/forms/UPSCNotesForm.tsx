@@ -393,8 +393,8 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               </div>
             </div>
 
-            <div>
-              <Label>Subcategories</Label>
+            {/* <div>
+             <Label>Subcategories</Label>
               <div className="flex gap-2 mb-2">
                 <Input
                   value={currentSubcategory}
@@ -422,7 +422,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Meta Title */}
