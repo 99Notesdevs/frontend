@@ -211,6 +211,18 @@ export function PageForm({ editPage = null }: PageFormProps) {
     return selectedCategories.filter(Boolean).pop() || null;
   };
 
+  const getFormattedDate = () => {
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const DD = pad(now.getDate());
+    const MM = pad(now.getMonth() + 1);
+    const YYYY = now.getFullYear();
+    const hh = pad(now.getHours());
+    const mm = pad(now.getMinutes());
+    const ss = pad(now.getSeconds());
+    return `${DD}${MM}${YYYY}_${hh}${mm}${ss}`;
+  };
+
   const handleImageUpload = async (content: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
@@ -221,7 +233,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       if (!src) continue;
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
-      const fileName = (img.getAttribute("title") || `${Date.now()}`) + '.png';
+      const fileName = (img.getAttribute("title") || getFormattedDate()) + '.png';
 
       if (isBlob || isBase64) {
         try {
