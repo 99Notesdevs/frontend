@@ -244,6 +244,19 @@ export function PageForm({ editPage = null }: PageFormProps) {
       reader.readAsDataURL(file);
     }
   };
+  
+  const getFormattedDate = () => {
+    const uid = Math.random().toString(36).slice(2, 6);
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const DD = pad(now.getDate());
+    const MM = pad(now.getMonth() + 1);
+    const YYYY = now.getFullYear();
+    const hh = pad(now.getHours());
+    const mm = pad(now.getMinutes());
+    const ss = pad(now.getSeconds());
+    return `${DD}${MM}${YYYY}_${hh}${mm}${ss}_${uid}`;
+  };
 
   const handleImageUpload = async (content: string) => {
       const parser = new DOMParser();
@@ -256,7 +269,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         console.log("I was here");
         const isBlob = src.startsWith("blob:");
         const isBase64 = src.startsWith("data:image");
-        const fileName = (img.getAttribute("title") || `${Date.now()}`) + ".png";
+        const fileName = (img.getAttribute("title") || getFormattedDate()) + ".png";
   
         if (isBlob || isBase64) {
           try {

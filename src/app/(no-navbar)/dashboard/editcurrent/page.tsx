@@ -66,6 +66,19 @@ export default function PageListCurrent() {
   const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
   const token = Cookie.get('token');
 
+  const getFormattedDate = () => {
+    const uid = Math.random().toString(36).slice(2, 6);
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const DD = pad(now.getDate());
+    const MM = pad(now.getMonth() + 1);
+    const YYYY = now.getFullYear();
+    const hh = pad(now.getHours());
+    const mm = pad(now.getMinutes());
+    const ss = pad(now.getSeconds());
+    return `${DD}${MM}${YYYY}_${hh}${mm}${ss}_${uid}`;
+  };
+
   const handleImageUpload = async (content: string) => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "text/html");
@@ -77,6 +90,7 @@ export default function PageListCurrent() {
           console.log("I was here");
           const isBlob = src.startsWith("blob:");
           const isBase64 = src.startsWith("data:image");
+          const fileNmae = (img.getAttribute("title") || getFormattedDate()) + ".png";
     
           if (isBlob || isBase64) {
             try {
@@ -87,7 +101,7 @@ export default function PageListCurrent() {
               formData.append("imageUrl", blob, "image.png");
     
               const url =
-                (await uploadImageToS3(formData, "CurrentAffairImages")) || "error";
+                (await uploadImageToS3(formData, "CurrentAffairImages", fileNmae)) || "error";
               img.setAttribute("src", url);
             } catch (error: unknown) {
               if (error instanceof Error) {

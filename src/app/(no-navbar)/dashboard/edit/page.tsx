@@ -1,19 +1,26 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
-import {ArticleForm, UpscNotesForm, GeneralStudiesForm , CurrentAffairForm, BlogForm, CustomLinkForm} from '@/components/dashboard/forms';
-import Cookie from 'js-cookie';
-import { env } from '@/config/env';
-import { uploadImageToS3 } from '@/config/imageUploadS3';
-import Drafts from '@/components/ui/drafts';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { PencilIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
+import {
+  ArticleForm,
+  UpscNotesForm,
+  GeneralStudiesForm,
+  CurrentAffairForm,
+  BlogForm,
+  CustomLinkForm,
+} from "@/components/dashboard/forms";
+import Cookie from "js-cookie";
+import { env } from "@/config/env";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
+import Drafts from "@/components/ui/drafts";
 
 interface Page {
   id: number;
   slug: string;
   title: string;
-  categories?: {id: number; name: string};
+  categories?: { id: number; name: string };
   tags: Array<{
     id: number;
     name: string;
@@ -42,24 +49,26 @@ function PageList() {
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const token = Cookie.get('token');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const token = Cookie.get("token");
 
   const categories = [
-    { id: 'all', name: 'All Pages' },
-    { id: 'article', name: 'Articles' },
-    { id: 'upsc-notes', name: 'UPSC Notes' },
-    { id: 'general-studies', name: 'General Studies' },
-    { id: 'current-affairs', name: 'Current Affairs' },
-    { id: 'blog', name: 'Blogs' },
-    { id: 'custom-link', name: 'Custom Links' }
+    { id: "all", name: "All Pages" },
+    { id: "article", name: "Articles" },
+    { id: "upsc-notes", name: "UPSC Notes" },
+    { id: "general-studies", name: "General Studies" },
+    { id: "current-affairs", name: "Current Affairs" },
+    { id: "blog", name: "Blogs" },
+    { id: "custom-link", name: "Custom Links" },
   ];
 
-  const filteredPages = pages.filter(page => {
-    const matchesSearch = page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        page.slug.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || page.templateId === selectedCategory;
+  const filteredPages = pages.filter((page) => {
+    const matchesSearch =
+      page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.slug.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" || page.templateId === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -75,13 +84,13 @@ function PageList() {
   const fetchPages = async () => {
     try {
       const response = await fetch(`${env.API}/page`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!response.ok) throw new Error('Failed to fetch pages');
-            const { data } = await response.json();
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Failed to fetch pages");
+      const { data } = await response.json();
       setPages(data);
     } catch (error) {
-      console.error('Error fetching pages:', error);
+      console.error("Error fetching pages:", error);
     } finally {
       setLoading(false);
     }
@@ -90,93 +99,114 @@ function PageList() {
   const fetchPageById = async (pageId: number) => {
     try {
       const response = await fetch(`${env.API}/page/id/${pageId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error('Failed to fetch page');
+      if (!response.ok) throw new Error("Failed to fetch page");
       const { data } = await response.json();
       setSelectedPage(data);
       setShowForm(true);
-      
+
       // Scroll to the form container after a small delay to ensure the form is mounted
       setTimeout(() => {
-        const formContainer = document.querySelector('.bg-white.shadow-sm.rounded-lg.p-6');
+        const formContainer = document.querySelector(
+          ".bg-white.shadow-sm.rounded-lg.p-6"
+        );
         if (formContainer) {
-          formContainer.scrollIntoView({ behavior: 'smooth' });
+          formContainer.scrollIntoView({ behavior: "smooth" });
         }
       }, 100);
     } catch (error) {
-      console.error('Error fetching page:', error);
+      console.error("Error fetching page:", error);
     }
   };
 
-    const handleImageUpload = async (content: string) => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(content, "text/html");
-      const imgTags = doc.querySelectorAll("img");
-  
-      for (const img of imgTags) {
-        const src = img.getAttribute("src");
-        if (!src) continue;
-        const isBlob = src.startsWith("blob:");
-        const isBase64 = src.startsWith("data:image");
-        const fileNmae = (img.getAttribute("title") || `${Date.now()}`) + ".png";
-  
-        if (isBlob || isBase64) {
-          try {
-            const response = await fetch(src);
-            const blob = await response.blob();
-  
-            const formData = new FormData();
-            formData.append("imageUrl", blob, "image.png");
-  
-            const url =
-              (await uploadImageToS3(formData, "ContentImages", fileNmae)) || "error";
-            img.setAttribute("src", url);
-          } catch (error: unknown) {
-            if (error instanceof Error) {
-              console.error("Error uploading image:", error.message);
-            }
+  const getFormattedDate = () => {
+    const uid = Math.random().toString(36).slice(2, 6);
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const DD = pad(now.getDate());
+    const MM = pad(now.getMonth() + 1);
+    const YYYY = now.getFullYear();
+    const hh = pad(now.getHours());
+    const mm = pad(now.getMinutes());
+    const ss = pad(now.getSeconds());
+    return `${DD}${MM}${YYYY}_${hh}${mm}${ss}_${uid}`;
+  };
+
+  const handleImageUpload = async (content: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+    const imgTags = doc.querySelectorAll("img");
+
+    for (const img of imgTags) {
+      const src = img.getAttribute("src");
+      if (!src) continue;
+      const isBlob = src.startsWith("blob:");
+      const isBase64 = src.startsWith("data:image");
+      const fileNmae = (img.getAttribute("title") || getFormattedDate()) + ".png";
+
+      if (isBlob || isBase64) {
+        try {
+          const response = await fetch(src);
+          const blob = await response.blob();
+
+          const formData = new FormData();
+          formData.append("imageUrl", blob, "image.png");
+
+          const url =
+            (await uploadImageToS3(formData, "ContentImages", fileNmae)) ||
+            "error";
+          img.setAttribute("src", url);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error("Error uploading image:", error.message);
           }
         }
       }
-  
-      return doc.body.innerHTML; // ⬅️ Only return after finishing all images
-    };
+    }
+
+    return doc.body.innerHTML; // ⬅️ Only return after finishing all images
+  };
 
   const saveEdit = async (formData: any) => {
     if (!selectedPage) return;
-    console.log('Form data:', formData);
+    console.log("Form data:", formData);
 
     try {
       // Generate new slug from title if it has changed
       const newTitle = formData.title;
-      const newSlug = newTitle.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
+      const newSlug = newTitle
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
 
       // Get the current page's level in the hierarchy
-      const currentLevel = selectedPage.slug.split('/').length;
-      
+      const currentLevel = selectedPage.slug.split("/").length;
+
       formData.content = await handleImageUpload(formData.content);
       // Create the page data object
       const pageData = {
         id: selectedPage.id,
         title: newTitle,
-        slug: selectedPage.templateId === 'blog' ? formData.slug : (
-          selectedPage.title !== newTitle
+        slug:
+          selectedPage.templateId === "blog"
+            ? formData.slug
+            : selectedPage.title !== newTitle
             ? [
                 ...selectedPage.slug.split("/").slice(0, currentLevel - 1),
                 newSlug,
               ].join("/")
-            : selectedPage.slug
-        ),
+            : selectedPage.slug,
         templateId: selectedPage.templateId,
         category: formData.category,
         parentId: selectedPage.parentId || null,
         FAQ: formData.FAQ,
         imageUrl: formData.imageUrl,
-        content: selectedPage.templateId === 'custom-link' ? "dummy" : formData.content,
-        link: selectedPage.templateId === 'custom-link' ? formData.link : null,
+        content:
+          selectedPage.templateId === "custom-link"
+            ? "dummy"
+            : formData.content,
+        link: selectedPage.templateId === "custom-link" ? formData.link : null,
         metadata: {
           metaTitle: formData.metaTitle || "",
           metaDescription: formData.metaDescription || "",
@@ -193,39 +223,39 @@ function PageList() {
           canonicalUrl: formData.canonicalUrl || "",
           schemaData: formData.schemaData || "",
           header: formData.header || "",
-          body: formData.body || ""
+          body: formData.body || "",
         },
         level: selectedPage.level || 0,
         showInNav: formData.showInNav || false,
         order: selectedPage.order || 0,
         updatedAt: new Date().toISOString(),
-        tags: formData.tags
+        tags: formData.tags,
       };
 
       // Prepare data for API submission with stringified content and metadata
       const apiPageData = {
         ...pageData,
         content: pageData.content,
-        metadata: JSON.stringify(pageData.metadata)
+        metadata: JSON.stringify(pageData.metadata),
       };
 
       const response = await fetch(`${env.API}/page/${selectedPage.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(apiPageData)
+        body: JSON.stringify(apiPageData),
       });
-      
-      if (!response.ok) throw new Error('Failed to update page');
-      
+
+      if (!response.ok) throw new Error("Failed to update page");
+
       // Refresh the page list
       fetchPages();
       setSelectedPage(null);
       setShowForm(false);
     } catch (error) {
-      console.error('Error saving changes:', error);
+      console.error("Error saving changes:", error);
     }
   };
 
@@ -233,9 +263,9 @@ function PageList() {
     const parsedContent = page.content || "";
     // @ts-ignore
     const metadata = JSON.parse(page.metadata || "{}");
-    const parsedimage=page.imageUrl || undefined;
+    const parsedimage = page.imageUrl || undefined;
     switch (templateId) {
-      case 'article':
+      case "article":
         return {
           title: page.title || "",
           content: parsedContent || "",
@@ -243,7 +273,7 @@ function PageList() {
           FAQ: page.FAQ || "",
           imageUrl: parsedimage || undefined,
           category: page.categories || [],
-          tags: page.tags.map(tag => tag.name) || [],
+          tags: page.tags.map((tag) => tag.name) || [],
           metaTitle: metadata.metaTitle || "",
           metaDescription: metadata.metaDescription || "",
           metaKeywords: metadata.metaKeywords || "",
@@ -259,10 +289,10 @@ function PageList() {
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
           header: metadata.header || "",
-          body: metadata.body || ""
+          body: metadata.body || "",
         };
-      
-      case 'general-studies':
+
+      case "general-studies":
         return {
           title: page.title || "",
           content: parsedContent || "",
@@ -284,10 +314,10 @@ function PageList() {
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
           header: metadata.header || "",
-          body: metadata.body || ""
+          body: metadata.body || "",
         };
-      
-      case 'current-affairs':
+
+      case "current-affairs":
         return {
           title: page.title || "",
           content: parsedContent || "",
@@ -308,9 +338,9 @@ function PageList() {
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
           header: metadata.header || "",
-          body: metadata.body || ""
+          body: metadata.body || "",
         };
-      case 'upsc-notes':
+      case "upsc-notes":
         return {
           title: page.title || "",
           content: parsedContent || "",
@@ -331,9 +361,9 @@ function PageList() {
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
           header: metadata.header || "",
-          body: metadata.body || ""
+          body: metadata.body || "",
         };
-      case 'blog':
+      case "blog":
         return {
           title: page.title || "",
           content: parsedContent || "",
@@ -355,9 +385,9 @@ function PageList() {
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
           header: metadata.header || "",
-          body: metadata.body || ""
+          body: metadata.body || "",
         };
-      case 'custom-link':
+      case "custom-link":
         return {
           title: page.title || "",
           content: parsedContent || "",
@@ -378,28 +408,28 @@ function PageList() {
           canonicalUrl: metadata.canonicalUrl || "",
           schemaData: metadata.schemaData || "",
           header: metadata.header || "",
-          body: metadata.body || ""
+          body: metadata.body || "",
         };
     }
   };
   const openDeleteModal = (pageId: number) => {
     setShowDeleteModal(true);
     setPageIdToDelete(pageId);
-  }
+  };
 
   const handleDelete = async () => {
-    if(!pageIdToDelete) return;
+    if (!pageIdToDelete) return;
 
     try {
       await fetch(`${env.API}/page/${pageIdToDelete}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
       fetchPages();
       setShowDeleteModal(false);
       setPageIdToDelete(null);
     } catch (error) {
-      console.error('Error deleting page:', error);
+      console.error("Error deleting page:", error);
       setPageIdToDelete(null);
       setShowDeleteModal(false);
     }
@@ -419,7 +449,9 @@ function PageList() {
         <h1 className="text-3xl font-bold text-[var(--admin-bg-dark)] mb-1">
           Page Management
         </h1>
-        <p className="text-[var(--admin-secondary)]">Manage your pages and content</p>
+        <p className="text-[var(--admin-secondary)]">
+          Manage your pages and content
+        </p>
       </div>
 
       {pages.length === 0 ? (
@@ -432,7 +464,9 @@ function PageList() {
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="px-6 py-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-[var(--admin-bg-dark)]">Pages</h2>
+              <h2 className="text-xl font-semibold text-[var(--admin-bg-dark)]">
+                Pages
+              </h2>
               <Link
                 href="/dashboard/add"
                 target="_blank"
@@ -500,7 +534,9 @@ function PageList() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-[var(--admin-primary)]">{page.slug}</div>
+                        <div className="text-sm text-[var(--admin-primary)]">
+                          {page.slug}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-[var(--admin-primary)]">
@@ -565,13 +601,15 @@ function PageList() {
               <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-gray-700">
-                    Showing{' '}
+                    Showing{" "}
                     <span className="font-medium">{indexOfFirstItem + 1}</span>
-                    {' to '}
-                    <span className="font-medium">{Math.min(indexOfLastItem, filteredPages.length)}</span>
-                    {' of '}
+                    {" to "}
+                    <span className="font-medium">
+                      {Math.min(indexOfLastItem, filteredPages.length)}
+                    </span>
+                    {" of "}
                     <span className="font-medium">{filteredPages.length}</span>
-                    {' results'}
+                    {" results"}
                   </p>
                 </div>
                 <div>
@@ -582,31 +620,51 @@ function PageList() {
                       className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                     >
                       <span className="sr-only">Previous</span>
-                      <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+                      <svg
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ${
-                          page === currentPage
-                            ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                            : 'text-gray-900 ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ${
+                            page === currentPage
+                              ? "z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                              : "text-gray-900 ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      )
+                    )}
                     <button
                       onClick={() => setCurrentPage(currentPage + 1)}
                       disabled={currentPage === totalPages}
                       className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                     >
                       <span className="sr-only">Next</span>
-                      <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                      <svg
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </button>
                   </nav>
@@ -620,7 +678,9 @@ function PageList() {
       {showForm && selectedPage && (
         <div className="mt-8">
           <div className="bg-white shadow-sm rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-[var(--admin-bg-dark)] mb-6">Edit Page</h2>
+            <h2 className="text-2xl font-bold text-[var(--admin-bg-dark)] mb-6">
+              Edit Page
+            </h2>
             <div className="space-y-6">
               {selectedPage.templateId === "article" && (
                 <ArticleForm
@@ -709,7 +769,7 @@ function PageList() {
           </div>
         </div>
       )}
-      <Drafts/>
+      <Drafts />
     </div>
   );
 }
