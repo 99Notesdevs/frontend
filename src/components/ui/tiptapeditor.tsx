@@ -8,9 +8,10 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import TextAlign from "@tiptap/extension-text-align";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
-import { Mark, mergeAttributes, Extension } from "@tiptap/core";
+import { Mark, mergeAttributes, Extension, Editor } from "@tiptap/core";
 import { common, createLowlight } from "lowlight";
 import Heading from "@tiptap/extension-heading";
+import { CleanPaste } from './claenpaste'
 import {
   Bold,
   Italic,
@@ -45,6 +46,13 @@ import TableHeader from "@tiptap/extension-table-header";
 import { Iframe } from "./Iframe";
 import { TABLE_DESIGNS } from "./tableDesigns";
 
+// Editor instance will be created using the useEditor hook in the component
+const editor = new Editor({
+  extensions: [
+    StarterKit,
+    CleanPaste,
+  ],
+})
 const lowlight = createLowlight(common);
 
 const FontSize = Mark.create({
@@ -998,6 +1006,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         }
       }),
       Iframe,
+      CleanPaste,
     ],
     content: content,
     onUpdate: ({ editor }) => {
