@@ -4,12 +4,10 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import TextAlign from "@tiptap/extension-text-align";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import { Mark, mergeAttributes, Extension, Editor } from "@tiptap/core";
-import { common, createLowlight } from "lowlight";
 import Heading from "@tiptap/extension-heading";
 import { CleanPaste } from './claenpaste'
 import {
@@ -53,7 +51,6 @@ const editor = new Editor({
     CleanPaste,
   ],
 })
-const lowlight = createLowlight(common);
 
 const FontSize = Mark.create({
   name: "fontSize",
@@ -996,11 +993,9 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       StarterKit.configure({
         bulletList: { keepMarks: true, keepAttributes: false },
         orderedList: { keepMarks: true, keepAttributes: false },
-        codeBlock: false,
         heading: false,
       }),
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
-      CodeBlockLowlight.configure({ lowlight }),
       CustomLink.configure({
         openOnClick: false,
         HTMLAttributes: {
