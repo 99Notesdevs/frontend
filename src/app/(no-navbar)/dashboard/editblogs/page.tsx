@@ -9,7 +9,6 @@ import {
   TrashIcon,
  
 } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import { BlogForm } from "@/components/dashboard/forms";
 import { BlogFormValues } from "@/components/dashboard/forms/BlogForm";
 import { uploadImageToS3 } from "@/config/imageUploadS3";

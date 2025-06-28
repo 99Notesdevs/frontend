@@ -6,9 +6,8 @@ import { CustomLinkForm, type CustomLinkFormData } from '@/components/dashboard/
 import { env } from '@/config/env';
 import Cookie from 'js-cookie';
 
-import { PencilIcon, TrashIcon, EyeIcon, ArrowLeftIcon, CalendarIcon, CalendarDaysIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
-import { CurrentAffairForm, CurrentArticleForm, CurrentArticleFormValues } from '@/components/dashboard/forms';
+import { PencilIcon, TrashIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { CurrentArticleForm, CurrentArticleFormValues } from '@/components/dashboard/forms';
 import Drafts from '@/components/ui/drafts';
 
 interface CurrentAffairType {
