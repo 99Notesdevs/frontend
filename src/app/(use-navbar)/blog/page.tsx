@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { env } from "@/config/env";
 import BlogCard from "@/components/Blogs/BlogCard";
 
@@ -15,28 +14,33 @@ interface Blog {
   alt: string;
 }
 
+const ITEMS_PER_PAGE = 12;
+
 const BlogsPage: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const itemsPerPage = 12;
 
   const fetchBlogs = async (searchTerm: string = "") => {
     try {
       setError(null);
       setLoading(true);
 
-      const skip = (currentPage - 1) * itemsPerPage;
-      const url = searchTerm
-        ? `${env.API}/blog/search?skip=${skip}&take=${itemsPerPage}&query=${encodeURIComponent(searchTerm)}`
-        : `${env.API}/blog?skip=${skip}&take=${itemsPerPage}`;
+      let url: string;
+      if (searchTerm) {
+        // Use title search endpoint if there's a search term
+        url = `${env.API}/blog/title/${encodeURIComponent(searchTerm)}`;
+      } else {
+        // Use paginated endpoint for regular listing
+        const skip = (currentPage - 1) * ITEMS_PER_PAGE;
+        url = `${env.API}/blog?skip=${skip}&take=${ITEMS_PER_PAGE}`;
+      }
 
+      // Fetch blogs
       const response = await fetch(url);
-
       if (!response.ok) {
         throw new Error("Failed to fetch blogs");
       }
@@ -44,55 +48,49 @@ const BlogsPage: React.FC = () => {
       const data = await response.json();
       const blogsData = data.data || [];
 
-      // Get total count for pagination
-      const countResponse = await fetch(`${env.API}/blog/count`);
-      if (!countResponse.ok) {
-        throw new Error("No blogs available");
+      // Get total count (only needed for pagination when not searching)
+      let totalItems = blogsData.length;
+      if (!searchTerm) {
+        try {
+          const countResponse = await fetch(`${env.API}/blog/count`);
+          if (countResponse.ok) {
+            const countData = await countResponse.json();
+            totalItems = countData.data || 0;
+          }
+        } catch (err) {
+          console.warn("Could not fetch total count:", err);
+        }
       }
-      const countData = await countResponse.json();
-      const totalItems = countData.data || 0;
 
-      setBlogs(blogsData);
       setFilteredBlogs(blogsData);
-      setTotalPages(Math.ceil(totalItems / itemsPerPage));
+      setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
     } catch (err) {
       console.error("Error fetching blogs:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
+      setFilteredBlogs([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBlogs();
-  }, [currentPage, itemsPerPage]);
+    fetchBlogs(searchQuery);
+  }, [currentPage, searchQuery]);
 
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
-      setFilteredBlogs(blogs);
+      fetchBlogs('');
       return;
     }
+    setCurrentPage(1);
+    fetchBlogs(searchQuery);
+  };
 
-    try {
-      setLoading(true);
-      const response = await fetch(`${env.API}/blog/title/${searchQuery}`);
-      console.log(response);
-      if (!response.ok) {
-        throw new Error("Failed to search blogs");
-      }
-
-      const data = await response.json();
-      const searchResults = data.data || [];
-      setFilteredBlogs(searchResults);
-      setTotalPages(Math.ceil(searchResults.length / itemsPerPage));
-      setCurrentPage(1); // Reset to first page when searching
-    } catch (error) {
-      console.error("Error searching blogs:", error);
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setLoading(false);
-    }
+  const clearSearch = () => {
+    setSearchQuery('');
+    setCurrentPage(1);
+    fetchBlogs('');
   };
 
   const handlePageChange = (page: number) => {
@@ -144,15 +142,30 @@ const BlogsPage: React.FC = () => {
               />
               <button
                 type="submit"
-                className="w-full sm:w-auto px-6 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--secondary)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-base font-medium"
+                className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--secondary)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-base font-medium"
               >
                 Search
               </button>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
+                >
+                  Clear
+                </button>
+              )}
             </div>
           </form>
         </div>
 
         {/* Blog posts grid */}
+        <div className="mb-4">
+          <p className="text-sm text-[var(--text-tertiary)]">
+            Showing {filteredBlogs.length} of {totalPages * ITEMS_PER_PAGE} blog posts
+            {searchQuery && ` for "${searchQuery}"`}
+          </p>
+        </div>
         {filteredBlogs.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-[var(--text-tertiary)] text-lg">No blogs found. Try a different search.</p>
@@ -167,9 +180,24 @@ const BlogsPage: React.FC = () => {
                     title: blog.title,
                     slug: blog.slug,
                     content: blog.content,
-                    metadata: blog.metadata, 
-                    imageUrl: JSON.parse(blog.imageUrl)[0],
-                    alt: JSON.parse(blog.imageUrl)[1]
+                    metadata: blog.metadata,
+                    imageUrl: (() => {
+                      try {
+                        const parsed = JSON.parse(blog.imageUrl);
+                        return parsed[0] || '';
+                      } catch {
+                        console.warn('Invalid image URL format for blog:', blog.title);
+                        return '';
+                      }
+                    })(),
+                    alt: (() => {
+                      try {
+                        const parsed = JSON.parse(blog.imageUrl);
+                        return parsed[1] || '';
+                      } catch {
+                        return '';
+                      }
+                    })()
                   }}
                 />
               </div>
