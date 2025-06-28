@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from "react";
-import { isLocked } from "@/lib/islocked";
 import axios from "axios";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";

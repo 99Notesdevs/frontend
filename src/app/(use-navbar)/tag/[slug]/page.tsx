@@ -52,6 +52,8 @@ interface CurrentArticleBlog {
     updatedAt: string;
   }>;
 }
+const itemsPerPage = 10;
+
 export default function TagPage() {
   const [pages, setPages] = useState<Page[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -77,7 +79,6 @@ export default function TagPage() {
   
   const slug = pathname.split('/').pop() || '';
 
-  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchCounts = async () => {

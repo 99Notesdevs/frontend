@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { env } from '@/config/env';
-
+import Cookies from 'js-cookie';
 interface Author {
   id: string;
   name: string;
@@ -21,15 +21,30 @@ export default function AuthorPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Safely get the slug from params
+    const slug = !Array.isArray(params.slug) ? params.slug : params.slug?.[0];
+    
+    // Only proceed if we have a valid slug
+    if (!slug) {
+      setLoading(false);
+      setError('Invalid author identifier');
+      return;
+    }
+
     const fetchAuthor = async () => {
       try {
-        const response = await fetch(`${env.API}/author/${params.slug}`);
+        const response = await fetch(`${env.API}/author/${slug}`,{
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        });
         if (!response.ok) throw new Error('Failed to fetch author data');
         const data = await response.json();
-        setAuthor(data);
+        setAuthor(data.data);
         setError(null);
       } catch (err) {
         setError('Failed to load author information');
+        console.error('Error fetching author:', err);
       } finally {
         setLoading(false);
       }
@@ -64,7 +79,12 @@ export default function AuthorPage() {
   }
 
   if (!author) {
-    return null;
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-xl font-bold mb-4">Author Not Found</h1>
+        <p>The requested author could not be found.</p>
+      </div>
+    );
   }
 
   return (
@@ -77,6 +97,11 @@ export default function AuthorPage() {
             src={author.imageUrl}
             alt={author.name}
             className="w-24 h-24 rounded-full mb-4"
+            onError={(e) => {
+              // Fallback if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
           />
         )}
         <p className="text-gray-600 mb-4">{author.email}</p>

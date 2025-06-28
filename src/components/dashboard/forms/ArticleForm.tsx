@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import TiptapEditor from "@/components/ui/tiptapeditor";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
 import DraftDialog from "@/components/ui/DraftDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,19 @@ import {
 } from "@/components/ui/select";
 import { TagInput } from "@/components/ui/tags/tag-input";
 import { FAQEditor } from "../../FAQp/FAQEditor";
+
+const TiptapEditor = dynamic(
+  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
+  { 
+    ssr: false, // Disable server-side rendering for this component
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    )
+  }
+);
 
 const articleSchema = z.object({
   title: z.string(),

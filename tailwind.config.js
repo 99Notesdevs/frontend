@@ -29,4 +29,12 @@ module.exports = {
     },
   },
   plugins: [require("@tailwindcss/typography")],
+  safelist: [
+    'float-left',
+    'float-right',
+    'mx-auto',
+    'mr-4',
+    'ml-4',
+    'mb-4',
+  ],
 }

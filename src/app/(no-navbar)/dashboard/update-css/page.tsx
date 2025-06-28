@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import dynamic from "next/dynamic";
 import {
   Loader2,
   RefreshCw,
@@ -26,12 +25,6 @@ import {
 } from "@/components/ui/card";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
-
-// Dynamically import the code editor to avoid SSR issues
-const CodeEditor = dynamic(
-  () => import("@uiw/react-textarea-code-editor").then((mod) => mod.default),
-  { ssr: false }
-);
 
 // Utility: Convert CSS variable object to :root CSS string
 function cssVarsObjectToRootString(vars: Record<string, string>): string {
@@ -335,30 +328,30 @@ export default function UpdateCssPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-[calc(100vh-300px)] min-h-[400px] overflow-auto">
-                {typeof window !== "undefined" && (
-                  <CodeEditor
-                    value={
-                      typeof css === "object" && css !== null
-                        ? cssVarsObjectToRootString(css)
-                        : css
-                    }
-                    language="css"
-                    placeholder="/* Enter your CSS here... */"
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      setCss(e.target.value)
-                    }
-                    padding={20}
-                    style={{
-                      fontSize: 14,
-                      backgroundColor: "#0f172a",
-                      fontFamily:
-                        "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-                      minHeight: "100%",
-                      lineHeight: "1.5",
-                    }}
-                    data-color-mode="dark"
-                  />
-                )}
+                <textarea
+                  value={
+                    typeof css === "object" && css !== null
+                      ? cssVarsObjectToRootString(css)
+                      : css
+                  }
+                  onChange={(e) => setCss(e.target.value)}
+                  placeholder="/* Enter your CSS here... */"
+                  style={{
+                    fontSize: 14,
+                    backgroundColor: "#0f172a",
+                    fontFamily:
+                      "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+                    minHeight: "100%",
+                    lineHeight: "1.5",
+                    padding: 20,
+                    width: "100%",
+                    height: "100%",
+                    resize: "none",
+                    border: "none",
+                    outline: "none",
+                    color: "white",
+                  }}
+                />
               </div>
             </CardContent>
             <CardFooter className="px-6 py-3 border-t bg-muted/20 text-xs text-muted-foreground flex justify-between">

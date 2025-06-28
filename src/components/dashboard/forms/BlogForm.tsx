@@ -12,9 +12,10 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/tags/tag-input";
-import TiptapEditor from "@/components/ui/tiptapeditor";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
@@ -27,6 +28,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DraftDialog from "@/components/ui/DraftDialog";
+
+const TiptapEditor = dynamic(
+  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
+  { 
+    ssr: false, // Disable server-side rendering for this component
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    )
+  }
+);
 
 const formSchema = z.object({
   title: z.string(),

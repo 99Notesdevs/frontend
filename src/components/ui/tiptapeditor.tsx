@@ -4,12 +4,10 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import TextAlign from "@tiptap/extension-text-align";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import { Mark, mergeAttributes, Extension, Editor } from "@tiptap/core";
-import { common, createLowlight } from "lowlight";
 import Heading from "@tiptap/extension-heading";
 import { CleanPaste } from './claenpaste'
 import {
@@ -53,7 +51,6 @@ const editor = new Editor({
     CleanPaste,
   ],
 })
-const lowlight = createLowlight(common);
 
 const FontSize = Mark.create({
   name: "fontSize",
@@ -115,7 +112,6 @@ const TableStyles = Extension.create({
 // Custom Image extension with resizing and text wrapping support
 const CustomImage = Image.extend({
   name: 'resizableImage',
-  
   addOptions() {
     return {
       ...this.parent?.(),
@@ -124,16 +120,14 @@ const CustomImage = Image.extend({
       },
     };
   },
-  
   addAttributes() {
     return {
       ...this.parent?.(),
-      alt: {
-        default: null,
-      },
+      src: { default: null },
+      alt: { default: null },
       title: { default: null },
       width: {
-        default: '100%',
+        default: 'auto',
         renderHTML: attributes => ({
           width: attributes.width,
         }),
@@ -147,63 +141,65 @@ const CustomImage = Image.extend({
       float: {
         default: 'none',
         renderHTML: attributes => ({
-          'data-float': attributes.float,
+          float: attributes.float,
         }),
       },
       margin: {
         default: '0 16px 16px 0',
         renderHTML: attributes => ({
-          'data-margin': attributes.margin,
+          margin: attributes.margin,
         }),
       },
     };
   },
-  
   renderHTML({ HTMLAttributes }) {
-    const { float = 'none', margin = '0 16px 16px 0' } = HTMLAttributes;
-    const imgStyle = `
-      max-width: 100%;
-      height: auto;
-      display: block;
-    `;
-    
-    const containerStyle = `
-      display: inline-block;
-      margin: ${margin};
-      float: ${float};
-      position: relative;
-      max-width: 100%;
-    `;
-    
-    return ['div', 
-      { 
-        'data-type': 'image-container',
-        'data-float': float,
-        style: containerStyle.trim()
-      },
-      ['img', mergeAttributes(HTMLAttributes, { 
-        'data-drag-handle': '',
-        'data-resizable': 'true',
-        style: imgStyle.trim(),
-        class: 'floating-image',
-        title: HTMLAttributes.title || '',
-      })]
-    ];
+    // Map float to Tailwind classes
+    let floatClass = '';
+    let marginClass = 'mb-4';
+    if (HTMLAttributes.float === 'left') {
+      floatClass = 'float-left';
+      marginClass = 'mr-4 mb-4';
+    } else if (HTMLAttributes.float === 'right') {
+      floatClass = 'float-right';
+      marginClass = 'ml-4 mb-4';
+    } else {
+      floatClass = 'mx-auto';
+      marginClass = 'mb-4';
+    }
+    // Compose class string
+    const className = [
+      'floating-image',
+      floatClass,
+      marginClass,
+    ].join(' ');
+
+    // Merge with any additional classes
+    const attrs = {
+      ...HTMLAttributes,
+      class: className,
+      style: [
+        HTMLAttributes.width && HTMLAttributes.width !== 'auto' ? `width:${HTMLAttributes.width};` : '',
+        HTMLAttributes.height && HTMLAttributes.height !== 'auto' ? `height:${HTMLAttributes.height};` : '',
+        'max-width:100%;height:auto;display:block;border-radius:0.375rem;',
+      ].join(''),
+    };
+
+    return ['img', attrs];
   },
-  
   addNodeView() {
     return ({ node, getPos, editor }) => {
       // Create the image element
       const img = document.createElement('img');
-      const { src, alt, width, height, float = 'none' } = node.attrs;
+      const { src, alt, width, height, float = 'none', margin = '0 16px 16px 16px' } = node.attrs;
       
       // Set up the image
       img.src = src;
       img.alt = alt || '';
-      img.style.width = width || '70%';
+      img.style.width = width || '50%';
       img.style.height = height || 'auto';
       img.style.maxWidth = '100%';
       img.style.display = 'block';
+      img.style.verticalAlign = 'bottom';
       img.className = 'floating-image';
       
       // Create the resize handle
@@ -219,6 +215,9 @@ const CustomImage = Image.extend({
       container.style.maxWidth = '100%';
       container.style.display = 'inline-block';
       container.style.verticalAlign = 'middle';
+      container.style.margin = margin;
+      container.style.shapeOutside = 'content-box';
+      container.style.shapeMargin = '0.75rem';
       
       // Add elements to the container
       container.appendChild(img);
@@ -340,26 +339,28 @@ interface ToolbarButtonProps {
   label: string;
   isActive?: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
 const ToolbarButton = ({
   onClick,
   icon,
   label,
-  isActive,
-  disabled,
+  isActive = false,
+  disabled = false,
+  className = "",
 }: ToolbarButtonProps) => {
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-900",
-        isActive && "bg-gray-100 text-blue-600",
-        disabled && "opacity-50 cursor-not-allowed"
+        "p-2 rounded-md hover:bg-gray-100 text-gray-700 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed",
+        isActive ? "bg-gray-200 text-gray-900" : "",
+        className
       )}
-      title={label}
-      type="button"
+      aria-label={label}
     >
       {icon}
     </button>
@@ -847,7 +848,32 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         position: relative;
         display: inline-block;
         max-width: 100%;
-        margin: 0.5rem 0;
+        margin: 0.5rem 1rem 1rem 1rem;
+        vertical-align: middle;
+        shape-outside: content-box;
+        shape-margin: 0.75rem;
+      }
+      
+      /* Improve text wrapping around images */
+      .ProseMirror p {
+        margin: 0 0 1em 0;
+        line-height: 1.6;
+      }
+      
+      .ProseMirror img.floating-image {
+        margin: 0.5rem 1rem 1rem 1rem;
+      }
+      
+      .ProseMirror img[data-float="left"] {
+        float: left;
+        margin-right: 1.5rem;
+        margin-left: 0;
+      }
+      
+      .ProseMirror img[data-float="right"] {
+        float: right;
+        margin-left: 1.5rem;
+        margin-right: 0;
       }
       
       .resize-handle {
@@ -967,11 +993,9 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       StarterKit.configure({
         bulletList: { keepMarks: true, keepAttributes: false },
         orderedList: { keepMarks: true, keepAttributes: false },
-        codeBlock: false,
         heading: false,
       }),
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
-      CodeBlockLowlight.configure({ lowlight }),
       CustomLink.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -1237,7 +1261,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     return html.replace(/></g, ">\n<");
   };
 
-  // Image alignment handler
+  // Toggle image alignment (left/right/none)
   const setImageAlignment = (float: string) => {
     const { state } = editor;
     const { selection } = state;
@@ -1245,7 +1269,22 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     const node = $from.nodeAfter || $from.nodeBefore;
 
     if (node && node.type.name === 'resizableImage') {
-      editor.chain().focus().updateAttributes('resizableImage', { float }).run();
+      // Toggle off if clicking the same alignment
+      const currentFloat = node.attrs.float || 'none';
+      const newFloat = currentFloat === float ? 'none' : float;
+      
+      // Set appropriate margins based on alignment
+      let margin = '0 16px 16px 0'; // default right margin
+      if (newFloat === 'right') {
+        margin = '0 0 16px 16px'; // left margin when right-aligned
+      } else if (newFloat === 'none') {
+        margin = '16px auto'; // centered
+      }
+      
+      editor.chain().focus().updateAttributes('resizableImage', { 
+        float: newFloat,
+        margin: margin
+      }).run();
     }
   };
 
@@ -1259,7 +1298,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     if (node && node.type.name === 'resizableImage') {
       return node.attrs.float || 'none';
     }
-    return 'none';
+    return null;
   };
 
   // Check if cursor is on an image
@@ -1269,6 +1308,19 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     const { $from } = selection;
     const node = $from.nodeAfter || $from.nodeBefore;
     return node && node.type.name === 'resizableImage';
+  };
+  
+  // Get current image attributes
+  const getImageAttributes = () => {
+    const { state } = editor;
+    const { selection } = state;
+    const { $from } = selection;
+    const node = $from.nodeAfter || $from.nodeBefore;
+    
+    if (node && node.type.name === 'resizableImage') {
+      return node.attrs;
+    }
+    return null;
   };
 
   return (
@@ -1538,25 +1590,28 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
             
             {/* Image Alignment Controls - Only show when an image is selected */}
             {isImageSelected() && (
-              <div className="flex items-center ml-2 border-l pl-2">
-                <span className="text-xs text-muted-foreground mr-2">Image:</span>
+              <div className="flex items-center ml-2 border-l pl-2 gap-1">
+                <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">Image:</span>
                 <ToolbarButton
                   onClick={() => setImageAlignment('left')}
                   isActive={getImageAlignment() === 'left'}
                   icon={<AlignLeft className="w-4 h-4" />}
                   label="Float Left"
+                  className={getImageAlignment() === 'left' ? 'bg-gray-200' : ''}
                 />
                 <ToolbarButton
                   onClick={() => setImageAlignment('none')}
                   isActive={getImageAlignment() === 'none'}
                   icon={<AlignCenter className="w-4 h-4" />}
                   label="Center"
+                  className={getImageAlignment() === 'none' ? 'bg-gray-200' : ''}
                 />
                 <ToolbarButton
                   onClick={() => setImageAlignment('right')}
                   isActive={getImageAlignment() === 'right'}
                   icon={<AlignRight className="w-4 h-4" />}
                   label="Float Right"
+                  className={getImageAlignment() === 'right' ? 'bg-gray-200' : ''}
                 />
               </div>
             )}
