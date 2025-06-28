@@ -97,7 +97,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   //   };
   // }, []);
   const fetchQuestions = useCallback(async () => {
-    if (!page?.id || !page?.categories?.id) {
+    if (!page?.id || !page?.categories?.[0]?.id) {
       // Don't proceed if page ID or category ID is not defined
       setCurrentQuestions([]);
       return;
@@ -109,7 +109,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     try {
       const limit = page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
       const response = await fetch(
-        `${env.API_TEST}/questions/practice?categoryId=${page.categories.id}&limit=${limit}`,
+        `${env.API_TEST}/questions/practice?categoryId=${page.categories[0].id}&limit=${limit}`,
         {
           headers: {
             'Authorization': `Bearer ${Cookies.get('token')}`,

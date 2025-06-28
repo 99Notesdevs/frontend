@@ -57,7 +57,7 @@ async function getPage(
 type Params = { slug: string };
 
 export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
-  const {slug} = params;
+  const {slug} = await params;
   const page = await getPage(slug);
 
   if (!page || !page.metadata) {
@@ -108,7 +108,7 @@ export async function generateMetadata({params}: {params: Params}): Promise<Meta
 
 
 export default async function Page({ params }: { params: Params }) {
-  const { slug } = params;
+  const { slug } = await params;
   const page = await getPage(slug);
 
   if (!page) {

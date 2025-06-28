@@ -62,7 +62,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
         const limit = page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
         console.log(page);
         const response = await fetch(
-          `${env.API_TEST}/questions/practice?categoryId=${page.categories?.id}&limit=${limit}`,
+          `${env.API_TEST}/questions/practice?categoryId=${page.categories?.[0].id}&limit=${limit}`,
           {
             headers: {
               'Authorization': `Bearer ${Cookies.get('token')}`,

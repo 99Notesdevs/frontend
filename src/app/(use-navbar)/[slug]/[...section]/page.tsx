@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function Page({ params }: { params: Params }) {
-  const { slug, section } = params;
+  const { slug, section } = await params;
   const page = await getPage(slug, section);
 
   if (!page) {
