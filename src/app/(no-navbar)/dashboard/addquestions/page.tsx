@@ -5,8 +5,22 @@ import { Input } from "@/components/ui/input";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
 import CategorySelect from "@/components/testUtils/CategorySelect";
-import TiptapEditor from "@/components/ui/tiptapeditor";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
+const TiptapEditor = dynamic(
+  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
+  { 
+    ssr: false, // Disable server-side rendering for this component
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    )
+  }
+);
+
 interface Category {
   id: number;
   name: string;

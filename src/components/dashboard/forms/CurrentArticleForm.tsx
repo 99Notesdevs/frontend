@@ -14,7 +14,8 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import TiptapEditor from "@/components/ui/tiptapeditor";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
@@ -34,6 +35,19 @@ import {
   BlogsManager,
   Blog,
 } from "@/components/dashboard/static/current-affair/BlogsManager";
+
+const TiptapEditor = dynamic(
+  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
+  { 
+    ssr: false, // Disable server-side rendering for this component
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    )
+  }
+);
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),

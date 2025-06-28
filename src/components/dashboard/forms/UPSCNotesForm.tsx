@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Editor from "@/components/ui/tiptapeditor";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Form,
   FormControl,
@@ -24,6 +25,18 @@ import {
 } from "@/components/ui/select";
 import DraftDialog from "@/components/ui/DraftDialog";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
+const TiptapEditor = dynamic(
+  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
+  { 
+    ssr: false, // Disable server-side rendering for this component
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    )
+  }
+);
 
 const formSchema = z.object({
   title: z.string(),
@@ -374,7 +387,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
                   Content <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Editor content={field.value} onChange={field.onChange} />
+                  <TiptapEditor content={field.value} onChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}

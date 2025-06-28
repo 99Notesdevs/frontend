@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Form,
   FormControl,
@@ -20,12 +22,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import TiptapEditor from "@/components/ui/tiptapeditor";
 import { Label } from "@radix-ui/react-label";
 import Image from "next/image";
 import { Alert } from "@/components/ui/alert";
 import DraftDialog from "@/components/ui/DraftDialog";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
+
+const TiptapEditor = dynamic(
+  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
+  { 
+    ssr: false, // Disable server-side rendering for this component
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    )
+  }
+);
 
 const currentAffairSchema = z.object({
   title: z.string(),
