@@ -34,9 +34,10 @@ async function getPage(slug: string, section: string[]): Promise<BaseTemplatePro
   }
 }
 
-type Params = { slug: string; section: string[] };
+type Params = Promise<{slug: string; section: string[]}>;
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+
+export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
   const { slug, section } = await params;
   const page = await getPage(slug, section);
 
@@ -46,9 +47,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       description: "The requested page could not be found.",
     };
   }
-  
   // @ts-ignore
   const JSONMetaData = JSON.parse(page.metadata);
+  console.log("JSONMetaData", JSONMetaData.schemaData);
   
   return {
     title: JSONMetaData.metaTitle || "Default Title",
@@ -87,7 +88,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-export default async function Page({ params }: { params: Params }) {
+export default async function Page({ params }: {params: Params}) {
   const { slug, section } = await params;
   const page = await getPage(slug, section);
 
@@ -101,6 +102,5 @@ export default async function Page({ params }: { params: Params }) {
     console.error('No template component found for:', page.template.id);
     notFound();
   }
-  
   return <TemplateComponent page={page} />;
 }

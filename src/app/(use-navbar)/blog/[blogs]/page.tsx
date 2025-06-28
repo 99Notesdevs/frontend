@@ -11,11 +11,12 @@ async function getPage(
   slug: string
 ): Promise<BaseTemplateProps["page"] | null> {
   try {
-    const normalizedSlug = slug.replace(/\s+/g, "-");
+    const normalizedSlug = slug.replace(/\s+/g, "-"); // Normalize slug by replacing spaces with hyphens
+    console.log("NORMALIZED SLUG", normalizedSlug);
     const response = await fetch(`${env.API}/blog/slug/${normalizedSlug}`);
     const res = await response.json();
     const page = res.data;
-    
+    console.log("PAGE", page);
     if (!page) {
       return null;
     }
@@ -27,134 +28,89 @@ async function getPage(
   }
 }
 
-type Params = {
+type Params = Promise<{
   blogs: string;
-};
+}>;
 
 export async function generateMetadata({
   params,
 }: {
   params: Params;
 }): Promise<Metadata> {
-  const { blogs: slug } = params;
+  const { blogs: slug } = await params; // Await params first
   const page = await getPage(slug);
 
-  if (!page?.metadata) {
+  if (!page || !page.metadata) {
     return {
       title: "Page Not Found",
       description: "The requested page could not be found.",
     };
   }
 
-  try {
-    const JSONMetaData = typeof page.metadata === 'string' 
-      ? JSON.parse(page.metadata) 
-      : page.metadata;
+  const JSONMetaData = JSON.parse(page.metadata);
 
-    return {
-      title: JSONMetaData.metaTitle || "Default Title",
-      description: JSONMetaData.metaDescription || "Default description",
-      keywords: JSONMetaData.metaKeywords || "Default keywords",
-      robots: JSONMetaData.robots || "index, follow",
-      openGraph: {
-        title: JSONMetaData.ogTitle || "Default OG Title",
-        description: JSONMetaData.ogDescription || "Default OG Description",
-        url: JSONMetaData.canonicalUrl || "https://example.com",
-        images: [
-          {
-            url: JSONMetaData.ogImage || "https://example.com/default-image.jpg",
-          },
-        ],
-        type: JSONMetaData.ogType || "website",
-      },
-      twitter: {
-        card: JSONMetaData.twitterCard || "summary_large_image",
-        title: JSONMetaData.twitterTitle || "Default Twitter Title",
-        description:
-          JSONMetaData.twitterDescription || "Default Twitter Description",
-        images: [
-          {
-            url:
-              JSONMetaData.twitterImage ||
-              "https://example.com/default-twitter-image.jpg",
-          },
-        ],
-      },
-      alternates: {
-        canonical:
-          JSONMetaData.canonicalUrl ||
-          "https://example.com/default-canonical-url",
-      },
-    };
-  } catch (error) {
-    console.error("Error parsing metadata:", error);
-    return {
-      title: "Error",
-      description: "There was an error loading this page's metadata.",
-    };
-  }
-}
-
-interface PageMetadata {
-  schemaData?: string | object;
-  // Add other metadata properties here as needed
+  return {
+    title: JSONMetaData.metaTitle || "Default Title",
+    description: JSONMetaData.metaDescription || "Default description",
+    keywords: JSONMetaData.metaKeywords || "Default keywords",
+    robots: JSONMetaData.robots || "index, follow",
+    openGraph: {
+      title: JSONMetaData.ogTitle || "Default OG Title",
+      description: JSONMetaData.ogDescription || "Default OG Description",
+      url: JSONMetaData.canonicalUrl || "https://example.com",
+      images: [
+        {
+          url: JSONMetaData.ogImage || "https://example.com/default-image.jpg",
+        },
+      ],
+      type: JSONMetaData.ogType || "website",
+    },
+    twitter: {
+      card: JSONMetaData.twitterCard || "summary_large_image",
+      title: JSONMetaData.twitterTitle || "Default Twitter Title",
+      description:
+        JSONMetaData.twitterDescription || "Default Twitter Description",
+      images: [
+        {
+          url:
+            JSONMetaData.twitterImage ||
+            "https://example.com/default-twitter-image.jpg",
+        },
+      ],
+    },
+    alternates: {
+      canonical:
+        JSONMetaData.canonicalUrl ||
+        "https://example.com/default-canonical-url",
+    },
+  };
 }
 
 export default async function Page({ params }: { params: Params }) {
-  const { blogs: slug } = params;
+  const { blogs: slug } = await params; // Await params first
   const normalizedSlug = slug.replace(/\s+/g, "-");
   const page = await getPage(normalizedSlug);
-  
+  const tags = page?.tags;
   if (!page) {
     notFound();
   }
 
-  const { title, content, metadata, imageUrl, id, tags = [] } = page;
-  
-  // Safely parse metadata
-  let parsedMetadata: PageMetadata = {};
-  try {
-    parsedMetadata = typeof metadata === 'string' ? JSON.parse(metadata) : metadata || {};
-  } catch (error) {
-    console.error("Error parsing metadata:", error);
-  }
-
-  // Safely handle image URL
-  let displayImage = "";
-  let displayImageAlt = "";
-  
-  try {
-    if (imageUrl) {
-      const displayImageArray = typeof imageUrl === 'string' ? JSON.parse(imageUrl) : [];
-      displayImage = displayImageArray[0] || "";
-      displayImageAlt = displayImageArray[1] || "";
-    } 
-  } catch (error) {
-    console.warn("Error parsing image URL:", error);
-  }
-
-  // Safely handle JSON-LD
-  let jsonLD = "";
-  try {
-    if (parsedMetadata.schemaData) {
-      jsonLD = typeof parsedMetadata.schemaData === 'string' 
-        ? parsedMetadata.schemaData 
-        : JSON.stringify(parsedMetadata.schemaData);
-    }
-  } catch (error) {
-    console.warn("Error processing JSON-LD:", error);
-  }
+  const { title, content, metadata, imageUrl, id } = page;
+  const parsedMetadata =
+    typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
+  const jsonLD = parsedMetadata.schemaData;
+  const displayImagearray = JSON.parse(imageUrl as string) || (parsedMetadata.coverImage as string);
+  const displayImage = displayImagearray[0];
+  const displayImageAlt = displayImagearray[1];
 
   return (
     <>
-      {jsonLD && (
-        <section>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: jsonLD }}
-          />
-        </section>
-      )}
+      <section>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLD || "" }}
+        />
+      </section>
       <main>
         <div className="min-h-screen bg-white relative w-full overflow-x-hidden">
           {/* Assistive Touch */}
@@ -174,11 +130,6 @@ export default async function Page({ params }: { params: Params }) {
                           fill
                           className="object-cover rounded-t-xl"
                           priority
-                          onError={(e) => {
-                            // Fallback if image fails to load
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
                         />
                       </div>
                     </div>
