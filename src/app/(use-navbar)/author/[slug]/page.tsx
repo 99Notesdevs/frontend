@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { env } from '@/config/env';
-
+import Cookies from 'js-cookie';
 interface Author {
   id: string;
   name: string;
@@ -33,10 +33,14 @@ export default function AuthorPage() {
 
     const fetchAuthor = async () => {
       try {
-        const response = await fetch(`${env.API}/author/${slug}`);
+        const response = await fetch(`${env.API}/author/${slug}`,{
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        });
         if (!response.ok) throw new Error('Failed to fetch author data');
         const data = await response.json();
-        setAuthor(data);
+        setAuthor(data.data);
         setError(null);
       } catch (err) {
         setError('Failed to load author information');

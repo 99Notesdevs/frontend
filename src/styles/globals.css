@@ -315,7 +315,6 @@ h6 {
   display: block;
   border-radius: 0.375rem;
   margin: 0;
-  vertical-align: bottom;
 }
 
 /* Text wrapping around images */
@@ -549,7 +548,6 @@ h6 {
   max-width: 100%;
   height: auto;
   display: block;
-  vertical-align: bottom;
   margin: 0;
 }
 
@@ -905,9 +903,6 @@ a[data-description]:hover::after {
 /* --- Fix: Remove or override white-space: nowrap for paragraphs and floated images --- */
 
 /* Remove this if not needed (it breaks wrapping in table cells): */
-.ProseMirror td {
-  /* white-space: nowrap; */ /* <-- comment out or remove this line */
-}
 
 /* Ensure paragraphs and block elements wrap text around floated images */
 .article-body p,
