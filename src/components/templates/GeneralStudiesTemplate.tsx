@@ -60,6 +60,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
       
       try {
         const limit = page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
+        console.log(page);
         const response = await fetch(
           `${env.API_TEST}/questions/practice?categoryId=${page.categories?.id}&limit=${limit}`,
           {
@@ -68,6 +69,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
             },
           }
         );
+        
   
         if (!response.ok) {
           throw new Error('Failed to fetch questions');
@@ -309,78 +311,80 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                         </div>
                       </div>
 
-                      {/* Practice Questions Section */}
-                      <div className="sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl">
-                        <div className="bg-gradient-to-br from-white to-[#f8f9fa] border-2 border-[var(--info-surface)] rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                          <div className="bg-gradient-to-r from-yellow-500 to-amber-300 px-6 py-4">
-                            <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                              <span className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                              </span>
-                              <span className="drop-shadow-sm">Practice PYQs</span>
-                            </h3>
-                            <p className="text-white/90 text-sm mt-1">Test your knowledge with these practice questions</p>
-                          </div>
-                          
-                          <div className="p-6">
-                            {isLoading ? (
-                              <div className="flex flex-col items-center justify-center py-8">
-                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-                                <p className="text-gray-600 font-medium">Loading Questions...</p>
-                                <p className="text-sm text-gray-500 mt-1">Preparing your practice session</p>
-                              </div>
-                            ) : error ? (
-                              <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-                                <div className="flex">
-                                  <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                    </svg>
-                                  </div>
-                                  <div className="ml-3">
-                                    <p className="text-sm text-red-700">{error}</p>
-                                    <button 
-                                      onClick={fetchQuestions}
-                                      className="mt-2 text-sm font-medium text-red-700 hover:text-red-600 underline"
-                                    >
-                                      Try Again
-                                    </button>
+                      {/* Practice Questions Section - Only show when there are questions or still loading */}
+                      {(isLoading || (currentQuestions && currentQuestions.length > 0)) && (
+                        <div className="sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl">
+                          <div className="bg-gradient-to-br from-white to-[#f8f9fa] border-2 border-[var(--info-surface)] rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
+                            <div className="bg-gradient-to-r from-yellow-500 to-amber-300 px-6 py-4">
+                              <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                                <span className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                </span>
+                                <span className="drop-shadow-sm">Practice PYQs</span>
+                              </h3>
+                              <p className="text-white/90 text-sm mt-1">Test your knowledge with these practice questions</p>
+                            </div>
+                            
+                            <div className="p-6">
+                              {isLoading ? (
+                                <div className="flex flex-col items-center justify-center py-8">
+                                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+                                  <p className="text-gray-600 font-medium">Loading Questions...</p>
+                                  <p className="text-sm text-gray-500 mt-1">Preparing your practice session</p>
+                                </div>
+                              ) : error ? (
+                                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                                  <div className="flex">
+                                    <div className="flex-shrink-0">
+                                      <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                      </svg>
+                                    </div>
+                                    <div className="ml-3">
+                                      <p className="text-sm text-red-700">{error}</p>
+                                      <button 
+                                        onClick={fetchQuestions}
+                                        className="mt-2 text-sm font-medium text-red-700 hover:text-red-600 underline"
+                                      >
+                                        Try Again
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ) : (
-                              <div className="animate-fade-in">
-                                <Quiz 
-                                  questions={currentQuestions} 
-                                  onQuizComplete={handleQuizComplete} 
-                                />
+                              ) : (
+                                <div className="animate-fade-in">
+                                  <Quiz 
+                                    questions={currentQuestions} 
+                                    onQuizComplete={handleQuizComplete} 
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            
+                            {!isLoading && !error && (
+                              <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center">
+                                <div className="flex items-center text-sm text-gray-500">
+                                  <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                  </svg>
+                                  {currentQuestions.length} Questions
+                                </div>
+                                <button 
+                                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                                  className="text-sm font-medium text-yellow-600 hover:text-yellow-700 flex items-center"
+                                >
+                                  <span>Back to Top</span>
+                                  <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                  </svg>
+                                </button>
                               </div>
                             )}
                           </div>
-                          
-                          {!isLoading && !error && (
-                            <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center">
-                              <div className="flex items-center text-sm text-gray-500">
-                                <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                </svg>
-                                {currentQuestions.length} Questions
-                              </div>
-                              <button 
-                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                className="text-sm font-medium text-yellow-600 hover:text-yellow-700 flex items-center"
-                              >
-                                <span>Back to Top</span>
-                                <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                                </svg>
-                              </button>
-                            </div>
-                          )}
                         </div>
-                      </div>
+                      )}
 
                       {/* Social Media Section */}
                       <div className="bg-white border border-[var(--border-light)] rounded-xl shadow-lg p-6">

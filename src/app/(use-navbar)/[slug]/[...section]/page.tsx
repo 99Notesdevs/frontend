@@ -37,7 +37,7 @@ async function getPage(slug: string, section: string[]): Promise<BaseTemplatePro
 type Params = { slug: string; section: string[] };
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug, section } = params;
+  const { slug, section } = await params;
   const page = await getPage(slug, section);
 
   if (!page || !page.metadata) {

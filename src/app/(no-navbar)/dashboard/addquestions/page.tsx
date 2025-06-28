@@ -60,6 +60,26 @@ const formRef = useRef<HTMLDivElement>(null);
     isOpen: boolean;
     questionId: string | null;
   }>({ isOpen: false, questionId: null });
+  
+  const [formKey, setFormKey] = useState(0);
+
+  const resetForm = () => {
+    setNewQuestion({
+      id: "",
+      question: "",
+      answer: "",
+      options: [],
+      categoryId: selectedCategory || 0,
+      explaination: "",
+      creatorName: creatorName || "",
+      multipleCorrectType: false,
+      pyq: false,
+      year: null,
+      rating: null
+    });
+    // Force re-render of the form to reset Tiptap editors
+    setFormKey(prev => prev + 1);
+  };
 
   // Fetch questions for selected category
   // Auto-hide toast after 3 seconds
@@ -198,19 +218,7 @@ const formRef = useRef<HTMLDivElement>(null);
       setToast({ message: "Question added successfully!", type: "success" });
   
       // Reset form
-      setNewQuestion({
-        id: "",
-        question: "",
-        answer: "",
-        options: [],
-        categoryId: selectedCategory || 0,
-        explaination: "",
-        creatorName: creatorName || "",
-        multipleCorrectType: false,
-        pyq: false,
-        year: null,
-        rating: null
-      });
+      resetForm();
       
       // Scroll to the top of the questions list
       if (formRef.current) {
@@ -403,6 +411,7 @@ const formRef = useRef<HTMLDivElement>(null);
               {editingQuestion ? "Edit Question" : "Add New Question"}
             </h2>
             <form
+              key={`form-${formKey}`}
               onSubmit={
                 editingQuestion ? handleUpdateQuestion : handleCreateQuestion
               }
@@ -760,23 +769,6 @@ const formRef = useRef<HTMLDivElement>(null);
                 Delete
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg text-white ${
-          toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-        }`}>
-          <div className="flex items-center">
-            <span>{toast.message}</span>
-            <button 
-              onClick={() => setToast(null)}
-              className="ml-4 text-white hover:text-gray-200"
-            >
-              ✕
-            </button>
           </div>
         </div>
       )}

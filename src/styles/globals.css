@@ -250,15 +250,188 @@ h6 {
   position: relative;
   vertical-align: top;
   box-sizing: border-box;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 /* Reset expanded width */
 .ProseMirror td p, .ProseMirror th p {
   margin: 0;
   min-width: 0;
+  white-space: normal;
+}
+
+/* Ensure table cells don't wrap text */
+.ProseMirror td {
+  white-space: nowrap;
+}
+
+/* Image floating and wrapping styles */
+.ProseMirror {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Floating image container */
+.ProseMirror [data-type="image-container"] {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 1rem 1rem 0;
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+/* Left floating image */
+.ProseMirror [data-type="image-container"][data-float="left"] {
+  float: left;
+  margin: 0.5rem 1rem 0.5rem 0;
+  shape-outside: margin-box;
+  shape-margin: 0.75rem;
+  clear: left;
+}
+
+/* Right floating image */
+.ProseMirror [data-type="image-container"][data-float="right"] {
+  float: right;
+  margin: 0.5rem 0 0.5rem 1rem;
+  shape-outside: margin-box;
+  shape-margin: 0.75rem;
+  clear: right;
+}
+
+/* Centered image */
+.ProseMirror [data-type="image-container"][data-float="none"] {
+  display: block;
+  margin: 1rem auto;
+  float: none;
+  clear: both;
+}
+
+/* Image styles */
+.ProseMirror .floating-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0.375rem;
+  margin: 0;
+  vertical-align: bottom;
+}
+
+/* Text wrapping around images */
+.ProseMirror p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  overflow: visible;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  margin: 0 0 1rem 1.5rem;
+  padding: 0;
+}
+
+/* Clear floats after content */
+.ProseMirror > *:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Fix for paragraphs after floats */
+.ProseMirror p + p {
+  clear: none;
+}
+
+/* Ensure proper spacing around images */
+.ProseMirror [data-type="image-container"] + p,
+.ProseMirror p + [data-type="image-container"] {
+  margin-top: 0;
+}
+
+/* Clear floats after content */
+.ProseMirror > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Clearfix for floated elements */
+.ProseMirror-clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Ensure proper text flow around floats */
+.ProseMirror > * + * {
+  margin-top: 0.75rem;
+}
+
+/* Fix for list items near floats */
+.ProseMirror li {
+  clear: both;
+}
+
+/* Better handling of content after floats */
+.ProseMirror > * {
+  clear: none;
+}
+
+/* Fix for images in lists */
+.ProseMirror li [data-type="image-container"] {
+  margin: 0.5rem 0;
+}
+
+/* Fix for image selection */
+.ProseMirror .floating-image {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Image resize handle */
+.ProseMirror [data-resizable="true"] {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.ProseMirror [data-resizable="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background-color: #3b82f6;
+  cursor: nwse-resize;
+  border-radius: 2px 0 0 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ProseMirror [data-resizable="true"]:hover::after {
+  opacity: 1;
+}
+
+/* Add a subtle shadow to indicate scrollability */
+.ProseMirror table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.ProseMirror table::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.ProseMirror table::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.ProseMirror table::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Heading highlight animation */
@@ -332,36 +505,52 @@ h6 {
   clear: left;
 }
 
+/* Image Container Styles */
+.resizable-image-container {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  line-height: 0;
+  margin: 0 16px 16px 0;
+}
+
+/* Float left */
+.ProseMirror [data-float="left"],
+.resizable-image-container[data-float="left"] {
+  float: left;
+  margin: 0 16px 16px 0;
+  clear: left;
+  shape-outside: content-box;
+  shape-margin: 1rem;
+}
+
 /* Float right */
-.ProseMirror [data-float="right"] {
+.ProseMirror [data-float="right"],
+.resizable-image-container[data-float="right"] {
   float: right;
-  margin: 0 0 1rem 1rem;
+  margin: 0 0 16px 16px;
   clear: right;
+  shape-outside: content-box;
+  shape-margin: 1rem;
 }
 
 /* Center (no float) */
-.ProseMirror [data-float="none"] {
+.ProseMirror [data-float="none"],
+.resizable-image-container[data-float="none"] {
   display: block;
   float: none;
   margin: 1rem auto;
   clear: both;
 }
 
-/* Ensure text wraps around floated images */
-.ProseMirror p {
-  margin: 0 0 1rem 0;
-  text-align: left;
-  word-wrap: break-word;
-}
-
-/* Image container with resize handle */
-.resizable-image-container {
-  position: relative;
-  display: inline-block;
+/* Floating image styles */
+.floating-image {
   max-width: 100%;
-  line-height: 0;
+  height: auto;
+  display: block;
+  vertical-align: bottom;
   margin: 0;
-  vertical-align: middle;
 }
 
 /* Resize handle */
@@ -371,19 +560,31 @@ h6 {
   bottom: -8px;
   width: 16px;
   height: 16px;
-  background: #3b82f6;
-  border: 2px solid white;
-  border-radius: 50%;
+  background-color: #3b82f6;
+  border-radius: 2px;
   cursor: nwse-resize;
   opacity: 0;
   transition: opacity 0.2s;
   z-index: 10;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Show resize handle on container hover */
 .resizable-image-container:hover .resize-handle {
   opacity: 1;
+}
+
+/* Ensure proper text wrapping */
+.ProseMirror {
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.ProseMirror p,
+.ProseMirror ul,
+.ProseMirror ol {
+  margin: 0 0 1em 0;
+  clear: none;
 }
 
 /* Clear floats after content */
@@ -393,8 +594,23 @@ h6 {
   clear: both;
 }
 
+/* Fix for text flowing around images */
+.ProseMirror p:first-child,
+.ProseMirror ul:first-child,
+.ProseMirror ol:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror p:last-child,
+.ProseMirror ul:last-child,
+.ProseMirror ol:last-child {
+  margin-bottom: 0;
+}
+
 /* Ensure text flows around floated images */
-.ProseMirror > p {
+.ProseMirror p,
+.ProseMirror ul,
+.ProseMirror ol {
   overflow: visible;
 }
 
@@ -666,3 +882,54 @@ a[data-description]:hover::after {
     border-bottom-color: #374151;
   }
 } */
+
+/* --- Remove or comment out any rules like this if present: --- */
+/* span img {
+  display: inline !important;
+} */
+
+/* --- Add article-body scope for rendered articles --- */
+.article-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.article-body p {
+  margin-bottom: 1rem;
+}
+
+/* --- Ensure no rules override float/margin for images --- */
+/* Remove or comment out any global img rules that force display:inline or override float/margin */
+
+/* --- Fix: Remove or override white-space: nowrap for paragraphs and floated images --- */
+
+/* Remove this if not needed (it breaks wrapping in table cells): */
+.ProseMirror td {
+  /* white-space: nowrap; */ /* <-- comment out or remove this line */
+}
+
+/* Ensure paragraphs and block elements wrap text around floated images */
+.article-body p,
+.ProseMirror p {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Optional: Ensure floated images don't force text to the bottom */
+.article-body img.float-left,
+.article-body img.float-right,
+.ProseMirror img.float-left,
+.ProseMirror img.float-right {
+  display: block;
+  /* margin already handled by Tailwind classes */
+}
+
+/* Optional: Add clearfix to parent paragraphs if needed */
+.article-body p::after,
+.ProseMirror p::after {
+  content: "";
+  display: table;
+  clear: both;
+}

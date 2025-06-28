@@ -20,14 +20,25 @@ interface BlogCardProps {
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
   return (
     <Link href={`/blog/${blog.slug}`} className="group block bg-white border border-[var(--border-light)] rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 h-[360px] w-full">
-      <div className="relative h-[160px] w-full overflow-hidden">
-        <Image
-          src={blog.imageUrl}
-          alt={blog.alt || 'Blog Image'}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-        />
+      <div className="relative h-[160px] w-full overflow-hidden bg-gray-100">
+        {blog.imageUrl ? (
+          <Image
+            src={blog.imageUrl}
+            alt={blog.title || 'Blog post image'}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = '/images/placeholder-blog.png';
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <span className="text-gray-400 text-sm">No image available</span>
+          </div>
+        )}
       </div>
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
