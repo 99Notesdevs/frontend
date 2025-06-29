@@ -112,7 +112,7 @@ export default async function Page({ params }: { params: Params }) {
   const { slug } = await params;
   const page = await getPage(slug);
 
-  if (!page) {
+  if (!slug || !page) {
     notFound();
   }
 

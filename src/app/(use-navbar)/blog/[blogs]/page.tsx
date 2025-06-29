@@ -91,7 +91,7 @@ export default async function Page({ params }: { params: Params }) {
   const normalizedSlug = slug.replace(/\s+/g, "-");
   const page = await getPage(normalizedSlug);
   const tags = page?.tags;
-  if (!page) {
+  if (!slug || !page) {
     notFound();
   }
 
