@@ -39,6 +39,12 @@ type Params = Promise<{slug: string; section: string[]}>;
 
 export async function generateMetadata({params}: {params: Params}): Promise<Metadata> {
   const { slug, section } = await params;
+  if (!slug || !section) {
+    return {
+      title: "Page Not Found",
+      description: "The requested page could not be found.",
+    };
+  }
   const page = await getPage(slug, section);
 
   if (!page || !page.metadata) {
@@ -91,7 +97,9 @@ export async function generateMetadata({params}: {params: Params}): Promise<Meta
 export default async function Page({ params }: {params: Params}) {
   const { slug, section } = await params;
   const page = await getPage(slug, section);
-
+  if (!slug || !section) {
+    notFound();
+  }
   if (!page) {
     notFound();
   }
