@@ -17,6 +17,68 @@
   }
 }
 
+/* Table styles */
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  margin: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table-wrapper table {
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+  min-width: 100px;
+}
+
+.table-wrapper th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.table-wrapper tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.table-wrapper tr:hover {
+  background-color: #f3f4f6;
+}
+
+/* For TipTap editor */
+.ProseMirror .table-wrapper {
+  margin: 0.5rem 0;
+}
+
+.ProseMirror table {
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.ProseMirror th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
 /* Yellow icon styling */
 .yellow-icon {
   filter: invert(70%) sepia(80%) saturate(1000%) hue-rotate(360deg) brightness(110%);
@@ -476,7 +538,7 @@ h6 {
   transform: translateX(0);
 }
 
-/* Floating image styles */
+ /* Floating image styles */
 .ProseMirror .floating-image {
   display: block;
   max-width: 100%;
@@ -617,7 +679,7 @@ h6 {
   margin: 0;
   padding: 0;
   vertical-align: middle;
-}
+} 
 
 /* Enhanced Tiptap Editor Link Preview */
 a[data-description] {
@@ -928,3 +990,7 @@ a[data-description]:hover::after {
   display: table;
   clear: both;
 }
+
+/* --- Tailwind classes now handle table overflow and min-width --- */
+/* Remove or comment out any global table/cell white-space: nowrap rules if present */
+/* .table-wrapper table, .table-wrapper th, .table-wrapper td { ... } */

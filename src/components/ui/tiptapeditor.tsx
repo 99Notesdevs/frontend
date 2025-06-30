@@ -89,7 +89,6 @@ const FontSize = Mark.create({
 
 const TableStyles = Extension.create({
   name: 'tableStyles',
-
   addGlobalAttributes() {
     return [
       {
@@ -109,9 +108,14 @@ const TableStyles = Extension.create({
   },
 });
 
-// Custom Image extension with resizing and text wrapping support
+// Custom Image extension with floating and clearing support
 const CustomImage = Image.extend({
-  name: 'resizableImage',
+  name: 'floatingImage',
+  group: 'block',
+  draggable: true,
+  selectable: true,
+  atom: true,
+  
   addOptions() {
     return {
       ...this.parent?.(),
@@ -120,171 +124,119 @@ const CustomImage = Image.extend({
       },
     };
   },
+  
   addAttributes() {
     return {
       ...this.parent?.(),
       src: { default: null },
-      alt: { default: null },
-      title: { default: null },
-      width: {
-        default: 'auto',
-        renderHTML: attributes => ({
-          width: attributes.width,
-        }),
-      },
-      height: {
-        default: 'auto',
-        renderHTML: attributes => ({
-          height: attributes.height,
-        }),
-      },
+      alt: { default: '' },
+      title: { default: '' },
+      width: { default: 'auto' },
+      height: { default: 'auto' },
       float: {
         default: 'none',
         renderHTML: attributes => ({
-          float: attributes.float,
-        }),
-      },
-      margin: {
-        default: '0 16px 16px 0',
-        renderHTML: attributes => ({
-          margin: attributes.margin,
+          'data-float': attributes.float,
         }),
       },
     };
   },
+  
+  parseHTML() {
+    return [
+      {
+        tag: 'img[src]',
+        getAttrs: (node: HTMLElement) => ({
+          src: node.getAttribute('src'),
+          alt: node.getAttribute('alt') || '',
+          title: node.getAttribute('title') || '',
+          width: node.getAttribute('width') || 'auto',
+          height: node.getAttribute('height') || 'auto',
+          float: node.getAttribute('data-float') || 'none',
+        }),
+      },
+    ];
+  },
+  
   renderHTML({ HTMLAttributes }) {
-    // Map float to Tailwind classes
-    let floatClass = '';
-    let marginClass = 'mb-4';
-    if (HTMLAttributes.float === 'left') {
-      floatClass = 'float-left';
-      marginClass = 'mr-4 mb-4';
-    } else if (HTMLAttributes.float === 'right') {
-      floatClass = 'float-right';
-      marginClass = 'ml-4 mb-4';
-    } else {
-      floatClass = 'mx-auto';
-      marginClass = 'mb-4';
-    }
-    // Compose class string
-    const className = [
-      'floating-image',
-      floatClass,
-      marginClass,
-    ].join(' ');
-
-    // Merge with any additional classes
-    const attrs = {
-      ...HTMLAttributes,
-      class: className,
-      style: [
-        HTMLAttributes.width && HTMLAttributes.width !== 'auto' ? `width:${HTMLAttributes.width};` : '',
-        HTMLAttributes.height && HTMLAttributes.height !== 'auto' ? `height:${HTMLAttributes.height};` : '',
-        'max-width:100%;height:auto;display:block;border-radius:0.375rem;',
-      ].join(''),
-    };
-
-    return ['img', attrs];
+    const { float, ...attrs } = HTMLAttributes;
+    const floatClass = float === 'left' ? 'float-left' : float === 'right' ? 'float-right' : 'mx-auto';
+    
+    return [
+      'div',
+      { 
+        class: `image-container ${floatClass} clearfix`,
+        'data-float': float,
+      },
+      ['img', { 
+        ...attrs,
+        class: `floating-image ${floatClass}`,
+        style: `
+          ${attrs.width && attrs.width !== 'auto' ? `width:${attrs.width};` : ''}
+          ${attrs.height && attrs.height !== 'auto' ? `height:${attrs.height};` : ''}
+          max-width: 100%;
+          height: auto;
+          display: block;
+        `,
+      }],
+      // Add a clearfix after the image
+      ['div', { class: 'clear-both' }]
+    ];
   },
+  
   addNodeView() {
     return ({ node, getPos, editor }) => {
-      // Create the image element
+      const container = document.createElement('div');
+      container.className = 'image-container clearfix';
+      
       const img = document.createElement('img');
-      const { src, alt, width, height, float = 'none', margin = '0 16px 16px 16px' } = node.attrs;
+      const { src, alt, title, width, height, float = 'none' } = node.attrs;
       
       // Set up the image
       img.src = src;
       img.alt = alt || '';
-      img.style.width = width || '50%';
-      img.style.height = height || 'auto';
+      img.title = title || '';
+      img.className = `floating-image ${float === 'left' ? 'float-left' : float === 'right' ? 'float-right' : 'mx-auto'}`;
+      
+      // Apply styles
+      if (width && width !== 'auto') img.style.width = width;
+      if (height && height !== 'auto') img.style.height = height;
       img.style.maxWidth = '100%';
+      img.style.height = 'auto';
       img.style.display = 'block';
-      img.style.verticalAlign = 'bottom';
-      img.className = 'floating-image';
       
-      // Create the resize handle
-      const resizeHandle = document.createElement('div');
-      resizeHandle.className = 'resize-handle';
+      // Set up container
+      if (float === 'left') {
+        container.style.float = 'left';
+        container.style.margin = '0 1rem 1rem 0';
+      } else if (float === 'right') {
+        container.style.float = 'right';
+        container.style.margin = '0 0 1rem 1rem';
+      } else {
+        container.style.margin = '0 auto 1rem';
+      }
       
-      // Create the container for the image and resize handle
-      const container = document.createElement('div');
-      container.className = 'resizable-image-container';
-      container.setAttribute('data-type', 'image-container');
-      container.setAttribute('data-float', float);
-      container.style.float = float;
-      container.style.maxWidth = '100%';
-      container.style.display = 'inline-block';
-      container.style.verticalAlign = 'middle';
-      container.style.margin = margin;
-      container.style.shapeOutside = 'content-box';
-      container.style.shapeMargin = '0.75rem';
-      
-      // Add elements to the container
       container.appendChild(img);
-      container.appendChild(resizeHandle);
       
-      // Resize functionality
-      let isResizing = false;
-      let startX: number, startY: number, startWidth: number, startHeight: number;
+      // Add clearfix after the image
+      const clearfix = document.createElement('div');
+      clearfix.className = 'clear-both';
       
-      const onMouseDown = (e: MouseEvent) => {
-        if (e.target === resizeHandle) {
-          e.preventDefault();
-          e.stopPropagation();
-          isResizing = true;
-          startX = e.clientX;
-          startY = e.clientY;
-          startWidth = parseInt(document.defaultView?.getComputedStyle(img).width || '0', 10);
-          startHeight = parseInt(document.defaultView?.getComputedStyle(img).height || '0', 10);
-          
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
-        }
-      };
-      
-      const onMouseMove = (e: MouseEvent) => {
-        if (!isResizing) return;
-        
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        
-        const newWidth = startWidth + dx;
-        const newHeight = startHeight + dy;
-        
-        img.style.width = `${newWidth}px`;
-        img.style.height = `${newHeight}px`;
-      };
-      
-      const onMouseUp = () => {
-        if (!isResizing) return;
-        
-        isResizing = false;
-        
-        // Update the node with new dimensions
-        const { view } = editor;
-        const { state } = view;
-        const pos = getPos();
-        
-        if (typeof pos === 'number') {
-          view.dispatch(
-            state.tr.setNodeMarkup(pos, undefined, {
-              ...node.attrs,
-              width: img.style.width,
-              height: img.style.height,
-            })
-          );
-        }
-        
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-      };
-      
-      container.addEventListener('mousedown', onMouseDown);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'image-wrapper';
+      wrapper.appendChild(container);
+      wrapper.appendChild(clearfix);
       
       return {
-        dom: container,
+        dom: wrapper,
+        update: (updatedNode) => {
+          if (updatedNode.attrs.src !== node.attrs.src) {
+            img.src = updatedNode.attrs.src;
+          }
+          return true;
+        },
         destroy: () => {
-          container.removeEventListener('mousedown', onMouseDown);
+          // Cleanup if needed
         },
       };
     };
@@ -1008,26 +960,70 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       TextStyle,
       FontSize,
       TableStyles,
-      Table.configure({
+      Table.extend({
+        renderHTML({ HTMLAttributes }) {
+          // Always wrap table in overflow-x-auto and set min-w-[700px] and whitespace-nowrap
+          return [
+            'div',
+            {
+              class: 'overflow-x-auto w-full',
+              'data-table-wrapper': 'true',
+            },
+            [
+              'table',
+              {
+                ...this.options.HTMLAttributes,
+                ...HTMLAttributes,
+                class: 'min-w-[700px] whitespace-nowrap border-collapse',
+                style: 'min-width:700px; table-layout:auto;',
+              },
+              ['tbody', 0],
+            ],
+          ];
+        },
+      }).configure({
         resizable: true,
         HTMLAttributes: {
-          style: 'width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;'
-        }
+          class: 'min-w-[700px] whitespace-nowrap border-collapse',
+          style: 'min-width:700px; border-collapse:collapse;',
+        },
       }),
       TableRow.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb;'
-        }
+          class: 'border-b border-gray-200 hover:bg-gray-50',
+        },
       }),
       TableHeader.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; background-color: #f9fafb; font-weight: 500;'
-        }
+          class: 'border-b border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700 bg-gray-50 min-w-[120px] whitespace-nowrap',
+        },
+      }),
+      TableCell.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            style: {
+              default: null,
+              parseHTML: element => element.getAttribute('style'),
+              renderHTML: attributes => {
+                if (!attributes.style) return {};
+                return { style: attributes.style };
+              },
+            },
+            class: {
+              default: 'px-4 py-3 text-sm text-gray-700 min-w-[120px] whitespace-nowrap',
+              parseHTML: element => element.getAttribute('class'),
+              renderHTML: attributes => ({
+                class: `px-4 py-3 text-sm text-gray-700 min-w-[120px] whitespace-nowrap ${attributes.class || ''}`.trim(),
+              }),
+            },
+          };
+        },
       }),
       TableCell.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top;'
-        }
+          class: 'border border-gray-200 px-4 py-2 text-sm text-gray-700 min-w-[120px] whitespace-nowrap',
+        },
       }),
       Iframe,
       CleanPaste,
@@ -1653,3 +1649,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
 };
 
 export default TiptapEditor;
+
+/* --- IMPORTANT: Update your tailwind.config.js safelist ---
+Add the following classes to the safelist to ensure Tailwind generates them for dynamic HTML:
+min-w-[700px], min-w-[120px], whitespace-nowrap, overflow-x-auto, w-full
+*/
