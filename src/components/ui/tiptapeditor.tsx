@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
@@ -36,13 +36,14 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ReactNode } from "react";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { Iframe } from "./Iframe";
 import { TABLE_DESIGNS } from "./tableDesigns";
+import { OrderedList } from '@tiptap/extension-ordered-list';
 
 // Editor instance will be created using the useEditor hook in the component
 const editor = new Editor({
@@ -266,6 +267,152 @@ const CustomLink = Link.extend({
   },
 });
 
+// Custom OrderedList extension to support different list styles
+const CustomOrderedList = OrderedList.extend({
+  addAttributes() {
+    return {
+      class: {
+        default: 'ordered',
+        parseHTML: (element: HTMLElement) => ({
+          class: element.getAttribute('class') || 'ordered'
+        }),
+      },
+    };
+  },
+  parseHTML() {
+    return [
+      {
+        tag: 'ol',
+        getAttrs: (node: HTMLElement | string) => {
+          if (typeof node === 'string') return {};
+          return {
+            class: node.getAttribute('class') || 'ordered',
+          };
+        },
+      },
+    ];
+  },
+  renderHTML({ HTMLAttributes }: { HTMLAttributes: { class?: string } }) {
+    const className = HTMLAttributes.class || 'ordered';
+    return ['ol', { ...HTMLAttributes, class: `list-${className}` }, 0];
+  },
+});
+
+// List style types
+const LIST_STYLES = [
+  { id: 'bullet', label: 'Bullets', icon: <List className="w-4 h-4" /> },
+  { id: 'ordered', label: 'Numbers (1, 2, 3)', icon: <ListOrdered className="w-4 h-4" /> },
+  { id: 'lower-roman', label: 'Roman (i, ii, iii)', icon: <span className="italic">i</span> },
+  { id: 'upper-roman', label: 'Roman (I, II, III)', icon: <span>I</span> },
+  { id: 'lower-alpha', label: 'Alphabet (a, b, c)', icon: <span>a</span> },
+];
+
+interface ListMenuProps {
+  editor: any;
+}
+
+const ListMenu = ({ editor }: ListMenuProps) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  // Close menu when clicking outside
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node) && 
+          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Get current list style
+  const getCurrentListStyle = () => {
+    if (editor.isActive('orderedList')) {
+      const attrs = editor.getAttributes('orderedList');
+      return attrs.class || 'ordered';
+    }
+    return null;
+  };
+
+  const currentStyle = getCurrentListStyle();
+  const currentStyleData = LIST_STYLES.find(style => style.id === currentStyle) || LIST_STYLES[0];
+
+  const toggleList = (styleId: string) => {
+    const isSameStyle = currentStyle === styleId;
+
+    // If clicking the same style, toggle it off
+    if (isSameStyle) {
+      editor.chain().focus().toggleOrderedList().run();
+      setIsOpen(false);
+      return;
+    }
+
+    // If switching from one list type to another
+    if (currentStyle !== null) {
+      // First clear any existing list
+      if (editor.isActive('orderedList')) {
+        editor.chain().focus().toggleOrderedList().run();
+      }
+    }
+
+    // Apply the new list style
+    editor.chain()
+      .focus()
+      .toggleOrderedList()
+      .updateAttributes('orderedList', { class: styleId })
+      .run();
+    
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <ToolbarButton
+        ref={buttonRef}
+        onClick={() => setIsOpen(!isOpen)}
+        icon={
+          <div className="flex items-center gap-1">
+            {currentStyleData.icon}
+            <ChevronDown className="w-3 h-3 opacity-50" />
+          </div>
+        }
+        label="List Styles"
+        isActive={currentStyle !== null}
+      />
+      
+      {isOpen && (
+        <div 
+          ref={menuRef}
+          className="absolute left-0 z-10 mt-1 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none"
+          role="menu"
+          aria-orientation="vertical"
+          tabIndex={-1}
+        >
+          {LIST_STYLES.map((style) => (
+            <button
+              key={style.id}
+              onClick={() => toggleList(style.id)}
+              className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
+                currentStyle === style.id 
+                  ? 'bg-gray-100 text-gray-900' 
+                  : 'text-gray-700 hover:bg-gray-50'
+              }`}
+              role="menuitem"
+              tabIndex={-1}
+            >
+              <span className="w-5 flex justify-center">{style.icon}</span>
+              <span>{style.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PRESET_COLORS = [
   '#000000', // Black
   '#343A40', // Dark Gray
@@ -285,39 +432,40 @@ const PRESET_COLORS = [
   '#F76707', // Orange
 ];
 
-interface ToolbarButtonProps {
-  onClick: () => void;
+interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
   label: string;
   isActive?: boolean;
-  disabled?: boolean;
-  className?: string;
 }
 
-const ToolbarButton = ({
+const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(({
   onClick,
   icon,
   label,
   isActive = false,
   disabled = false,
   className = "",
-}: ToolbarButtonProps) => {
+}, ref) => {
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "p-2 rounded-md hover:bg-gray-100 text-gray-700 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed",
-        isActive ? "bg-gray-200 text-gray-900" : "",
+        "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0",
+        isActive ? "bg-accent text-accent-foreground" : "",
         className
       )}
       aria-label={label}
+      title={label}
     >
       {icon}
     </button>
   );
-};
+});
+
+ToolbarButton.displayName = 'ToolbarButton';
 
 interface TableMenuProps {
   editor: any;
@@ -943,10 +1091,16 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        bulletList: { keepMarks: true, keepAttributes: false },
-        orderedList: { keepMarks: true, keepAttributes: false },
-        heading: false,
+        heading: {
+          levels: [1, 2, 3, 4, 5, 6],
+        },
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: true,
+        },
+        orderedList: false,
       }),
+      CustomOrderedList,
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       CustomLink.configure({
         openOnClick: false,
@@ -1523,18 +1677,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               isActive={editor.isActive("strike")}
             />
             <ColorMenu editor={editor} />
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-              icon={<List className="w-5 h-5" />}
-              label="Bullet List"
-              isActive={editor.isActive("bulletList")}
-            />
-            <ToolbarButton
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              icon={<ListOrdered className="w-5 h-5" />}
-              label="Ordered List"
-              isActive={editor.isActive("orderedList")}
-            />
+            <ListMenu editor={editor} />
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               icon={<Quote className="w-5 h-5" />}
@@ -1647,6 +1790,84 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     </div>
   );
 };
+
+// Add CSS for list styles
+const listStyles = `
+  .ProseMirror ul,
+  .ProseMirror ol {
+    padding: 0 1.5rem;
+    margin: 0.5rem 0;
+  }
+
+  .ProseMirror li {
+    position: relative;
+    padding-left: 0.5rem;
+    margin: 0.25rem 0;
+  }
+
+  /* Ensure list markers are visible */
+  .ProseMirror ul,
+  .ProseMirror ol {
+    color: #000; /* Black color for all list markers */
+  }
+
+  /* Nested lists */
+  .ProseMirror ul ul,
+  .ProseMirror ol ol,
+  .ProseMirror ul ol,
+  .ProseMirror ol ul {
+    margin: 0.25rem 0;
+  }
+
+  /* Ordered list styles */
+  .ProseMirror ol.list-lower-roman {
+    list-style-type: lower-roman;
+    list-style-position: outside;
+  }
+  
+  .ProseMirror ol.list-upper-roman {
+    list-style-type: upper-roman;
+    list-style-position: outside;
+  }
+  
+  .ProseMirror ol.list-lower-alpha {
+    list-style-type: lower-alpha;
+    list-style-position: outside;
+  }
+
+  /* Bullet list style */
+  .ProseMirror ol.list-bullet {
+    list-style-type: disc;
+    list-style-position: outside;
+  }
+  
+  .ProseMirror ol.list-ordered {
+    list-style-type: decimal;
+    list-style-position: outside;
+  }
+  
+  
+
+  /* Ensure list items have proper spacing */
+  .ProseMirror li > p,
+  .ProseMirror li > div {
+    margin: 0;
+    display: inline;
+  }
+
+  /* Fix for nested list spacing */
+  .ProseMirror li > ul,
+  .ProseMirror li > ol {
+    margin-bottom: 0;
+  }
+`;
+
+// Inject the styles
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = listStyles;
+  document.head.appendChild(style);
+}
 
 export default TiptapEditor;
 
