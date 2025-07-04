@@ -36,7 +36,7 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect, useRef, ReactNode } from "react";
+import React, { useState, useEffect, useRef,ReactNode } from "react";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
@@ -90,6 +90,7 @@ const FontSize = Mark.create({
 
 const TableStyles = Extension.create({
   name: 'tableStyles',
+
   addGlobalAttributes() {
     return [
       {
@@ -109,14 +110,9 @@ const TableStyles = Extension.create({
   },
 });
 
-// Custom Image extension with floating and clearing support
+// Custom Image extension with resizing and text wrapping support
 const CustomImage = Image.extend({
-  name: 'floatingImage',
-  group: 'block',
-  draggable: true,
-  selectable: true,
-  atom: true,
-  
+  name: 'resizableImage',
   addOptions() {
     return {
       ...this.parent?.(),
@@ -125,119 +121,171 @@ const CustomImage = Image.extend({
       },
     };
   },
-  
   addAttributes() {
     return {
       ...this.parent?.(),
       src: { default: null },
-      alt: { default: '' },
-      title: { default: '' },
-      width: { default: 'auto' },
-      height: { default: 'auto' },
+      alt: { default: null },
+      title: { default: null },
+      width: {
+        default: 'auto',
+        renderHTML: attributes => ({
+          width: attributes.width,
+        }),
+      },
+      height: {
+        default: 'auto',
+        renderHTML: attributes => ({
+          height: attributes.height,
+        }),
+      },
       float: {
         default: 'none',
         renderHTML: attributes => ({
-          'data-float': attributes.float,
+          float: attributes.float,
+        }),
+      },
+      margin: {
+        default: '0 16px 16px 0',
+        renderHTML: attributes => ({
+          margin: attributes.margin,
         }),
       },
     };
   },
-  
-  parseHTML() {
-    return [
-      {
-        tag: 'img[src]',
-        getAttrs: (node: HTMLElement) => ({
-          src: node.getAttribute('src'),
-          alt: node.getAttribute('alt') || '',
-          title: node.getAttribute('title') || '',
-          width: node.getAttribute('width') || 'auto',
-          height: node.getAttribute('height') || 'auto',
-          float: node.getAttribute('data-float') || 'none',
-        }),
-      },
-    ];
-  },
-  
   renderHTML({ HTMLAttributes }) {
-    const { float, ...attrs } = HTMLAttributes;
-    const floatClass = float === 'left' ? 'float-left' : float === 'right' ? 'float-right' : 'mx-auto';
-    
-    return [
-      'div',
-      { 
-        class: `image-container ${floatClass} clearfix`,
-        'data-float': float,
-      },
-      ['img', { 
-        ...attrs,
-        class: `floating-image ${floatClass}`,
-        style: `
-          ${attrs.width && attrs.width !== 'auto' ? `width:${attrs.width};` : ''}
-          ${attrs.height && attrs.height !== 'auto' ? `height:${attrs.height};` : ''}
-          max-width: 100%;
-          height: auto;
-          display: block;
-        `,
-      }],
-      // Add a clearfix after the image
-      ['div', { class: 'clear-both' }]
-    ];
+    // Map float to Tailwind classes
+    let floatClass = '';
+    let marginClass = 'mb-4';
+    if (HTMLAttributes.float === 'left') {
+      floatClass = 'float-left';
+      marginClass = 'mr-4 mb-4';
+    } else if (HTMLAttributes.float === 'right') {
+      floatClass = 'float-right';
+      marginClass = 'ml-4 mb-4';
+    } else {
+      floatClass = 'mx-auto';
+      marginClass = 'mb-4';
+    }
+    // Compose class string
+    const className = [
+      'floating-image',
+      floatClass,
+      marginClass,
+    ].join(' ');
+
+    // Merge with any additional classes
+    const attrs = {
+      ...HTMLAttributes,
+      class: className,
+      style: [
+        HTMLAttributes.width && HTMLAttributes.width !== 'auto' ? `width:${HTMLAttributes.width};` : '',
+        HTMLAttributes.height && HTMLAttributes.height !== 'auto' ? `height:${HTMLAttributes.height};` : '',
+        'max-width:100%;height:auto;display:block;border-radius:0.375rem;',
+      ].join(''),
+    };
+
+    return ['img', attrs];
   },
-  
   addNodeView() {
     return ({ node, getPos, editor }) => {
-      const container = document.createElement('div');
-      container.className = 'image-container clearfix';
-      
+      // Create the image element
       const img = document.createElement('img');
-      const { src, alt, title, width, height, float = 'none' } = node.attrs;
+      const { src, alt, width, height, float = 'none', margin = '0 16px 16px 16px' } = node.attrs;
       
       // Set up the image
       img.src = src;
       img.alt = alt || '';
-      img.title = title || '';
-      img.className = `floating-image ${float === 'left' ? 'float-left' : float === 'right' ? 'float-right' : 'mx-auto'}`;
-      
-      // Apply styles
-      if (width && width !== 'auto') img.style.width = width;
-      if (height && height !== 'auto') img.style.height = height;
+      img.style.width = width || '50%';
+      img.style.height = height || 'auto';
       img.style.maxWidth = '100%';
-      img.style.height = 'auto';
       img.style.display = 'block';
+      img.style.verticalAlign = 'bottom';
+      img.className = 'floating-image';
       
-      // Set up container
-      if (float === 'left') {
-        container.style.float = 'left';
-        container.style.margin = '0 1rem 1rem 0';
-      } else if (float === 'right') {
-        container.style.float = 'right';
-        container.style.margin = '0 0 1rem 1rem';
-      } else {
-        container.style.margin = '0 auto 1rem';
-      }
+      // Create the resize handle
+      const resizeHandle = document.createElement('div');
+      resizeHandle.className = 'resize-handle';
       
+      // Create the container for the image and resize handle
+      const container = document.createElement('div');
+      container.className = 'resizable-image-container';
+      container.setAttribute('data-type', 'image-container');
+      container.setAttribute('data-float', float);
+      container.style.float = float;
+      container.style.maxWidth = '100%';
+      container.style.display = 'inline-block';
+      container.style.verticalAlign = 'middle';
+      container.style.margin = margin;
+      container.style.shapeOutside = 'content-box';
+      container.style.shapeMargin = '0.75rem';
+      
+      // Add elements to the container
       container.appendChild(img);
+      container.appendChild(resizeHandle);
       
-      // Add clearfix after the image
-      const clearfix = document.createElement('div');
-      clearfix.className = 'clear-both';
+      // Resize functionality
+      let isResizing = false;
+      let startX: number, startY: number, startWidth: number, startHeight: number;
       
-      const wrapper = document.createElement('div');
-      wrapper.className = 'image-wrapper';
-      wrapper.appendChild(container);
-      wrapper.appendChild(clearfix);
+      const onMouseDown = (e: MouseEvent) => {
+        if (e.target === resizeHandle) {
+          e.preventDefault();
+          e.stopPropagation();
+          isResizing = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startWidth = parseInt(document.defaultView?.getComputedStyle(img).width || '0', 10);
+          startHeight = parseInt(document.defaultView?.getComputedStyle(img).height || '0', 10);
+          
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        }
+      };
+      
+      const onMouseMove = (e: MouseEvent) => {
+        if (!isResizing) return;
+        
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        
+        const newWidth = startWidth + dx;
+        const newHeight = startHeight + dy;
+        
+        img.style.width = `${newWidth}px`;
+        img.style.height = `${newHeight}px`;
+      };
+      
+      const onMouseUp = () => {
+        if (!isResizing) return;
+        
+        isResizing = false;
+        
+        // Update the node with new dimensions
+        const { view } = editor;
+        const { state } = view;
+        const pos = getPos();
+        
+        if (typeof pos === 'number') {
+          view.dispatch(
+            state.tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              width: img.style.width,
+              height: img.style.height,
+            })
+          );
+        }
+        
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+      
+      container.addEventListener('mousedown', onMouseDown);
       
       return {
-        dom: wrapper,
-        update: (updatedNode) => {
-          if (updatedNode.attrs.src !== node.attrs.src) {
-            img.src = updatedNode.attrs.src;
-          }
-          return true;
-        },
+        dom: container,
         destroy: () => {
-          // Cleanup if needed
+          container.removeEventListener('mousedown', onMouseDown);
         },
       };
     };
@@ -453,7 +501,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0",
+       "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0",
         isActive ? "bg-accent text-accent-foreground" : "",
         className
       )}
@@ -1091,7 +1139,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: {
+          heading: {
           levels: [1, 2, 3, 4, 5, 6],
         },
         bulletList: {
@@ -1114,70 +1162,26 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       TextStyle,
       FontSize,
       TableStyles,
-      Table.extend({
-        renderHTML({ HTMLAttributes }) {
-          // Always wrap table in overflow-x-auto and set min-w-[700px] and whitespace-nowrap
-          return [
-            'div',
-            {
-              class: 'overflow-x-auto w-full',
-              'data-table-wrapper': 'true',
-            },
-            [
-              'table',
-              {
-                ...this.options.HTMLAttributes,
-                ...HTMLAttributes,
-                class: 'min-w-[700px] whitespace-nowrap border-collapse',
-                style: 'min-width:700px; table-layout:auto;',
-              },
-              ['tbody', 0],
-            ],
-          ];
-        },
-      }).configure({
+      Table.configure({
         resizable: true,
         HTMLAttributes: {
-          class: 'min-w-[700px] whitespace-nowrap border-collapse',
-          style: 'min-width:700px; border-collapse:collapse;',
-        },
+          style: 'width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;'
+        }
       }),
       TableRow.configure({
         HTMLAttributes: {
-          class: 'border-b border-gray-200 hover:bg-gray-50',
-        },
+          style: 'border: 1px solid #e5e7eb;'
+        }
       }),
       TableHeader.configure({
         HTMLAttributes: {
-          class: 'border-b border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700 bg-gray-50 min-w-[120px] whitespace-nowrap',
-        },
-      }),
-      TableCell.extend({
-        addAttributes() {
-          return {
-            ...this.parent?.(),
-            style: {
-              default: null,
-              parseHTML: element => element.getAttribute('style'),
-              renderHTML: attributes => {
-                if (!attributes.style) return {};
-                return { style: attributes.style };
-              },
-            },
-            class: {
-              default: 'px-4 py-3 text-sm text-gray-700 min-w-[120px] whitespace-nowrap',
-              parseHTML: element => element.getAttribute('class'),
-              renderHTML: attributes => ({
-                class: `px-4 py-3 text-sm text-gray-700 min-w-[120px] whitespace-nowrap ${attributes.class || ''}`.trim(),
-              }),
-            },
-          };
-        },
+          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; background-color: #f9fafb; font-weight: 500;'
+        }
       }),
       TableCell.configure({
         HTMLAttributes: {
-          class: 'border border-gray-200 px-4 py-2 text-sm text-gray-700 min-w-[120px] whitespace-nowrap',
-        },
+          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top;'
+        }
       }),
       Iframe,
       CleanPaste,
@@ -1438,20 +1442,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     }
   };
 
-  // Get current image alignment
-  const getImageAlignment = () => {
-    const { state } = editor;
-    const { selection } = state;
-    const { $from } = selection;
-    const node = $from.nodeAfter || $from.nodeBefore;
-
-    if (node && node.type.name === 'resizableImage') {
-      return node.attrs.float || 'none';
-    }
-    return null;
-  };
-
-  // Check if cursor is on an image
+  // Helper: Check if cursor is on an image
   const isImageSelected = () => {
     const { state } = editor;
     const { selection } = state;
@@ -1460,15 +1451,14 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     return node && node.type.name === 'resizableImage';
   };
   
-  // Get current image attributes
-  const getImageAttributes = () => {
+  // Helper: Get current image float alignment
+  const getImageAlignment = () => {
     const { state } = editor;
     const { selection } = state;
     const { $from } = selection;
     const node = $from.nodeAfter || $from.nodeBefore;
-    
     if (node && node.type.name === 'resizableImage') {
-      return node.attrs;
+      return node.attrs.float || 'none';
     }
     return null;
   };
@@ -1870,8 +1860,3 @@ if (typeof document !== 'undefined') {
 }
 
 export default TiptapEditor;
-
-/* --- IMPORTANT: Update your tailwind.config.js safelist ---
-Add the following classes to the safelist to ensure Tailwind generates them for dynamic HTML:
-min-w-[700px], min-w-[120px], whitespace-nowrap, overflow-x-auto, w-full
-*/
