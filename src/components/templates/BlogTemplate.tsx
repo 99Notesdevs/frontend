@@ -116,12 +116,12 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
                       prose-headings:relative
                       prose-headings:mb-6
                       
-                      prose-h1:text-2xl sm:prose-h1:text-3xl lg:prose-h1:text-4xl
+                      prose-h1:text-2xl sm:prose-h1:text-3xl lg:prose-h1:text-3xl
                       prose-h1:font-bold
                       prose-h1:text-gray-800
                       prose-h1:leading-tight
                       
-                      prose-h2:text-2xl sm:prose-h2:text-3xl
+                      prose-h2:text-2xl sm:prose-h2:text-2xl
                       prose-h2:text-gray-700
                       prose-h2:pb-2
                       prose-h2:after:content-['']
