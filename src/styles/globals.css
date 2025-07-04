@@ -25,12 +25,99 @@
   -webkit-overflow-scrolling: touch;
   border-radius: 0.375rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  scrollbar-width: thin;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Tiptap table styles */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 700px; /* Ensure table has a minimum width */
+  margin: 0;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  min-width: 120px; /* Minimum width for each cell */
+  max-width: 400px; /* Maximum width for each cell */
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  position: relative;
+  vertical-align: top;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+  font-size: 0.875rem;
+}
+
+.ProseMirror th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #111827;
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.ProseMirror th[data-colwidth] {
+  width: 120px;
+}
+
+/* Make sure tables are scrollable in the editor */
+.ProseMirror {
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Table wrapper for editor */
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  margin: 1.5rem 0;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  background: white;
+  border: 1px solid #e5e7eb;
 }
 
 .table-wrapper table {
   min-width: 100%;
   border-collapse: collapse;
   table-layout: auto;
+  margin: 0;
 }
 
 .table-wrapper th,
@@ -38,13 +125,18 @@
   padding: 0.75rem 1rem;
   border: 1px solid #e5e7eb;
   text-align: left;
-  min-width: 100px;
+  min-width: 120px;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 .table-wrapper th {
   background-color: #f9fafb;
   font-weight: 600;
-  color: #374151;
+  color: #111827;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .table-wrapper tr:nth-child(even) {
@@ -425,6 +517,13 @@ h6 {
   padding: 0;
 }
 
+/* Clearfix utility */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 /* Clear floats after content */
 .ProseMirror > *:after {
   content: "";
@@ -435,6 +534,19 @@ h6 {
 /* Fix for paragraphs after floats */
 .ProseMirror p + p {
   clear: none;
+}
+
+/* Clear both utility */
+.clear-both {
+  clear: both !important;
+  display: block !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  overflow: hidden;
 }
 
 /* Ensure proper spacing around images */
@@ -697,19 +809,96 @@ h6 {
   margin-bottom: 0;
 }
 
-/* Ensure text flows around floated images */
+/* Ensure proper text flow around floated images */
 .ProseMirror p,
 .ProseMirror ul,
 .ProseMirror ol {
   overflow: visible;
+  clear: none;
 }
 
-/* Add some spacing around images */
+/* Clear floats after content */
+.ProseMirror > *:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Clearfix utility */
+.clear-both {
+  clear: both !important;
+  display: block !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden;
+}
+
+/* Image container styles */
+.ProseMirror [data-type="image-container"] {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0 0 1rem 0;
+  line-height: 0;
+}
+
+/* Float left */
+.ProseMirror [data-float="left"] {
+  float: left;
+  margin: 0 1rem 1rem 0;
+  clear: left;
+}
+
+/* Float right */
+.ProseMirror [data-float="right"] {
+  float: right;
+  margin: 0 0 1rem 1rem;
+  clear: right;
+}
+
+/* Center (no float) */
+.ProseMirror [data-float="none"] {
+  display: block;
+  float: none;
+  margin: 1rem auto;
+  clear: both;
+}
+
+/* Image styles */
 .ProseMirror img {
-  margin: 0;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 !important;
   padding: 0;
-  vertical-align: middle;
-} 
+}
+
+/* Clear floats after image paragraphs */
+.ProseMirror p:has(img[data-float="left"]),
+.ProseMirror p:has(img[data-float="right"]) {
+  display: block;
+  overflow: hidden;
+}
+
+/* Prevent text from wrapping after a certain point */
+.ProseMirror .no-wrap {
+  clear: both;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Better handling of content after floats */
+.ProseMirror > *:not(.floating-image) {
+  clear: none;
+}
+
+/* Clear floats after content sections */
+.ProseMirror > div:not(:last-child),
+.ProseMirror > p:not(:last-child) {
+  margin-bottom: 1em;
+}
 
 /* Enhanced Tiptap Editor Link Preview */
 a[data-description] {
@@ -990,11 +1179,6 @@ a[data-description]:hover::after {
 }
 
 /* --- Ensure no rules override float/margin for images --- */
-/* Remove or comment out any global img rules that force display:inline or override float/margin */
-
-/* --- Fix: Remove or override white-space: nowrap for paragraphs and floated images --- */
-
-/* Remove this if not needed (it breaks wrapping in table cells): */
 
 /* Ensure paragraphs and block elements wrap text around floated images */
 .article-body p,
@@ -1002,25 +1186,47 @@ a[data-description]:hover::after {
   white-space: normal !important;
   overflow-wrap: break-word;
   word-break: break-word;
+  position: relative;
+  overflow: hidden; /* This contains the float */
 }
 
-/* Optional: Ensure floated images don't force text to the bottom */
+/* Container for floated images and their associated text */
+.article-body p:has(img[class*='float-']),
+.ProseMirror p:has(img[class*='float-']) {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+/* Floated image styles */
 .article-body img.float-left,
 .article-body img.float-right,
 .ProseMirror img.float-left,
 .ProseMirror img.float-right {
   display: block;
-  /* margin already handled by Tailwind classes */
+  margin: 0 !important; /* Reset any margins */
+  max-width: 50%; /* Ensure image doesn't take more than half the width */
 }
 
-/* Optional: Add clearfix to parent paragraphs if needed */
-.article-body p::after,
-.ProseMirror p::after {
+/* Text container next to floated images */
+.article-body p:has(img[class*='float-']) > :not(img),
+.ProseMirror p:has(img[class*='float-']) > :not(img) {
+  flex: 1;
+  min-width: 0; /* Allow text to wrap */
+}
+
+/* Clear floats after paragraphs */
+.article-body p:after,
+.ProseMirror p:after {
   content: "";
   display: table;
   clear: both;
 }
 
-/* --- Tailwind classes now handle table overflow and min-width --- */
-/* Remove or comment out any global table/cell white-space: nowrap rules if present */
-/* .table-wrapper table, .table-wrapper th, .table-wrapper td { ... } */
+/* Ensure content after floated paragraphs is cleared */
+.article-body p:has(img[class*='float-']) + p,
+.ProseMirror p:has(img[class*='float-']) + p {
+  clear: both;
+  padding-top: 1rem;
+}
