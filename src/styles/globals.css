@@ -84,48 +84,78 @@
   filter: invert(70%) sepia(80%) saturate(1000%) hue-rotate(360deg) brightness(110%);
 }
 
+.prose {
+  font-size: 0.9375rem; /* 15px base font size */
+  line-height: 1.6;
+}
+
+/* Make sure these styles take precedence over Tailwind's prose classes */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Remove !important from H1 and H2 to allow template-specific colors */
 .prose h1 {
-    font-size: 2.25rem;
-    /* Example: 36px */
-    margin-bottom: 1rem;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  margin: 1.5rem 0 1rem;
+  font-weight: 600;
 }
 
 .prose h2 {
-    font-size: 1.875rem;
-    /* Example: 30px */
-    margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  margin: 1.25rem 0 0.75rem;
+  font-weight: 600;
 }
 
+/* Keep !important for H3 and H4 to ensure our color scheme is applied */
 .prose h3 {
-    font-size: 1.5rem;
-    /* Example: 24px */
-    margin-bottom: 0.5rem;
+  font-size: 1.25rem !important;
+  line-height: 1.3 !important;
+  margin: 1.1rem 0 0.6rem !important;
+  font-weight: 600 !important;
+  color:#083344 !important; /* cyan-950 #083344*/
 }
 
 .prose h4 {
-    font-size: 1.25rem;
-    /* Example: 20px */
-    margin-bottom: 0.5rem;
+  font-size: 1.125rem !important;
+  line-height: 1.35 !important;
+  margin: 1rem 0 0.5rem !important;
+  font-weight: 600 !important;
+  color: #1d4ed8 !important; /* blue-700 */
 }
 
 .prose h5 {
-    font-size: 1.125rem;
-    /* Example: 18px */
-    margin-bottom: 0.5rem;
+  font-size: 1rem; /* 16px */
+  line-height: 1.4;
+  margin: 0.9rem 0 0.5rem;
+  font-weight: 600;
 }
 
 .prose h6 {
-    font-size: 1rem;
-    /* Example: 16px */
-    margin-bottom: 0.5rem;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.4;
+  margin: 0.8rem 0 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
 }
 
 .locked-content {
-    position: relative;
-    overflow: hidden;
-    max-height: 200px;
-    /* Adjust the height to control how much content is initially visible */
-    margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+  max-height: 200px;
+  margin-bottom: 1rem;
 }
 
 .locked-content::after {
