@@ -392,9 +392,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
       // Show success message
       showToast("Page created successfully!", "success");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error creating page:", error);
-      showToast("Failed to create page. Please try again.", "error");
+      showToast(error instanceof Error ? error.message : "Failed to create page. Please try again.", "error");
     }
   };
 
