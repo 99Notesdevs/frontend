@@ -1,5 +1,5 @@
 interface DraftData {
-    id?: string
+    id: string
     title: string
     data: any
     draftType: string
@@ -36,87 +36,109 @@ interface DraftData {
   
     async saveDraft(id: string | null, title: string, data: any, draftType: string): Promise<string> {
       const db = await this.openDB()
-  
+      
       return new Promise((resolve, reject) => {
         try {
           const transaction = db.transaction([this.storeName], "readwrite")
           const store = transaction.objectStore(this.storeName)
-  
+    
           transaction.onerror = () => reject(transaction.error)
-  
+          
+          const now = new Date()
+          
           if (id) {
-            // Update existing draft
+            // Handle existing draft update
             const getRequest = store.get(id)
-  
             getRequest.onsuccess = () => {
               const existingDraft = getRequest.result
-              const draftData: DraftData = {
-                id: id,
+              const draftData = {
+                id: String(id),
                 title,
                 data,
                 draftType,
-                createdAt: existingDraft ? existingDraft.createdAt : new Date(),
-                updatedAt: new Date(),
+                createdAt: existingDraft?.createdAt || now,
+                updatedAt: now
               }
-  
-              const putRequest = store.put(draftData)
-              putRequest.onerror = () => reject(putRequest.error)
-              putRequest.onsuccess = () => resolve(id)
+              const request = store.put(draftData)
+              request.onerror = () => reject(request.error)
+              request.onsuccess = () => resolve(String(id))
             }
-  
             getRequest.onerror = () => reject(getRequest.error)
           } else {
-            // Create new draft
-            const draftData: DraftData = {
+            // Handle new draft
+            const newId = Date.now().toString()  // Generate string ID
+            const draftData = {
+              id: newId,
               title,
               data,
               draftType,
-              createdAt: new Date(),
-              updatedAt: new Date(),
+              createdAt: now,
+              updatedAt: now
             }
-  
-            const addRequest = store.add(draftData)
-            addRequest.onerror = () => reject(addRequest.error)
-            addRequest.onsuccess = () => resolve(addRequest.result.toString())
+            console.log("New draft data:", draftData)
+            const request = store.add(draftData)
+            request.onerror = () => reject(request.error)
+            request.onsuccess = () => resolve(newId)
           }
         } catch (error) {
           reject(error)
         }
       })
     }
-  
     async getDraftById(id: string): Promise<DraftData | null> {
       const db = await this.openDB()
-  
+      
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([this.storeName], "readonly")
         const store = transaction.objectStore(this.storeName)
         const request = store.get(id)
-  
-        request.onerror = () => reject(request.error)
-        request.onsuccess = () => resolve(request.result || null)
-        transaction.onerror = () => reject(transaction.error)
+        
+        request.onerror = () => {
+          console.error("Error getting draft:", request.error)
+          reject(request.error)
+        }
+        
+        request.onsuccess = () => {
+          const result = request.result
+          if (result) {
+            // Ensure all dates are Date objects
+            result.createdAt = new Date(result.createdAt)
+            result.updatedAt = new Date(result.updatedAt)
+          }
+          resolve(result || null)
+        }
+        
+        transaction.onerror = () => {
+          console.error("Transaction error:", transaction.error)
+          reject(transaction.error)
+        }
       })
     }
-  
     async getAllDraftsByType(draftType: string): Promise<DraftData[]> {
       const db = await this.openDB()
-  
+      
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([this.storeName], "readonly")
         const store = transaction.objectStore(this.storeName)
         const index = store.index("draftType")
         const request = index.getAll(draftType)
-  
+        
         request.onerror = () => reject(request.error)
+        
         request.onsuccess = () => {
-          const drafts = request.result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+          const drafts = request.result
+            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+            .map(draft => ({
+              ...draft,
+              createdAt: new Date(draft.createdAt),
+              updatedAt: new Date(draft.updatedAt)
+            }))
           resolve(drafts)
         }
+        
         transaction.onerror = () => reject(transaction.error)
       })
     }
-  
     async getAllDrafts(): Promise<DraftData[]> {
       const db = await this.openDB()
   
@@ -130,6 +152,7 @@ interface DraftData {
           const drafts = request.result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
           resolve(drafts)
         }
+        console.log("Drafts result:", request.result)
         transaction.onerror = () => reject(transaction.error)
       })
     }
@@ -140,7 +163,7 @@ interface DraftData {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([this.storeName], "readwrite")
         const store = transaction.objectStore(this.storeName)
-        const request = store.delete(id)
+        const request = store.delete(String(id))
   
         request.onerror = () => reject(request.error)
         request.onsuccess = () => resolve()

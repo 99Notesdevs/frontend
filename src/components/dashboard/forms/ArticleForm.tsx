@@ -53,6 +53,7 @@ const articleSchema = z.object({
   showInNav: z.boolean().default(false),
   questionNumber: z.number().optional(),
   FAQ: z.string().optional(),
+  status: z.string().optional(),
 })
 
 type ArticleFormData = z.infer<typeof articleSchema>

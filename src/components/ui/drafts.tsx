@@ -117,7 +117,7 @@ export default function Drafts({ types, onSelectDraft }: DraftsProps) {
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {drafts.map((draft) => (
           <div
-            key={draft.id}
+            key={`${draft.draftType}-${draft.id}`}  
             className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow"
           >
             <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onSelectDraft?.(draft.id!, draft.draftType)}>
