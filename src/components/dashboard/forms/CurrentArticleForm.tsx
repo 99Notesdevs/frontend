@@ -1,59 +1,41 @@
-"use client";
+"use client"
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import dynamic from 'next/dynamic';
-import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { uploadImageToS3 } from "@/config/imageUploadS3";
-import { Alert } from "@/components/ui/alert";
-import { QuizQuestions } from "@/components/dashboard/static/current-affair/QuizQuestions";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { TagInput } from "@/components/ui/tags/tag-input";
-import DraftDialog from "@/components/ui/DraftDialog";
-import { Plus, X, Pencil, Trash2 } from "lucide-react";
-import {
-  BlogsManager,
-  Blog,
-} from "@/components/dashboard/static/current-affair/BlogsManager";
+import type React from "react"
 
-const TiptapEditor = dynamic(
-  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
-  { 
-    ssr: false, // Disable server-side rendering for this component
-    loading: () => (
-      <div className="space-y-2">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    )
-  }
-);
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import dynamic from "next/dynamic"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect, useState, useCallback } from "react"
+import Image from "next/image"
+import { uploadImageToS3 } from "@/config/imageUploadS3"
+import { Alert } from "@/components/ui/alert"
+import { QuizQuestions } from "@/components/dashboard/static/current-affair/QuizQuestions"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { TagInput } from "@/components/ui/tags/tag-input"
+import DraftDialog from "@/components/ui/DraftDialog"
+import { BlogsManager, type Blog } from "@/components/dashboard/static/current-affair/BlogsManager"
+import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts"
+
+const TiptapEditor = dynamic(() => import("@/components/ui/tiptapeditor").then((mod) => mod.default), {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-2">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-64 w-full" />
+    </div>
+  ),
+})
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   content: z.string().min(10, "Content must be at least 10 characters"),
   tags: z.array(z.string()).optional(),
-  imageUrl: z.string().optional(),
+  imageUrl: z.string().nullable().optional(),
   slug: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -74,304 +56,313 @@ const formSchema = z.object({
   body: z.string().optional(),
   author: z.string().optional(),
   blogs: z.array(z.any()).optional(),
-});
+})
 
-export type CurrentArticleFormValues = z.infer<typeof formSchema>;
+export type CurrentArticleFormValues = z.infer<typeof formSchema>
 
 interface CurrentArticleFormProps {
-  onSubmit: (data: CurrentArticleFormValues) => void;
-  defaultValues?: Partial<CurrentArticleFormValues>;
+  onSubmit: (data: CurrentArticleFormValues) => void
+  defaultValues?: Partial<CurrentArticleFormValues>
 }
 
-export function CurrentArticleForm({
-  onSubmit,
-  defaultValues,
-}: CurrentArticleFormProps) {
+export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFormProps) {
   const parseImageUrl = (url: string | undefined): [string, string] => {
     try {
-      return JSON.parse(url || "[]") as [string, string];
+      return JSON.parse(url || "[]") as [string, string]
     } catch (error) {
-      return ["", ""];
+      return ["", ""]
     }
-  };
+  }
 
   const getImageUrl = (url: string | undefined): string => {
-    const [imageUrl] = parseImageUrl(url);
-    return imageUrl;
-  };
+    const [imageUrl] = parseImageUrl(url)
+    return imageUrl
+  }
 
   const getImageAlt = (url: string | undefined): string => {
-    const [, altText] = parseImageUrl(url);
-    return altText;
-  };
+    const [, altText] = parseImageUrl(url)
+    return altText
+  }
 
   const [imagePreview, setImagePreview] = useState<string | null>(
-    defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null
-  );
+    defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null,
+  )
   const [ogimagePreview, setOgImagePreview] = useState<string | null>(
-    defaultValues?.ogImage ? getImageUrl(defaultValues.ogImage) : null
-  );
-  const [isUploading, setIsUploading] = useState(false);
+    defaultValues?.ogImage ? getImageUrl(defaultValues.ogImage) : null,
+  )
+  const [isUploading, setIsUploading] = useState(false)
   const [alert, setAlert] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-  const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [drafts, setDrafts] = useState<
-    {
-      title: string;
-      data: any;
-    }[]
-  >([]);
+    message: string
+    type: "success" | "error"
+  } | null>(null)
+  const [showDraftDialog, setShowDraftDialog] = useState(false)
+
+  const {
+    drafts,
+    currentDraftId,
+    isLoading: isLoadingDrafts,
+    error: draftError,
+    saveDraft: saveDraftToDB,
+    deleteDraft,
+    getDraft,
+    loadDrafts,
+    setCurrentDraftId,
+  } = useIndexedDBDrafts<CurrentArticleFormValues>({
+    draftType: "currentArticle",
+    defaultTitle: "Untitled Current Article",
+    autoSaveInterval: 30000,
+  })
+
+  const defaultFormValues: CurrentArticleFormValues = {
+    title: "",
+    content: "",
+    tags: [],
+    blogs: [],
+    imageUrl: "",
+    slug: "",
+    metaTitle: "",
+    metaDescription: "",
+    metaKeywords: "",
+    quizQuestions: JSON.stringify([
+      {
+        id: 1,
+        question: "",
+        options: ["", "", "", ""],
+        correctAnswer: 0,
+        explanation: "",
+      },
+    ]),
+    robots: "noindex,nofollow",
+    ogTitle: "",
+    ogDescription: "",
+    ogImage: "",
+    ogType: "",
+    twitterCard: "",
+    twitterTitle: "",
+    twitterDescription: "",
+    twitterImage: "",
+    canonicalUrl: "",
+    schemaData: "",
+    header: "",
+    body: "",
+    author: "",
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      tags: [],
-      blogs: [],
+      ...defaultFormValues,
       ...defaultValues,
     },
-  });
+  })
 
   const handleBlogsChange = (blogs: Blog[]) => {
-    // Ensure we're only storing the necessary blog data
     const normalizedBlogs = blogs.map((blog) => ({
       id: blog.id,
       title: blog.title,
       content: blog.content,
       slug: blog.slug,
-      tags:
-        blog.tags?.map((tag) => (typeof tag === "string" ? tag : tag || "")) ||
-        [],
+      tags: blog.tags?.map((tag) => (typeof tag === "string" ? tag : tag || "")) || [],
       author: blog.author,
       parentSlug: blog.parentSlug,
       createdAt: blog.createdAt,
       updatedAt: blog.updatedAt,
-    }));
+    }))
 
-    form.setValue("blogs", normalizedBlogs);
-  };
+    form.setValue("blogs", normalizedBlogs)
+  }
 
   useEffect(() => {
-    const savedDrafts = localStorage.getItem("currentArticleDrafts");
-    if (savedDrafts) {
-      const parsedDrafts = JSON.parse(savedDrafts);
-      setDrafts(parsedDrafts);
-      if (parsedDrafts.length > 0) {
-        setShowDraftDialog(true);
-      }
+    if (drafts.length > 0 && !isLoadingDrafts && !currentDraftId) {
+      setShowDraftDialog(true)
     }
-  }, []);
+  }, [drafts, isLoadingDrafts, currentDraftId])
+
   const slug =
     defaultValues?.slug ||
     form
       .watch("title")
       .toLowerCase()
       .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-  const loadDraft = () => {
-    const savedDrafts = localStorage.getItem("currentArticleDrafts");
-    if (savedDrafts) {
-      const parsedDrafts = JSON.parse(savedDrafts);
-      if (parsedDrafts.length > 0) {
-        setShowDraftDialog(true);
-      }
+      .replace(/[^a-z0-9-]/g, "")
+
+  const loadDraft = async () => {
+    await loadDrafts()
+    if (drafts.length > 0) {
+      setShowDraftDialog(true)
     }
-  };
+  }
 
-  const selectDraft = (title: string) => {
-    const savedDrafts = localStorage.getItem("currentArticleDrafts");
-    if (savedDrafts) {
-      const parsedDrafts = JSON.parse(savedDrafts);
-      const selectedDraft = parsedDrafts.find(
-        (draft: { title: string; data: CurrentArticleFormValues }) =>
-          draft.title === title
-      );
-      if (selectedDraft) {
-        const draftData = {
-          ...selectedDraft.data,
-        };
-
-        form.reset(draftData);
-        setImagePreview(getImageUrl(selectedDraft.data.imageUrl));
-
-        console.log("selectedDraft.data", selectedDraft.data);
-        setShowDraftDialog(false);
+  const selectDraft = useCallback(
+    async (draftId: string) => {
+      try {
+        const selectedDraft = await getDraft(draftId)
+        if (selectedDraft) {
+          const draftData = { ...selectedDraft.data }
+          form.reset(draftData)
+          setCurrentDraftId(selectedDraft.id!)
+          setImagePreview(getImageUrl(selectedDraft.data.imageUrl))
+          if (selectedDraft.data.ogImage) {
+            setOgImagePreview(getImageUrl(selectedDraft.data.ogImage))
+          }
+          setShowDraftDialog(false)
+        }
+      } catch (error) {
+        console.error("Error selecting draft:", error)
+        setAlert({
+          message: "Failed to load draft. Please try again.",
+          type: "error",
+        })
       }
-    }
-  };
+    },
+    [getDraft, form, setCurrentDraftId],
+  )
 
-  const saveDraft = async () => {
+  const saveDraft = useCallback(async () => {
     try {
-      const draftTitle = form.getValues("title") || "Untitled Draft";
-      const draftData = form.getValues();
-      const currentBlogs = form.getValues("blogs") || [];
+      const draftTitle = form.getValues("title") || "Untitled Draft"
+      const draftData = form.getValues()
+      const currentBlogs = form.getValues("blogs") || []
 
-      const savedDrafts = localStorage.getItem("currentArticleDrafts");
-      const existingDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
+      const dataToSave = {
+        ...draftData,
+        blogs: currentBlogs.map((blog) => ({
+          ...blog,
+          tags:
+            blog.tags
+              ?.map((tag: any) => {
+                if (typeof tag === "string") return tag
+                if (tag && typeof tag === "object" && "name" in tag) return tag.name
+                return String(tag)
+              })
+              .filter(Boolean) || [],
+        })),
+        imageUrl: draftData.imageUrl || imagePreview,
+        showInNav: false,
+        quizQuestions:
+          draftData.quizQuestions ||
+          JSON.stringify([
+            {
+              id: 1,
+              question: "",
+              options: ["", "", "", ""],
+              correctAnswer: 0,
+              explanation: "",
+            },
+          ]),
+      }
+      const savedId = await saveDraftToDB(draftTitle, dataToSave)
+      if(savedId==null){
+        return;
+      }
+      if (!currentDraftId) {
+        setCurrentDraftId(savedId)
+      }
 
-      const filteredDrafts = existingDrafts.filter(
-        (draft: { title: string; data: CurrentArticleFormValues }) =>
-          draft.title !== draftTitle
-      );
-
-      const newDraft = {
-        title: draftTitle,
-        data: {
-          ...draftData,
-          blogs: currentBlogs.map((blog) => ({
-            ...blog,
-            // Ensure tags are in the correct format (array of strings)
-            tags:
-              blog.tags
-                ?.map((tag: any) => {
-                  if (typeof tag === "string") return tag;
-                  if (tag && typeof tag === "object" && "name" in tag)
-                    return tag.name;
-                  return String(tag);
-                })
-                .filter(Boolean) || [],
-          })),
-          imageUrl: draftData.imageUrl || imagePreview,
-          showInNav: false,
-          quizQuestions:
-            draftData.quizQuestions ||
-            JSON.stringify([
-              {
-                id: 1,
-                question: "",
-                options: ["", "", "", ""],
-                correctAnswer: 0,
-                explanation: "",
-              },
-            ]),
-        },
-      };
-
-      console.log("newDraft", newDraft);
-      const updatedDrafts = [...filteredDrafts, newDraft];
-      localStorage.setItem(
-        "currentArticleDrafts",
-        JSON.stringify(updatedDrafts)
-      );
-
-      setDrafts(updatedDrafts);
       setAlert({
         message: "Draft saved successfully!",
         type: "success",
-      });
+      })
     } catch (error) {
-      console.error("Error saving draft:", error);
+      console.error("Error saving draft:", error)
       setAlert({
         message: "Failed to save draft. Please try again.",
         type: "error",
-      });
+      })
     }
-  };
+  }, [form, saveDraftToDB, currentDraftId, setCurrentDraftId, imagePreview])
 
-  const startNew = () => {
-    form.reset(defaultValues || {});
-    setShowDraftDialog(false);
-  };
+  const startNew = useCallback(() => {
+    form.reset(defaultFormValues)
+    setCurrentDraftId(null)
+    setImagePreview(null)
+    setOgImagePreview(null)
+    setShowDraftDialog(false)
+  }, [form, setCurrentDraftId])
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const file = e.target.files?.[0];
+    e.preventDefault()
+    const file = e.target.files?.[0]
     if (file) {
-      setIsUploading(true);
-      const reader = new FileReader();
+      setIsUploading(true)
+      const reader = new FileReader()
       reader.onloadend = async () => {
         try {
-          const result = reader.result as string;
-          setImagePreview(result);
-          console.log(file);
+          const result = reader.result as string
+          setImagePreview(result)
 
-          const formData = new FormData();
-          formData.append("imageUrl", file);
+          const formData = new FormData()
+          formData.append("imageUrl", file)
 
-          const s3Url = await uploadImageToS3(
-            formData,
-            "CurrentArticle",
-            file.name
-          );
+          const s3Url = await uploadImageToS3(formData, "CurrentArticle", file.name)
           if (s3Url) {
             form.setValue("imageUrl", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
-            });
+            })
           } else {
-            form.setValue(
-              "imageUrl",
-              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
-              {
-                shouldValidate: true,
-              }
-            );
+            form.setValue("imageUrl", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
+              shouldValidate: true,
+            })
           }
         } catch (error) {
-          console.error("Error uploading image:", error);
+          console.error("Error uploading image:", error)
         } finally {
-          setIsUploading(false);
+          setIsUploading(false)
         }
-      };
-      reader.readAsDataURL(file);
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const file = e.target.files?.[0];
+    e.preventDefault()
+    const file = e.target.files?.[0]
     if (file) {
-      setIsUploading(true);
-      const reader = new FileReader();
+      setIsUploading(true)
+      const reader = new FileReader()
       reader.onloadend = async () => {
         try {
-          const result = reader.result as string;
-          setOgImagePreview(result);
+          const result = reader.result as string
+          setOgImagePreview(result)
 
-          const formData = new FormData();
-          formData.append("imageUrl", file);
+          const formData = new FormData()
+          formData.append("imageUrl", file)
 
-          const s3Url = await uploadImageToS3(
-            formData,
-            "BlogOGImages",
-            file.name
-          );
+          const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name)
           if (s3Url) {
             form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
-            });
+            })
           } else {
-            form.setValue(
-              "ogImage",
-              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
-              {
-                shouldValidate: true,
-              }
-            );
-            throw new Error("Failed to upload image to S3");
+            form.setValue("ogImage", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
+              shouldValidate: true,
+            })
+            throw new Error("Failed to upload image to S3")
           }
         } catch (error) {
-          console.error("Error uploading image:", error);
+          console.error("Error uploading image:", error)
         } finally {
-          setIsUploading(false);
+          setIsUploading(false)
         }
-      };
-      reader.readAsDataURL(file);
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const draftData = form.getValues();
+    const interval = setInterval(async () => {
+      const draftData = form.getValues()
       if (draftData.title && draftData.title.trim().length > 0) {
-        saveDraft();
+        try {
+          await saveDraft()
+        } catch (error) {
+          console.error("Auto-save failed:", error)
+        }
       }
-    }, 30000);
+    }, 30000)
 
-    return () => clearInterval(interval);
-  }, [form]);
+    return () => clearInterval(interval)
+  }, [saveDraft])
 
   return (
     <div className="relative">
@@ -380,16 +371,15 @@ export function CurrentArticleForm({
         onClose={() => setShowDraftDialog(false)}
         onLoadDraft={loadDraft}
         onStartNew={startNew}
-        drafts={drafts}
+        drafts={drafts.map((draft) => ({
+          id: draft.id!,
+          title: draft.title,
+          data: draft.data,
+          updatedAt: draft.updatedAt,
+        }))}
         onSelectDraft={selectDraft}
       />
-      {alert && (
-        <Alert
-          message={alert.message}
-          type={alert.type}
-          onClose={() => setAlert(null)}
-        />
-      )}
+      {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* Title */}
@@ -398,9 +388,7 @@ export function CurrentArticleForm({
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Title *
-                </FormLabel>
+                <FormLabel className="text-gray-500 font-medium">Title *</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter title"
@@ -420,9 +408,7 @@ export function CurrentArticleForm({
               name="author"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-500 font-medium">
-                    Author *
-                  </FormLabel>
+                  <FormLabel className="text-gray-500 font-medium">Author *</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter author"
@@ -451,20 +437,15 @@ export function CurrentArticleForm({
                         <FormLabel>Image Alt Text</FormLabel>
                         <FormControl>
                           <Input
-                            value={getImageAlt(altField.value)}
+                            value={getImageAlt(altField.value || "")}
                             onChange={(e) => {
-                              const [imageUrl, altText] = parseImageUrl(
-                                altField.value
-                              );
-                              altField.onChange(
-                                JSON.stringify([imageUrl, e.target.value])
-                              );
+                              const [imageUrl, altText] = parseImageUrl(altField.value || "")
+                              altField.onChange(JSON.stringify([imageUrl, e.target.value]))
                             }}
                           />
                         </FormControl>
                         <FormDescription>
-                          Describe the image for accessibility. This will be
-                          used as the alt text.
+                          Describe the image for accessibility. This will be used as the alt text.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -483,23 +464,17 @@ export function CurrentArticleForm({
                   <div className="space-y-2">
                     <div className="relative h-48 w-full">
                       <Image
-                        src={imagePreview}
+                        src={imagePreview || "/placeholder.svg"}
                         alt="Current Article image preview"
                         fill
                         className="object-cover rounded-lg"
                         priority
                       />
                     </div>
-                    <p className="text-sm text-green-500">
-                      Image uploaded successfully
-                    </p>
+                    <p className="text-sm text-green-500">Image uploaded successfully</p>
                   </div>
                 )}
-                {isUploading && (
-                  <div className="text-sm text-blue-500 mt-2">
-                    Uploading image...
-                  </div>
-                )}
+                {isUploading && <div className="text-sm text-blue-500 mt-2">Uploading image...</div>}
               </div>
             )}
           />
@@ -510,9 +485,7 @@ export function CurrentArticleForm({
             name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Content *
-                </FormLabel>
+                <FormLabel className="text-gray-500 font-medium">Content *</FormLabel>
                 <FormControl>
                   <div className="border border-blue-100 rounded-lg overflow-hidden">
                     <TiptapEditor
@@ -532,16 +505,31 @@ export function CurrentArticleForm({
             name="quizQuestions"
             render={({ field: { value, onChange } }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Quiz Questions
-                </FormLabel>
+                <FormLabel className="text-gray-500 font-medium">Quiz Questions</FormLabel>
                 <FormControl>
                   <QuizQuestions
                     defaultValue={value || "[]"}
                     onChange={(questions) => {
-                      onChange(questions);
+                      onChange(questions)
                     }}
                   />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Tags */}
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field: { onChange, value, ...field } }) => (
+              <FormItem>
+                <FormLabel className="text-gray-500 font-medium">Tags</FormLabel>
+                <FormControl>
+                  <div className="space-y-2">
+                    <TagInput value={value || []} onChange={onChange} placeholder="Add tags..." className="w-full" />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -554,9 +542,7 @@ export function CurrentArticleForm({
             name="metaTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Meta Title
-                </FormLabel>
+                <FormLabel className="text-gray-500 font-medium">Meta Title</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter meta title"
@@ -571,160 +557,32 @@ export function CurrentArticleForm({
 
           <FormField
             control={form.control}
-            name="metaDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Meta Description
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter meta description"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="metaKeywords"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Meta Keywords
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter meta keywords"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Tags */}
-          <FormField
-            control={form.control}
-            name="tags"
-            render={({ field: { onChange, value, ...field } }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Tags
-                </FormLabel>
-                <FormControl>
-                  <div className="space-y-2">
-                    <TagInput
-                      value={value || []}
-                      onChange={onChange}
-                      placeholder="Add tags..."
-                      className="w-full"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="robots"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Robots
-                </FormLabel>
+                <FormLabel className="text-gray-500 font-medium">Robots</FormLabel>
                 <FormControl>
-                  <Select
-                    value={field.value || "noindex,nofollow"}
-                    onValueChange={(value) => field.onChange(value)}
-                    defaultValue="noindex,nofollow"
-                  >
-                    <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg text-gray-500">
+                  <Select value={field.value || "noindex,nofollow"} onValueChange={field.onChange}>
+                    <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg">
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
-                    <SelectContent className="text-white max-h-60 overflow-y-auto">
-                      <SelectItem value="index,follow">
-                        Index & Follow (Default)
-                      </SelectItem>
-                      <SelectItem value="noindex,follow">
-                        No Index, Follow
-                      </SelectItem>
-                      <SelectItem value="index,nofollow">
-                        Index, No Follow
-                      </SelectItem>
-                      <SelectItem value="noindex,nofollow">
-                        No Index & No Follow
-                      </SelectItem>
+                    <SelectContent>
+                      <SelectItem value="index,follow">Index & Follow (Default)</SelectItem>
+                      <SelectItem value="noindex,follow">No Index, Follow</SelectItem>
+                      <SelectItem value="index,nofollow">Index, No Follow</SelectItem>
+                      <SelectItem value="noindex,nofollow">No Index & No Follow</SelectItem>
                       <SelectItem value="noarchive">No Archive</SelectItem>
                       <SelectItem value="nosnippet">No Snippet</SelectItem>
-                      <SelectItem value="data-nosnippet">
-                        Data No Snippet
-                      </SelectItem>
-                      <SelectItem value="max-snippet:0">
-                        Max Snippet: None
-                      </SelectItem>
-                      <SelectItem value="max-snippet:-1">
-                        Max Snippet: Unlimited
-                      </SelectItem>
-                      <SelectItem value="max-snippet:50">
-                        Max Snippet: 50 Characters
-                      </SelectItem>
-                      <SelectItem value="noimageindex">
-                        No Image Index
-                      </SelectItem>
+                      <SelectItem value="data-nosnippet">Data No Snippet</SelectItem>
+                      <SelectItem value="max-snippet:0">Max Snippet: None</SelectItem>
+                      <SelectItem value="max-snippet:-1">Max Snippet: Unlimited</SelectItem>
+                      <SelectItem value="max-snippet:50">Max Snippet: 50 Characters</SelectItem>
+                      <SelectItem value="noimageindex">No Image Index</SelectItem>
                       <SelectItem value="nocache">No Cache</SelectItem>
                       <SelectItem value="none">None</SelectItem>
                       <SelectItem value="all">All</SelectItem>
                     </SelectContent>
                   </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ogTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  OG Title
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter OG title"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ogDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  OG Description
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter OG description"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -749,15 +607,13 @@ export function CurrentArticleForm({
                   <div className="space-y-2">
                     <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-[var(--admin-border)]">
                       <Image
-                        src={ogimagePreview}
+                        src={ogimagePreview || "/placeholder.svg"}
                         alt="Image preview"
                         fill
                         className="object-cover"
                       />
                     </div>
-                    <p className="text-sm text-green-500">
-                      Image uploaded successfully
-                    </p>
+                    <p className="text-sm text-green-500">Image uploaded successfully</p>
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500">No image uploaded</p>
@@ -766,145 +622,17 @@ export function CurrentArticleForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="twitterTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Twitter Title
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter Twitter title"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="twitterDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Twitter Description
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter Twitter description"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="twitterImage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Twitter Image URL
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter Twitter image URL"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="canonicalUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Canonical URL
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter canonical URL"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="schemaData"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Schema Data
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter schema data"
-                    {...field}
-                    className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="header"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Header</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="body"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Body</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Blogs</h3>
             <BlogsManager
               initialBlogs={(form.watch("blogs") || []).map((blog) => ({
                 ...blog,
-                // Ensure tags are in the correct format (array of strings)
                 tags:
                   blog.tags
                     ?.map((tag: any) => {
-                      if (typeof tag === "string") return tag;
-                      if (tag && typeof tag === "object" && "name" in tag)
-                        return tag.name;
-                      return String(tag);
+                      if (typeof tag === "string") return tag
+                      if (tag && typeof tag === "object" && "name" in tag) return tag.name
+                      return String(tag)
                     })
                     .filter(Boolean) || [],
               }))}
@@ -914,15 +642,10 @@ export function CurrentArticleForm({
             />
           </div>
 
-          <Button
-            type="button"
-            onClick={saveDraft}
-            className="bg-gray-300 hover:bg-gray-400 mr-5"
-          >
+          <Button type="button" onClick={saveDraft} className="bg-gray-300 hover:bg-gray-400 mr-5">
             Save as draft
           </Button>
 
-          {/* Submit Button */}
           <div className="flex justify-end">
             <Button
               disabled={isUploading}
@@ -935,5 +658,5 @@ export function CurrentArticleForm({
         </form>
       </Form>
     </div>
-  );
+  )
 }
