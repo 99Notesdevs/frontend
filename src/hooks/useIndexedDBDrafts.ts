@@ -66,6 +66,7 @@ export function useIndexedDBDrafts<T = any>({
         console.log("here saving")
         await loadDrafts() // Refresh the drafts list
         console.log("here saved")
+        
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to save draft")
         console.error("Error saving draft:", err)

@@ -260,7 +260,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({ initialData, onSubmit 
   const saveDraft = useCallback(async () => {
     const draftData = form.getValues()
     const title = draftData.title || "Untitled Draft"
-
+    console.log("Saving draft with data:", draftData)
     try {
       // Ensure FAQ data is properly serialized
       if (!draftData.FAQ || draftData.FAQ === "") {
@@ -273,15 +273,16 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({ initialData, onSubmit 
           draftData.FAQ = JSON.stringify({ general: [] })
         }
       }
-
-      const savedId = await saveDraftToDB(title, draftData)
-      if(savedId==null){
-        return;
-      }
-      if (!currentDraftId) {
-        setCurrentDraftId(savedId)
-      }
-
+      console.log("Saving draft with data:", draftData)
+      await saveDraftToDB(title, draftData)
+      // console.log("Saved draft with ID:", savedId)
+      // if(savedId==null){
+      //   return;
+      // }
+      // if (!currentDraftId) {
+      //   setCurrentDraftId(savedId)
+      // }
+      console.log("Draft saved successfully!")
       setAlert({
         message: "Draft saved successfully!",
         type: "success",

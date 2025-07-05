@@ -251,13 +251,13 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             },
           ]),
       }
-      const savedId = await saveDraftToDB(draftTitle, dataToSave)
-      if(savedId==null){
-        return;
-      }
-      if (!currentDraftId) {
-        setCurrentDraftId(savedId)
-      }
+      await saveDraftToDB(draftTitle, dataToSave)
+      // if(savedId==null){
+      //   return;
+      // }
+      // if (!currentDraftId) {
+      //   setCurrentDraftId(savedId)
+      // }
 
       setAlert({
         message: "Draft saved successfully!",

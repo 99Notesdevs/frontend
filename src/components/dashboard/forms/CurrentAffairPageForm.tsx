@@ -220,13 +220,13 @@ export function CurrentAffairPageForm({ onSubmit, defaultValues, folder }: Curre
     const title = draftData.title || "Untitled Draft"
 
     try {
-      const savedId = await saveDraftToDB(title, draftData)
-      if(savedId==null){
-        return;
-      }
-      if (!currentDraftId) {
-        setCurrentDraftId(savedId)
-      }
+      await saveDraftToDB(title, draftData)
+      // if(savedId==null){
+      //   return;
+      // }
+      // if (!currentDraftId) {
+      //   setCurrentDraftId(savedId)
+      // }
 
       setAlert({
         message: "Draft saved successfully!",
