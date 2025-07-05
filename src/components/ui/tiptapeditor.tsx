@@ -7,7 +7,7 @@ import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
-import { Mark, mergeAttributes, Extension, Editor, Command } from "@tiptap/core";
+import { Mark, mergeAttributes, Extension, Editor } from "@tiptap/core";
 import Heading from "@tiptap/extension-heading";
 import { CleanPaste } from './claenpaste'
 import {
@@ -45,60 +45,12 @@ import { Iframe } from "./Iframe";
 import { TABLE_DESIGNS } from "./tableDesigns";
 import { OrderedList } from '@tiptap/extension-ordered-list';
 
-// Add type for clear command
-declare module '@tiptap/core' {
-  interface Commands<ReturnType> {
-    clear: {
-      clear: () => ReturnType;
-    }
-  }
-}
-
-const ClearCommand = Extension.create<null, {
-  clear: () => ReturnType<Command>;
-}>({
-  name: 'clear',
-  
-  addCommands() {
-    return {
-      clear: (): Command => ({ commands }) => {
-        return commands.insertContent({
-          type: 'paragraph',
-          attrs: {
-            class: 'clear-both'
-          },
-          content: [
-            {
-              type: 'text',
-              text: '\u00A0' // Non-breaking space
-            }
-          ]
-        });
-      },
-    } as const;
-  },
-});
-
 // Editor instance will be created using the useEditor hook in the component
-// This is just a type reference, not an actual editor instance
 const editor = new Editor({
   extensions: [
     StarterKit,
     CleanPaste,
-    ClearCommand,
-    Link,
-    Image,
-    TextAlign,
-    Color,
-    TextStyle,
-    Heading,
-    Table,
-    TableRow,
-    TableCell,
-    TableHeader,
-    OrderedList,
   ],
-  content: ''
 })
 
 const FontSize = Mark.create({
@@ -1210,33 +1162,28 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       TextStyle,
       FontSize,
       TableStyles,
-      Table.extend({
-        renderHTML({ HTMLAttributes }) {
-          return ['div', { class: 'table-wrapper' }, ['table', { ...HTMLAttributes, style: 'min-width: 100%; table-layout: fixed; border-collapse: collapse; border: 1px solid #e5e7eb;' }, ['tbody', 0]]];
-        },
-      }).configure({
+      Table.configure({
         resizable: true,
         HTMLAttributes: {
-          class: 'w-full',
-        },
+          style: 'width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;'
+        }
       }),
       TableRow.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb;',
-        },
+          style: 'border: 1px solid #e5e7eb;'
+        }
       }),
       TableHeader.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; background-color: #f9fafb; font-weight: 500; min-width: 120px; white-space: nowrap;',
-        },
+          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; background-color: #f9fafb; font-weight: 500;'
+        }
       }),
       TableCell.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top; min-width: 120px; white-space: nowrap;',
-        },
+          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top;'
+        }
       }),
       Iframe,
-      ClearCommand,
       CleanPaste,
     ],
     content: content,
@@ -1597,7 +1544,15 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       )}
       
       {imageDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onKeyDown={(e) => { if (e.key === 'Escape') {
+            handleCancelImage();
+          } else if (e.key === 'Enter') {
+            handleAddImage();
+          }}}
+          tabIndex={-1}
+        >
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-medium mb-4">Add Image</h3>
             
@@ -1789,11 +1744,6 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                 />
               </div>
             )}
-            <ToolbarButton
-              onClick={() => editor.chain().focus().clear().run()}
-              icon={<Minus className="w-5 h-5" />}
-              label="Clear Floats"
-            />
           </>
         )}
       </div>

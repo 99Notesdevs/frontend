@@ -8,15 +8,6 @@ function cleanHTML(html: string): string {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = html;
 
-  // Remove all style attributes
-  const allElements = tempDiv.getElementsByTagName('*');
-  for (let i = 0; i < allElements.length; i++) {
-    allElements[i].removeAttribute('style');
-    allElements[i].removeAttribute('class');
-    allElements[i].removeAttribute('lang');
-    allElements[i].removeAttribute('data-mce-style');
-  }
-
   // Remove span tags but keep their content
   const spans = tempDiv.getElementsByTagName('span');
   while (spans[0]) {
@@ -31,45 +22,8 @@ function cleanHTML(html: string): string {
   }
 
   // Remove empty tags
-  const emptyTags = tempDiv.querySelectorAll('p:empty, div:empty, span:empty');
+  const emptyTags = tempDiv.querySelectorAll('span:empty');
   emptyTags.forEach(el => el.remove());
-
-  // Clean up MS Word specific markup
-  const msWordElements = tempDiv.querySelectorAll('[class^="Mso"], [class*=" Mso"], [style*="mso-"]');
-  msWordElements.forEach(el => {
-    el.removeAttribute('class');
-    el.removeAttribute('style');
-  });
-
-  // Convert b to strong and i to em
-  const bTags = tempDiv.getElementsByTagName('b');
-  while (bTags[0]) {
-    const b = bTags[0];
-    const strong = document.createElement('strong');
-    while (b.firstChild) {
-      strong.appendChild(b.firstChild);
-    }
-    b.parentNode?.replaceChild(strong, b);
-  }
-
-  const iTags = tempDiv.getElementsByTagName('i');
-  while (iTags[0]) {
-    const i = iTags[0];
-    const em = document.createElement('em');
-    while (i.firstChild) {
-      em.appendChild(i.firstChild);
-    }
-    i.parentNode?.replaceChild(em, i);
-  }
-
-  // Clean up any remaining empty elements
-  const allElementsAgain = tempDiv.getElementsByTagName('*');
-  for (let i = 0; i < allElementsAgain.length; i++) {
-    const el = allElementsAgain[i];
-    if (el.childNodes.length === 0 && !el.textContent?.trim()) {
-      el.remove();
-    }
-  }
 
   return tempDiv.innerHTML;
 }
