@@ -20,7 +20,7 @@ interface Page {
   id: number;
   slug: string;
   title: string;
-  categories?: { id: number; name: string };
+  categories?: Array<{ id: number; name: string }>;
   tags: Array<{
     id: number;
     name: string;
