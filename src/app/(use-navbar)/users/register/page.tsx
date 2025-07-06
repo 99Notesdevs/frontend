@@ -50,7 +50,7 @@ const Register = () => {
           showToast("No token received from server. Please try again later.", "error");
           return;
         }
-        Cookies.set('token', data.token, { expires: 5 });
+        Cookies.set('token', data.split(" ")[1], { expires: 5 });
         router.push('/users/dashboard');
         showToast("Registration successful!", "success");
       } else {
