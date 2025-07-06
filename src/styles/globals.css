@@ -155,8 +155,71 @@
 
 /* Ensure tables in article content have proper scrolling */
 .prose {
-  overflow-x: visible;
-  width: 100%;
+  color: var(--text-primary);
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* Add floating image styles for article content */
+.prose [data-type="image-container"] {
+  display: inline-block;
+  margin: 0.5rem 0;
+  position: relative;
+  max-width: 100%;
+}
+
+.prose [data-type="image-container"][data-float="left"] {
+  float: left;
+  margin-right: 1.5rem;
+  margin-left: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  shape-outside: margin-box;
+  max-width: 50%;
+}
+
+.prose [data-type="image-container"][data-float="right"] {
+  float: right;
+  margin-left: 1.5rem;
+  margin-right: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  shape-outside: margin-box;
+  max-width: 50%;
+}
+
+.prose [data-type="image-container"][data-float="none"] {
+  clear: both;
+  display: block;
+  margin: 1rem auto;
+  max-width: 100%;
+}
+
+.prose .floating-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0;
+  border-radius: 0.375rem;
+}
+
+/* Ensure paragraphs clear floats properly */
+.prose p {
+  clear: both;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+/* Clear floats after content */
+.prose > *:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Add some spacing between paragraphs */
+.prose p + p {
+  margin-top: 0.75em;
 }
 
 .prose :where(table):not(:where([class~='not-prose'] *)) {
@@ -545,255 +608,50 @@ h6 {
   clear: none;
 }
 
-/* Ensure proper spacing around images */
-.ProseMirror [data-type="image-container"] + p,
-.ProseMirror p + [data-type="image-container"] {
-  margin-top: 0;
-}
-
-/* Clear floats after content */
-.ProseMirror > *:last-child {
-  margin-bottom: 0;
-}
-
-/* Clearfix for floated elements */
-.ProseMirror-clearfix::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Ensure proper text flow around floats */
-.ProseMirror > * + * {
-  margin-top: 0.75rem;
-}
-
-/* Fix for list items near floats */
-.ProseMirror li {
-  clear: both;
-}
-
-/* Better handling of content after floats */
-.ProseMirror > * {
-  clear: none;
-}
-
-/* Fix for images in lists */
-.ProseMirror li [data-type="image-container"] {
-  margin: 0.5rem 0;
-}
-
-/* Fix for image selection */
-.ProseMirror .floating-image {
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* Image resize handle */
-.ProseMirror [data-resizable="true"] {
-  position: relative;
-  display: inline-block;
-  max-width: 100%;
-}
-
-.ProseMirror [data-resizable="true"]::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
-  background-color: #3b82f6;
-  cursor: nwse-resize;
-  border-radius: 2px 0 0 0;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.ProseMirror [data-resizable="true"]:hover::after {
-  opacity: 1;
-}
-
-/* Add a subtle shadow to indicate scrollability */
-.ProseMirror table::-webkit-scrollbar {
-  height: 8px;
-}
-
-.ProseMirror table::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.ProseMirror table::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.ProseMirror table::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* Heading highlight animation */
-.highlight-heading {
-  position: relative;
-  animation: highlight-fade 2s ease-in-out;
-}
-
-@keyframes highlight-fade {
-  0% {
-    background-color: rgba(253, 230, 138, 0.5);
-  }
-  100% {
-    background-color: transparent;
-  }
-}
-
-/* Ensure headings have pointer cursor and proper spacing */
-.prose h2 {
-  cursor: pointer;
-  position: relative;
-  padding-left: 1.5rem;
-  transition: all 0.2s ease;
-}
-
-.prose h2:hover {
-  color: var(--action-primary);
-}
-
-/* Add a subtle indicator for TOC-linked headings */
-.prose h2::before {
-  content: '#';
-  position: absolute;
-  left: 0;
-  color: var(--action-primary);
-  opacity: 0;
-  transform: translateX(-0.5rem);
-  transition: all 0.2s ease;
-}
-
-.prose h2:hover::before {
-  opacity: 1;
-  transform: translateX(0);
-}
-
- /* Floating image styles */
-.ProseMirror .floating-image {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: 0;
-  padding: 0;
-  transition: all 0.2s ease;
-  pointer-events: none;
-}
-
-/* Image container */
-.ProseMirror [data-type="image-container"] {
-  position: relative;
-  display: inline-block;
-  max-width: 100%;
-  line-height: 1.2;
-  margin: 0;
-  vertical-align: middle;
-}
-
-/* Float left */
-.ProseMirror [data-float="left"] {
-  float: left;
-  margin: 0 1rem 1rem 0;
-  clear: left;
-}
-
 /* Image Container Styles */
 .resizable-image-container {
   position: relative;
   display: inline-block;
-  max-width: 100%;
+  max-width: 50%;
   vertical-align: top;
-  line-height: 1.5;
-  margin: 0 0 1em 0;
-  clear: both;
+  margin: 0.25em 1em 0.5em 0;
+  z-index: 1;
 }
 
-/* Float left */
-.ProseMirror [data-float="left"],
+/* Left-floated images */
 .resizable-image-container[data-float="left"] {
   float: left;
-  margin: 0 1.5em 1em 0;
+  margin: 0.25em 1.5em 0.5em 0;
   shape-outside: margin-box;
-  shape-margin: 1rem;
-  max-width: 50%;
+  shape-margin: 1em;
   clear: left;
 }
 
-/* Float right */
-.ProseMirror [data-float="right"],
+/* Right-floated images */
 .resizable-image-container[data-float="right"] {
   float: right;
-  margin: 0 0 1em 1.5em;
+  margin: 0.25em 0 0.5em 1.5em;
   shape-outside: margin-box;
-  shape-margin: 1rem;
-  max-width: 50%;
+  shape-margin: 1em;
   clear: right;
 }
 
-/* Clear floats after the image container */
-.resizable-image-container::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Ensure paragraphs after floated images clear properly */
-.ProseMirror p,
-.article-body p {
-  clear: both;
-  overflow: hidden;
-}
-
-/* Allow text to flow only next to the image, not below */
-.ProseMirror p:has(+ [data-float]),
-.article-body p:has(+ [data-float]) {
-  overflow: hidden;
-  margin-bottom: 0;
-  padding-bottom: 1em;
-}
-
-/* Clear floats when needed */
-.ProseMirror .clear-float {
-  clear: both;
-  height: 0;
-  font-size: 0;
-  line-height: 0;
-  overflow: hidden;
-}
-
-/* Ensure text flows around images */
-.ProseMirror p {
-  overflow: visible;
-}
-
-/* Prevent empty paragraphs from collapsing */
-.ProseMirror p:empty:before {
-  content: '\00A0';
-  display: inline;
-}
-
-/* Center (no float) */
-.ProseMirror [data-float="none"],
+/* Center-aligned images */
 .resizable-image-container[data-float="none"] {
   display: block;
   float: none;
-  margin: 1rem auto;
+  margin: 1em auto;
+  max-width: 100%;
   clear: both;
 }
 
-/* Floating image styles */
+/* Image styles */
 .floating-image {
   max-width: 100%;
   height: auto;
   display: block;
   margin: 0;
+  pointer-events: auto;
 }
 
 /* Resize handle */
@@ -815,7 +673,7 @@ h6 {
   opacity: 1;
 }
 
-/* Ensure proper text wrapping */
+/* Text wrapping and flow */
 .ProseMirror {
   overflow-wrap: break-word;
   white-space: normal;
@@ -823,12 +681,11 @@ h6 {
   word-break: break-word;
 }
 
-.ProseMirror p,
-.ProseMirror ul,
-.ProseMirror ol {
+/* Paragraph styles */
+.ProseMirror p {
   margin: 0 0 1em 0;
-  clear: none;
   overflow: visible;
+  clear: none;
 }
 
 /* Clear floats after content */
@@ -836,41 +693,6 @@ h6 {
   content: "";
   display: table;
   clear: both;
-}
-
-/* Container for floated content */
-.ProseMirror .resizable-image-container {
-  position: relative;
-  display: inline-block;
-  vertical-align: top;
-  margin: 0.25em 1.5em 0.5em 0;
-  max-width: 50%;
-  clear: none !important;
-}
-
-/* Float left */
-.ProseMirror .resizable-image-container[data-float="left"],
-.ProseMirror [data-float="left"] {
-  float: left;
-  margin: 0.25em 1.5em 0.5em 0;
-  shape-outside: margin-box;
-  shape-margin: 0.75rem;
-}
-
-/* Float right */
-.ProseMirror .resizable-image-container[data-float="right"],
-.ProseMirror [data-float="right"] {
-  float: right;
-  margin: 0.25em 0 0.5em 1.5em;
-  shape-outside: margin-box;
-  shape-margin: 0.75rem;
-}
-
-/* Allow text to flow around images */
-.ProseMirror p {
-  overflow: visible;
-  clear: none;
-  margin: 0 0 1em 0;
 }
 
 /* Clear floats for block elements */
@@ -895,37 +717,24 @@ h6 {
 }
 
 /* Clear floats when needed */
-.ProseMirror .clearfix:after {
-  content: "";
-  display: table;
+.clear-float {
   clear: both;
+  height: 0;
+  font-size: 0;
+  line-height: 0;
+  overflow: hidden;
 }
 
-/* Fix for text flowing around images */
-.ProseMirror p:first-child,
-.ProseMirror ul:first-child,
-.ProseMirror ol:first-child {
-  margin-top: 0;
+/* Prevent empty paragraphs from collapsing */
+.ProseMirror p:empty:before {
+  content: '\00A0';
+  display: inline;
 }
 
-.ProseMirror p:last-child,
-.ProseMirror ul:last-child,
-.ProseMirror ol:last-child {
-  margin-bottom: 0;
-}
-
-/* Ensure text flows around floated images */
-.ProseMirror p,
-.ProseMirror ul,
-.ProseMirror ol {
-  overflow: visible;
-}
-
-/* Add some spacing around images */
-.ProseMirror img {
-  margin: 0;
-  padding: 0;
-  vertical-align: middle;
+/* Fix for image selection */
+.ProseMirror .floating-image {
+  user-select: none;
+  -webkit-user-drag: none;
 } 
 
 /* Enhanced Tiptap Editor Link Preview */

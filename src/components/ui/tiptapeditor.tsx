@@ -200,7 +200,10 @@ const CustomImage = Image.extend({
       img.style.height = height || 'auto';
       img.style.maxWidth = '100%';
       img.style.display = 'block';
-      img.style.verticalAlign = 'bottom';
+      img.style.verticalAlign = 'top';
+      img.style.margin = '0';
+      img.style.padding = '0';
+      img.style.border = 'none';
       img.className = 'floating-image';
       
       // Create the resize handle
@@ -213,14 +216,21 @@ const CustomImage = Image.extend({
       container.setAttribute('data-type', 'image-container');
       container.setAttribute('data-float', float);
       container.style.float = float;
-      container.style.maxWidth = '100%';
+      container.style.maxWidth = '50%';
       container.style.display = 'inline-block';
-      container.style.verticalAlign = 'middle';
+      container.style.verticalAlign = 'top';
       container.style.margin = margin;
-      container.style.shapeOutside = 'content-box';
-      container.style.shapeMargin = '0.75rem';
+      container.style.shapeOutside = 'margin-box';
+      container.style.shapeMargin = '1em';
+      container.style.zIndex = '1';
       
-      // Add elements to the container
+      // Make the image and resize handle interactive while keeping the container non-interactive
+      img.style.pointerEvents = 'auto';
+      img.style.display = 'block';
+      img.style.margin = '0';
+      img.style.padding = '0';
+      img.style.border = 'none';
+      resizeHandle.style.pointerEvents = 'auto';
       container.appendChild(img);
       container.appendChild(resizeHandle);
       
