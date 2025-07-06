@@ -183,8 +183,10 @@ export function GeneralStudiesForm({ onSubmit, defaultValues, folder }: GeneralS
   })
 
   const [currentSubcategory, setCurrentSubcategory] = useState("")
-  const [mainCategory, setMainCategory] = useState(defaultValues?.category?.[0] || "")
-  const [subcategories, setSubcategories] = useState<string[]>(defaultValues?.category?.slice(1) || [])
+  // @ts-ignore
+  const [mainCategory, setMainCategory] = useState(defaultValues?.category?.[0]?.name || "")
+  // // @ts-ignore
+  // const [subcategories, setSubcategories] = useState<string[]>(defaultValues?.category?.slice(1)?.map((category: { name: string }) => category.name) || [])
 
   useEffect(() => {
     if (drafts.length > 0 && !isLoadingDrafts && !currentDraftId) {
@@ -213,8 +215,8 @@ export function GeneralStudiesForm({ onSubmit, defaultValues, folder }: GeneralS
 
           // Handle categories
           if (selectedDraft.data.category && Array.isArray(selectedDraft.data.category)) {
-            setMainCategory(selectedDraft.data.category[0] || "")
-            setSubcategories(selectedDraft.data.category.slice(1) || [])
+            setMainCategory(selectedDraft.data.category[0]?.name || "")
+            // setSubcategories(selectedDraft.data.category.slice(1)?.map((category: { name: string }) => category.name) || [])
           }
 
           setShowDraftDialog(false)
@@ -262,21 +264,21 @@ export function GeneralStudiesForm({ onSubmit, defaultValues, folder }: GeneralS
     setImagePreview(null)
     setOgImagePreview(null)
     setMainCategory("")
-    setSubcategories([])
+    // setSubcategories([])
     setCurrentSubcategory("")
     setShowDraftDialog(false)
   }, [form, setCurrentDraftId])
 
-  const addSubcategory = () => {
-    if (currentSubcategory.trim()) {
-      setSubcategories([...subcategories, currentSubcategory.trim()])
-      setCurrentSubcategory("")
-    }
-  }
+  // const addSubcategory = () => {
+  //   if (currentSubcategory.trim()) {
+  //     setSubcategories([...subcategories, currentSubcategory.trim()])
+  //     setCurrentSubcategory("")
+  //   }
+  // }
 
-  const removeSubcategory = (index: number) => {
-    setSubcategories(subcategories.filter((_, i) => i !== index))
-  }
+  // const removeSubcategory = (index: number) => {
+  //   setSubcategories(subcategories.filter((_, i) => i !== index))
+  // }
 
   const handleMainCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMainCategory(e.target.value)
@@ -286,7 +288,7 @@ export function GeneralStudiesForm({ onSubmit, defaultValues, folder }: GeneralS
   const handleSubmitForm = (data: GeneralStudiesFormValues) => {
     const transformedData = {
       ...data,
-      category: [mainCategory, ...subcategories].filter(Boolean) as string[],
+      category: [mainCategory].filter(Boolean) as string[],
     }
 
     onSubmit(transformedData)

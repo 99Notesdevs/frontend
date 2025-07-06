@@ -188,8 +188,10 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({ initialData, onSubmit 
   })
 
   const [currentSubcategory, setCurrentSubcategory] = useState("")
-  const [mainCategory, setMainCategory] = useState(initialData?.category?.[0] || "")
-  const [subcategories, setSubcategories] = useState<string[]>(initialData?.category?.slice(1) || [])
+  // @ts-ignore
+  const [mainCategory, setMainCategory] = useState(initialData?.category?.[0]?.name || "")
+  // @ts-ignore
+  const [subcategories, setSubcategories] = useState<string[]>(initialData?.category?.slice(1)?.map((category) => category.name) || [])
 
   useEffect(() => {
     if (drafts.length > 0 && !isLoadingDrafts && !currentDraftId) {
@@ -232,8 +234,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({ initialData, onSubmit 
 
           // Handle categories
           if (formData.category && Array.isArray(formData.category)) {
-            setMainCategory(formData.category[0] || "")
-            setSubcategories(formData.category.slice(1) || [])
+            setMainCategory(formData.category[0]?.name || "")
+            setSubcategories(formData.category.slice(1)?.map((category: { name: string }) => category.name) || [])
           }
 
           // Handle image previews
