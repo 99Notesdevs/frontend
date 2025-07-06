@@ -839,20 +839,59 @@ h6 {
 }
 
 /* Container for floated content */
-.ProseMirror .float-container {
-  float: left;
-  margin: 0 16px 16px 0;
+.ProseMirror .resizable-image-container {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  margin: 0.25em 1.5em 0.5em 0;
   max-width: 50%;
+  clear: none !important;
 }
 
-.ProseMirror .float-container[data-float="right"] {
+/* Float left */
+.ProseMirror .resizable-image-container[data-float="left"],
+.ProseMirror [data-float="left"] {
+  float: left;
+  margin: 0.25em 1.5em 0.5em 0;
+  shape-outside: margin-box;
+  shape-margin: 0.75rem;
+}
+
+/* Float right */
+.ProseMirror .resizable-image-container[data-float="right"],
+.ProseMirror [data-float="right"] {
   float: right;
-  margin: 0 0 16px 16px;
+  margin: 0.25em 0 0.5em 1.5em;
+  shape-outside: margin-box;
+  shape-margin: 0.75rem;
 }
 
 /* Allow text to flow around images */
-.ProseMirror p + p {
-  margin-top: 0;
+.ProseMirror p {
+  overflow: visible;
+  clear: none;
+  margin: 0 0 1em 0;
+}
+
+/* Clear floats for block elements */
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6,
+.ProseMirror hr,
+.ProseMirror ul,
+.ProseMirror ol,
+.ProseMirror pre,
+.ProseMirror blockquote,
+.ProseMirror table {
+  clear: both;
+}
+
+/* Ensure proper spacing after images */
+.ProseMirror .resizable-image-container + * {
+  margin-top: 0.5em;
 }
 
 /* Clear floats when needed */
