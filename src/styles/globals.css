@@ -1177,110 +1177,113 @@ a[data-description]:hover::after {
 }
 
 /* Image container styles for article view */
-.article-body .resizable-image-container {
+.article-body .resizable-image-container,
+.prose .resizable-image-container {
   position: relative;
   display: inline-block;
   max-width: 100%;
   vertical-align: top;
-  margin: 0 0 1em 0;
+  margin: 0;
   clear: both;
-  /* Prevent text from wrapping on both sides */
-  float: none !important;
-  clear: both !important;
 }
 
 /* Float left - only affects immediate sibling text */
 .article-body .resizable-image-container[data-float="left"],
-.article-body [data-float="left"] {
+.article-body [data-float="left"],
+.prose .resizable-image-container[data-float="left"],
+.prose [data-float="left"] {
   float: left;
-  margin: 0 1.5em 1em 0;
+  margin: 0.25em 1.5em 0.5em 0;
   max-width: 50%;
+  shape-outside: margin-box;
+  shape-margin: 0.75rem;
+  clear: none !important;
 }
 
-/* Float right - only affects immediate sibling text */
+/* Float right in article body */
 .article-body .resizable-image-container[data-float="right"],
-.article-body [data-float="right"] {
+.article-body [data-float="right"],
+.prose .resizable-image-container[data-float="right"],
+.prose [data-float="right"] {
   float: right;
-  margin: 0 0 1em 1.5em;
+  margin: 0.25em 0 0.5em 1.5em;
   max-width: 50%;
+  shape-outside: margin-box;
+  shape-margin: 0.75rem;
+  clear: none !important;
 }
 
-/* Clear floats after images */
-.article-body .resizable-image-container::after {
-  content: "";
-  display: table;
+/* Allow text to wrap around floated images */
+.article-body p,
+.prose p {
+  overflow: visible;
+  clear: none;
+  margin-bottom: 1em;
+}
+
+/* Clear floats after the image's container paragraph */
+.article-body p:has(> .resizable-image-container),
+.prose p:has(> .resizable-image-container) {
+  display: flow-root; /* Modern clearfix */
+}
+
+/* Clear floats for elements that should start on a new line */
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4,
+.article-body h5,
+.article-body h6,
+.article-body hr,
+.article-body ul,
+.article-body ol,
+.article-body pre,
+.article-body blockquote,
+.article-body table,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6,
+.prose hr,
+.prose ul,
+.prose ol,
+.prose pre,
+.prose blockquote,
+.prose table {
   clear: both;
 }
 
-/* Clear all floats after the image container */
-.article-body .resizable-image-container + * {
-  clear: both;
-  display: block;
-  float: none !important;
-  width: 100%;
+/* Ensure images don't overflow their containers */
+.article-body .resizable-image-container,
+.prose .resizable-image-container {
+  max-width: 100%;
+  height: auto;
 }
 
-/* Ensure all block elements after the image container clear floats */
+/* Special handling for paragraphs following floated images */
+.article-body p + p,
+.prose p + p {
+  clear: none;
+}
+
+/* Ensure proper spacing around images */
 .article-body .resizable-image-container + p,
-.article-body .resizable-image-container + h1,
-.article-body .resizable-image-container + h2,
-.article-body .resizable-image-container + h3,
-.article-body .resizable-image-container + h4,
-.article-body .resizable-image-container + h5,
-.article-body .resizable-image-container + h6,
-.article-body .resizable-image-container + div,
-.article-body .resizable-image-container + section,
-.article-body .resizable-image-container + article {
-  clear: both !important;
-  float: none !important;
-  width: 100% !important;
-  overflow: hidden;
+.prose .resizable-image-container + p {
+  margin-top: 0.5em;
 }
 
-/* Clear any floats within paragraphs */
-.article-body p {
-  overflow: hidden;
-  clear: both;
-}
-
-/* Clear all floats at the end of the article */
-.article-body::after {
+/* Clear floats at the end of containers */
+.article-body::after,
+.prose::after {
   content: "";
   display: table;
   clear: both;
 }
 
-/* Prevent any content from wrapping around floated images */
-.article-body > *:not(.resizable-image-container) {
-  clear: both;
-  float: none;
-  width: 100%;
-}
-
-/* Allow text to wrap only when it's in the same paragraph as the image */
-.article-body p:has(.resizable-image-container) {
-  overflow: hidden;
-}
-
-.article-body p:has(.resizable-image-container) + * {
-  clear: both;
-  float: none;
-  width: 100%;
-}
-
-/* Optional: Ensure floated images don't force text to the bottom */
-.article-body img.float-left,
-.article-body img.float-right,
-.ProseMirror img.float-left,
-.ProseMirror img.float-right {
-  display: block;
-  /* margin already handled by Tailwind classes */
-}
-
-/* Optional: Add clearfix to parent paragraphs if needed */
-.article-body p::after,
-.ProseMirror p::after {
-  content: "";
-  display: table;
+/* Ensure floated images don't affect layout of following sections */
+.article-body > *:not(p, .resizable-image-container),
+.prose > *:not(p, .resizable-image-container) {
   clear: both;
 }
