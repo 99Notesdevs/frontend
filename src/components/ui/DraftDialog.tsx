@@ -1,69 +1,78 @@
-import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon } from "@radix-ui/react-icons";
+"use client"
 
-interface DraftDialogProps {
-  open: boolean;
-  onClose: (open: boolean) => void;
-  onLoadDraft: () => void;
-  onStartNew: () => void;
-  drafts: { 
-    title: string; 
-    data: { 
-      title: string; 
-      content: string; 
-      imageUrl: string | undefined; 
-      showInNav: boolean | undefined; 
-      tags?: string[] | undefined; 
-    } 
-  }[];
-  onSelectDraft: (title: string) => void;
+import type React from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+
+interface Draft {
+  id: string
+  title: string
+  data: any
+  updatedAt: Date
 }
 
-const DraftDialog: React.FC<DraftDialogProps> = ({ open, onClose, onLoadDraft, onStartNew, drafts, onSelectDraft }) => (
-  <Dialog.Root open={open} onOpenChange={onClose}>
-    <Dialog.Portal>
-      <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-      <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <Dialog.Title className="text-lg font-bold mb-4">Saved Drafts</Dialog.Title>
+interface DraftDialogProps {
+  open: boolean
+  onClose: () => void
+  onLoadDraft: () => void
+  onStartNew: () => void
+  drafts: Draft[]
+  onSelectDraft: (draftId: string) => void
+}
+
+const DraftDialog: React.FC<DraftDialogProps> = ({ open, onClose, onLoadDraft, onStartNew, drafts, onSelectDraft }) => {
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Load Draft</DialogTitle>
+        </DialogHeader>
+
         <div className="space-y-4">
-          {drafts.length > 0 ? (
-            <div className="space-y-2">
+          <p className="text-sm text-gray-600">
+            You have {drafts.length} saved draft{drafts.length !== 1 ? "s" : ""}. Would you like to continue with one of
+            them or start fresh?
+          </p>
+
+          {drafts.length > 0 && (
+            <div className="space-y-2 max-h-60 overflow-y-auto">
               {drafts.map((draft) => (
-                <button
-                  key={draft.title}
-                  onClick={() => onSelectDraft(draft.title)}
-                  className="w-full px-4 py-2 flex items-center justify-between border rounded hover:bg-gray-50"
+                <div
+                  key={draft.id}
+                  className="flex items-center justify-between p-2 border rounded hover:bg-gray-50 cursor-pointer"
+                  onClick={() => onSelectDraft(draft.id)}
                 >
-                  <span className="font-medium">{draft.title}</span>
-                  <span className="text-sm text-gray-500">
-                    {draft.data.tags?.join(', ')}
-                  </span>
-                </button>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{draft.title || "Untitled Draft"}</p>
+                    <p className="text-xs text-gray-500">{formatDate(draft.updatedAt)}</p>
+                  </div>
+                </div>
               ))}
             </div>
-          ) : (
-            <p className="text-gray-500 text-center">No drafts available</p>
           )}
-          <div className="mt-4 flex justify-end space-x-2">
-            <button
-              onClick={onStartNew}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
+
+          <div className="flex space-x-2">
+            <Button onClick={onStartNew} variant="outline" className="flex-1 bg-transparent">
               Start New
-            </button>
+            </Button>
+            <Button onClick={onClose} className="flex-1">
+              Cancel
+            </Button>
           </div>
         </div>
-        <Dialog.Close asChild>
-          <button
-            aria-label="Close"
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-          >
-            <Cross2Icon />
-          </button>
-        </Dialog.Close>
-      </Dialog.Content>
-    </Dialog.Portal>
-  </Dialog.Root>
-);
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-export default DraftDialog;
+export default DraftDialog

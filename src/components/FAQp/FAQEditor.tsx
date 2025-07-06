@@ -1,121 +1,144 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Plus, Trash2 } from "lucide-react"
 
 interface SubQuestion {
-  id: string;
-  question: string;
-  answer: string;
+  id: string
+  question: string
+  answer: string
 }
 
 interface FAQItem {
-  id: string;
-  question: string;
-  answer: string;
-  subQuestions: SubQuestion[];
+  id: string
+  question: string
+  answer: string
+  subQuestions: SubQuestion[]
 }
 
 export interface FAQEditorProps {
-  value?: string;
-  onChange: (value: string) => void;
+  value?: string
+  onChange: (value: string) => void
 }
 
-export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
-  const [faqs, setFaqs] = useState<FAQItem[]>([]);
-  const [isAdding, setIsAdding] = useState<{ [key: string]: boolean }>({});
+export interface FAQEditorRef {
+  reset: () => void
+}
+
+export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(({ value, onChange }, ref) => {
+  const [faqs, setFaqs] = useState<FAQItem[]>([])
+  const [isAdding, setIsAdding] = useState<{ [key: string]: boolean }>({})
+
+  // Expose reset method to parent
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      setFaqs([])
+      setIsAdding({})
+    },
+  }))
 
   // Parse the initial value
   useEffect(() => {
     if (value) {
       try {
-        const parsed = JSON.parse(value);
-        // Add IDs to items if they don't exist
-        const faqData = (parsed.general || []).map((item: any) => ({
-          ...item,
-          id: item.id || Date.now().toString(),
-          subQuestions: (item.subQuestions || []).map((sub: any) => ({
-            ...sub,
-            id: sub.id || Date.now().toString()
+        const parsed = JSON.parse(value)
+        if (parsed && parsed.general && Array.isArray(parsed.general)) {
+          // Add IDs to items if they don't exist
+          const faqData = parsed.general.map((item: any) => ({
+            ...item,
+            id: item.id || `faq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            subQuestions: (item.subQuestions || []).map((sub: any) => ({
+              ...sub,
+              id: sub.id || `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            })),
           }))
-        }));
-        setFaqs(faqData);
+          setFaqs(faqData)
+        } else {
+          setFaqs([])
+        }
       } catch (error) {
-        console.error('Failed to parse FAQ data', error);
+        console.error("Failed to parse FAQ data", error)
+        setFaqs([])
       }
+    } else {
+      setFaqs([])
     }
-  }, [value]);
+  }, [value])
 
   // Update the parent form when FAQs change
   useEffect(() => {
-    const faqData = { general: faqs };
-    onChange(JSON.stringify(faqData));
-  }, [faqs, onChange]);
+    const faqData = { general: faqs }
+    const jsonString = JSON.stringify(faqData)
+    onChange(jsonString)
+  }, [faqs, onChange])
 
   const addFAQ = useCallback(() => {
-    setFaqs(prev => [...prev, { 
-      id: Date.now().toString(),
-      question: '', 
-      answer: '', 
-      subQuestions: [] 
-    }]);
-  }, []);
+    const newFAQ = {
+      id: `faq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      question: "",
+      answer: "",
+      subQuestions: [],
+    }
+    setFaqs((prev) => [...prev, newFAQ])
+  }, [])
 
-  const addSubQuestion = useCallback((parentId: string) => {
-    if (isAdding[parentId]) return;
-    
-    setIsAdding(prev => ({ ...prev, [parentId]: true }));
-    
-    setFaqs(prev => 
-      prev.map(item => 
-        item.id === parentId 
-          ? {
-              ...item,
-              subQuestions: [
-                ...item.subQuestions,
-                { 
-                  id: Date.now().toString(),
-                  question: '', 
-                  answer: '' 
-                }
-              ]
-            }
-          : item
+  const addSubQuestion = useCallback(
+    (parentId: string) => {
+      if (isAdding[parentId]) return
+
+      setIsAdding((prev) => ({ ...prev, [parentId]: true }))
+
+      setFaqs((prev) =>
+        prev.map((item) =>
+          item.id === parentId
+            ? {
+                ...item,
+                subQuestions: [
+                  ...item.subQuestions,
+                  {
+                    id: `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    question: "",
+                    answer: "",
+                  },
+                ],
+              }
+            : item,
+        ),
       )
-    );
-    
-    setTimeout(() => {
-      setIsAdding(prev => ({ ...prev, [parentId]: false }));
-    }, 300);
-  }, [isAdding]);
 
-  const updateFAQ = useCallback((id: string, field: 'question' | 'answer', value: string, isSubQuestion = false, subId?: string) => {
-    setFaqs(prev => 
-      isSubQuestion && subId
-        ? prev.map(item => ({
-            ...item,
-            subQuestions: item.subQuestions.map(sub => 
-              sub.id === subId ? { ...sub, [field]: value } : sub
-            )
-          }))
-        : prev.map(item => 
-            item.id === id ? { ...item, [field]: value } : item
-          )
-    );
-  }, []);
+      setTimeout(() => {
+        setIsAdding((prev) => ({ ...prev, [parentId]: false }))
+      }, 300)
+    },
+    [isAdding],
+  )
+
+  const updateFAQ = useCallback(
+    (id: string, field: "question" | "answer", value: string, isSubQuestion = false, subId?: string) => {
+      setFaqs((prev) =>
+        isSubQuestion && subId
+          ? prev.map((item) => ({
+              ...item,
+              subQuestions: item.subQuestions.map((sub) => (sub.id === subId ? { ...sub, [field]: value } : sub)),
+            }))
+          : prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+      )
+    },
+    [],
+  )
 
   const deleteFAQ = useCallback((id: string, isSubQuestion = false, parentId?: string) => {
-    setFaqs(prev => 
+    setFaqs((prev) =>
       isSubQuestion && parentId
-        ? prev.map(item => ({
+        ? prev.map((item) => ({
             ...item,
-            subQuestions: item.subQuestions.filter(sub => sub.id !== id)
+            subQuestions: item.subQuestions.filter((sub) => sub.id !== id),
           }))
-        : prev.filter(item => item.id !== id)
-    );
-  }, []);
+        : prev.filter((item) => item.id !== id),
+    )
+  }, [])
 
   return (
     <div className="space-y-4">
@@ -128,7 +151,7 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
                   <span className="font-medium text-gray-700">{index + 1}.</span>
                   <Input
                     value={item.question}
-                    onChange={(e) => updateFAQ(item.id, 'question', e.target.value)}
+                    onChange={(e) => updateFAQ(item.id, "question", e.target.value)}
                     placeholder="Enter question"
                     className="flex-1"
                   />
@@ -142,14 +165,14 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
                     <Trash2 size={16} />
                   </Button>
                 </div>
-                
+
                 <Input
                   value={item.answer}
-                  onChange={(e) => updateFAQ(item.id, 'answer', e.target.value)}
+                  onChange={(e) => updateFAQ(item.id, "answer", e.target.value)}
                   placeholder="Enter answer"
                   className="w-full ml-6"
                 />
-                
+
                 <div className="flex justify-between items-center">
                   <Button
                     type="button"
@@ -159,11 +182,11 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
                     className="text-sm"
                     disabled={isAdding[item.id]}
                   >
-                    <Plus size={14} className="mr-1" /> 
-                    {isAdding[item.id] ? 'Adding...' : 'Add Sub-question'}
+                    <Plus size={14} className="mr-1" />
+                    {isAdding[item.id] ? "Adding..." : "Add Sub-question"}
                   </Button>
                 </div>
-                
+
                 {item.subQuestions.length > 0 && (
                   <div className="mt-3 ml-6 space-y-3 border-l-2 border-gray-100 pl-4">
                     {item.subQuestions.map((subItem, subIndex) => (
@@ -172,7 +195,7 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
                           <span className="text-sm text-gray-600">{subIndex + 1}.</span>
                           <Input
                             value={subItem.question}
-                            onChange={(e) => updateFAQ(subItem.id, 'question', e.target.value, true, subItem.id)}
+                            onChange={(e) => updateFAQ(subItem.id, "question", e.target.value, true, subItem.id)}
                             placeholder="Enter sub-question"
                             className="flex-1 text-sm"
                           />
@@ -188,7 +211,7 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
                         </div>
                         <Input
                           value={subItem.answer}
-                          onChange={(e) => updateFAQ(subItem.id, 'answer', e.target.value, true, subItem.id)}
+                          onChange={(e) => updateFAQ(subItem.id, "answer", e.target.value, true, subItem.id)}
                           placeholder="Enter answer"
                           className="w-full text-sm ml-6"
                         />
@@ -205,17 +228,14 @@ export const FAQEditor: React.FC<FAQEditorProps> = ({ value, onChange }) => {
           </div>
         )}
       </div>
-      
-      <Button
-        type="button"
-        variant="outline"
-        onClick={addFAQ}
-        className="w-full"
-      >
+
+      <Button type="button" variant="outline" onClick={addFAQ} className="w-full bg-transparent">
         <Plus size={16} className="mr-2" /> Add Question
       </Button>
     </div>
-  );
-};
+  )
+})
 
-export default FAQEditor;
+FAQEditor.displayName = "FAQEditor"
+
+export default FAQEditor
