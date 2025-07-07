@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
@@ -9,7 +9,7 @@ import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import { Mark, mergeAttributes, Extension, Editor } from "@tiptap/core";
 import Heading from "@tiptap/extension-heading";
-import { CleanPaste } from './claenpaste'
+import { CleanPaste } from "./cleanpaste";
 import {
   Bold,
   Italic,
@@ -24,8 +24,6 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
-  Undo,
-  Redo,
   Table as TableIcon,
   RowsIcon,
   ColumnsIcon,
@@ -36,22 +34,19 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect, useRef,ReactNode } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { Iframe } from "./Iframe";
 import { TABLE_DESIGNS } from "./tableDesigns";
-import { OrderedList } from '@tiptap/extension-ordered-list';
+import { OrderedList } from "@tiptap/extension-ordered-list";
 
 // Editor instance will be created using the useEditor hook in the component
 const editor = new Editor({
-  extensions: [
-    StarterKit,
-    CleanPaste,
-  ],
-})
+  extensions: [StarterKit, CleanPaste],
+});
 
 const FontSize = Mark.create({
   name: "fontSize",
@@ -89,35 +84,35 @@ const FontSize = Mark.create({
 });
 
 const TableStyles = Extension.create({
-  name: 'tableStyles',
+  name: "tableStyles",
 
   addGlobalAttributes() {
     return [
       {
-        types: ['table', 'tableRow', 'tableCell', 'tableHeader'],
+        types: ["table", "tableRow", "tableCell", "tableHeader"],
         attributes: {
           style: {
             default: null,
-            parseHTML: element => element.getAttribute('style'),
-            renderHTML: attributes => {
-              if (!attributes.style) return {}
-              return { style: attributes.style }
-            }
-          }
-        }
-      }
-    ]
+            parseHTML: (element) => element.getAttribute("style"),
+            renderHTML: (attributes) => {
+              if (!attributes.style) return {};
+              return { style: attributes.style };
+            },
+          },
+        },
+      },
+    ];
   },
 });
 
 // Custom Image extension with resizing and text wrapping support
 const CustomImage = Image.extend({
-  name: 'resizableImage',
+  name: "resizableImage",
   addOptions() {
     return {
       ...this.parent?.(),
       HTMLAttributes: {
-        class: 'floating-image',
+        class: "floating-image",
       },
     };
   },
@@ -128,26 +123,26 @@ const CustomImage = Image.extend({
       alt: { default: null },
       title: { default: null },
       width: {
-        default: 'auto',
-        renderHTML: attributes => ({
+        default: "auto",
+        renderHTML: (attributes) => ({
           width: attributes.width,
         }),
       },
       height: {
-        default: 'auto',
-        renderHTML: attributes => ({
+        default: "auto",
+        renderHTML: (attributes) => ({
           height: attributes.height,
         }),
       },
       float: {
-        default: 'none',
-        renderHTML: attributes => ({
+        default: "none",
+        renderHTML: (attributes) => ({
           float: attributes.float,
         }),
       },
       margin: {
-        default: '0 16px 16px 0',
-        renderHTML: attributes => ({
+        default: "0 16px 16px 0",
+        renderHTML: (attributes) => ({
           margin: attributes.margin,
         }),
       },
@@ -155,89 +150,99 @@ const CustomImage = Image.extend({
   },
   renderHTML({ HTMLAttributes }) {
     // Map float to Tailwind classes
-    let floatClass = '';
-    let marginClass = 'mb-4';
-    if (HTMLAttributes.float === 'left') {
-      floatClass = 'float-left';
-      marginClass = 'mr-4 mb-4';
-    } else if (HTMLAttributes.float === 'right') {
-      floatClass = 'float-right';
-      marginClass = 'ml-4 mb-4';
+    let floatClass = "";
+    let marginClass = "mb-4";
+    if (HTMLAttributes.float === "left") {
+      floatClass = "float-left";
+      marginClass = "mr-4 mb-4";
+    } else if (HTMLAttributes.float === "right") {
+      floatClass = "float-right";
+      marginClass = "ml-4 mb-4";
     } else {
-      floatClass = 'mx-auto';
-      marginClass = 'mb-4';
+      floatClass = "mx-auto";
+      marginClass = "mb-4";
     }
     // Compose class string
-    const className = [
-      'floating-image',
-      floatClass,
-      marginClass,
-    ].join(' ');
+    const className = ["floating-image", floatClass, marginClass].join(" ");
 
     // Merge with any additional classes
     const attrs = {
       ...HTMLAttributes,
       class: className,
       style: [
-        HTMLAttributes.width && HTMLAttributes.width !== 'auto' ? `width:${HTMLAttributes.width};` : '',
-        HTMLAttributes.height && HTMLAttributes.height !== 'auto' ? `height:${HTMLAttributes.height};` : '',
-        'max-width:100%;height:auto;display:block;border-radius:0.375rem;',
-      ].join(''),
+        HTMLAttributes.width && HTMLAttributes.width !== "auto"
+          ? `width:${HTMLAttributes.width};`
+          : "",
+        HTMLAttributes.height && HTMLAttributes.height !== "auto"
+          ? `height:${HTMLAttributes.height};`
+          : "",
+        "max-width:100%;height:auto;display:block;border-radius:0.375rem;",
+      ].join(""),
     };
 
-    return ['img', attrs];
+    return ["img", attrs];
   },
   addNodeView() {
     return ({ node, getPos, editor }) => {
       // Create the image element
-      const img = document.createElement('img');
-      const { src, alt, width, height, float = 'none', margin = '0 16px 16px 16px' } = node.attrs;
-      
+      const img = document.createElement("img");
+      const {
+        src,
+        alt,
+        width,
+        height,
+        float = "none",
+        margin = "0 16px 16px 16px",
+      } = node.attrs;
+
       // Set up the image
       img.src = src;
-      img.alt = alt || '';
-      img.style.width = width || '50%';
-      img.style.height = height || 'auto';
-      img.style.maxWidth = '100%';
-      img.style.display = 'block';
-      img.style.verticalAlign = 'top';
-      img.style.margin = '0';
-      img.style.padding = '0';
-      img.style.border = 'none';
-      img.className = 'floating-image';
-      
+      img.alt = alt || "";
+      img.style.width = width || "50%";
+      img.style.height = height || "auto";
+      img.style.maxWidth = "100%";
+      img.style.display = "block";
+      img.style.verticalAlign = "top";
+      img.style.margin = "0";
+      img.style.padding = "0";
+      img.style.border = "none";
+      img.className = "floating-image";
+
       // Create the resize handle
-      const resizeHandle = document.createElement('div');
-      resizeHandle.className = 'resize-handle';
-      
+      const resizeHandle = document.createElement("div");
+      resizeHandle.className = "resize-handle";
+
       // Create the container for the image and resize handle
-      const container = document.createElement('div');
-      container.className = 'resizable-image-container';
-      container.setAttribute('data-type', 'image-container');
-      container.setAttribute('data-float', float);
+      const container = document.createElement("div");
+      container.className = "resizable-image-container";
+      container.setAttribute("data-type", "image-container");
+      container.setAttribute("data-float", float);
       container.style.float = float;
-      container.style.maxWidth = '50%';
-      container.style.display = 'inline-block';
-      container.style.verticalAlign = 'top';
+      container.style.maxWidth = "50%";
+      container.style.display = "inline-block";
+      container.style.verticalAlign = "top";
       container.style.margin = margin;
-      container.style.shapeOutside = 'margin-box';
-      container.style.shapeMargin = '1em';
-      container.style.zIndex = '1';
-      
+      container.style.shapeOutside = "margin-box";
+      container.style.shapeMargin = "1em";
+      container.style.zIndex = "1";
+
       // Make the image and resize handle interactive while keeping the container non-interactive
-      img.style.pointerEvents = 'auto';
-      img.style.display = 'block';
-      img.style.margin = '0';
-      img.style.padding = '0';
-      img.style.border = 'none';
-      resizeHandle.style.pointerEvents = 'auto';
+      img.style.pointerEvents = "auto";
+      img.style.display = "block";
+      img.style.margin = "0";
+      img.style.padding = "0";
+      img.style.border = "none";
+      resizeHandle.style.pointerEvents = "auto";
       container.appendChild(img);
       container.appendChild(resizeHandle);
-      
+
       // Resize functionality
       let isResizing = false;
-      let startX: number, startY: number, startWidth: number, startHeight: number;
-      
+      let startX: number,
+        startY: number,
+        startWidth: number,
+        startHeight: number;
+
       const onMouseDown = (e: MouseEvent) => {
         if (e.target === resizeHandle) {
           e.preventDefault();
@@ -245,38 +250,44 @@ const CustomImage = Image.extend({
           isResizing = true;
           startX = e.clientX;
           startY = e.clientY;
-          startWidth = parseInt(document.defaultView?.getComputedStyle(img).width || '0', 10);
-          startHeight = parseInt(document.defaultView?.getComputedStyle(img).height || '0', 10);
-          
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
+          startWidth = parseInt(
+            document.defaultView?.getComputedStyle(img).width || "0",
+            10
+          );
+          startHeight = parseInt(
+            document.defaultView?.getComputedStyle(img).height || "0",
+            10
+          );
+
+          document.addEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onMouseUp);
         }
       };
-      
+
       const onMouseMove = (e: MouseEvent) => {
         if (!isResizing) return;
-        
+
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
-        
+
         const newWidth = startWidth + dx;
         const newHeight = startHeight + dy;
-        
+
         img.style.width = `${newWidth}px`;
         img.style.height = `${newHeight}px`;
       };
-      
+
       const onMouseUp = () => {
         if (!isResizing) return;
-        
+
         isResizing = false;
-        
+
         // Update the node with new dimensions
         const { view } = editor;
         const { state } = view;
         const pos = getPos();
-        
-        if (typeof pos === 'number') {
+
+        if (typeof pos === "number") {
           view.dispatch(
             state.tr.setNodeMarkup(pos, undefined, {
               ...node.attrs,
@@ -285,17 +296,17 @@ const CustomImage = Image.extend({
             })
           );
         }
-        
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
+
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
       };
-      
-      container.addEventListener('mousedown', onMouseDown);
-      
+
+      container.addEventListener("mousedown", onMouseDown);
+
       return {
         dom: container,
         destroy: () => {
-          container.removeEventListener('mousedown', onMouseDown);
+          container.removeEventListener("mousedown", onMouseDown);
         },
       };
     };
@@ -312,16 +323,16 @@ const CustomLink = Link.extend({
       title: {
         default: null,
       },
-      'data-description': {
+      "data-description": {
         default: null,
       },
-      'data-title': {
+      "data-title": {
         default: null,
       },
     };
   },
   renderHTML({ HTMLAttributes }) {
-    return ['a', HTMLAttributes, 0];
+    return ["a", HTMLAttributes, 0];
   },
 });
 
@@ -330,9 +341,9 @@ const CustomOrderedList = OrderedList.extend({
   addAttributes() {
     return {
       class: {
-        default: 'ordered',
+        default: "ordered",
         parseHTML: (element: HTMLElement) => ({
-          class: element.getAttribute('class') || 'ordered'
+          class: element.getAttribute("class") || "ordered",
         }),
       },
     };
@@ -340,29 +351,37 @@ const CustomOrderedList = OrderedList.extend({
   parseHTML() {
     return [
       {
-        tag: 'ol',
+        tag: "ol",
         getAttrs: (node: HTMLElement | string) => {
-          if (typeof node === 'string') return {};
+          if (typeof node === "string") return {};
           return {
-            class: node.getAttribute('class') || 'ordered',
+            class: node.getAttribute("class") || "ordered",
           };
         },
       },
     ];
   },
   renderHTML({ HTMLAttributes }: { HTMLAttributes: { class?: string } }) {
-    const className = HTMLAttributes.class || 'ordered';
-    return ['ol', { ...HTMLAttributes, class: `list-${className}` }, 0];
+    const className = HTMLAttributes.class || "ordered";
+    return ["ol", { ...HTMLAttributes, class: `list-${className}` }, 0];
   },
 });
 
 // List style types
 const LIST_STYLES = [
-  { id: 'bullet', label: 'Bullets', icon: <List className="w-4 h-4" /> },
-  { id: 'ordered', label: 'Numbers (1, 2, 3)', icon: <ListOrdered className="w-4 h-4" /> },
-  { id: 'lower-roman', label: 'Roman (i, ii, iii)', icon: <span className="italic">i</span> },
-  { id: 'upper-roman', label: 'Roman (I, II, III)', icon: <span>I</span> },
-  { id: 'lower-alpha', label: 'Alphabet (a, b, c)', icon: <span>a</span> },
+  { id: "bullet", label: "Bullets", icon: <List className="w-4 h-4" /> },
+  {
+    id: "ordered",
+    label: "Numbers (1, 2, 3)",
+    icon: <ListOrdered className="w-4 h-4" />,
+  },
+  {
+    id: "lower-roman",
+    label: "Roman (i, ii, iii)",
+    icon: <span className="italic">i</span>,
+  },
+  { id: "upper-roman", label: "Roman (I, II, III)", icon: <span>I</span> },
+  { id: "lower-alpha", label: "Alphabet (a, b, c)", icon: <span>a</span> },
 ];
 
 interface ListMenuProps {
@@ -377,26 +396,31 @@ const ListMenu = ({ editor }: ListMenuProps) => {
   // Close menu when clicking outside
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node) && 
-          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Get current list style
   const getCurrentListStyle = () => {
-    if (editor.isActive('orderedList')) {
-      const attrs = editor.getAttributes('orderedList');
-      return attrs.class || 'ordered';
+    if (editor.isActive("orderedList")) {
+      const attrs = editor.getAttributes("orderedList");
+      return attrs.class || "ordered";
     }
     return null;
   };
 
   const currentStyle = getCurrentListStyle();
-  const currentStyleData = LIST_STYLES.find(style => style.id === currentStyle) || LIST_STYLES[0];
+  const currentStyleData =
+    LIST_STYLES.find((style) => style.id === currentStyle) || LIST_STYLES[0];
 
   const toggleList = (styleId: string) => {
     const isSameStyle = currentStyle === styleId;
@@ -411,18 +435,19 @@ const ListMenu = ({ editor }: ListMenuProps) => {
     // If switching from one list type to another
     if (currentStyle !== null) {
       // First clear any existing list
-      if (editor.isActive('orderedList')) {
+      if (editor.isActive("orderedList")) {
         editor.chain().focus().toggleOrderedList().run();
       }
     }
 
     // Apply the new list style
-    editor.chain()
+    editor
+      .chain()
       .focus()
       .toggleOrderedList()
-      .updateAttributes('orderedList', { class: styleId })
+      .updateAttributes("orderedList", { class: styleId })
       .run();
-    
+
     setIsOpen(false);
   };
 
@@ -440,9 +465,9 @@ const ListMenu = ({ editor }: ListMenuProps) => {
         label="List Styles"
         isActive={currentStyle !== null}
       />
-      
+
       {isOpen && (
-        <div 
+        <div
           ref={menuRef}
           className="absolute left-0 z-10 mt-1 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none"
           role="menu"
@@ -454,12 +479,13 @@ const ListMenu = ({ editor }: ListMenuProps) => {
               key={style.id}
               onClick={() => toggleList(style.id)}
               className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
-                currentStyle === style.id 
-                  ? 'bg-gray-100 text-gray-900' 
-                  : 'text-gray-700 hover:bg-gray-50'
+                currentStyle === style.id
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
               role="menuitem"
               tabIndex={-1}
+              type="button"
             >
               <span className="w-5 flex justify-center">{style.icon}</span>
               <span>{style.label}</span>
@@ -472,58 +498,64 @@ const ListMenu = ({ editor }: ListMenuProps) => {
 };
 
 const PRESET_COLORS = [
-  '#000000', // Black
-  '#343A40', // Dark Gray
-  '#495057', // Gray
-  '#868E96', // Medium Gray
-  '#E9ECEF', // Light Gray
-  '#F8F9FA', // Almost White
-  '#E03131', // Red
-  '#C2255C', // Pink
-  '#9C36B5', // Purple
-  '#3B5BDB', // Blue
-  '#1098AD', // Cyan
-  '#0CA678', // Teal
-  '#37B24D', // Green
-  '#74B816', // Lime
-  '#F59F00', // Yellow
-  '#F76707', // Orange
+  "#000000", // Black
+  "#343A40", // Dark Gray
+  "#495057", // Gray
+  "#868E96", // Medium Gray
+  "#E9ECEF", // Light Gray
+  "#F8F9FA", // Almost White
+  "#E03131", // Red
+  "#C2255C", // Pink
+  "#9C36B5", // Purple
+  "#3B5BDB", // Blue
+  "#1098AD", // Cyan
+  "#0CA678", // Teal
+  "#37B24D", // Green
+  "#74B816", // Lime
+  "#F59F00", // Yellow
+  "#F76707", // Orange
 ];
 
-interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ToolbarButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
   label: string;
   isActive?: boolean;
 }
 
-const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(({
-  onClick,
-  icon,
-  label,
-  isActive = false,
-  disabled = false,
-  className = "",
-}, ref) => {
-  return (
-    <button
-      ref={ref}
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-       "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0",
-        isActive ? "bg-accent text-accent-foreground" : "",
-        className
-      )}
-      aria-label={label}
-      title={label}
-    >
-      {icon}
-    </button>
-  );
-});
+const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
+  (
+    {
+      onClick,
+      icon,
+      label,
+      isActive = false,
+      disabled = false,
+      className = "",
+    },
+    ref
+  ) => {
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        className={cn(
+          "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0",
+          isActive ? "bg-accent text-accent-foreground" : "",
+          className
+        )}
+        aria-label={label}
+        title={label}
+      >
+        {icon}
+      </button>
+    );
+  }
+);
 
-ToolbarButton.displayName = 'ToolbarButton';
+ToolbarButton.displayName = "ToolbarButton";
 
 interface TableMenuProps {
   editor: any;
@@ -548,7 +580,11 @@ const TableMenu = ({ editor }: TableMenuProps) => {
 
   const addTable = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    editor
+      .chain()
+      .focus()
+      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+      .run();
     setIsOpen(false);
     setShowTemplates(false);
   };
@@ -592,21 +628,22 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     e.preventDefault();
     const { from, to } = editor.state.selection;
     const transactions: any[] = [];
-    
+
     editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
-      if (node.type.name === 'tableRow') {
-        const currentHeight = node.attrs.style?.match(/height:\s*(\d+px)/)?.[1] || '24px';
+      if (node.type.name === "tableRow") {
+        const currentHeight =
+          node.attrs.style?.match(/height:\s*(\d+px)/)?.[1] || "24px";
         const newHeight = `${Math.min(parseInt(currentHeight) + 10, 200)}px`;
-        
+
         transactions.push(
           editor.state.tr.setNodeMarkup(pos, null, {
             ...node.attrs,
-            style: `height: ${newHeight};`
+            style: `height: ${newHeight};`,
           })
         );
       }
     });
-    
+
     transactions.forEach((tr: any) => editor.view.dispatch(tr));
   };
 
@@ -614,21 +651,22 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     e.preventDefault();
     const { from, to } = editor.state.selection;
     const transactions: any[] = [];
-    
+
     editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
-      if (node.type.name === 'tableRow') {
-        const currentHeight = node.attrs.style?.match(/height:\s*(\d+px)/)?.[1] || '24px';
+      if (node.type.name === "tableRow") {
+        const currentHeight =
+          node.attrs.style?.match(/height:\s*(\d+px)/)?.[1] || "24px";
         const newHeight = `${Math.max(parseInt(currentHeight) - 10, 10)}px`;
-        
+
         transactions.push(
           editor.state.tr.setNodeMarkup(pos, null, {
             ...node.attrs,
-            style: `height: ${newHeight};`
+            style: `height: ${newHeight};`,
           })
         );
       }
     });
-    
+
     transactions.forEach((tr: any) => editor.view.dispatch(tr));
   };
 
@@ -636,22 +674,23 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     e.preventDefault();
     const { from, to } = editor.state.selection;
     const transactions: any[] = [];
-    
+
     editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
-      if (node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
-        const currentStyle = node.attrs.style || '';
-        const currentWidth = currentStyle.match(/width:\s*(\d+px)/)?.[1] || '100px';
+      if (node.type.name === "tableCell" || node.type.name === "tableHeader") {
+        const currentStyle = node.attrs.style || "";
+        const currentWidth =
+          currentStyle.match(/width:\s*(\d+px)/)?.[1] || "100px";
         const newWidth = `${Math.min(parseInt(currentWidth) + 20, 500)}px`;
-        const newStyle = currentStyle 
+        const newStyle = currentStyle
           ? currentStyle.replace(/width:\s*\d+px/, `width: ${newWidth}`)
           : `width: ${newWidth};`;
-        
-        if (!currentStyle.includes('width:')) {
+
+        if (!currentStyle.includes("width:")) {
           // If width style doesn't exist, add it
           transactions.push(
             editor.state.tr.setNodeMarkup(pos, null, {
               ...node.attrs,
-              style: `${node.attrs.style || ''} width: ${newWidth};`.trim()
+              style: `${node.attrs.style || ""} width: ${newWidth};`.trim(),
             })
           );
         } else {
@@ -659,13 +698,13 @@ const TableMenu = ({ editor }: TableMenuProps) => {
           transactions.push(
             editor.state.tr.setNodeMarkup(pos, null, {
               ...node.attrs,
-              style: newStyle
+              style: newStyle,
             })
           );
         }
       }
     });
-    
+
     transactions.forEach((tr: any) => editor.view.dispatch(tr));
   };
 
@@ -673,22 +712,23 @@ const TableMenu = ({ editor }: TableMenuProps) => {
     e.preventDefault();
     const { from, to } = editor.state.selection;
     const transactions: any[] = [];
-    
+
     editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
-      if (node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
-        const currentStyle = node.attrs.style || '';
-        const currentWidth = currentStyle.match(/width:\s*(\d+px)/)?.[1] || '100px';
+      if (node.type.name === "tableCell" || node.type.name === "tableHeader") {
+        const currentStyle = node.attrs.style || "";
+        const currentWidth =
+          currentStyle.match(/width:\s*(\d+px)/)?.[1] || "100px";
         const newWidth = `${Math.max(parseInt(currentWidth) - 20, 50)}px`;
-        const newStyle = currentStyle 
+        const newStyle = currentStyle
           ? currentStyle.replace(/width:\s*\d+px/, `width: ${newWidth}`)
           : `width: ${newWidth};`;
-        
-        if (!currentStyle.includes('width:')) {
+
+        if (!currentStyle.includes("width:")) {
           // If width style doesn't exist, add it
           transactions.push(
             editor.state.tr.setNodeMarkup(pos, null, {
               ...node.attrs,
-              style: `${node.attrs.style || ''} width: ${newWidth};`.trim()
+              style: `${node.attrs.style || ""} width: ${newWidth};`.trim(),
             })
           );
         } else {
@@ -696,13 +736,13 @@ const TableMenu = ({ editor }: TableMenuProps) => {
           transactions.push(
             editor.state.tr.setNodeMarkup(pos, null, {
               ...node.attrs,
-              style: newStyle
+              style: newStyle,
             })
           );
         }
       }
     });
-    
+
     transactions.forEach((tr: any) => editor.view.dispatch(tr));
   };
 
@@ -806,7 +846,9 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   Add Column
                 </button>
                 <div className="border-t border-gray-100 my-1">
-                  <div className="px-2 py-1 text-xs font-medium text-gray-500">Row Height</div>
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500">
+                    Row Height
+                  </div>
                   <div className="flex">
                     <button
                       type="button"
@@ -827,7 +869,9 @@ const TableMenu = ({ editor }: TableMenuProps) => {
                   </div>
                 </div>
                 <div className="border-t border-gray-100 my-1">
-                  <div className="px-2 py-1 text-xs font-medium text-gray-500">Column Width</div>
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500">
+                    Column Width
+                  </div>
                   <div className="flex">
                     <button
                       type="button"
@@ -886,7 +930,7 @@ interface ColorMenuProps {
 
 const ColorMenu = ({ editor }: ColorMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [customColor, setCustomColor] = useState('#000000');
+  const [customColor, setCustomColor] = useState("#000000");
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -908,6 +952,7 @@ const ColorMenu = ({ editor }: ColorMenuProps) => {
   return (
     <div className="relative" ref={menuRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-900 flex items-center gap-1",
@@ -916,29 +961,36 @@ const ColorMenu = ({ editor }: ColorMenuProps) => {
         title="Text Color"
       >
         <div className="flex items-center gap-1">
-          <Palette 
-            className="w-5 h-5" 
-            style={{ 
-              color: editor.getAttributes('textStyle').color || '#000000' 
-            }} 
+          <Palette
+            className="w-5 h-5"
+            style={{
+              color: editor.getAttributes("textStyle").color || "#000000",
+            }}
           />
           <ChevronDown
             className="w-3 h-3 transition-transform duration-200"
-            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
           />
         </div>
       </button>
       {isOpen && (
-        <div className="absolute z-50 mt-2 p-2 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5" style={{ width: '272px' }}>
+        <div
+          className="absolute z-50 mt-2 p-2 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          style={{ width: "272px" }}
+        >
           <div className="grid grid-cols-8 gap-1" role="menu">
             {PRESET_COLORS.map((color) => (
               <button
                 key={color}
+                type="button"
                 onClick={() => setColor(color)}
                 className="w-8 h-8 rounded-md border border-gray-200 transition-transform hover:scale-110 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                style={{ 
+                style={{
                   backgroundColor: color,
-                  transform: editor.getAttributes('textStyle').color === color ? 'scale(1.1)' : 'scale(1)'
+                  transform:
+                    editor.getAttributes("textStyle").color === color
+                      ? "scale(1.1)"
+                      : "scale(1)",
                 }}
                 title={color}
               />
@@ -953,6 +1005,7 @@ const ColorMenu = ({ editor }: ColorMenuProps) => {
                 className="w-8 h-8 p-0 border-0 rounded cursor-pointer"
               />
               <button
+                type="button"
                 onClick={() => setColor(customColor)}
                 className="flex-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md px-3 py-1.5 transition-colors"
               >
@@ -982,25 +1035,28 @@ const FONT_SIZES = {
 const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkData, setLinkData] = useState({
-    url: '',
-    title: '',
-    description: ''
+    url: "",
+    title: "",
+    description: "",
   });
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [htmlContent, setHtmlContent] = useState("");
   const [currentSize, setCurrentSize] = useState("Normal");
   const imageInputRef = React.useRef<HTMLInputElement>(null);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string>('');
-  const [altText, setAltText] = useState('');
-  const [name, setName] = useState('');
+  const [imageSrc, setImageSrc] = useState<string>("");
+  const [altText, setAltText] = useState("");
+  const [name, setName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [htmlCursor, setHtmlCursor] = useState(0); // For HTML textarea cursor
-  const [tiptapSelection, setTiptapSelection] = useState<{ from: number; to: number } | null>(null); // For Tiptap selection
-  
+  const [tiptapSelection, setTiptapSelection] = useState<{
+    from: number;
+    to: number;
+  } | null>(null); // For Tiptap selection
+
   // Add styles for the resizable image
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .resizable-image-container {
         position: relative;
@@ -1075,7 +1131,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       }
     `;
     document.head.appendChild(style);
-    
+
     return () => {
       document.head.removeChild(style);
     };
@@ -1089,67 +1145,67 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     if (e.target.files?.length) {
       const file = e.target.files[0];
       const reader = new FileReader();
-      
+
       reader.onloadstart = () => setIsUploading(true);
-      
+
       reader.onload = (event) => {
         if (event.target?.result) {
           setImageSrc(event.target.result as string);
           setImageDialogOpen(true);
-          setAltText('');
+          setAltText("");
         }
       };
-      
+
       reader.onloadend = () => setIsUploading(false);
-      
+
       reader.onerror = () => {
-        console.error('Error reading file');
+        console.error("Error reading file");
         setIsUploading(false);
       };
 
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleAddImage = () => {
     if (!editor || !imageSrc) return;
-    
+
     editor
       .chain()
       .focus()
-      .setImage({ 
+      .setImage({
         src: imageSrc,
         alt: altText,
-        title: name
+        title: name,
       })
       .run();
-      
+
     // Reset the dialog
     setImageDialogOpen(false);
-    setImageSrc('');
-    setAltText('');
-    setName('');
-    
+    setImageSrc("");
+    setAltText("");
+    setName("");
+
     // Reset the input value to allow selecting the same file again
     if (imageInputRef.current) {
-      imageInputRef.current.value = '';
+      imageInputRef.current.value = "";
     }
   };
-  
+
   const handleCancelImage = () => {
     setImageDialogOpen(false);
-    setImageSrc('');
-    setAltText('');
-    setName('');
+    setImageSrc("");
+    setAltText("");
+    setName("");
     if (imageInputRef.current) {
-      imageInputRef.current.value = '';
+      imageInputRef.current.value = "";
     }
   };
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-          heading: {
+        heading: {
           levels: [1, 2, 3, 4, 5, 6],
         },
         bulletList: {
@@ -1163,7 +1219,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       CustomLink.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-500 underline hover:text-blue-700',
+          class: "text-blue-500 underline hover:text-blue-700",
         },
       }),
       CustomImage, // Use our custom resizable image extension
@@ -1175,23 +1231,26 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       Table.configure({
         resizable: true,
         HTMLAttributes: {
-          style: 'width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;'
-        }
+          style:
+            "width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;",
+        },
       }),
       TableRow.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb;'
-        }
+          style: "border: 1px solid #e5e7eb;",
+        },
       }),
       TableHeader.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; background-color: #f9fafb; font-weight: 500;'
-        }
+          style:
+            "border: 1px solid #e5e7eb; padding: 0.5rem; background-color: #f9fafb; font-weight: 500;",
+        },
       }),
       TableCell.configure({
         HTMLAttributes: {
-          style: 'border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top;'
-        }
+          style:
+            "border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top;",
+        },
       }),
       Iframe,
       CleanPaste,
@@ -1208,7 +1267,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         // Prevent default image dragging behavior
         dragstart: (view: any, event: Event) => {
           const target = event.target as HTMLElement;
-          if (target?.closest('.resizable-image-container')) {
+          if (target?.closest(".resizable-image-container")) {
             event.preventDefault();
             return true;
           }
@@ -1216,7 +1275,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         },
       },
       attributes: {
-        class: 'prose prose-slate max-w-none focus:outline-none min-h-[300px] p-4 text-gray-900 overflow-y-auto h-[600px]',
+        class:
+          "prose prose-slate max-w-none focus:outline-none min-h-[300px] p-4 text-gray-900 overflow-y-auto h-[600px]",
       },
     },
   });
@@ -1232,7 +1292,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   // Helper: Get plain text up to a position in HTML
   function getTextUpToHtmlPos(html: string, pos: number) {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html.slice(0, pos), 'text/html');
+    const doc = parser.parseFromString(html.slice(0, pos), "text/html");
     return doc.body.textContent?.length || 0;
   }
 
@@ -1240,9 +1300,9 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   function findHtmlPosForTextOffset(html: string, offset: number) {
     let textCount = 0;
     for (let i = 0; i < html.length; i++) {
-      if (html[i] === '<') {
+      if (html[i] === "<") {
         // Skip tag
-        while (i < html.length && html[i] !== '>') i++;
+        while (i < html.length && html[i] !== ">") i++;
       } else {
         textCount++;
         if (textCount === offset) return i + 1;
@@ -1258,27 +1318,18 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       // Switching to HTML mode
       const content = editor.getHTML();
       const processedContent = content
-        .replace(
-          /<table([^>]*)>/g,
-          (match, attrs) => {
-            if (attrs.includes('style=')) return match;
-            return `<table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; margin: 0;"${attrs}>`;
-          }
-        )
-        .replace(
-          /<t[hd]([^>]*)>/g,
-          (match, attrs) => {
-            if (attrs.includes('style=')) return match;
-            return `<td style="border: 1px solid #e5e7eb; padding: 4px 6px; margin: 0; line-height: 1.2;"${attrs}>`;
-          }
-        )
-        .replace(
-          /<th([^>]*)>/g,
-          (match, attrs) => {
-            if (attrs.includes('style=')) return match;
-            return `<th style="border: 1px solid #e5e7eb; padding: 4px 6px; background-color: #f9fafb; margin: 0; line-height: 1.2;"${attrs}>`;
-          }
-        );
+        .replace(/<table([^>]*)>/g, (match, attrs) => {
+          if (attrs.includes("style=")) return match;
+          return `<table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; margin: 0;"${attrs}>`;
+        })
+        .replace(/<t[hd]([^>]*)>/g, (match, attrs) => {
+          if (attrs.includes("style=")) return match;
+          return `<td style="border: 1px solid #e5e7eb; padding: 4px 6px; margin: 0; line-height: 1.2;"${attrs}>`;
+        })
+        .replace(/<th([^>]*)>/g, (match, attrs) => {
+          if (attrs.includes("style=")) return match;
+          return `<th style="border: 1px solid #e5e7eb; padding: 4px 6px; background-color: #f9fafb; margin: 0; line-height: 1.2;"${attrs}>`;
+        });
       setHtmlContent(processedContent);
       // Store Tiptap selection
       const { from, to } = editor.state.selection;
@@ -1292,7 +1343,9 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     } else {
       // Switching back to rich text mode
       // Store HTML cursor
-      const textarea = document.getElementById('tiptap-html-textarea') as HTMLTextAreaElement;
+      const textarea = document.getElementById(
+        "tiptap-html-textarea"
+      ) as HTMLTextAreaElement;
       const cursor = textarea ? textarea.selectionStart : 0;
       setHtmlCursor(cursor);
       // Map HTML cursor to text offset
@@ -1314,8 +1367,10 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
 
   // Set textarea cursor after switching to HTML mode
   useEffect(() => {
-    if (isHtmlMode && typeof htmlCursor === 'number') {
-      const textarea = document.getElementById('tiptap-html-textarea') as HTMLTextAreaElement;
+    if (isHtmlMode && typeof htmlCursor === "number") {
+      const textarea = document.getElementById(
+        "tiptap-html-textarea"
+      ) as HTMLTextAreaElement;
       if (textarea) {
         textarea.setSelectionRange(htmlCursor, htmlCursor);
         textarea.focus();
@@ -1382,38 +1437,39 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     const { url, title, description } = linkData;
 
     // Remove the link if the URL is empty
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
     } else {
       // Update the link with all attributes
       editor
         .chain()
         .focus()
-        .extendMarkRange('link')
-        .setLink({ 
+        .extendMarkRange("link")
+        .setLink({
           href: url,
-          'data-title': title,
-          'data-description': description 
+          "data-title": title,
+          "data-description": description,
         } as any)
         .run();
     }
-    
+
     setLinkDialogOpen(false);
   };
 
   const setLink = () => {
     if (!editor) return;
-    
-    const previousUrl = editor.getAttributes('link').href || '';
-    const previousTitle = editor.getAttributes('link').title || '';
-    const previousDescription = editor.getAttributes('link')['data-description'] || '';
-    
+
+    const previousUrl = editor.getAttributes("link").href || "";
+    const previousTitle = editor.getAttributes("link").title || "";
+    const previousDescription =
+      editor.getAttributes("link")["data-description"] || "";
+
     setLinkData({
       url: previousUrl,
       title: previousTitle,
-      description: previousDescription
+      description: previousDescription,
     });
-    
+
     setLinkDialogOpen(true);
   };
 
@@ -1432,23 +1488,27 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     const { $from } = selection;
     const node = $from.nodeAfter || $from.nodeBefore;
 
-    if (node && node.type.name === 'resizableImage') {
+    if (node && node.type.name === "resizableImage") {
       // Toggle off if clicking the same alignment
-      const currentFloat = node.attrs.float || 'none';
-      const newFloat = currentFloat === float ? 'none' : float;
-      
+      const currentFloat = node.attrs.float || "none";
+      const newFloat = currentFloat === float ? "none" : float;
+
       // Set appropriate margins based on alignment
-      let margin = '0 16px 16px 0'; // default right margin
-      if (newFloat === 'right') {
-        margin = '0 0 16px 16px'; // left margin when right-aligned
-      } else if (newFloat === 'none') {
-        margin = '16px auto'; // centered
+      let margin = "0 16px 16px 0"; // default right margin
+      if (newFloat === "right") {
+        margin = "0 0 16px 16px"; // left margin when right-aligned
+      } else if (newFloat === "none") {
+        margin = "16px auto"; // centered
       }
-      
-      editor.chain().focus().updateAttributes('resizableImage', { 
-        float: newFloat,
-        margin: margin
-      }).run();
+
+      editor
+        .chain()
+        .focus()
+        .updateAttributes("resizableImage", {
+          float: newFloat,
+          margin: margin,
+        })
+        .run();
     }
   };
 
@@ -1458,17 +1518,17 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     const { selection } = state;
     const { $from } = selection;
     const node = $from.nodeAfter || $from.nodeBefore;
-    return node && node.type.name === 'resizableImage';
+    return node && node.type.name === "resizableImage";
   };
-  
+
   // Helper: Get current image float alignment
   const getImageAlignment = () => {
     const { state } = editor;
     const { selection } = state;
     const { $from } = selection;
     const node = $from.nodeAfter || $from.nodeBefore;
-    if (node && node.type.name === 'resizableImage') {
-      return node.attrs.float || 'none';
+    if (node && node.type.name === "resizableImage") {
+      return node.attrs.float || "none";
     }
     return null;
   };
@@ -1482,7 +1542,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         accept="image/*"
         className="hidden"
       />
-      
+
       {/* Image Dialog */}
       {/* Link Dialog */}
       {linkDialogOpen && (
@@ -1492,7 +1552,10 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
             <form onSubmit={handleLinkSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="url"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     URL <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1502,11 +1565,16 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="https://example.com"
                     value={linkData.url}
-                    onChange={(e) => setLinkData({...linkData, url: e.target.value})}
+                    onChange={(e) =>
+                      setLinkData({ ...linkData, url: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Title
                   </label>
                   <input
@@ -1515,11 +1583,16 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Link title (optional)"
                     value={linkData.title}
-                    onChange={(e) => setLinkData({...linkData, title: e.target.value})}
+                    onChange={(e) =>
+                      setLinkData({ ...linkData, title: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Description
                   </label>
                   <textarea
@@ -1528,7 +1601,9 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Link description (optional)"
                     value={linkData.description}
-                    onChange={(e) => setLinkData({...linkData, description: e.target.value})}
+                    onChange={(e) =>
+                      setLinkData({ ...linkData, description: e.target.value })
+                    }
                   />
                 </div>
               </div>
@@ -1552,26 +1627,28 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
           </div>
         </div>
       )}
-      
+
       {imageDialogOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onKeyDown={(e) => { if (e.key === 'Escape') {
-            handleCancelImage();
-          } else if (e.key === 'Enter') {
-            handleAddImage();
-          }}}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              handleCancelImage();
+            } else if (e.key === "Enter") {
+              handleAddImage();
+            }
+          }}
           tabIndex={-1}
         >
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-medium mb-4">Add Image</h3>
-            
+
             <div className="mb-4">
               {imageSrc && (
                 <div className="mb-4 border rounded-md overflow-hidden">
-                  <img 
-                    src={imageSrc} 
-                    alt="Preview" 
+                  <img
+                    src={imageSrc}
+                    alt="Preview"
                     className="max-h-48 w-full object-contain"
                   />
                 </div>
@@ -1588,7 +1665,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 autoFocus
               />
-              
+
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Alt Text (for accessibility)
               </label>
@@ -1603,7 +1680,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                 Alt text improves accessibility for users with screen readers.
               </p>
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
@@ -1619,7 +1696,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                 disabled={isUploading}
               >
-                {isUploading ? 'Uploading...' : 'Add Image'}
+                {isUploading ? "Uploading..." : "Add Image"}
               </button>
             </div>
           </div>
@@ -1726,31 +1803,39 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               label="Justify"
               isActive={editor.isActive({ textAlign: "justify" })}
             />
-            
+
             {/* Image Alignment Controls - Only show when an image is selected */}
             {isImageSelected() && (
               <div className="flex items-center ml-2 border-l pl-2 gap-1">
-                <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">Image:</span>
+                <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">
+                  Image:
+                </span>
                 <ToolbarButton
-                  onClick={() => setImageAlignment('left')}
-                  isActive={getImageAlignment() === 'left'}
+                  onClick={() => setImageAlignment("left")}
+                  isActive={getImageAlignment() === "left"}
                   icon={<AlignLeft className="w-4 h-4" />}
                   label="Float Left"
-                  className={getImageAlignment() === 'left' ? 'bg-gray-200' : ''}
+                  className={
+                    getImageAlignment() === "left" ? "bg-gray-200" : ""
+                  }
                 />
                 <ToolbarButton
-                  onClick={() => setImageAlignment('none')}
-                  isActive={getImageAlignment() === 'none'}
+                  onClick={() => setImageAlignment("none")}
+                  isActive={getImageAlignment() === "none"}
                   icon={<AlignCenter className="w-4 h-4" />}
                   label="Center"
-                  className={getImageAlignment() === 'none' ? 'bg-gray-200' : ''}
+                  className={
+                    getImageAlignment() === "none" ? "bg-gray-200" : ""
+                  }
                 />
                 <ToolbarButton
-                  onClick={() => setImageAlignment('right')}
-                  isActive={getImageAlignment() === 'right'}
+                  onClick={() => setImageAlignment("right")}
+                  isActive={getImageAlignment() === "right"}
                   icon={<AlignRight className="w-4 h-4" />}
                   label="Float Right"
-                  className={getImageAlignment() === 'right' ? 'bg-gray-200' : ''}
+                  className={
+                    getImageAlignment() === "right" ? "bg-gray-200" : ""
+                  }
                 />
               </div>
             )}
@@ -1777,13 +1862,15 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
           <EditorContent
             editor={editor}
             className="prose prose-slate max-w-full p-4 w-full"
-            style={{
-              '--tw-prose-pre-bg': 'transparent',
-              '--tw-prose-pre-border': '1px solid #e5e7eb',
-              '--tw-prose-pre-padding': '1rem',
-              '--tw-prose-pre-code-padding': '0',
-              '--tw-prose-pre-code-bg': 'transparent',
-            } as React.CSSProperties}
+            style={
+              {
+                "--tw-prose-pre-bg": "transparent",
+                "--tw-prose-pre-border": "1px solid #e5e7eb",
+                "--tw-prose-pre-padding": "1rem",
+                "--tw-prose-pre-code-padding": "0",
+                "--tw-prose-pre-code-bg": "transparent",
+              } as React.CSSProperties
+            }
           />
         </div>
       )}
@@ -1863,8 +1950,8 @@ const listStyles = `
 `;
 
 // Inject the styles
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
   style.textContent = listStyles;
   document.head.appendChild(style);
 }
