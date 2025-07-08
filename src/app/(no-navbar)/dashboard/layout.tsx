@@ -28,7 +28,8 @@ const navigationItems = {
         { icon: FaPlus, text: "Add Admin", path: "/dashboard/addadmin" },
         { icon: FaEdit, text: "Manage Users", path: "/dashboard/manageusers" },
         { icon: FaEdit, text: "Manage Subscriptions", path: "/dashboard/subscription" },
-        { icon: FaEdit, text: "Admin Permissions", path: "/dashboard/adminpermissions" }
+        { icon: FaEdit, text: "Admin Permissions", path: "/dashboard/adminpermissions" },
+        { icon: FaAirbnb, text: "Admin Logs", path: "/dashboard/logs" }
       ]
     },
     {
