@@ -155,6 +155,21 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
     }
   }, [headScripts, bodyScripts]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Filter out custom-link templates and paginate
+  const filteredChildren = page.children.filter((child: any) => child.templateId !== "custom-link");
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredChildren.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredChildren.length / itemsPerPage);
+
   return (
       <>
         <section>
@@ -200,7 +215,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                         <div className="w-full h-1 bg-[var(--highlight-bg)] rounded-full"></div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                        {page.children.map((child: any) => {
+                        {currentItems.map((child: any) => {
                           // Skip children with custom-link template
                           if (child.templateId === "custom-link") {
                             return null;
@@ -263,6 +278,68 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                           );
                         })}
                       </div>
+                      {totalPages > 1 && (
+                        <div className="flex justify-center mt-8">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handlePageChange(1)}
+                              disabled={currentPage === 1}
+                              className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100"
+                            >
+                              «
+                            </button>
+                            <button
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100"
+                            >
+                              ‹
+                            </button>
+                            
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                              let pageNum;
+                              if (totalPages <= 5) {
+                                pageNum = i + 1;
+                              } else if (currentPage <= 3) {
+                                pageNum = i + 1;
+                              } else if (currentPage >= totalPages - 2) {
+                                pageNum = totalPages - 4 + i;
+                              } else {
+                                pageNum = currentPage - 2 + i;
+                              }
+
+                              return (
+                                <button
+                                  key={pageNum}
+                                  onClick={() => handlePageChange(pageNum)}
+                                  className={`w-10 h-10 flex items-center justify-center rounded-full ${
+                                    currentPage === pageNum 
+                                      ? 'bg-blue-500 text-white' 
+                                      : 'border hover:bg-gray-100'
+                                  }`}
+                                >
+                                  {pageNum}
+                                </button>
+                              );
+                            })}
+
+                            <button
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                              className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100"
+                            >
+                              ›
+                            </button>
+                            <button
+                              onClick={() => handlePageChange(totalPages)}
+                              disabled={currentPage === totalPages}
+                              className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100"
+                            >
+                              »
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
