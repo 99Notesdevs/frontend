@@ -54,18 +54,18 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
 
   if (error) {
     return (
-      <div className="py-16 bg-[var(--bg-main)]">
+      <div className="py-16 bg-[var(--bg-main)] dark:bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-[var(--surface-darker)] mb-4">Current Affairs</h2>
+            <h2 className="text-2xl font-bold text-[var(--surface-darker)] dark:text-white mb-4">Current Affairs</h2>
             <div className="w-24 h-1 bg-[var(--accent)] rounded-full mx-auto"></div>
           </div>
           <div className="text-center p-8">
             <h3 className="text-lg font-semibold text-red-600 mb-4">Error</h3>
-            <p className="text-[var(--text-tertiary)] mb-4">{error}</p>
+            <p className="text-[var(--text-tertiary)] dark:text-gray-300 mb-4">{error}</p>
             <button
               onClick={fetchCurrentAffairs}
-              className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
+              className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-200"
             >
               Refresh
             </button>
@@ -77,10 +77,10 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
 
   if (isLoading) {
     return (    
-      <div className="py-16 bg-[var(--bg-main)]">
+      <div className="py-16 bg-[var(--bg-main)] dark:bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-[var(--surface-darker)] mb-4">Current Affairs</h2>
+            <h2 className="text-2xl font-bold text-[var(--surface-darker)] dark:text-white mb-4">Current Affairs</h2>
             <div className="w-24 h-1 bg-[var(--accent)] rounded-full mx-auto"></div>
           </div>
           <div className="text-center p-8">
@@ -98,13 +98,13 @@ const CurrentAffairs: React.FC<CurrentAffairsProps> = ({ title, description }) =
   }));
 
   return (
-    <section className="py-16 bg-[var(--bg-main)]">
+    <section className="py-16 bg-[var(--bg-main)] dark:bg-slate-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
         <span className="text-[var(--primary)] font-medium tracking-wider text-sm uppercase font-opensans">Current Affairs</span>
-          <h2 className="text-3xl font-semibold text-[var(--surface-darker)] mb-4 font-opensans">{title}</h2>
+          <h2 className="text-3xl font-semibold text-[var(--surface-darker)] dark:text-white mb-4 font-opensans">{title}</h2>
           <div className="w-24 h-1 bg-[var(--primary)] mx-auto mb-6"></div>
-          <p className="text-lg font-normal text-[var(--text-tertiary)] max-w-3xl mx-auto font-opensans">
+          <p className="text-lg font-normal text-[var(--text-tertiary)] dark:text-gray-300 max-w-3xl mx-auto font-opensans">
             {description}
           </p>
         </div>

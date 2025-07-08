@@ -100,13 +100,13 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             {title}
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 dark:text-gray-300">
             {description}
           </p>
         </div>
@@ -127,7 +127,7 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
               className={`px-6 py-2 rounded-full transition-all ${
                 selectedCategory === category
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-black hover:bg-gray-200"
+                  : "bg-gray-100 dark:bg-slate-700 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-slate-600"
               }`}
             >
               {category}
@@ -141,7 +141,7 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
             ? getFilteredMaterials().map((page) => (
                 <div
                   key={page.id}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
+                  className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
                 >
                   <Image
                     src={JSON.parse(page?.imageUrl)[0] || "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"}
@@ -155,11 +155,11 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
                     }}
                   />
                   <div className="p-6">
-                    <h3 className="text-xl text-black font-semibold mb-2">
+                    <h3 className="text-xl text-black dark:text-white font-semibold mb-2">
                       {page.title}
                     </h3>
                     <p
-                      className="text-black mb-4"
+                      className="text-black dark:text-gray-300 mb-4"
                       dangerouslySetInnerHTML={{
                         __html: page.content
                           ? page.content.substring(0, 100) + "..."
@@ -168,7 +168,7 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
                     />
                     <Link
                       href={`${page.slug}`}
-                      className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+                      className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium inline-flex items-center"
                     >
                       Learn More
                       <svg

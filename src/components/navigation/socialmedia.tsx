@@ -30,7 +30,7 @@ const SocialMedia = () => {
   ];
 
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between w-full gap-2">
       {socialLinks.map((social, index) => (
         <a
           key={index}
@@ -38,13 +38,20 @@ const SocialMedia = () => {
           target="_blank"
           rel="noopener noreferrer"
           className={`p-2 rounded-lg transition-all duration-300 
-            ${social.color} hover:text-white bg-[var(--bg-main)]/80 
-            hover:shadow-lg transform hover:-translate-y-1 
-            border border-[var(--bg-elevated)] hover:border-transparent 
-            flex items-center justify-center`}
+            ${social.color} 
+            hover:text-white 
+            bg-white dark:bg-slate-800 
+            hover:shadow-lg 
+            transform hover:-translate-y-1 
+            border border-gray-200 dark:border-slate-700 
+            hover:border-transparent 
+            flex items-center justify-center
+            group`}
           aria-label={`Visit our ${social.url.split('.com/')[1]} page`}
         >
-          {social.icon}
+          <span className="group-hover:scale-110 transition-transform duration-300">
+            {social.icon}
+          </span>
         </a>
       ))}
     </div>

@@ -299,7 +299,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
         />
       </section>
       <main>
-        <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
+        <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white dark:from-slate-900 dark:to-slate-900">
           {/* Assistive Touch */}
           <AssistiveTouch content={mainContentFinal} />
 
@@ -313,7 +313,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
               <main className="lg:col-start-1 lg:col-span-8 space-y-4 sm:space-y-6">
                 {/* Featured Image */}
                 {displayImage && (
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.01] dark:shadow-slate-800/50">
                     <div className="relative w-full h-[300px] md:h-[400px]">
                       <Image
                         src={`${displayImage}`}
@@ -327,9 +327,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 )}
                 <Tags tags={page.tags} />
                 {/* Article Content */}
-                <div className="bg-white shadow-xl w-full mb-8 sm:mb-10">
+                <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full mb-8 sm:mb-10 rounded-xl overflow-hidden">
                   <div className="p-5 sm:p-10">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--surface-darker)] mb-3 text-center">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--surface-darker)] dark:text-white mb-3 text-center">
                       {page.title}
                     </h1>
                     <div
@@ -339,7 +339,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
                 </div>
                 {page.FAQ && (
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
+                  <div className="bg-white dark:bg-slate-800  rounded-xl shadow-lg p-4 sm:p-6 mt-4">
                     <FAQPage data={page.FAQ} />
                   </div>
                 )}
@@ -359,7 +359,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 <div>
                   {/* Search Bar */}
                   <div
-                    className="flex justify-left bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
+                    className="flex justify-left bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 
                         transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
                   >
                     <div className="w-full mr-2">
@@ -375,10 +375,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
                   {/* TOC Section */}
                   <div
-                    className="hidden lg:block bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 
-                        transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
+                    className="hidden lg:block bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 
+                        transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-700/50 mb-4 sm:mb-6"
                   >
-                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2">
+                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] dark:text-slate-200 border-b-2 border-[var(--info-surface)] dark:border-slate-600 pb-2">
                       Table of Contents
                     </h3>
                     <div className="pr-2">
@@ -387,8 +387,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
 
                   {/* Practice Questions Section - Sticky Footer */}
-                  <div className="sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl">
-                    <div className="bg-gradient-to-br from-white to-[#f8f9fa] border-2 border-[var(--info-surface)] rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
+                  <div className="sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/50">
+                    <div className="bg-gradient-to-br from-white to-[#f8f9fa] dark:from-slate-800 dark:to-slate-900 border-2 border-[var(--info-surface)] dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl dark:shadow-slate-900/50">
                       <div className="bg-gradient-to-r from-yellow-400 to-amber-300 px-6 py-4">
                         <h3 className="text-xl font-bold text-white flex items-center gap-3">
                           <span className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
@@ -463,8 +463,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </div>
 
                       {!isLoading && !error && (
-                        <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center">
-                          <div className="flex items-center text-sm text-gray-500">
+                        <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                          <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
                             <svg
                               className="h-4 w-4 mr-1.5 text-yellow-500"
                               fill="currentColor"
@@ -482,7 +482,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                             onClick={() =>
                               window.scrollTo({ top: 0, behavior: "smooth" })
                             }
-                            className="text-sm font-medium text-yellow-600 hover:text-yellow-700 flex items-center"
+                            className="text-sm font-medium text-yellow-600 hover:text-yellow-700 dark:text-amber-400 dark:hover:text-amber-300 flex items-center"
                           >
                             <span>Back to Top</span>
                             <svg
@@ -505,7 +505,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
 
                   {/* Social Media Section */}
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
                     <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
                       <span className="text-[var(--action-primary)]">🌐</span>
                       <span>Connect With Us</span>

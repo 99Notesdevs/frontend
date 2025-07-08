@@ -41,18 +41,44 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, basePa
 
   return (
     <div className="flex justify-center mt-8 w-full">
-      <div className="flex flex-wrap justify-center max-w-2xl mx-auto">
-        {getPagesToShow().map((page) => (
-          <Link key={page} href={`${basePath}?page=${page}`} legacyBehavior>
-            <a 
-              className={`inline-flex items-center justify-center px-3 py-1.5 border rounded-md transition-colors duration-300 
-                ${page === currentPage ? 'bg-[var(--primary)] text-white' : 'bg-white text-[var(--surface-darker)] hover:bg-[var(--bg-main)]'}
-                ${page === '...' ? 'cursor-default opacity-50' : ''}`}
-            >
-              {page}
+      <div className="flex flex-wrap justify-center max-w-2xl mx-auto gap-1">
+        {currentPage > 1 && (
+          <Link href={`${basePath}?page=${currentPage - 1}`} legacyBehavior>
+            <a className="inline-flex items-center justify-center px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-md transition-colors duration-300 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700">
+              &laquo; Prev
             </a>
           </Link>
+        )}
+        
+        {getPagesToShow().map((page, index) => (
+          <div key={page === '...' ? `ellipsis-${index}` : page}>
+            {page === '...' ? (
+              <span className="inline-flex items-center justify-center px-3 py-1.5 text-gray-500 dark:text-gray-400">
+                {page}
+              </span>
+            ) : (
+              <Link href={`${basePath}?page=${page}`} legacyBehavior>
+                <a 
+                  className={`inline-flex items-center justify-center w-10 h-10 border rounded-md transition-colors duration-200
+                    ${page === currentPage 
+                      ? 'bg-[var(--primary)] text-white border-[var(--primary)]' 
+                      : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700'}
+                    ${page === '...' ? 'cursor-default' : ''}`}
+                >
+                  {page}
+                </a>
+              </Link>
+            )}
+          </div>
         ))}
+        
+        {currentPage < totalPages && (
+          <Link href={`${basePath}?page=${currentPage + 1}`} legacyBehavior>
+            <a className="inline-flex items-center justify-center px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-md transition-colors duration-300 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700">
+              Next &raquo;
+            </a>
+          </Link>
+        )}
       </div>
     </div>
   );

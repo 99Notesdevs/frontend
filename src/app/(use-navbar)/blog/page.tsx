@@ -101,20 +101,27 @@ const BlogsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-[var(--bg-main)]">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-slate-900 p-6">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
+        <p className="text-lg text-gray-700 dark:text-gray-300 mt-4">Loading blog posts...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[var(--bg-main)]">
-        <div className="p-8 bg-white rounded-lg shadow-lg text-center">
-          <p className="text-red-500 text-lg mb-4">{error}</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-slate-900 p-6">
+        <div className="p-8 bg-white dark:bg-slate-800 rounded-xl shadow-xl text-center max-w-md w-full">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Something went wrong</h3>
+          <p className="text-red-500 text-lg mb-6 dark:text-red-400">{error}</p>
           <button
             onClick={() => fetchBlogs()}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
           >
             Try Again
           </button>
@@ -124,11 +131,11 @@ const BlogsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen gradient:bg-gray-50 to bg-white pt-8 ">
+    <div className="min-h-screen bg-white dark:bg-slate-900 pt-8">
       <div className="w-full max-w-[2000px] px-4 sm:px-8 flex flex-col">
         {/* Title and search section */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] text-left">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] dark:text-white text-left">
             Blog Posts
           </h1>
           <form onSubmit={handleSearch} className="w-full sm:w-auto max-w-lg">
@@ -138,7 +145,7 @@ const BlogsPage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search blogs..."
-                className="flex-1 px-4 py-2 text-base border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-w-0"
+                className="flex-1 px-4 py-2 text-base border border-[var(--border-light)] dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-w-0"
               />
               <button
                 type="submit"
@@ -150,7 +157,7 @@ const BlogsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
+                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white focus:outline-none"
                 >
                   Clear
                 </button>
@@ -161,71 +168,117 @@ const BlogsPage: React.FC = () => {
 
         {/* Blog posts grid */}
         <div className="mb-4">
-          <p className="text-sm text-[var(--text-tertiary)]">
+          <p className="text-sm text-[var(--text-tertiary)] dark:text-gray-400">
             Showing {filteredBlogs.length} of {totalPages * ITEMS_PER_PAGE} blog posts
             {searchQuery && ` for "${searchQuery}"`}
           </p>
         </div>
         {filteredBlogs.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-[var(--text-tertiary)] text-lg">No blogs found. Try a different search.</p>
+            <p className="text-[var(--text-tertiary)] dark:text-gray-400 text-lg">No blogs found. Try a different search.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filteredBlogs.map((blog) => (
-              <div key={blog.id} className="bg-white rounded-md shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredBlogs.map((blog) => {
+              let imageUrl = '';
+              let alt = '';
+              
+              try {
+                const parsed = JSON.parse(blog.imageUrl);
+                imageUrl = Array.isArray(parsed) ? parsed[0] : parsed;
+                alt = Array.isArray(parsed) && parsed[1] ? parsed[1] : blog.title;
+              } catch (e) {
+                console.warn('Invalid image URL format for blog:', blog.title);
+                imageUrl = blog.imageUrl || '';
+                alt = blog.alt || blog.title;
+              }
+              
+              return (
                 <BlogCard
+                  key={blog.id}
                   blog={{
                     id: blog.id,
                     title: blog.title,
                     slug: blog.slug,
                     content: blog.content,
                     metadata: blog.metadata,
-                    imageUrl: (() => {
-                      try {
-                        const parsed = JSON.parse(blog.imageUrl);
-                        return parsed[0] || '';
-                      } catch {
-                        console.warn('Invalid image URL format for blog:', blog.title);
-                        return '';
-                      }
-                    })(),
-                    alt: (() => {
-                      try {
-                        const parsed = JSON.parse(blog.imageUrl);
-                        return parsed[1] || '';
-                      } catch {
-                        return '';
-                      }
-                    })()
+                    imageUrl: imageUrl,
+                    alt: alt,
+                    createdAt: blog.createdAt,
+                    author: '99Notes'
                   }}
                 />
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
         {/* Pagination - simplified style */}
-        <div className="flex justify-center mt-8 mb-8">
-          <div className="flex items-center gap-4">
+        <div className="flex justify-center mt-12 mb-16">
+          <nav className="flex items-center space-x-2" aria-label="Pagination">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--secondary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
-              ← Previous
+              Previous
             </button>
-            <span className="text-sm font-medium text-[var(--text-strong)]">
-              Page {currentPage} of {totalPages}
-            </span>
+            
+            <div className="hidden md:flex space-x-2">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                // Calculate page numbers to show (current page in the middle when possible)
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                      currentPage === pageNum
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              {totalPages > 5 && currentPage < totalPages - 2 && (
+                <span className="px-4 py-2 text-gray-700 dark:text-gray-400">...</span>
+              )}
+              
+              {totalPages > 5 && currentPage < totalPages - 2 && (
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md text-sm font-medium transition-colors duration-200"
+                >
+                  {totalPages}
+                </button>
+              )}
+            </div>
+            
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
-              Next →
+              Next
             </button>
-          </div>
+            
+            <div className="hidden md:block text-sm text-gray-700 dark:text-gray-400 ml-4">
+              Page {currentPage} of {totalPages}
+            </div>
+          </nav>
         </div>
       </div>
     </div>

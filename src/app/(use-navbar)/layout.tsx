@@ -5,6 +5,7 @@ import Footer from "@/components/Footer/Footer";
 import { getNavigationTree, getFooterLinks } from "@/lib/navigation";
 import { Suspense } from "react";
 import GlobalScriptsLoader from "@/components/GlobalScriptsLoader";
+import { ThemeProvider } from "@/components/ui/themeprovider";
 
 const inter = Inter({
   subsets: ["latin"]
@@ -26,7 +27,7 @@ export default async function RootLayout({
   const footerSections = await getFooterLinks();
 
   return (
-    <html>
+    <html suppressHydrationWarning>
       <head>
         <script
           src="https://accounts.google.com/gsi/client"
@@ -36,22 +37,26 @@ export default async function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={inter.className}>
-        <GlobalScriptsLoader />
-        <Suspense
-          fallback={
-            <div className="text-[var(--text-strong)]">Loading Navbar...</div>
-          }
-        >
-          <Navbar navigation={navigation} />
-        </Suspense>
-        {children}
-        <Suspense
-          fallback={
-            <div className="text-[var(--text-strong)]">Loading Footer...</div>
-          }
-        >
-          <Footer footerSections={footerSections} />
-        </Suspense>
+        <ThemeProvider>
+          <GlobalScriptsLoader />
+          <Suspense
+            fallback={
+              <div className="text-foreground">Loading Navbar...</div>
+            }
+          >
+            <Navbar navigation={navigation} />
+          </Suspense>
+          <main className="min-h-[calc(100vh-64px)] bg-background text-foreground">
+            {children}
+          </main>
+          <Suspense
+            fallback={
+              <div className="text-foreground">Loading Footer...</div>
+            }
+          >
+            <Footer footerSections={footerSections} />
+          </Suspense>
+        </ThemeProvider>
       </body>
     </html>
   );

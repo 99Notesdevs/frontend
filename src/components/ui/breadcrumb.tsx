@@ -33,7 +33,10 @@ export default function Breadcrumb({
       <nav aria-label="Breadcrumb">
         <ol className={cn("flex items-center space-x-2", containerClasses)}>
           <li className={listClasses}>
-            <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link 
+              href="/" 
+              className="text-muted-foreground hover:text-foreground transition-colors dark:text-slate-400 dark:hover:text-white"
+            >
               {homeElement}
             </Link>
           </li>
@@ -47,11 +50,14 @@ export default function Breadcrumb({
 
             return (
               <React.Fragment key={index}>
-                <li className={cn(listClasses, isActive && activeClasses)}>
+                <li className={cn(listClasses, isActive && activeClasses, 'dark:text-slate-300')}>
                   {isActive ? (
-                    <span>{itemLink}</span>
+                    <span className="dark:text-white font-medium">{itemLink}</span>
                   ) : (
-                    <Link href={href} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Link 
+                      href={href} 
+                      className="text-muted-foreground hover:text-foreground transition-colors dark:text-slate-400 dark:hover:text-white"
+                    >
                       {itemLink}
                     </Link>
                   )}
