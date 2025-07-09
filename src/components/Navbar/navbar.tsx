@@ -275,12 +275,9 @@ export default function Navbar({ navigation }: NavbarProps) {
                     priority
                   />
                 </Link>
-                <div className="lg:hidden ml-2">
-                  <ToggleMode />
-                </div>
               </div>
               <div className="hidden lg:flex flex-1 justify-end items-center gap-1 2xl:pr-8 ">
-                {/* <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div> */}
+                {/* <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div> */} 
                 <NestedNavigation items={navigation} />
                 <Link href="/about" passHref>
                   <span
@@ -307,11 +304,14 @@ export default function Navbar({ navigation }: NavbarProps) {
               </div>  
 
               {/* Mobile menu button */}
-              <div className="lg:hidden">
+              <div className="lg:hidden flex items-center gap-2">
+                <div className="flex lg:hidden">
+                  <ToggleMode />
+                </div>
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-tertiary)] bg-[var(--tertiary)]
-                         hover:text-[var(--warning-border)] hover:bg-[var(--quaternary)] focus:outline-none transition-colors"
+                  className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-tertiary)] bg-[var(--tertiary)] dark:bg-amber-900/20
+                         hover:text-[var(--primary)] hover:bg-[var(--quaternary)] dark:hover:bg-amber-900/20 focus:outline-none transition-colors"
                 >
                   <span className="sr-only">Open main menu</span>
                   {isOpen ? (
@@ -481,9 +481,6 @@ export default function Navbar({ navigation }: NavbarProps) {
                 Blogs
               </span>
             </Link>
-            <div className="px-3 py-2">
-              <ToggleMode />
-            </div>
           </div>
         </div>
       </nav>
