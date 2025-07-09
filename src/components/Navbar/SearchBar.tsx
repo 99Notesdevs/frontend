@@ -55,12 +55,12 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center">
-      <div className={`relative group bg-white border border-[var(--border-light)] rounded-xl w-full`}>
+    <div className="relative flex flex-col items-center w-full">
+      <div className={`relative group bg-white dark:bg-slate-800 border border-[var(--border-light)] dark:border-slate-700 rounded-xl w-full transition-colors duration-200`}>
         <input
           type="text"
           placeholder="Search notes, subjects..."
-          className="w-full py-1.5 pl-8 pr-3 text-sm text-[var(--text-strong)] placeholder-[var(--text-tertiary)] 
+          className="w-full py-1.5 pl-8 pr-3 text-sm text-[var(--text-strong)] dark:text-slate-200 placeholder-[var(--text-tertiary)] dark:placeholder-slate-500 
                     bg-transparent border-none outline-none"
           value={query}
           onChange={handleInputChange}
@@ -69,7 +69,7 @@ const SearchBar = () => {
         />
         <div className="absolute inset-y-0 left-0 flex items-center pl-2.5">
           <svg
-            className="w-4 h-4 text-[var(--text-tertiary)]"
+            className="w-4 h-4 text-[var(--text-tertiary)] dark:text-slate-400"
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -102,12 +102,12 @@ const SearchBar = () => {
                       className="w-10 h-10 object-cover rounded"
                     />
                   )}
-                  <div>
-                    <h3 className="font-semibold">
-                  {result.title || "Untitled"}
+                  <div className="ml-2">
+                    <h3 className="font-semibold text-gray-800 dark:text-white">
+                      {result.title || "Untitled"}
                     </h3>
-                    <p className="text-xs text-[var(--text-tertiary)]">
-                      {result.content.replace(/<[^>]*>/g, "").slice(0, 50)}...
+                    <p className="text-xs text-gray-600 dark:text-slate-400">
+                      {result.content?.replace(/<[^>]*>/g, "").slice(0, 50)}...
                     </p>
                   </div>
                 </li>

@@ -200,12 +200,12 @@ const navigationSections: NavSection[] = [
 
   return (
     <>
-    <div className="min-h-screen bg-white pt-8">
+    <div className="min-h-screen bg-white dark:bg-slate-900 pt-8 transition-colors duration-200">
       <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-6">
         {/* On mobile */}
         <div className="flex flex-col md:hidden">
           <main className="flex-1">
-            <article className="bg-[var(--bg-main)] border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
+            <article className="bg-[var(--bg-main)] dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30">
               {memoizedChildren}
             </article>
           </main>
@@ -213,7 +213,7 @@ const navigationSections: NavSection[] = [
 
         {/* Sidebar - now at the same level as main content */}
         <aside className="w-full md:w-[340px] lg:w-[400px] flex-shrink-0">
-          <nav className="bg-white border border-blue-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl md:sticky md:top-24">
+          <nav className="bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30 md:sticky md:top-24">
            {/* Navigation section */}
             {loading ? (
               <div className="flex justify-center py-8">
@@ -228,7 +228,7 @@ const navigationSections: NavSection[] = [
                       className={`w-full flex items-center justify-between px-4 py-3 text-base font-semibold 
                         ${expandedSections[section.title] 
                           ? 'bg-[var(--nav-primary)] text-white' 
-                          : 'text-[var(--surface-darker)] hover:bg-gray-50'}
+                          : 'text-[var(--surface-darker)] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700'}
                         rounded-md transition-colors duration-200`}
                     >
                       <span className="flex items-center gap-1">
@@ -251,7 +251,7 @@ const navigationSections: NavSection[] = [
                         <Link
                           key={itemIndex}
                           href={item.path}
-                          className="group flex items-center px-5 py-2 text-[1.07rem] font-medium rounded-md text-[var(--text-strong)] hover:bg-gray-50 hover:text-[var(--surface-darker)] transition-all duration-200"
+                          className="group flex items-center px-5 py-2 text-[1.07rem] font-medium rounded-md text-[var(--text-strong)] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-[var(--surface-darker)] dark:hover:text-white transition-all duration-200"
                         >
                           <span className="mr-1">•</span>
                           <span className="truncate">{item.title}</span>
@@ -263,12 +263,12 @@ const navigationSections: NavSection[] = [
               </section>
             )}
             
-            <div className="border-t border-[var(--border-light)] bg-[var(--bg-main)] p-6 space-y-8">
+            <div className="border-t border-[var(--border-light)] dark:border-slate-700 bg-[var(--bg-main)] dark:bg-slate-800 p-6 space-y-8">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-orange-500 flex items-center justify-center gap-2">
+                <h3 className="text-xl font-semibold text-orange-500 dark:text-orange-400 flex items-center justify-center gap-2">
                   Contact Us
                 </h3>
-                <div className="w-64 h-[4px] bg-[var(--nav-primary)] mx-auto my-2"></div>
+                <div className="w-64 h-[4px] bg-[var(--nav-primary)] dark:bg-blue-600 mx-auto my-2"></div>
                 <ContactForm />
               </div>
               
@@ -276,8 +276,8 @@ const navigationSections: NavSection[] = [
               <h3 className="text-xl font-semibold text-orange-500 flex items-center justify-center gap-2">
                   Connect with Us
                 </h3>
-                <div className="w-64 h-[4px] bg-[var(--nav-primary)] mx-auto my-2"></div>
-                <div className="flex flex-wrap gap-4 justify-center">
+                <div className="w-64 h-[4px] bg-[var(--nav-primary)] dark:bg-blue-600 mx-auto my-2"></div>
+                <div className="flex flex-wrap gap-4 justify-center text-gray-800 dark:text-gray-200">
                   <SocialMedia />
               </div>
               </div>
@@ -289,7 +289,7 @@ const navigationSections: NavSection[] = [
         {/* On tablet/desktop: Display main content second */}
         <div className="hidden md:flex flex-1">
           <main className="w-full">
-            <article className="bg-[var(--bg-main)] border border-blue-100 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
+            <article className="bg-[var(--bg-main)] dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30">
               {memoizedChildren}
             </article>
           </main>

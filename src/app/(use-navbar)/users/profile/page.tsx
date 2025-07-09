@@ -77,7 +77,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[var(--bg-main)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-[var(--bg-main)] to-yellow-50 dark:from-slate-900 dark:to-slate-800 transition-colors duration-200">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <Sidebar />
@@ -118,13 +118,13 @@ const Profile = () => {
         </button>
 
         {/* Profile Header */}
-        <div className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 text-white relative overflow-hidden">
+        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 p-6 rounded-xl border border-yellow-200 dark:border-yellow-800/50">
           <div className="absolute inset-0 bg-black/5 backdrop-blur-[1px]"></div>
           <div className="absolute inset-0 bg-[url('/subtle-pattern.png')] opacity-10"></div>
           <div className="max-w-7xl mx-auto px-4 py-12 relative">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="relative group">
-                <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-white/90 shadow-xl transition-transform duration-300 group-hover:scale-105">
+                <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden border-4 border-yellow-100 dark:border-yellow-900/30 shadow-lg">
                   <img
                     src={imagePreview || userData.avatar}
                     alt="Profile"
@@ -134,9 +134,10 @@ const Profile = () => {
                 <label className="absolute bottom-2 right-2 bg-white p-3 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-all duration-300 hover:shadow-xl">
                   <input
                     type="file"
+                    id="avatar-upload"
                     className="hidden"
-                    onChange={handleImageUpload}
                     accept="image/*"
+                    onChange={handleImageUpload}
                   />
                   <svg
                     className="w-5 h-5 text-yellow-500"
@@ -154,13 +155,13 @@ const Profile = () => {
                 </label>
               </div>
               <div className="text-center md:text-left">
-                <h1 className="text-4xl font-bold mb-2 text-white/90">
-                  {userData.firstName}
-                </h1>
+                <h3 className="text-lg font-semibold text-amber-800 dark:text-amber-400">
+                  Current Plan: {userData.subscription.plan}
+                </h3>
                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                  <span className="px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
-                    {userData.role}
-                  </span>
+                  <button className="mt-4 bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md hover:shadow-lg">
+                    Manage Subscription
+                  </button>
                   <span className="px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
                     {/* {userData.subscription.plan} */}
                   </span>
@@ -174,80 +175,88 @@ const Profile = () => {
         <div className="max-w-5xl mx-auto p-6 space-y-8">
           <div className="grid grid-cols-1 gap-8">
             {/* Personal Information */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-8 border border-[var(--bg-elevated)]">
-              <h2 className="text-2xl font-bold mb-8 text-[var(--surface-dark)] flex items-center gap-3">
-                <span className="h-8 w-1 bg-yellow-500 rounded-full"></span>
-                Personal Information
+            <div className="bg-white/70 dark:bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-slate-700/50">
+              <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-200 mb-6">
+                Profile Information
               </h2>
-              <div className="space-y-6">
-                {[
-                  {
-                    label: "Full Name",
-                    value: userData.firstName + " " + userData.lastName,
-                    icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-                  },
-                  {
-                    label: "Email Address",
-                    value: userData.email,
-                    icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-                  },
-                  {
-                    label: "Phone Number",
-                    value: userData.phone,
-                    icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
-                  },
-                  {
-                    label: "Username",
-                    value: userData.username,
-                    icon: "M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z",
-                  },
-                  {
-                    label: "Date of Birth",
-                    value: userData.dob,
-                    icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-                  },
-                  {
-                    label: "Gender",
-                    value: userData.gender,
-                    icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-                  },
-                  {
-                    label: "Location",
-                    value: userData.location,
-                    icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
-                  },
-                ].map((field) => (
-                  <div
-                    key={field.label}
-                    className="group hover:bg-[var(--bg-main)]/50 p-4 rounded-xl transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="text-yellow-500/70 group-hover:text-yellow-500 transition-colors">
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d={field.icon}
-                          />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-sm text-[var(--text-tertiary)] group-hover:text-[var(--text-tertiary)] transition-colors">
-                          {field.label}
-                        </label>
-                        <div className="text-[var(--surface-darker)] font-medium mt-1">
-                          {field.value}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="mt-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={`${userData.firstName} ${userData.lastName}`}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={userData.email}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={userData.phone}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    value={userData.username}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="text"
+                    value={new Date(userData.dob).toLocaleDateString()}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Gender
+                  </label>
+                  <input
+                    type="text"
+                    value={userData.gender}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={userData.location}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
               </div>
             </div>
 

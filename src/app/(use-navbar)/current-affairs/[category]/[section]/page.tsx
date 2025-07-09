@@ -120,7 +120,7 @@ const CurrentAffairArticlePage = async ({
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
-    <div className="min-h-screen bg-gradient-to-br from-white via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-white via-white to-blue-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 transition-colors duration-200">
       <div className="container max-w-7xl mx-auto px-4 py-2">
         <AssistiveTouch content={article?.content || ""} />
 
@@ -129,14 +129,14 @@ const CurrentAffairArticlePage = async ({
             
             {/* Main content column - adjusting padding top for mobile */}
             <div className="lg:col-span-8 xl:col-span-8 pt-4 lg:pt-[50px]">
-              <div className="bg-white border rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 mb-4">
+              <div className="bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg shadow-lg dark:shadow-slate-900/30 p-4 hover:shadow-xl dark:hover:shadow-slate-900/50 transition-all duration-300 mb-4">
                 {/* Article Header */}
                 <div className="text-center mb-8 sm:mb-12">
                   
                     <div className="mb-4">
                       <Link
                         href={`/current-affairs/${category}`}
-                        className="text-[var(--secondary)] hover:text-blue-800 font-medium text-sm"
+                        className="text-[var(--secondary)] hover:text-blue-800 dark:hover:text-blue-400 font-medium text-sm transition-colors duration-200"
                       >
                         {category}
                       </Link>
@@ -146,10 +146,10 @@ const CurrentAffairArticlePage = async ({
                   
                   {article?.metadata && (
                     <>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-dark)] mb-8">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-dark)] dark:text-white mb-8">
                       {JSON.parse(article.metadata).metaTitle}
                     </h1>
-                    <p className="text-sm text-[var(--text-tertiary)] mb-2" >
+                    <p className="text-sm text-[var(--text-tertiary)] dark:text-slate-300 mb-2" >
                       By {article.author} • {article.createdAt ? new Date(article.createdAt).toLocaleDateString('en-US', {
                         month: 'long',
                         day: 'numeric',
@@ -167,7 +167,7 @@ const CurrentAffairArticlePage = async ({
                             className="group"
                           >
                             <span 
-                              className="inline-block bg-yellow-50 text-[var(--primary)] hover:bg-[var(--info-surface)] transition-colors duration-200 cursor-pointer px-3 py-1 text-sm font-medium rounded-full"
+                              className="inline-block bg-yellow-50 dark:bg-yellow-900/30 text-[var(--primary)] dark:text-yellow-400 hover:bg-[var(--info-surface)] dark:hover:bg-slate-700 transition-colors duration-200 cursor-pointer px-3 py-1 text-sm font-medium rounded-full"
                             >
                               {tag}
                             </span>
@@ -182,7 +182,7 @@ const CurrentAffairArticlePage = async ({
                 </div>
                 <div 
                   key={1235}
-                  className="prose prose-sm sm:prose-base lg:prose-lg max-w-none
+                  className="prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg max-w-none
                   prose-headings:font-semibold
                   prose-headings:tracking-normal
                   prose-headings:text-left
@@ -191,13 +191,27 @@ const CurrentAffairArticlePage = async ({
                   
                   prose-h1:text-3xl sm:prose-h1:text-4xl
                   prose-h1:font-bold
-                  prose-h1:text-[var(--surface-dark)]
+                  prose-h1:text-[var(--surface-dark)] dark:text-white
                   prose-h1:leading-tight
                   
                   prose-h2:text-2xl sm:prose-h2:text-3xl
-                  prose-h2:text-[var(--text-strong)]
+                  prose-h2:text-[var(--text-strong)] dark:text-slate-200
                   prose-h2:pb-2
                   prose-h2:after:content-['']
+                  
+                  /* Dark mode styles */
+                  dark:prose-p:text-slate-300
+                  dark:prose-strong:text-white
+                  dark:prose-a:text-blue-400
+                  dark:prose-a:border-blue-700
+                  dark:prose-a:hover:text-blue-300
+                  dark:prose-blockquote:border-l-blue-500
+                  dark:prose-blockquote:bg-slate-800/50
+                  dark:prose-pre:bg-slate-800
+                  dark:prose-code:text-slate-300
+                  dark:prose-th:border-slate-700
+                  dark:prose-td:border-slate-700
+                  dark:prose-hr:border-slate-700
                   prose-h2:after:block
                   prose-h2:after:w-16
                   prose-h2:after:h-[2px]

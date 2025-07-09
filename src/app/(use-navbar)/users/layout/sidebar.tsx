@@ -97,16 +97,16 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
   return (
     <div 
       className={`
-        h-screen bg-white/80 backdrop-blur-md shadow-xl
+        h-screen bg-white/80 dark:bg-slate-800/90 backdrop-blur-md shadow-xl
         ${isCollapsed ? 'w-20' : 'w-[280px]'}
         transition-all duration-300 ease-in-out
         overflow-y-auto relative
-        border-r border-gray-200/50
+        border-r border-gray-200/50 dark:border-slate-700/50
       `}
     >
       {/* Mobile close button */}
       <button 
-        className="absolute top-4 right-4 p-2 rounded-full hover:bg-yellow-50 md:hidden text-gray-600 transition-colors duration-200"
+        className="absolute top-4 right-4 p-2 rounded-full hover:bg-yellow-50 dark:hover:bg-slate-700 md:hidden text-gray-600 dark:text-gray-300 transition-colors duration-200"
         onClick={onClose}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,9 +119,9 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
         {/* Updated User Profile Section */}
         <div 
           onClick={handleProfileClick}
-          className={`flex items-center ${isCollapsed ? 'justify-center' : 'p-4'} border-b border-gray-200/50 mb-6 cursor-pointer hover:bg-yellow-50 rounded-lg transition-all duration-200`}
+          className={`flex items-center ${isCollapsed ? 'justify-center' : 'p-4'} border-b border-gray-200/50 dark:border-slate-700/50 mb-6 cursor-pointer hover:bg-yellow-50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200`}
         >
-          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 dark:from-yellow-500 dark:to-yellow-700 text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200">
             <img src="/default-avatar.png" alt="Profile" className="w-full h-full rounded-full object-cover" />
           </div>
           {!isCollapsed && (
@@ -138,7 +138,7 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
             <div key={section.title} className="space-y-3">
               {!isCollapsed && (
                 <div 
-                  className="flex items-center justify-between text-sm font-semibold text-gray-500 cursor-pointer hover:text-yellow-600 transition-colors duration-200"
+                  className="flex items-center justify-between text-sm font-semibold text-gray-500 dark:text-slate-400 cursor-pointer hover:text-yellow-600 dark:hover:text-yellow-500 transition-colors duration-200"
                   onClick={() => setExpandedSection(expandedSection === section.title ? null : section.title)}
                 >
                   {section.title}
@@ -153,7 +153,9 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
                       onMouseEnter={() => setHoveredItem(item.name)}
                       onMouseLeave={() => setHoveredItem(null)}
                       className={`flex items-center ${isCollapsed ? 'justify-center px-2' : 'px-4'} py-2 rounded cursor-pointer transition-all duration-300 
-                        ${hoveredItem === item.name ? 'bg-yellow-500 text-white' : 'text-yellow-600 hover:bg-yellow-50'}`}
+                        ${hoveredItem === item.name 
+                          ? 'bg-yellow-500 dark:bg-yellow-600 text-white' 
+                          : 'text-yellow-600 dark:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-slate-700'}`}
                     >
                       {isCollapsed ? item.name.charAt(0) : item.name}
                     </div>
@@ -166,7 +168,7 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
 
         {/* Logout Button */}
         <button onClick={logout}
-          className={`w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white py-7 sm:py-2.5 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200 font-medium mt-10 text-sm sm:text-base`}
+          className={`w-full bg-gradient-to-r from-yellow-400 to-yellow-600 dark:from-yellow-500 dark:to-yellow-700 text-white py-7 sm:py-2.5 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200 font-medium mt-10 text-sm sm:text-base`}
         >
           {isCollapsed ? 'L' : 'Logout'}
         </button>

@@ -13,6 +13,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   const router = useRouter();
 
@@ -37,6 +38,8 @@ const Register = () => {
       showToast("Passwords do not match!", "warning");
       return;
     }
+    
+    setLoading(true);
     try {
       const response = await axios.post(`${env.API}/user/signup`, {
         email,
@@ -57,153 +60,187 @@ const Register = () => {
         showToast(response.data.message, "error");
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
       showToast("Registration failed. Please try again later.", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[var(--bg-main)] to-white px-4 sm:px-6">
-      {toast && (
-        <div className={`fixed bottom-4 right-4 p-3 rounded-lg shadow-lg transition-all duration-300 ${
-          toast.type === 'success' 
-            ? 'bg-slate-900 text-white' 
-            : toast.type === 'warning'
-            ? 'bg-yellow-500 text-white'
-            : 'bg-red-500 text-white'
-        }`}>
-          <p className="text-sm">{toast.message}</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 px-4 sm:px-6 py-12 transition-colors duration-200">
+      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg dark:shadow-slate-900/30 border border-gray-200 dark:border-slate-700">
+        <div>
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
+            Create an account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-slate-400">
+            Join our community today
+          </p>
         </div>
-      )}
-      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[340px] sm:max-w-sm border border-[var(--bg-elevated)]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[var(--surface-dark)] text-center mb-4">
-          Register
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-          <div>
-            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
-              First Name*
-            </label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+
+        {toast && (
+          <div
+            className={`p-4 rounded-lg ${
+              toast.type === "success"
+                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                : toast.type === "warning"
+                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+            }`}
+          >
+            <p className="text-sm text-center">{toast.message}</p>
           </div>
-          <div>
-            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
-              Last Name
-            </label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                First name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm transition-colors"
+                placeholder="John"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Last name
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm transition-colors"
+                placeholder="Doe"
+              />
+            </div>
           </div>
+
           <div>
-            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
-              Email*
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Email address <span className="text-red-500">*</span>
             </label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm transition-colors"
+              placeholder="you@example.com"
             />
           </div>
+
           <div>
-            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
-              Password*
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
+                id="password"
+                name="password"
                 type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                required
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm transition-colors pr-10"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 leading-5"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500 dark:text-slate-500 dark:hover:text-slate-400"
               >
                 {showPassword ? (
                   <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    viewBox="0 0 24 24"
+                    className="h-5 w-5"
                     fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
                     <path
-                      d="M2 2L22 22"
-                      stroke="currentColor"
-                      strokeWidth="2"
                       strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                     <path
-                      d="M6.71277 6.7226C3.66479 8.79527 2 12 2 12C2 12 2 12 5.63636 19 12 19C14.0503 19 15.8174 18.2734 17.2711 17.2884M11 5.05822C11.3254 5.02013 11.6588 5 12 5C18.3636 5 22 12 22 12C22 12 21.3082 13.3317 20 14.8335"
-                      stroke="currentColor"
-                      strokeWidth="2"
                       strokeLinecap="round"
-                    />
-                    <path
-                      d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                     />
                   </svg>
                 ) : (
                   <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    viewBox="0 0 24 24"
+                    className="h-5 w-5"
                     fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
                     <path
-                      d="M12 5C18.3636 5 22 12 22 12C22 12 18.3636 19 12 19C5.63636 19 2 12 2 12C2 12 5.63636 5 12 5Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
                     />
                   </svg>
                 )}
               </button>
             </div>
           </div>
+
           <div>
-            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
-              Repeat Password*
+            <label htmlFor="repeatPassword" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Confirm Password <span className="text-red-500">*</span>
             </label>
             <input
-              type="password"
+              id="repeatPassword"
+              type={showPassword ? "text" : "password"}
               value={repeatPassword}
               onChange={(e) => setRepeatPassword(e.target.value)}
               required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm transition-colors"
+              placeholder="••••••••"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-[var(--primary)] text-white py-2 sm:py-2.5 rounded-lg hover:bg-slate-700 transition duration-200 font-medium mt-2 text-sm sm:text-base"
-          >
-            Register
-          </button>
-          <div className="flex justify-between items-center pt-2 text-sm">
-            <a
-              href="/users/login"
-              className="text-[var(--primary)] hover:text-[var(--secondary)] font-medium"
+
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:cursor-not-allowed transition-colors"
             >
-              Already have an account? Login
-            </a>
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating account...
+                </>
+              ) : 'Create account'}
+            </button>
+          </div>
+
+          <div className="text-center text-sm">
+            <p className="text-gray-600 dark:text-slate-400">
+              Already have an account?{' '}
+              <a href="/users/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
+                Sign in
+              </a>
+            </p>
           </div>
         </form>
       </div>

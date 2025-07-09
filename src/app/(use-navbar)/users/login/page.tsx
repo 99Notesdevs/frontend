@@ -146,119 +146,143 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[var(--bg-elevated)] to-white px-4 sm:px-6">
-      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[380px] sm:max-w-sm border border-[var(--border-light)]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[var(--surface-dark)] text-center mb-2">
-          Login
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 px-4 sm:px-6 py-12 transition-colors duration-200">
+      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg dark:shadow-slate-900/30 border border-gray-200 dark:border-slate-700">
+        <div>
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
+            Welcome back
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-slate-400">
+            Sign in to your account
+          </p>
+        </div>
+
         {toast && (
           <div
-            className={`mb-4 p-3 rounded-lg shadow-sm transition-all duration-300 ${
+            className={`p-4 rounded-lg ${
               toast.type === "success"
-                ? "bg-slate-900 text-white"
+                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                 : toast.type === "warning"
-                ? "bg-yellow-500 text-white"
-                : "bg-red-500 text-white"
+                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
             }`}
           >
             <p className="text-sm text-center">{toast.message}</p>
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-          <div>
-            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
-              Email:
-            </label>
-            <input
-              type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-          <div>
-            <label className="block text-[var(--text-strong)] text-xs sm:text-sm font-medium mb-1">
-              Password:
-            </label>
-            <div className="relative">
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Email address
+              </label>
               <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
                 required
-                className="w-full p-2 sm:p-2.5 text-sm sm:text-base text-[var(--surface-dark)] bg-[var(--bg-main)] border border-[var(--border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm transition-colors"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-tertiary)] leading-5"
-              >
-                {showPassword ? (
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2 2L22 22"
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm transition-colors pr-10"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500 dark:text-slate-500 dark:hover:text-slate-400"
+                >
+                  {showPassword ? (
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
                       stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M6.71277 6.7226C3.66479 8.79527 2 12 2 12C2 12 5.63636 19 12 19C14.0503 19 15.8174 18.2734 17.2711 17.2884M11 5.05822C11.3254 5.02013 11.6588 5 12 5C18.3636 5 22 12 22 12C22 12 21.3082 13.3317 20 14.8335"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
                       stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 5C18.3636 5 22 12 22 12C22 12 18.3636 19 12 19C5.63636 19 2 12 2 12C2 12 5.63636 5 12 5Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                )}
-              </button>
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-slate-600 rounded dark:bg-slate-700"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-slate-300">
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <a href="/users/password-reset" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
+                  Forgot your password?
+                </a>
+              </div>
             </div>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-[var(--primary)] text-white py-2 sm:py-2.5 rounded-lg hover:bg-slate-700 transition duration-200 font-medium mt-2 text-sm sm:text-base"
-          >
-            Login
-          </button>
-          <div className="flex justify-between items-center pt-2 text-sm">
+
+          <div>
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            >
+              Sign in
+            </button>
             <a
               href="/users/register"
               className="text-[var(--primary)] hover:text-[var(--secondary)] font-medium"
             >
               Don't have an account? Register
-            </a>
-            <a
-              href="/users/password-reset"
-              className="text-[var(--primary)] hover:text-[var(--secondary)] font-medium"
-            >
-              Forgot Password?
             </a>
           </div>
         </form>

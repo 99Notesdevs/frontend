@@ -92,80 +92,122 @@ export default function SubscriptionPage() {
 
   const renderContent = () => {
     if (loading) {
-      return <div>Loading...</div>;
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white dark:from-slate-900 dark:to-slate-800">
+          <div className="container mx-auto px-4 py-16">
+            <div className="flex justify-center gap-4 mb-12">
+              <div className="h-10 w-24 bg-gray-200 dark:bg-slate-700 rounded-md animate-pulse"></div>
+              <div className="h-10 w-24 bg-gray-200 dark:bg-slate-700 rounded-md animate-pulse"></div>
+              <div className="h-10 w-24 bg-gray-200 dark:bg-slate-700 rounded-md animate-pulse"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700 animate-pulse h-80">
+                  <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-3/4 mb-4 mx-auto"></div>
+                  <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/2 mb-6 mx-auto"></div>
+                  <div className="space-y-3 mb-6">
+                    <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-5/6"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-2/3"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-3/4"></div>
+                  </div>
+                  <div className="h-10 bg-gray-200 dark:bg-slate-700 rounded w-full mt-8"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
     }
 
     switch (selectedSection) {
       case 'Articles':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             {plans.map((plan) => (
               <Card 
                 key={plan.id}
-                className="border-2 border-[var(--nav-primary)] hover:border-[var(--nav-secondary)] hover:border-primary transition-all duration-300"
+                className="group border-2 border-[var(--nav-primary)] dark:border-slate-700 hover:border-[var(--nav-secondary)] dark:hover:border-slate-600 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30 bg-white dark:bg-slate-800 overflow-hidden"
               >
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl font-bold mb-2">{plan.name}</CardTitle>
-                  <p className="text-3xl font-bold text-primary">{`₹${plan.price}/${plan.validity} Days`}</p>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-[var(--text-tertiary)]">
-                    {extractFeatures(plan.description).map((feature, idx) => (
-                      <li key={idx} className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-6">
-                    <Button
-                      className="w-full bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)] text-white font-semibold py-3"
-                      onClick={() => handleBuyClick(plan)}
-                    >
-                      Buy Now
-                    </Button>
+                <div className="p-1 bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)]">
+                  <div className="bg-white dark:bg-slate-800 p-5 md:p-6">
+                    <CardHeader className="text-center p-0 mb-4">
+                      <CardTitle className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                        {plan.name}
+                      </CardTitle>
+                      <p className="text-2xl md:text-3xl font-bold text-[var(--nav-primary)] dark:text-blue-400">
+                        ₹{plan.price}
+                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">/{plan.validity} Days</span>
+                      </p>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <ul className="space-y-3 text-gray-600 dark:text-gray-300 mb-6">
+                        {extractFeatures(plan.description).map((feature, idx) => (
+                          <li key={idx} className="flex items-start">
+                            <svg
+                              className="flex-shrink-0 w-5 h-5 text-green-500 mr-2 mt-0.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            <span className="text-sm md:text-base">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button
+                        className="w-full bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] hover:from-[var(--nav-secondary)] hover:to-[var(--nav-primary)] text-white font-semibold py-3 md:py-4 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                        onClick={() => handleBuyClick(plan)}
+                      >
+                        Buy Now
+                      </Button>
+                    </CardContent>
                   </div>
-                </CardContent>
+                </div>
               </Card>
             ))}
           </div>
         );
       case 'Books':
         return (
-          <div className="text-center py-12">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 md:p-12 text-center border border-gray-200 dark:border-slate-700 shadow-lg">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-3xl font-bold mb-6">Cover Your Entire UPSC Syllabus with 20 Books</h2>
-              {/* <p className="text-[var(--text-tertiary)] mb-8">Get access to our comprehensive collection of UPSC preparation books</p> */}
-              <Button className="bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)] text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <a href="https://shop.99notes.in/books/" className="text-white">
-                  Shop Now
-                </a>
-              </Button>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-6">
+                Cover Your Entire UPSC Syllabus with 20 Books
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-lg mx-auto">
+                Get access to our comprehensive collection of UPSC preparation books
+              </p>
+              <a 
+                href="https://shop.99notes.in/books/" 
+                className="inline-block bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] hover:from-[var(--nav-secondary)] hover:to-[var(--nav-primary)] text-white font-semibold px-8 py-3 md:px-10 md:py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+              >
+                Shop Now
+              </a>
             </div>
           </div>
         );
       case 'Notes':
         return (
-          <div className="text-center py-12">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 md:p-12 text-center border border-gray-200 dark:border-slate-700 shadow-lg">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-3xl font-bold mb-6">Cover Your Entire UPSC Syllabus with Handwritten Notes</h2>
-             <Button className="bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)] text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <a href="https://shop.99notes.in/notes/" className="text-white">
-                  Download Now
-                </a>
-              </Button>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-6">
+                Cover Your Entire UPSC Syllabus with Handwritten Notes
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-lg mx-auto">
+                Access high-quality handwritten notes for comprehensive UPSC preparation
+              </p>
+              <a 
+                href="https://shop.99notes.in/notes/" 
+                className="inline-block bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] hover:from-[var(--nav-secondary)] hover:to-[var(--nav-primary)] text-white font-semibold px-8 py-3 md:px-10 md:py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+              >
+                Download Now
+              </a>
             </div>
           </div>
         );
@@ -173,30 +215,25 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="mb-8 flex justify-center gap-4">
-          <Button
-            className={`px-6 py-3 ${selectedSection === 'Articles' ? 'bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)]' : ''}`}
-            onClick={() => setSelectedSection('Articles')}
-          >
-            Articles
-          </Button>
-          <Button
-            className={`px-6 py-3 ${selectedSection === 'Books' ? 'bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)]' : ''}`}
-            onClick={() => setSelectedSection('Books')}
-          >
-            Books
-          </Button>
-          <Button
-            className={`px-6 py-3 ${selectedSection === 'Notes' ? 'bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)]' : ''}`}
-            onClick={() => setSelectedSection('Notes')}
-          >
-            Notes
-          </Button>
+    <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white dark:from-slate-900 dark:to-slate-800 transition-colors duration-200">
+      <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="mb-8 md:mb-12 flex flex-wrap justify-center gap-3 md:gap-4">
+          {['Articles', 'Books', 'Notes'].map((section) => (
+            <Button
+              key={section}
+              className={`px-5 py-2.5 md:px-6 md:py-3 rounded-lg font-medium transition-all duration-200 ${
+                selectedSection === section
+                  ? 'bg-[var(--nav-primary)] hover:bg-[var(--nav-secondary)] text-white shadow-lg'
+                  : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600'
+              }`}
+              onClick={() => setSelectedSection(section as any)}
+            >
+              {section}
+            </Button>
+          ))}
         </div>
         
-        <div className="mt-12">
+        <div className="mt-8 md:mt-12">
           {renderContent()}
         </div>
       </div>

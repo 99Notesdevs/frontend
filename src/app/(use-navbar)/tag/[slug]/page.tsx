@@ -59,6 +59,7 @@ export default function TagPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [currentBlog, setCurrentBlog] = useState<CurrentArticleBlog | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState({
     pages: 1,
     blogs: 1,
@@ -154,13 +155,17 @@ export default function TagPage() {
 
   // Loading skeleton component
   const CardSkeleton = () => (
-    <div className="border rounded-lg overflow-hidden animate-pulse">
-      <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
-      <div className="p-4">
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-4"></div>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="animate-pulse">
+        <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-6"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow dark:shadow-slate-900/30 border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow duration-200">
+              <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded w-3/4 mb-3"></div>
+              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -176,12 +181,47 @@ export default function TagPage() {
     </div>
   );
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow dark:shadow-slate-900/30 border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow duration-200">
+                <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded w-3/4 mb-3"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r" role="alert">
+          <p className="font-bold flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            Error
+          </p>
+          <p className="mt-1">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold">
-          <span className="text-muted-foreground">Tag:</span> {slug}
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-2">
+          Tag: <span className="text-[var(--nav-primary)]">{slug}</span>
         </h1>
+        <div className="w-16 h-1 bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] rounded-full"></div>
       </div>
       
       {/* Pages Section */}
