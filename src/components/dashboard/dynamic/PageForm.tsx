@@ -484,7 +484,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
                           handleLevelChange(level, value)
                         }
                       >
-                        <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
+                        <SelectTrigger className="w-full border-slate-200 text-gray-900 focus:border-blue-400 focus:ring-blue-400">
                           <SelectValue
                             placeholder={
                               level === 0
@@ -537,7 +537,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   setSelectedTemplate(value === "_none" ? "" : value);
                 }}
               >
-                <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
+                <SelectTrigger className="w-full border-slate-200 text-gray-900 focus:border-blue-400 focus:ring-blue-400">
                   <SelectValue placeholder="Choose a template" />
                 </SelectTrigger>
                 <SelectContent>

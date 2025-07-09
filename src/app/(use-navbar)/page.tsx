@@ -101,7 +101,7 @@ export default function Home() {
             >
               <div className="space-y-4 overflow-hidden">
                 <motion.h1 
-                  className="text-4xl font-semibold text-[var(--surface-dark)] dark:text-slate-100 leading-relaxed font-opensans"
+                  className="text-4xl font-semibold text-[var(--surface-dark)] dark:text-slate-100 leading-relaxed font-opensans pt-5"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}

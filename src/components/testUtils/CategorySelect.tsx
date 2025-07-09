@@ -48,7 +48,7 @@ export default function CategorySelect({
         value={selectedCategoryId?.toString()}
         onValueChange={(value) => onCategoryChange(Number(value))}
       >
-        <SelectTrigger className="w-full bg-white text-white border border-gray-300 font-medium shadow focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition mb-3">
+        <SelectTrigger className="w-full bg-white text-[var(--admin-bg-dark)] border border-gray-300 font-medium shadow focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition mb-3">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent className="z-50 border border-gray-700 shadow-2xl rounded-lg mt-1 min-w-[200px]">
@@ -56,7 +56,7 @@ export default function CategorySelect({
             <SelectItem
               key={category.id}
               value={category.id.toString()}
-              className="text-white px-4 py-2 hover:bg-[#2d323c] cursor-pointer rounded"
+              className="text-[var(--admin-bg-dark)] px-4 py-2 hover:bg-[#2d323c] cursor-pointer rounded"
             >
               {category.name}
             </SelectItem>

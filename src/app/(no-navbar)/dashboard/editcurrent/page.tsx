@@ -344,7 +344,7 @@ export default function PageListCurrent() {
                 onClick={() =>
                   (window.location.href = "/dashboard")
                 }
-                className="border-[var(--admin-bg-primary)] text-white hover:bg-[var(--admin-bg-primary)]"
+                className="border-[var(--admin-bg-primary)] text-white bg-[var(--admin-bg-primary)] hover:bg-[var(--admin-bg-primary)]"
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-2" />
                 Back
@@ -475,7 +475,7 @@ export default function PageListCurrent() {
                   variant="destructive"
                   size="sm"
                   onClick={() => handleDelete(page.id)}
-                  className="border-[var(--admin-border)] text-red-600 hover:bg-red-50"
+                  className="border-[var(--admin-border)] bg-white text-red-600 hover:bg-red-100"
                 >
                   <TrashIcon className="w-4 h-4 mr-2 text-red-500" />
                   Delete
