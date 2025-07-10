@@ -335,15 +335,16 @@ const CustomLink = Link.extend({
     return ["a", HTMLAttributes, 0];
   },
 });
-
-// Custom OrderedList extension to support different list styles
 const CustomOrderedList = OrderedList.extend({
   addAttributes() {
     return {
-      class: {
-        default: "ordered",
-        parseHTML: (element: HTMLElement) => ({
-          class: element.getAttribute("class") || "ordered",
+      ...this.parent?.(),
+      'data-list-style': {
+        default: 'decimal',
+        parseHTML: element => element.getAttribute('data-list-style') || 'decimal',
+        renderHTML: attributes => ({
+          'data-list-style': attributes['data-list-style'] || 'decimal',
+          style: `list-style-type: ${attributes['data-list-style'] || 'decimal'}`,
         }),
       },
     };
@@ -351,37 +352,51 @@ const CustomOrderedList = OrderedList.extend({
   parseHTML() {
     return [
       {
-        tag: "ol",
-        getAttrs: (node: HTMLElement | string) => {
-          if (typeof node === "string") return {};
+        tag: 'ol',
+        getAttrs: node => {
+          const element = node as HTMLElement;
+          // Try to get list style from data attribute first, then from style attribute
+          const listStyle = element.getAttribute('data-list-style') || 
+                           (element.style.listStyleType || 'decimal');
           return {
-            class: node.getAttribute("class") || "ordered",
+            'data-list-style': listStyle,
           };
         },
       },
     ];
   },
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: { class?: string } }) {
-    const className = HTMLAttributes.class || "ordered";
-    return ["ol", { ...HTMLAttributes, class: `list-${className}` }, 0];
+  renderHTML({ HTMLAttributes }) {
+    const listStyle = HTMLAttributes['data-list-style'] || 'decimal';
+    
+    return ['ol', { 
+      ...HTMLAttributes, 
+      'data-list-style': listStyle,
+      style: `list-style-type: ${listStyle}`
+    }, 0];
+  },
+  addCommands() {
+    return {
+      ...this.parent?.(),
+      setOrderedListStyle: 
+        (styleType: string) => 
+        ({ commands }: { commands: any }) => {
+          return commands.updateAttributes('orderedList', { 
+            'data-list-style': styleType,
+            style: `list-style-type: ${styleType}`
+          });
+        },
+    };
   },
 });
 
 // List style types
 const LIST_STYLES = [
-  { id: "bullet", label: "Bullets", icon: <List className="w-4 h-4" /> },
-  {
-    id: "ordered",
-    label: "Numbers (1, 2, 3)",
-    icon: <ListOrdered className="w-4 h-4" />,
-  },
-  {
-    id: "lower-roman",
-    label: "Roman (i, ii, iii)",
-    icon: <span className="italic">i</span>,
-  },
-  { id: "upper-roman", label: "Roman (I, II, III)", icon: <span>I</span> },
-  { id: "lower-alpha", label: "Alphabet (a, b, c)", icon: <span>a</span> },
+  { id: 'disc', label: 'Bullets', icon: <List className="w-4 h-4" /> },
+  { id: 'decimal', label: 'Numbers', icon: <ListOrdered className="w-4 h-4" /> },
+  { id: 'lower-roman', label: 'Lower Roman', icon: <ListOrdered className="w-4 h-4" /> },
+  { id: 'upper-roman', label: 'Upper Roman', icon: <ListOrdered className="w-4 h-4" /> },
+  { id: 'lower-alpha', label: 'Lower Alpha', icon: <ListOrdered className="w-4 h-4" /> },
+  { id: 'upper-alpha', label: 'Upper Alpha', icon: <ListOrdered className="w-4 h-4" /> },
 ];
 
 interface ListMenuProps {
@@ -413,7 +428,15 @@ const ListMenu = ({ editor }: ListMenuProps) => {
   const getCurrentListStyle = () => {
     if (editor.isActive("orderedList")) {
       const attrs = editor.getAttributes("orderedList");
-      return attrs.class || "ordered";
+      // Check both data-list-style attribute and style attribute for backward compatibility
+      let style = attrs['data-list-style'];
+      if (!style && attrs.style) {
+        const match = attrs.style.match(/list-style-type:\s*([^;]+)/);
+        if (match) style = match[1].trim();
+      }
+      return style || 'decimal';
+    } else if (editor.isActive('bulletList')) {
+      return 'disc';
     }
     return null;
   };
@@ -427,26 +450,38 @@ const ListMenu = ({ editor }: ListMenuProps) => {
 
     // If clicking the same style, toggle it off
     if (isSameStyle) {
-      editor.chain().focus().toggleOrderedList().run();
+      if (styleId === 'disc') {
+        editor.chain().focus().toggleBulletList().run();
+      } else {
+        editor.chain().focus().toggleOrderedList().run();
+      }
       setIsOpen(false);
       return;
     }
 
-    // If switching from one list type to another
+    // If switching from one list type to another, first clear any existing list
     if (currentStyle !== null) {
-      // First clear any existing list
-      if (editor.isActive("orderedList")) {
+      if (editor.isActive('orderedList')) {
         editor.chain().focus().toggleOrderedList().run();
+      } else if (editor.isActive('bulletList')) {
+        editor.chain().focus().toggleBulletList().run();
       }
     }
 
     // Apply the new list style
-    editor
-      .chain()
-      .focus()
-      .toggleOrderedList()
-      .updateAttributes("orderedList", { class: styleId })
-      .run();
+    if (styleId === 'disc') {
+      editor.chain().focus().toggleBulletList().run();
+    } else {
+      editor
+        .chain()
+        .focus()
+        .toggleOrderedList()
+        .updateAttributes('orderedList', { 
+          'data-list-style': styleId,
+          style: `list-style-type: ${styleId}`
+        })
+        .run();
+    }
 
     setIsOpen(false);
   };
@@ -1877,83 +1912,5 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     </div>
   );
 };
-
-// Add CSS for list styles
-const listStyles = `
-  .ProseMirror ul,
-  .ProseMirror ol {
-    padding: 0 1.5rem;
-    margin: 0.5rem 0;
-  }
-
-  .ProseMirror li {
-    position: relative;
-    padding-left: 0.5rem;
-    margin: 0.25rem 0;
-  }
-
-  /* Ensure list markers are visible */
-  .ProseMirror ul,
-  .ProseMirror ol {
-    color: #000; /* Black color for all list markers */
-  }
-
-  /* Nested lists */
-  .ProseMirror ul ul,
-  .ProseMirror ol ol,
-  .ProseMirror ul ol,
-  .ProseMirror ol ul {
-    margin: 0.25rem 0;
-  }
-
-  /* Ordered list styles */
-  .ProseMirror ol.list-lower-roman {
-    list-style-type: lower-roman;
-    list-style-position: outside;
-  }
-  
-  .ProseMirror ol.list-upper-roman {
-    list-style-type: upper-roman;
-    list-style-position: outside;
-  }
-  
-  .ProseMirror ol.list-lower-alpha {
-    list-style-type: lower-alpha;
-    list-style-position: outside;
-  }
-
-  /* Bullet list style */
-  .ProseMirror ol.list-bullet {
-    list-style-type: disc;
-    list-style-position: outside;
-  }
-  
-  .ProseMirror ol.list-ordered {
-    list-style-type: decimal;
-    list-style-position: outside;
-  }
-  
-  
-
-  /* Ensure list items have proper spacing */
-  .ProseMirror li > p,
-  .ProseMirror li > div {
-    margin: 0;
-    display: inline;
-  }
-
-  /* Fix for nested list spacing */
-  .ProseMirror li > ul,
-  .ProseMirror li > ol {
-    margin-bottom: 0;
-  }
-`;
-
-// Inject the styles
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.textContent = listStyles;
-  document.head.appendChild(style);
-}
 
 export default TiptapEditor;

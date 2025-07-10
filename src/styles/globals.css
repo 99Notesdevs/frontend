@@ -959,6 +959,82 @@ a[data-description]::after {
   color: #4b5563;
 }
 
+/* List styles */
+.ProseMirror ul,
+.ProseMirror ol,
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+  list-style-position: outside;
+}
+
+/* Default list styles */
+.ProseMirror ul,
+.prose ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol,
+.prose ol {
+  list-style-type: decimal;
+}
+
+/* List style variants */
+.ProseMirror ol[data-list-style="decimal"],
+.prose ol[data-list-style="decimal"] {
+  list-style-type: decimal;
+}
+
+.ProseMirror ol[data-list-style="lower-roman"],
+.prose ol[data-list-style="lower-roman"] {
+  list-style-type: lower-roman;
+}
+
+.ProseMirror ol[data-list-style="upper-roman"],
+.prose ol[data-list-style="upper-roman"] {
+  list-style-type: upper-roman;
+}
+
+.ProseMirror ol[data-list-style="lower-alpha"],
+.ProseMirror ol[data-list-style="lower-latin"],
+.prose ol[data-list-style="lower-alpha"],
+.prose ol[data-list-style="lower-latin"] {
+  list-style-type: lower-alpha;
+}
+
+.ProseMirror ol[data-list-style="upper-alpha"],
+.ProseMirror ol[data-list-style="upper-latin"],
+.prose ol[data-list-style="upper-alpha"],
+.prose ol[data-list-style="upper-latin"] {
+  list-style-type: upper-alpha;
+}
+
+/* Support for inline style attributes (for backward compatibility) */
+.ProseMirror ol[style*="lower-roman"],
+.prose ol[style*="lower-roman"] {
+  list-style-type: lower-roman !important;
+}
+
+.ProseMirror ol[style*="upper-roman"],
+.prose ol[style*="upper-roman"] {
+  list-style-type: upper-roman !important;
+}
+
+.ProseMirror ol[style*="lower-alpha"],
+.ProseMirror ol[style*="lower-latin"],
+.prose ol[style*="lower-alpha"],
+.prose ol[style*="lower-latin"] {
+  list-style-type: lower-alpha !important;
+}
+
+.ProseMirror ol[style*="upper-alpha"],
+.ProseMirror ol[style*="upper-latin"],
+.prose ol[style*="upper-alpha"],
+.prose ol[style*="upper-latin"] {
+  list-style-type: upper-alpha !important;
+}
+
 /* Adjust for left edge */
 @media (max-width: 400px) {
   a[data-description]::before,
