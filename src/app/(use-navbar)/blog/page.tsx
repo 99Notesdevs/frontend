@@ -204,7 +204,6 @@ const BlogsPage: React.FC = () => {
                     metadata: blog.metadata,
                     imageUrl: imageUrl,
                     alt: alt,
-                    createdAt: blog.createdAt,
                     author: '99Notes'
                   }}
                 />
