@@ -22,6 +22,7 @@ import { Link } from "lucide-react";
 import Bookmark from "../ui/Bookmark";
 import Quiz from '@/components/quiz/quiz';
 import FAQPage from "@/components/FAQp/faqp";
+import { BackToTop } from "@/components/ui/reachtotop";
 
 interface Question {
   id: number;
@@ -505,8 +506,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
 
                   {/* Social Media Section */}
-                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
-                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] dark:text-white border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
                       <span className="text-[var(--action-primary)]">🌐</span>
                       <span>Connect With Us</span>
                     </h3>
@@ -516,12 +517,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
 
                   {/* Contact Form Section */}
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg mt-4">
                     <ContactForm />
                   </div>
 
                   {/* Ads Section */}
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg mt-4">
                     <Ads imageUrl="/" altText="ads" />
                   </div>
 
@@ -566,6 +567,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             </div>
           </div>
         </div>
+        <BackToTop />
       </main>
     </>
   );

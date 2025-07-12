@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { isAuth } from "@/lib/isAuth";
 import logo from '../../../public/Logo.svg'
 import SearchBar from "./SearchBar";
 import { NavItem } from "@/types/navigation";
@@ -195,6 +196,23 @@ export default function Navbar({ navigation }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authStatus = await isAuth();
+        setIsLoggedIn(authStatus.isAuthenticated);
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -220,7 +238,7 @@ export default function Navbar({ navigation }: NavbarProps) {
 
       <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'border-b-0' : ''}`}>
         {/* Top Bar - Hidden when scrolled */}
-        <div
+        {/* <div
           className={`hidden md:block bg-[var(--primary)] w-full transition-all duration-300 h-0 overflow-hidden opacity-0`}
         >
           <div className="container mx-auto px-6 flex justify-between items-center h-12">
@@ -233,7 +251,6 @@ export default function Navbar({ navigation }: NavbarProps) {
               </Link>
             </div>
 
-            {/* Login Text with Icon - Right Side */}
             <div className="ml-30">
               <Link href={isLoggedIn ? "/users/dashboard" : "/users/login"} passHref>
                 <div className="flex items-center gap-2 hover:text-white/90 transition-colors">
@@ -251,7 +268,7 @@ export default function Navbar({ navigation }: NavbarProps) {
               </Link>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Main Navbar */}
         <div
@@ -293,7 +310,39 @@ export default function Navbar({ navigation }: NavbarProps) {
                     Blogs
                   </span>
                 </Link>
-                <div className="ml-2">
+                <div className="ml-2 flex items-center gap-4">
+                  {!isLoading && (isLoggedIn ? (
+                    <Link 
+                      href="/users/dashboard" 
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                        <svg
+                          className="w-5 h-5 text-gray-600 dark:text-gray-300"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                      </div>
+                    </Link>
+                  ) : (
+                    <Link 
+                      href="/users/login" 
+                      className="group flex items-center gap-2 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] transition-colors duration-200"
+                    >
+                      <span className="text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 group-hover:text-[var(--action-primary)] dark:group-hover:text-[var(--action-primary)] transition-colors duration-200">
+                        Login
+                      </span>
+                      <svg
+                        className="w-5 h-5 text-[var(--text-strong)] dark:text-slate-200 group-hover:text-[var(--action-primary)] dark:group-hover:text-[var(--action-primary)] transition-colors duration-200"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </Link>
+                  ))}
                   <ToggleMode />
                 </div>
               </div>
@@ -307,6 +356,33 @@ export default function Navbar({ navigation }: NavbarProps) {
               <div className="lg:hidden flex items-center gap-2">
                 <div className="flex lg:hidden">
                   <ToggleMode />
+                  {!isLoading && (
+                    <Link href={isLoggedIn ? "/users/dashboard" : "/users/login"} passHref>
+                      <div className="flex items-center gap-3 cursor-pointer">
+                        {isLoggedIn ? (
+                          <div className="w-8 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                            <svg
+                              className="w-5 h-5 text-gray-600 dark:text-gray-300"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                          </div>
+                        ) : (
+                          <>
+                            <svg
+                              className="w-5 h-10 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--primary)]"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                          </>
+                        )}
+                      </div>
+                    </Link>
+                  )}
                 </div>
                 <button
                   onClick={() => setIsOpen(!isOpen)}

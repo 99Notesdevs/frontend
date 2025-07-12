@@ -47,7 +47,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
 
   if (error || !questions || questions.length === 0) {
     return (
-      <div className="text-center py-6 text-gray-600">
+      <div className="text-center py-6 text-gray-600 dark:text-gray-400">
         <p>No practice questions available at the moment.</p>
       </div>
     );
@@ -97,15 +97,15 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="space-y-8">
+      <div className="space-y-8" data-theme="light">
         {showResults ? (
-          <div className="border-2 border-yellow-400 rounded-2xl shadow-lg bg-white p-8">
+          <div className="border-2 border-yellow-400 dark:border-yellow-600 rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8">
             <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6">
-              <h2 className="text-3xl font-bold text-green-700">Quiz Completed!</h2>
-              <div className="text-5xl font-extrabold text-green-600">
+              <h2 className="text-3xl font-bold text-green-700 dark:text-green-400">Quiz Completed!</h2>
+              <div className="text-5xl font-extrabold text-green-600 dark:text-green-400">
                 {calculateScore()} / {questions.length}
               </div>
-              <p className="text-lg text-gray-700">
+              <p className="text-lg text-gray-700 dark:text-gray-300">
                 {calculateScore() >= questions.length / 2 ? '🎉 Great job! ' : 'Keep practicing! '}
                 You answered {calculateScore()} out of {questions.length} questions correctly.
               </p>
@@ -131,19 +131,19 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
             <div className="max-h-[600px]">
               {(() => {
                 const question = questions[currentQuestion];
-  
-  if (!question) {
-    return (
-      <div className="text-center py-6 text-gray-600">
-        <p>Error: Question data is not available.</p>
-      </div>
-    );
-  }
+
+                if (!question) {
+                  return (
+                    <div className="text-center py-6 text-gray-600 dark:text-gray-400">
+                      <p>Error: Question data is not available.</p>
+                    </div>
+                  );
+                }
                 const isAnswered = selectedOptions[question.id] !== undefined;
                 return (
                   <div key={question.id} className="mb-8">
-                    <div className="bg-white border-2 border-gray-200 rounded-2xl shadow p-8">
-                      <h2 className="text-xl font-bold text-center mb-6 text-yellow-800">Q{currentQuestion + 1}. {stripHtml(question.question)}</h2>
+                    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl shadow p-8">
+                      <h2 className="text-xl font-bold text-center mb-6 text-yellow-800 dark:text-yellow-400">Q{currentQuestion + 1}. {stripHtml(question.question)}</h2>
                       <div className="space-y-3">
                         {question.options.map((option, index) => {
                           const isSelected = selectedOptions[question.id] === index;
@@ -152,14 +152,14 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                           let className = "flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors text-lg font-medium";
                           if (isShown) {
                             if (isCorrect) {
-                              className += " border-green-500 bg-green-50 text-green-800";
+                              className += " border-green-500 dark:border-green-700 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200";
                             } else if (isSelected) {
-                              className += " border-red-600 bg-red-50 text-red-800";
+                              className += " border-red-600 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200";
                             } else {
-                              className += " border-gray-300 bg-gray-50";
+                              className += " border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700";
                             }
                           } else {
-                            className += " border-gray-300 hover:bg-yellow-50";
+                            className += " border-gray-300 dark:border-gray-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/30";
                           }
                           return (
                             <label
@@ -171,7 +171,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                 name={`question-${question.id}`}
                                 checked={isSelected}
                                 onChange={() => handleOptionSelect(question.id, index)}
-                                className="mr-3 w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-yellow-500"
+                                className="mr-3 w-5 h-5 rounded border-gray-300 dark:border-gray-500 text-green-600 dark:text-green-400 focus:ring-yellow-500 dark:focus:ring-yellow-600 dark:bg-gray-700"
                                 disabled={isShown}
                               />
                               <span>{index + 1}. {stripHtml(option)}</span>
@@ -180,11 +180,11 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                         })}
                         
                         {showExplanations[question.id] && (
-                          <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r">
+                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-600 rounded-r">
                             {question.explaination && (
                               <div className="mb-2">
-                                <p className="font-semibold text-blue-800">Explanation:</p>
-                                <p className="text-blue-700">{stripHtml(question.explaination)}</p>
+                                <p className="font-semibold text-blue-800 dark:text-blue-300">Explanation:</p>
+                                <p className="text-blue-700 dark:text-blue-200">{stripHtml(question.explaination)}</p>
                               </div>
                             )}
                           </div>

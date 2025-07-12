@@ -389,7 +389,7 @@
 
 .prose {
   font-size: 0.9375rem; /* 15px base font size */
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
 /* Make sure these styles take precedence over Tailwind's prose classes */
