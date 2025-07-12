@@ -10,7 +10,6 @@ interface Blog {
   metadata: string;
   imageUrl: string;
   alt: string;
-  createdAt?: string;
   author?: string;
 }
 
@@ -74,15 +73,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2">
               {blog.title}
             </h3>
-            
-            {blog.createdAt && (
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
-                <span>{formatDate(blog.createdAt)}</span>
-                <span className="mx-2">•</span>
-                <span>{blog.author || '99Notes'}</span>
-              </div>
-            )}
-            
+            <span className="text-xs text-[var(--text-secondary)] dark:text-blue-400 mb-2 block">
+              By 99Notes
+            </span>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4 line-clamp-3">
               {getExcerpt(blog.content, 120)}
             </p>
