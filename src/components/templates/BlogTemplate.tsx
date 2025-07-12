@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { RelatedTopics } from "../Blogs/relatedTopics";
 import { Tags } from "@/components/ui/tags/Tags";
 import Breadcrumb from "@/components/ui/breadcrumb";
+import { BackToTop } from "@/components/ui/reachtotop";
 
 export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
   const { title, content, metadata, imageUrl, slug } = page;
@@ -194,6 +195,7 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
             </div>
           </div>
         </div>
+        <BackToTop />
       </main>
 
       {/* JSON-LD */}

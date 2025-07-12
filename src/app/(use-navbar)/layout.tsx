@@ -46,7 +46,7 @@ export default async function RootLayout({
           >
             <Navbar navigation={navigation} />
           </Suspense>
-          <main className="min-h-[calc(100vh-64px)] bg-background text-foreground">
+          <main className="min-h-[calc(100vh-64px)] bg-background dark:bg-slate-900 text-foreground">
             {children}
           </main>
           <Suspense
