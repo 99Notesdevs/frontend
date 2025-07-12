@@ -93,15 +93,17 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
             group flex items-center py-2 px-4 text-[15px] rounded-md transition-all duration-200
             ${isCurrentPage 
               ? 'text-blue-600 bg-blue-50/70 font-medium' 
-              : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
+              : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50 dark:text-slate-200 dark:hover:text-blue-400 dark:hover:bg-slate-700/50'
             }
-            ${level === 0 ? 'font-medium text-slate-800' : ''}
+            ${level === 0 ? 'font-medium text-slate-800 dark:text-slate-100' : ''}
             ${level === 1 ? 'font-normal' : ''}
             ${level >= 2 ? 'ml-6 font-normal' : ''}
           `}
         >
           {level >= 2 && (
-            <span className="mr-2 text-slate-400 text-xs">•</span>
+            <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700/70">
+              <span className="mr-2 text-slate-400 text-xs dark:text-slate-500">•</span>
+            </div>
           )}
           {page.title}
         </Link>

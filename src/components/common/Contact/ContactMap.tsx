@@ -43,7 +43,7 @@ const ContactMap: React.FC = () => {
   };
 
   return (
-    <section className="py-10 bg-white">
+    <section className="py-10 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Info Cards */}
@@ -51,7 +51,7 @@ const ContactMap: React.FC = () => {
             {Object.values(contactInfo).map((info, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg border border-[var(--border-light)] shadow-md p-6 flex items-start space-x-4 
+                className="bg-white dark:bg-slate-800 rounded-lg border border-[var(--border-light)] dark:border-slate-700 shadow-md dark:shadow-slate-900/50 p-6 flex items-start space-x-4 
                           hover:shadow-2xl hover:shadow-[var(--tertiary)] hover:border-[var(--quaternary)] transform hover:scale-105 hover:-translate-y-2 
                           transition-all duration-300 ease-in-out cursor-pointer"
               >
@@ -59,10 +59,10 @@ const ContactMap: React.FC = () => {
                   {info.icon}
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-[var(--surface-darker)] mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--surface-darker)] dark:text-white mb-2">
                     {info.title}
                   </h3>
-                  <p className="text-[var(--text-strong)]">
+                  <p className="text-[var(--text-strong)] dark:text-gray-300">
                     <a 
                       href={info.href} 
                       target={info.title === 'Address' ? "_blank" : undefined}
@@ -80,7 +80,7 @@ const ContactMap: React.FC = () => {
           </div>
 
           {/* Map Section */}
-          <div className="lg:col-span-3 h-[500px] rounded-lg overflow-hidden shadow-lg border border-[var(--border-light)]">
+          <div className="lg:col-span-3 h-[500px] rounded-lg overflow-hidden shadow-lg border border-[var(--border-light)] dark:border-slate-700">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7003.347428505327!2d77.18153009347897!3d28.639539652643215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03e216d2cca9%3A0x61c92a5509fc5a9c!2s99Notes%20Head%20Office%20-Best%20IAS%20Coaching%20Institute!5e0!3m2!1sen!2sin!4v1741270613524!5m2!1sen!2sin" 
               className="w-full h-full"

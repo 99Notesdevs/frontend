@@ -64,7 +64,7 @@ const About = async () => {
   } catch (error) {
     console.error("Error fetching content:", error)
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
         <p className="text-red-500 text-lg">Failed to load content. Please try again later.</p>
       </div>
     )
@@ -81,10 +81,10 @@ const About = async () => {
           rel="stylesheet"
           />
       </Head>
-      <main className="w-full min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-amber-50/30 relative">
+      <main className="w-full min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-amber-50/30 dark:from-slate-900 dark:to-slate-800/70 relative">
         {/* Hero Section with asymmetric design */}
-        <div className="absolute top-0 right-0 w-1/2 sm:w-1/3 h-40 sm:h-96 bg-amber-50/40 rounded-bl-[60px] sm:rounded-bl-[120px] transform rotate-6 z-0 max-w-full hidden xs:block"></div>
-        <div className="absolute bottom-0 left-0 w-1/2 sm:w-1/4 h-32 sm:h-80 bg-amber-50/40 rounded-tr-[50px] sm:rounded-tr-[100px] transform -rotate-6 z-0 max-w-full hidden xs:block"></div>
+        <div className="absolute top-0 right-0 w-1/2 sm:w-1/3 h-40 sm:h-96 bg-amber-50/40 dark:bg-slate-800/30 rounded-bl-[60px] sm:rounded-bl-[120px] transform rotate-6 z-0 max-w-full hidden xs:block"></div>
+        <div className="absolute bottom-0 left-0 w-1/2 sm:w-1/4 h-32 sm:h-80 bg-amber-50/40 dark:bg-slate-800/30 rounded-tr-[50px] sm:rounded-tr-[100px] transform -rotate-6 z-0 max-w-full hidden xs:block"></div>
         <section className="w-full max-w-7xl mx-auto px-2 lg:px-4 py-6 md:py-12 relative mt-2">
           <div className="absolute -top-6 left-1/4 w-10 h-10 bg-amber-100/50 rounded-full animate-pulse hidden md:block"></div>
           <div className="absolute bottom-6 right-10 w-16 h-16 bg-amber-50/50 rounded-full animate-pulse delay-300 hidden md:block"></div>
@@ -110,7 +110,7 @@ const About = async () => {
             </div>
             <div className="w-full md:w-1/2 relative z-10 mt-6 md:mt-0">
               <div className="space-y-4 xs:space-y-8">
-                <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold text-[var(--surface-darker)] leading-tight relative">
+                <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold text-[var(--surface-darker)] dark:text-white leading-tight relative">
                   About{" "}
                   <span className="text-[var(--nav-primary)]">
                     99Notes
@@ -136,7 +136,7 @@ const About = async () => {
                     </svg>
                   </span>
                 </h1>
-                <p className="text-base xs:text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] pl-2 xs:pl-4 border-l-2 xs:border-l-4 border-[var(--nav-primary)]">
+                <p className="text-base xs:text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] dark:text-gray-300 pl-2 xs:pl-4 border-l-2 xs:border-l-4 border-[var(--nav-primary)]">
                   {content.heroText}
                 </p>
                 {/* Decorative element */}
@@ -162,14 +162,14 @@ const About = async () => {
           </div>
           <div className="flex flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 items-center">
             <div className="w-full lg:w-1/2 order-2 lg:order-1">
-              <p className="text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] ">{content.whatWeDo.description}</p>
+              <p className="text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] dark:text-gray-300">{content.whatWeDo.description}</p>
               <ul className="space-y-4 sm:space-y-6">
                 {content.whatWeDo.items.map((item, index) => (
                   <li key={index} className="flex items-start space-x-2 sm:space-x-4 group">
                     <span className="flex-shrink-0 w-6 sm:w-8 h-6 sm:h-8 rounded-md bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] flex items-center justify-center text-white font-bold transform group-hover:scale-110 transition-transform duration-300 rotate-3">
                       {index + 1}
                     </span>
-                    <span className="text-lg sm:text-xl text-[var(--text-strong)] group-hover:text-[var(--nav-secondary)] transition-colors duration-300">
+                    <span className="text-lg sm:text-xl text-[var(--text-strong)] dark:text-gray-300 group-hover:text-[var(--nav-secondary)] transition-colors duration-300">
                       {item}
                     </span>
                   </li>
@@ -196,20 +196,20 @@ const About = async () => {
         </section>
 
         {/* Mission Section with improved aesthetics */}
-        <section className="py-12 sm:py-16 md:py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-50/50 to-amber-50/50 -z-10"></div>
-          <div className="absolute top-0 right-0 w-1/3 h-full bg-amber-100/20 rounded-l-full -z-10 transform skew-y-6 hidden md:block"></div>
-          <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-amber-100/20 rounded-tr-full -z-10"></div>
+        <section className="py-12 sm:py-16 md:py-24 relative overflow-hidden bg-white dark:bg-slate-900">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-50/50 to-amber-50/50 dark:from-slate-800/50 dark:to-slate-800/50 -z-10"></div>
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-amber-100/20 dark:bg-slate-700/30 rounded-l-full -z-10 transform skew-y-6 hidden md:block"></div>
+          <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-amber-100/20 dark:bg-slate-700/30 rounded-tr-full -z-10"></div>
 
           <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8">
             <div className="absolute top-6 left-6 w-12 h-12 border-t border-l border-amber-200 opacity-70 hidden md:block"></div>
             <div className="absolute bottom-6 right-6 w-12 h-12 border-b border-r border-amber-200 opacity-70 hidden md:block"></div>
 
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden border border-[var(--bg-elevated)] transform hover:scale-[1.01] transition-all duration-700">
+            <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden border border-[var(--bg-elevated)] dark:border-slate-700 transform hover:scale-[1.01] transition-all duration-700">
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/2 p-8 sm:p-12 md:p-16 flex flex-col justify-center relative">
                   <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-amber-200 -mt-4 -ml-4 hidden md:block"></div>
-                  <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] mb-8 relative">
+                  <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] dark:text-white mb-8 relative">
                     Our{" "}
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] relative">
                       Mission
@@ -242,7 +242,7 @@ const About = async () => {
                       </svg>
                     </span>
                   </h2>
-                  <p className="text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] mb-6 first-letter:text-3xl first-letter:font-bold first-letter:text-[var(--nav-secondary)] first-letter:mr-1 first-letter:float-left">
+                  <p className="text-lg sm:text-xl leading-relaxed text-[var(--text-strong)] dark:text-gray-300 mb-6 first-letter:text-3xl first-letter:font-bold first-letter:text-[var(--nav-secondary)] first-letter:mr-1 first-letter:float-left">
                     {content.mission.description}
                   </p>
                   <div className="flex items-center space-x-1 sm:space-x-2 mt-4">
@@ -318,12 +318,12 @@ const About = async () => {
 
         {/* Founder Section with enhanced visuals */}
         <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-white to-amber-50/30 -z-10"></div>
-          <div className="absolute top-1/4 right-0 w-1/3 h-1/2 bg-amber-50/50 rounded-l-full opacity-70 -z-10"></div>
-          <div className="absolute left-0 bottom-0 w-1/4 h-full bg-amber-50/40 -z-10 transform -skew-y-6"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white to-amber-50/30 dark:from-slate-900/95 dark:to-amber-900/10 -z-10"></div>
+          <div className="absolute top-1/4 right-0 w-1/3 h-1/2 bg-amber-50/50 dark:bg-amber-900/10 rounded-l-full opacity-70 dark:opacity-50 -z-10"></div>
+          <div className="absolute left-0 bottom-0 w-1/4 h-full bg-amber-50/40 dark:bg-amber-900/10 -z-10 transform -skew-y-6"></div>
           <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] relative inline-block">
+              <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] dark:text-[var(--surface-dark)] relative inline-block">
                 Meet Our{" "}
                 <span className="text-[var(--nav-primary)] bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)]">
                   Founder
@@ -333,8 +333,8 @@ const About = async () => {
             </div>
             <div className="flex flex-col md:flex-row items-center gap-8 sm:gap-12 md:gap-16">
               <div className="md:w-1/2 order-2 md:order-1">
-                <div className="bg-white rounded-lg shadow-lg p-8 sm:p-12 md:p-16 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 relative">
-                  <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-amber-200 -mt-4 -mr-4 hidden md:block"></div>
+                <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 sm:p-12 md:p-16 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 relative border border-gray-100 dark:border-slate-700">
+                  <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-amber-200 dark:border-amber-800 -mt-4 -mr-4 hidden md:block"></div>
                   <h3 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] mb-2">{content.founder.name}</h3>
                   <p className="text-lg sm:text-xl text-[var(--nav-secondary)] mb-6">{content.founder.title}</p>
                   <blockquote className="text-lg sm:text-xl italic text-[var(--text-strong)] border-l-4 border-[var(--nav-primary)] pl-6 py-2 mb-8 relative">
@@ -349,7 +349,7 @@ const About = async () => {
                       </p>
                     ))}
                   </div>
-                  <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-amber-200 -mb-4 -ml-4 hidden md:block"></div>
+                  <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-amber-200 dark:border-amber-800 -mb-4 -ml-4 hidden md:block"></div>
                 </div>
               </div>
               <div className="md:w-1/2 order-1 md:order-2 mb-8 sm:mb-12 md:mb-0">
@@ -374,11 +374,11 @@ const About = async () => {
 
         {/* Co-Founder Section with asymmetric design */}
         <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-50/90 to-amber-50/90 -z-10"></div>
-          <div className="absolute bottom-1/4 left-0 w-1/3 h-1/2 bg-amber-50/60 rounded-r-full opacity-70 -z-10"></div>
-          <div className="absolute right-0 top-0 w-1/4 h-full bg-amber-50/40 -z-10 transform skew-y-6"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-50/90 to-amber-50/90 dark:from-slate-900/95 dark:to-amber-900/10 -z-10"></div>
+          <div className="absolute bottom-1/4 left-0 w-1/3 h-1/2 bg-amber-50/60 dark:bg-amber-900/10 rounded-r-full opacity-70 dark:opacity-50 -z-10"></div>
+          <div className="absolute right-0 top-0 w-1/4 h-full bg-amber-50/40 dark:bg-amber-900/10 -z-10 transform skew-y-6"></div>
           <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8">
-            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] mb-12 sm:mb-16 text-center relative inline-block">
+            <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)]dark:text-[var(--surface-dark)] mb-12 sm:mb-16 text-center relative inline-block">
               Meet Our{" "}
               <span className="text-[var(--nav-primary)] bg-clip-text bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)]">
                 Co-Founder
@@ -403,8 +403,8 @@ const About = async () => {
                 </div>
               </div>
               <div className="md:w-1/2">
-                <div className="bg-white rounded-lg shadow-lg p-8 sm:p-12 md:p-16 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 relative">
-                  <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-amber-200 -mt-4 -mr-4 hidden md:block"></div>
+                <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 sm:p-12 md:p-16 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 relative border border-gray-100 dark:border-slate-700">
+                  <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-amber-200 dark:border-amber-800 -mt-4 -mr-4 hidden md:block"></div>
                   <h3 className="text-2xl xs:text-3xl sm:text-4xl font-bold text-[var(--surface-darker)] mb-2">{content.cofounder.name}</h3>
                   <p className="text-lg sm:text-xl text-[var(--nav-secondary)] mb-6">{content.cofounder.title}</p>
                   <blockquote className="text-lg sm:text-xl italic text-[var(--text-strong)] border-l-4 border-[var(--nav-primary)] pl-6 py-2 mb-8 relative">
@@ -419,7 +419,7 @@ const About = async () => {
                       </p>
                     ))}
                   </div>
-                  <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-amber-200 -mb-4 -ml-4 hidden md:block"></div>
+                  <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-amber-200 dark:border-amber-800 -mb-4 -ml-4 hidden md:block"></div>
                 </div>
               </div>
             </div>
@@ -427,12 +427,12 @@ const About = async () => {
         </section>
 
         {/* Battle-Hardened Veterans Section - Redesigned to match Core Members */}
-        <section className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24 bg-gradient-to-r from-amber-50 to-amber-50 rounded-3xl my-8 sm:my-12 md:my-16 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 sm:w-64 h-32 sm:h-64 bg-amber-200/20 rounded-full blur-2xl hidden md:block"></div>
-          <div className="absolute bottom-0 left-0 w-40 sm:w-80 h-40 sm:h-80 bg-amber-200/20 rounded-full blur-2xl hidden md:block"></div>
+        <section className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 py-5 bg-gradient-to-r from-amber-50 to-amber-50 dark:from-slate-800/80 dark:to-amber-900/10 rounded-3xl my-8 sm:my-12 md:my-16 relative overflow-hidden border border-amber-100/50 dark:border-slate-700/50">
+          <div className="absolute top-0 right-0 w-32 sm:w-64 h-32 sm:h-64 bg-amber-200/20 dark:bg-amber-800/10 rounded-full blur-2xl hidden md:block"></div>
+          <div className="absolute bottom-0 left-0 w-40 sm:w-80 h-40 sm:h-80 bg-amber-200/20 dark:bg-amber-800/10 rounded-full blur-2xl hidden md:block"></div>
 
           <div className="text-center mb-8 sm:mb-12 md:mb-16 relative">
-            <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-6xl text-amber-100/40 font-poppins font-bold">
+            <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-6xl text-amber-100/40 dark:text-amber-900/20 font-poppins font-bold">
               Veterans
             </span>
             <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] relative">
@@ -444,22 +444,22 @@ const About = async () => {
             <div className="w-12 sm:w-24 h-1.5 bg-gradient-to-r from-[var(--nav-primary)] to-[var(--nav-secondary)] rounded-full mx-auto mt-4"></div>
             <p className="text-[var(--text-strong)] mt-6 max-w-2xl mx-auto text-lg font-poppins">{content.veterans.description}</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 md:p-16 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
+          <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-xl p-8 sm:p-12 md:p-16 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group border border-amber-100/50 dark:border-slate-700/50">
             {/* Decorative corners */}
-            <div className="absolute -top-2 -left-2 w-8 h-8 sm:w-16 sm:h-16 border-t-4 border-l-4 border-amber-400/60 rounded-tl-xl z-20"></div>
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 sm:w-16 sm:h-16 border-b-4 border-r-4 border-amber-400/60 rounded-br-xl z-20"></div>
+            <div className="absolute -top-2 -left-2 w-8 h-8 sm:w-16 sm:h-16 border-t-4 border-l-4 border-amber-400/60 dark:border-amber-600/60 rounded-tl-xl z-20"></div>
+            <div className="absolute -bottom-2 -right-2 w-8 h-8 sm:w-16 sm:h-16 border-b-4 border-r-4 border-amber-400/60 dark:border-amber-600/60 rounded-br-xl z-20"></div>
 
             <SliderWrapper images={content.veterans.images} />
           </div>
         </section>
 
         {/* Core Members Section - Enhanced */}
-        <section className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24 bg-gradient-to-r from-amber-50 to-amber-50 rounded-3xl my-8 sm:my-12 md:my-16 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-32 sm:w-64 h-32 sm:h-64 bg-amber-200/20 rounded-full blur-2xl hidden md:block"></div>
-          <div className="absolute bottom-0 right-0 w-40 sm:w-80 h-40 sm:h-80 bg-amber-200/20 rounded-full blur-2xl hidden md:block"></div>
+        <section className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 py-5 bg-gradient-to-r from-amber-50 to-amber-50 dark:from-slate-800/80 dark:to-amber-900/10 rounded-3xl my-8 sm:my-12 md:my-16 relative overflow-hidden border border-amber-100/50 dark:border-slate-700/50">
+          <div className="absolute top-0 right-0 w-32 sm:w-64 h-32 sm:h-64 bg-amber-200/20 dark:bg-amber-800/10 rounded-full blur-2xl hidden md:block"></div>
+          <div className="absolute bottom-0 left-0 w-40 sm:w-80 h-40 sm:h-80 bg-amber-200/20 dark:bg-amber-800/10 rounded-full blur-2xl hidden md:block"></div>
 
           <div className="text-center mb-8 sm:mb-12 md:mb-16 relative">
-            <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-6xl text-amber-100/40 font-poppins font-bold">
+            <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-6xl text-amber-100/40 dark:text-amber-900/20 font-poppins font-bold">
               Team
             </span>
             <h2 className="text-4xl xs:text-5xl sm:text-6xl font-bold text-[var(--surface-darker)] relative">
@@ -473,10 +473,10 @@ const About = async () => {
               {content.coreMembers.description}
             </p>
           </div>
-          <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 md:p-16 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
+          <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-xl p-8 sm:p-12 md:p-16 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group border border-amber-100/50 dark:border-slate-700/50">
             {/* Decorative corners */}
-            <div className="absolute -top-2 -left-2 w-8 h-8 sm:w-16 sm:h-16 border-t-4 border-l-4 border-amber-400/60 rounded-tl-xl z-20"></div>
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 sm:w-16 sm:h-16 border-b-4 border-r-4 border-amber-400/60 rounded-br-xl z-20"></div>
+            <div className="absolute -top-2 -left-2 w-8 h-8 sm:w-16 sm:h-16 border-t-4 border-l-4 border-amber-400/60 dark:border-amber-600/60 rounded-tl-xl z-20"></div>
+            <div className="absolute -bottom-2 -right-2 w-8 h-8 sm:w-16 sm:h-16 border-b-4 border-r-4 border-amber-400/60 dark:border-amber-600/60 rounded-br-xl z-20"></div>
 
             <SliderWrapper images={content.coreMembers.images} />
           </div>

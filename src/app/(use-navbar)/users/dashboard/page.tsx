@@ -92,29 +92,29 @@ const Dashboard = () => {
     const requiresSubscription = article.isLocked && !isSubscribed;
     
     return (
-      <div className={`relative ${requiresSubscription ? 'group' : ''}`}>
+      <div className={`relative rounded-xl overflow-hidden ${requiresSubscription ? 'group' : ''}`}>
         <Link 
           href={requiresSubscription ? '/subscription' : `/${article.slug}`}
           className="block"
         >
-          <div className={`bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${
+          <div className={`bg-white dark:bg-slate-700 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${
             requiresSubscription ? 'opacity-70 blur-[2px] group-hover:blur-[1px] transition-all duration-300' : ''
           }`}>
-            <div className="relative h-48 bg-gray-100">
+            <div className="relative h-48 bg-gray-100 dark:bg-slate-600">
               {article.imageUrl ? (
                 <Image
                   src={article.imageUrl}
                   alt={article.title}
                   fill
-                  className="object-cover"
+                  className="object-cover hover:scale-105 transition-transform duration-300"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-yellow-100 to-yellow-200">
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-yellow-100 to-yellow-200 dark:from-yellow-200 dark:to-yellow-300">
                   <span className="text-4xl">📝</span>
                 </div>
               )}
               {article.isLocked && (
-                <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
+                <div className="absolute top-2 right-2 bg-yellow-500 dark:bg-yellow-600 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center shadow-md">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
@@ -123,15 +123,15 @@ const Dashboard = () => {
               )}
             </div>
             <div className="p-4">
-              <h3 className="font-bold text-lg text-gray-800 group-hover:text-yellow-600 transition-colors mb-2 line-clamp-2">
+              <h3 className="font-bold text-lg text-gray-800 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors mb-2 line-clamp-2">
                 {article.title}
               </h3>
-              <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+              <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-3">
                 {article.description}
               </p>
               <div className="flex justify-between items-center text-sm text-gray-500">
                 <span>{new Date(article.createdAt).toLocaleDateString()}</span>
-                <span className="flex items-center text-yellow-600 font-medium">
+                <span className="flex items-center text-yellow-600 dark:text-yellow-400 font-medium hover:text-yellow-700 dark:hover:text-yellow-300 transition-colors">
                   Read more
                   <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -144,12 +144,17 @@ const Dashboard = () => {
         
         {requiresSubscription && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="bg-white/90 p-4 rounded-lg shadow-lg max-w-xs">
-              <h4 className="font-bold text-gray-800 mb-2">Premium Content</h4>
-              <p className="text-sm text-gray-600 mb-3">Subscribe to unlock this article and all premium content</p>
+            <div className="bg-white/90 dark:bg-slate-800/95 p-6 rounded-xl shadow-2xl max-w-xs border border-yellow-400/20">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h4 className="font-bold text-gray-800 dark:text-white mb-2">Premium Content</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Subscribe to unlock this article and all premium content</p>
               <Link 
                 href="/dashboard/subscription"
-                className="block w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                className="block w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 Subscribe Now
               </Link>
@@ -162,10 +167,10 @@ const Dashboard = () => {
 
   return (
     <ProtectedRoute>
-      <div className="flex flex-col md:flex-row bg-gradient-to-br from-[var(--bg-main)] to-yellow-50 min-h-screen">
+      <div className="flex flex-col md:flex-row bg-gradient-to-br from-[var(--bg-main)] to-yellow-50 dark:from-slate-900 dark:to-slate-800 min-h-screen transition-colors duration-200">
         {/* Mobile menu button */}
         <button 
-          className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-[var(--primary)] text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-[var(--primary)] dark:from-yellow-500 dark:to-yellow-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           onClick={() => setSidebarOpen(true)}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,14 +179,14 @@ const Dashboard = () => {
         </button>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8">
+        <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8 transition-colors duration-200">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Welcome Message */}
-            <div className="bg-white/70 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="bg-white/70 dark:bg-slate-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-slate-700/50">
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-900 to-yellow-600 bg-clip-text text-transparent">
                 Welcome back{isSubscribed ? ' Premium Member' : ''}!
               </h1>
-              <p className="text-[var(--text-tertiary)] mt-2 text-lg">
+              <p className="text-[var(--text-tertiary)] dark:text-slate-300 mt-2 text-lg">
                 {isSubscribed 
                   ? 'Explore our premium content' 
                   : 'Upgrade to premium to unlock all content'}
@@ -189,15 +194,15 @@ const Dashboard = () => {
             </div>
 
             {/* Articles Section */}
-            <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="bg-white/70 dark:bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-slate-700/50">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-indigo-900">
+                <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-200">
                   {isSubscribed ? 'Latest Articles' : 'Premium Articles'}
                 </h2>
                 {!isSubscribed && (
                   <Link 
                     href="/dashboard/subscription"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                    className="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                   >
                     Upgrade to Premium
                   </Link>

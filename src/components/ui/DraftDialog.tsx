@@ -62,10 +62,10 @@ const DraftDialog: React.FC<DraftDialogProps> = ({ open, onClose, onLoadDraft, o
           )}
 
           <div className="flex space-x-2">
-            <Button onClick={onStartNew} variant="outline" className="flex-1 bg-transparent">
+            <Button onClick={onStartNew} variant="outline" className="flex-1 text-[var(--admin-bg-dark)]">
               Start New
             </Button>
-            <Button onClick={onClose} className="flex-1">
+            <Button onClick={onClose} className="flex-1 text-[var(--admin-bg-dark)]">
               Cancel
             </Button>
           </div>

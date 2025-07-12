@@ -533,10 +533,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   value={selectedType}
                   onValueChange={handleTypeChange}
                 >
-                  <SelectTrigger className="w-full border-white text-white focus:border-white focus:ring-white">
+                  <SelectTrigger className="w-full border-slate-300 text-gray-900 focus:border-slate-400 ">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white text-white">
+                  <SelectContent className="text-gray-900">
                     <SelectItem value="daily">Daily</SelectItem>
                     <SelectItem value="monthly">Monthly</SelectItem>
                     <SelectItem value="yearly">Yearly</SelectItem>
@@ -566,8 +566,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   value={createNewAffair ? 'new' : selectedAffairId}
                   onValueChange={handleAffairChange}
                 >
-                  <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
-                    <SelectValue placeholder="Select a current affair or create new" className="text-white placeholder:text-white/70" />
+                  <SelectTrigger className="w-full border-slate-200 text-gray-900 focus:border-slate-400 focus:ring-slate-400">
+                    <SelectValue placeholder="Select a current affair or create new" className="text-gray-900 placeholder:text-gray-900/70" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="new">Create New Current Affair</SelectItem>
@@ -586,8 +586,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
                         value={selectedAffairTemplate}
                         onValueChange={handleAffairTemplateChange}
                       >
-                        <SelectTrigger className="text-white">
-                          <SelectValue placeholder="Select template type" className="text-white placeholder:text-white/70" />
+                        <SelectTrigger className="w-full border-slate-200 text-gray-900 focus:border-slate-400 focus:ring-slate-400">
+                          <SelectValue placeholder="Select template type" className="text-gray-900 placeholder:text-gray-900/70" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="article">Article</SelectItem>
@@ -689,7 +689,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
                     value={selectedTemplate}
                     onValueChange={handleTemplateChange}
                   >
-                    <SelectTrigger className="w-full border-slate-200 text-white focus:border-slate-400 focus:ring-slate-400">
+                    <SelectTrigger className="w-full border-slate-200 text-gray-900 focus:border-slate-400 focus:ring-slate-400">
                       <SelectValue placeholder="Select template type" />
                     </SelectTrigger>
                     <SelectContent>

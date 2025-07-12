@@ -276,29 +276,60 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
   };
 
   return (
-    <Card>
-      <CardContent className="p-6">
+    <Card className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm transition-colors duration-200">
+      <CardContent className="p-4 sm:p-6">
+        <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+          Table of Contents
+        </h2>
         <nav className="space-y-2">
           {headings.map((heading) => (
-            <div key={heading.id} className="mb-2">
+            <div 
+              key={heading.id} 
+              className={`mb-1.5 transition-colors duration-200 rounded-md ${
+                activeId === heading.id ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'
+              }`}
+            >
               <a
                 href={`#${heading.id}`}
-                className={`block text-sm hover:text-[var(--accent-link)] transition-colors
-                  ${heading.level === 1 ? "font-medium" : ""}
-                  ${heading.level > 1 ? `pl-${(heading.level - 1) * 4}` : ""}
+                className={`block py-1.5 px-3 text-sm transition-colors duration-200 rounded-md
+                  ${heading.level === 1 ? 'font-medium' : 'font-normal'}
+                  ${heading.level > 1 ? `pl-${(heading.level - 1) * 4 + 4}` : ''}
                   ${
                     activeId === heading.id
-                      ? "text-[var(--accent-link)]"
-                      : "text-[var(--text-base)] dark:text-[var(--text-tertiary)]"
+                      ? 'text-blue-600 dark:text-blue-400 font-medium'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                   }`}
                 onClick={(e) => handleLinkClick(e, heading)}
               >
-                {heading.text}
+                <div className="flex items-center">
+                  {activeId === heading.id && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 mr-2.5 flex-shrink-0"></span>
+                  )}
+                  <span className="line-clamp-1">{heading.text}</span>
+                </div>
               </a>
             </div>
           ))}
         </nav>
       </CardContent>
+      <style jsx global>{`
+        .highlight-heading {
+          animation: highlight 2s ease-out;
+          position: relative;
+        }
+        
+        @keyframes highlight {
+          0% { background-color: rgba(59, 130, 246, 0.2); }
+          100% { background-color: transparent; }
+        }
+        
+        @media (prefers-color-scheme: dark) {
+          @keyframes highlight {
+            0% { background-color: rgba(96, 165, 250, 0.3); }
+            100% { background-color: transparent; }
+          }
+        }
+      `}</style>
     </Card>
   );
 };

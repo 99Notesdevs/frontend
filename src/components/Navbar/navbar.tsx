@@ -7,6 +7,7 @@ import logo from '../../../public/Logo.svg'
 import SearchBar from "./SearchBar";
 import { NavItem } from "@/types/navigation";
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { ToggleMode } from "./togglemode";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -51,7 +52,7 @@ function NestedNavigation({
           >
             <Link
               href={item.link ? item.link : `/${item.slug}`}
-              className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
+              className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
             >
               {item.title}
               {item.children.length > 0 && (
@@ -65,7 +66,7 @@ function NestedNavigation({
               )}
             </Link>
             {item.children.length > 0 && (
-              <div className={`absolute mt-0 w-[max(700px,100%)] min-h-[350px] invisible group-hover:visible bg-white rounded-md shadow-lg border border-[var(--border-light)] z-50 ${
+              <div className={`absolute mt-0 w-[max(700px,100%)] min-h-[350px] invisible group-hover:visible bg-white dark:bg-slate-800 rounded-md shadow-lg border border-[var(--border-light)] dark:border-slate-700 z-50 ${
                 item.slug === 'current-affairs' ? 'p-4' : ''
               } ${
                 items.indexOf(item) >= items.length - 2 ? 'right-0' : 'left-0'
@@ -76,7 +77,7 @@ function NestedNavigation({
                     item.children.map((child) => (
                       <div key={child.slug} className="space-y-2">
                         <div className="space-y-1">
-                          <h3 className="text-[14px] font-normal text-[var(--surface-darker)] pb-2 border-b border-[var(--bg-elevated)] font-opensans w-full">
+                          <h3 className="text-[14px] font-normal text-[var(--surface-darker)] dark:text-slate-300 pb-2 border-b border-[var(--bg-elevated)] dark:border-slate-700 font-opensans w-full">
                             {child.title}
                           </h3>
                           {child.children.length > 0 && (
@@ -85,7 +86,7 @@ function NestedNavigation({
                                 <Link
                                   key={grandChild.slug}
                                   href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
-                                  className={`${plusJakarta.className} flex px-3 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[13px] font-normal tracking-[-0.01em] items-center`}
+                                  className={`${plusJakarta.className} flex px-3 py-1 text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[13px] font-normal tracking-[-0.01em] items-center`}
                                 >
                                   <svg 
                                     className="w-3 h-3 mr-2 fill-current opacity-80"
@@ -106,12 +107,12 @@ function NestedNavigation({
                     // Original layout for other dropdowns
                     <>
                       {/* Level 2 - Left column */}
-                      <div className="w-[200px] border-r border-[var(--bg-elevated)] p-4 h-[350px] overflow-y-auto">
+                      <div className="w-[200px] border-r border-[var(--bg-elevated)] dark:border-slate-700 p-4 h-[350px] overflow-y-auto">
                         {item.children.map((child) => (
                           <div key={child.slug} className="mb-2">
                             <Link
                               href={child.link ? child.link : `/${child.slug}`}
-                              className="flex px-1 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-medium items-center justify-between font-urbanist tracking-wide"
+                              className="flex px-1 py-1 text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-medium items-center justify-between font-urbanist tracking-wide"
                               onMouseEnter={() => setOpenDropdown(child.slug)}
                             >
                               <span>{child.title}</span>
@@ -130,7 +131,7 @@ function NestedNavigation({
                       </div>
                       
                       {/* Level 3 and 4 - Right column */}
-                      <div className="flex-1 p-3 h-[350px] overflow-y-auto">
+                      <div className="flex-1 p-3 h-[350px] overflow-y-auto dark:bg-slate-800">
                         {openDropdown &&
                           items.map((parentItem) =>
                             parentItem.slug === hoveredParent &&
@@ -143,7 +144,7 @@ function NestedNavigation({
                                         <div key={grandChild.slug} className="mb-2">
                                           <Link
                                             href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
-                                            className="flex px-3 py-1 text-[var(--text-strong)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal items-center font-opensans"
+                                            className="flex px-3 py-1 text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal items-center font-opensans"
                                           >
                                             {grandChild.title}
                                           </Link>
@@ -153,7 +154,7 @@ function NestedNavigation({
                                                 <Link
                                                   key={greatGrandChild.slug}
                                                   href={greatGrandChild.link ? greatGrandChild.link : `/${greatGrandChild.slug}`}
-                                                  className="flex px-1 py-1 text-[12.5px] font-inter font-normal tracking-normal text-[var(--text-tertiary)] hover:bg-[var(--bg-main)] hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 items-center"
+                                                  className="flex px-1 py-1 text-[12.5px] font-inter font-normal tracking-normal text-[var(--text-tertiary)] dark:text-slate-400 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 items-center"
                                                 >
                                                   <svg 
                                                     className="w-3 h-3 mr-2 fill-current"
@@ -256,14 +257,14 @@ export default function Navbar({ navigation }: NavbarProps) {
         <div
               className={` w-full max-w-[2000px] transition-all duration-300 -mt-[1px]  ${
             isScrolled
-              ? "bg-white h-[70px]  shadow-md "
-              : "bg-white h-[70px]"
+              ? "bg-white h-[70px] dark:bg-slate-900 shadow-md "
+              : "bg-white h-[70px] dark:bg-slate-700"
           }`}
         >
           <div className="container w-full max-w-[2000px] px-2 lg:px-12">
             <div className="flex justify-between items-center h-[72px] lg:px-5">
               {/* Logo */}
-              <div className="flex-shrink-0 min-w-[35px] mx-2">
+              <div className="flex-shrink-0 min-w-[35px] mx-2 flex items-center">
                 <Link href="/" passHref>
                   <Image
                     src={logo}
@@ -276,22 +277,25 @@ export default function Navbar({ navigation }: NavbarProps) {
                 </Link>
               </div>
               <div className="hidden lg:flex flex-1 justify-end items-center gap-1 2xl:pr-8 ">
-                {/* <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div> */}
+                {/* <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div> */} 
                 <NestedNavigation items={navigation} />
                 <Link href="/about" passHref>
                   <span
-                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
+                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
                   >
                     About 99Notes
                   </span>
                 </Link>
                 <Link href="/blog" passHref>
                   <span
-                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
+                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
                   >
                     Blogs
                   </span>
                 </Link>
+                <div className="ml-2">
+                  <ToggleMode />
+                </div>
               </div>
 
               {/* Desktop search bar */}
@@ -300,11 +304,14 @@ export default function Navbar({ navigation }: NavbarProps) {
               </div>  
 
               {/* Mobile menu button */}
-              <div className="lg:hidden">
+              <div className="lg:hidden flex items-center gap-2">
+                <div className="flex lg:hidden">
+                  <ToggleMode />
+                </div>
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-tertiary)] bg-[var(--tertiary)]
-                         hover:text-[var(--warning-border)] hover:bg-[var(--quaternary)] focus:outline-none transition-colors"
+                  className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-tertiary)] bg-[var(--tertiary)] dark:bg-amber-900/20
+                         hover:text-[var(--primary)] hover:bg-[var(--quaternary)] dark:hover:bg-amber-900/20 focus:outline-none transition-colors"
                 >
                   <span className="sr-only">Open main menu</span>
                   {isOpen ? (
@@ -354,7 +361,7 @@ export default function Navbar({ navigation }: NavbarProps) {
             isOpen 
               ? "translate-y-0 opacity-100 max-h-[80vh] overflow-y-auto" 
               : "-translate-y-2 opacity-0 pointer-events-none max-h-0"
-          } bg-white/95 backdrop-blur-lg shadow-lg`}
+          } bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg shadow-lg`}
         >
           <div className="px-2 pt-2 pb-3 space-y-1">
             {/* Search Bar in mobile menu */}
@@ -366,7 +373,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                 <div className="flex items-center justify-between">
                   <Link
                     href={item.link ? item.link : `/${item.slug}`}
-                    className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--surface-dark)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
+                    className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
                     onClick={() => setIsOpen(false)}
                   >
                     {item.title}
@@ -396,7 +403,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                         <div className="flex items-center justify-between">
                           <Link
                             href={child.link ? child.link : `/${child.slug}`}
-                            className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--surface-dark)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
+                            className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
                             onClick={() => setIsOpen(false)}
                           >
                             {child.title}
@@ -426,7 +433,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                                 <div className="flex items-center justify-between">
                                   <Link
                                     href={grandChild.link ? grandChild.link : `/${grandChild.slug}`}
-                                    className="block px-4 py-2 text-sm font-normal text-[var(--text-strong)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] font-inter tracking-normal"
+                                    className="block px-4 py-2 text-sm font-normal text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] font-inter tracking-normal"
                                     onClick={() => setIsOpen(false)}
                                   >
                                     {grandChild.title}
@@ -438,7 +445,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                                       <Link
                                         key={greatGrandChild.slug}
                                         href={greatGrandChild.link ? greatGrandChild.link : `/${greatGrandChild.slug}`}
-                                        className="block px-4 py-2 text-sm text-[var(--text-tertiary)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] font-inter font-normal tracking-normal"
+                                        className="block px-4 py-2 text-sm text-[var(--text-tertiary)] dark:text-slate-400 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] font-inter font-normal tracking-normal"
                                         onClick={() => setIsOpen(false)}
                                       >
                                         {greatGrandChild.title}
@@ -460,7 +467,7 @@ export default function Navbar({ navigation }: NavbarProps) {
             {/* About and Blogs */}
             <Link href="/about" passHref>
               <span
-                className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
+                  className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
                 onClick={() => setIsOpen(false)}
               >
                 About 99Notes
@@ -468,7 +475,7 @@ export default function Navbar({ navigation }: NavbarProps) {
             </Link>
             <Link href="/blog" passHref>
               <span
-                className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] hover:bg-[var(--bg-main)] rounded-md transition-colors duration-200 hover:text-[var(--action-primary)]`}
+                  className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
                 onClick={() => setIsOpen(false)}
               >
                 Blogs

@@ -105,9 +105,9 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-sm shadow-lg">
+    <div className="w-full max-w-2xl mx-auto p-6 bg-white dark:bg-slate-800 rounded-sm shadow-lg dark:shadow-slate-700/50">
       <div className="text-center mb-8">
-        <h2 className="text-1xl font-bold text-[var(--text-strong)] mb-2">
+        <h2 className="text-1xl font-bold text-[var(--text-strong)] dark:text-slate-100 mb-2">
           Get Free UPSC Study Material
         </h2>
       </div>
@@ -139,7 +139,7 @@ const ContactForm: React.FC = () => {
         ] as { field: keyof FormData; icon: any }[]).map(({ field, icon: Icon }) => (
           <div key={field} className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Icon className="h-5 w-5 text-gray-400" />
+              <Icon className="h-5 w-5 text-gray-400 dark:text-slate-400" />
             </div>
             <input
               type={field === 'email' ? 'email' : field === 'message' ? 'textarea' : 'text'}
@@ -148,14 +148,14 @@ const ContactForm: React.FC = () => {
               onChange={handleChange}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
               className={`w-full pl-10 pr-4 py-3 border ${
-                errors[field] ? 'border-[var(--error-border)]' : 'border-[var(--border-light)]'
-              } rounded-lg text-[var(--text-strong)] text-sm transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder-[var(--text-tertiary)] ${
+                errors[field] ? 'border-[var(--error-border)]' : 'border-[var(--border-light)] dark:border-slate-600'
+              } rounded-lg text-[var(--text-strong)] dark:text-slate-200 bg-white dark:bg-slate-700 text-sm transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent placeholder-[var(--text-tertiary)] dark:placeholder-slate-400 ${
                 field === 'message' ? 'h-32 resize-none' : ''
               }`}
               disabled={isSubmitting}
             />
             {errors[field] && (
-              <p className="text-red-500 text-xs mt-1 ml-1">{errors[field]}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1 ml-1">{errors[field]}</p>
             )}
           </div>
         ))}
@@ -163,12 +163,12 @@ const ContactForm: React.FC = () => {
         <div className="flex justify-center mt-6">
           <button
             type="submit"
-            className="px-8 py-3 bg-[#ffc107] hover:bg-[#ffb300] text-black font-medium rounded-none transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-[15px] shadow-md hover:shadow-lg flex items-center"
+            className="px-8 py-3 bg-[#ffc107] hover:bg-[#ffb300] dark:bg-yellow-400 dark:hover:bg-yellow-300 text-black font-medium rounded-none transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-[15px] shadow-md hover:shadow-lg flex items-center"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black dark:text-slate-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>

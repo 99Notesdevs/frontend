@@ -88,9 +88,9 @@ export default function Home() {
     );
   }
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Hero Section with Contact Form */}
-      <section className="container w-full max-w-[2000px] px-6 lg:px-18 mt-8 md:mt-0">
+      <section className="container w-full max-w-[2000px] px-6 lg:px-18 md:mt-0">
           <div className="md:flex justify-evenly items-center gap-20">
             {/* Left Column - Text Content */}
             <motion.div 
@@ -101,7 +101,7 @@ export default function Home() {
             >
               <div className="space-y-4 overflow-hidden">
                 <motion.h1 
-                  className="text-4xl font-semibold text-[var(--surface-dark)] leading-relaxed font-opensans"
+                  className="text-4xl font-semibold text-[var(--surface-dark)] dark:text-slate-100 leading-relaxed font-opensans pt-5"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
@@ -116,7 +116,7 @@ export default function Home() {
                 </motion.h1>
               </div>
               <motion.p 
-                className="text-base font-semibold text-[var(--text-strong)] leading-relaxed font-opensans"
+                className="text-base font-semibold text-[var(--text-strong)] dark:text-slate-300 leading-relaxed font-opensans"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
@@ -137,7 +137,7 @@ export default function Home() {
         title={homeData.StudyMaterials.title} 
         description={homeData.StudyMaterials.description} 
       />
-      <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
         <Slider images={coreMemberImages} />
       </div>
       <CurrentAffairs title={homeData.CurrentAffairs.title} description={homeData.CurrentAffairs.description} />

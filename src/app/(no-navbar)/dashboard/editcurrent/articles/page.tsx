@@ -281,7 +281,7 @@ export default function ArticlesPage() {
                 onClick={() =>
                   (window.location.href = "/dashboard/editcurrent")
                 }
-                className="border-[var(--admin-bg-primary)] text-white hover:bg-[var(--admin-bg-primary)]"
+                className="border-[var(--admin-bg-primary)] text-white bg-[var(--admin-bg-primary)] hover:bg-[var(--admin-bg-primary)]"
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-2" />
                 Back
@@ -306,7 +306,7 @@ export default function ArticlesPage() {
       )}
 
       {!loading && !error && pages.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-5">
           {pages.map((page) => (
             <div
               key={page.id}
@@ -347,7 +347,7 @@ export default function ArticlesPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => handleDelete(page.id)}
-                  className="border-[var(--admin-border)] text-red-600 hover:bg-red-50"
+                  className="border-[var(--admin-border)] text-red-600 bg-red-50 hover:bg-red-200"
                 >
                   <TrashIcon className="w-4 h-4 mr-2 text-red-500" />
                   Delete
