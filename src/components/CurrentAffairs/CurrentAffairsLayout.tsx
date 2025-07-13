@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { env } from "@/config/env";
 import ContactForm from '../common/ContactForm/ContactForm';
 import SocialMedia from '../navigation/socialmedia';
-import Ads from "../navigation/Ads";
+// import Ads from "../navigation/Ads";
 
 interface CurrentAffairSection {
   id: number;
@@ -281,7 +281,7 @@ const navigationSections: NavSection[] = [
                   <SocialMedia />
               </div>
               </div>
-                <Ads imageUrl="/" altText="Advertisement" />
+                {/* <Ads imageUrl="/99notes.in" altText="Advertisement" /> */}
             </div>
           </nav>
         </aside>
