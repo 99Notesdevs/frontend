@@ -389,7 +389,12 @@
 
 .prose {
   font-size: 0.9375rem; /* 15px base font size */
-  line-height: 1.4;
+  line-height: 1.3;
+}
+
+.prose p {
+  font-size: 0.9375rem;
+  line-height: 1.5;
 }
 
 /* Make sure these styles take precedence over Tailwind's prose classes */
@@ -398,23 +403,23 @@
 .prose h3,
 .prose h4,
 .prose h5,
-.prose h6 {
-  font-weight: 600;
+.prose h6 
+  /* font-weight: 600;
   line-height: 1.2;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
-}
+} */
 
 /* Remove !important from H1 and H2 to allow template-specific colors */
 .prose h1 {
-  font-size: 1.75rem;
+  font-size: 1.50rem;
   line-height: 1.2;
   margin: 1.5rem 0 1rem;
   font-weight: 600;
 }
 
 .prose h2 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   line-height: 1.25;
   margin: 1.25rem 0 0.75rem;
   font-weight: 600;
@@ -422,7 +427,7 @@
 
 /* Keep !important for H3 and H4 to ensure our color scheme is applied */
 .prose h3 {
-  font-size: 1.25rem !important;
+  font-size: 1.125rem !important;
   line-height: 1.3 !important;
   margin: 1.1rem 0 0.6rem !important;
   font-weight: 600 !important;
@@ -430,7 +435,7 @@
 }
 
 .prose h4 {
-  font-size: 1.125rem !important;
+  font-size: 1rem !important;
   line-height: 1.35 !important;
   margin: 1rem 0 0.5rem !important;
   font-weight: 600 !important;
@@ -438,14 +443,14 @@
 }
 
 .prose h5 {
-  font-size: 1rem; /* 16px */
+  font-size: 0.875rem; /* 16px */
   line-height: 1.4;
   margin: 0.9rem 0 0.5rem;
   font-weight: 600;
 }
 
 .prose h6 {
-  font-size: 0.9375rem; /* 15px */
+  font-size: 0.75rem; /* 15px */
   line-height: 1.4;
   margin: 0.8rem 0 0.5rem;
   font-weight: 600;
