@@ -48,7 +48,7 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   console.log("page", page);
-  const { title, content, metadata } = page;
+  const { title, content, metadata, } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
@@ -326,13 +326,33 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                   </div>
                 )}
-                <Tags tags={page.tags} />
+                
                 {/* Article Content */}
                 <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full mb-8 sm:mb-10 rounded-xl overflow-hidden">
                   <div className="p-5 sm:p-10">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--surface-darker)] dark:text-white mb-3 text-center">
-                      {page.title}
-                    </h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-[var(--primary)] mb-3 text-center">
+                        {page.title}
+                      </h1>
+        {/* PDF Download Section */}
+        {/* {pdfLink && (
+          <div className="mt-8 p-4 bg-[var(--bg-main)] rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-[var(--surface-darker)]">Download PDF Notes</h3>
+                <p className="text-sm text-[var(--text-base)]">Get offline access to these notes</p>
+              </div>
+              <a
+                href={pdfLink}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Download PDF
+              </a>
+            </div>
+          </div>
+        )} */}
+                    <Tags tags={page.tags} />
                     <div
                       className="prose prose-lg max-w-none"
                       dangerouslySetInnerHTML={{ __html: mainContentFinal }}

@@ -222,17 +222,28 @@ const CurrentAffairsSectionPage = async ({
         {/* <div className="container ">
         <Breadcrumb /> */}
           {/* Image */}
-          {currentAffair?.imageUrl && (
-            <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
-              <Image
-                src={JSON.parse(currentAffair.imageUrl)[0]}
-                alt={JSON.parse(currentAffair.imageUrl)[1]}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover transition-transform duration-300 hover:scale-105"
-              />
-            </div>
-          )}
+          {(() => {
+            try {
+              if (!currentAffair?.imageUrl) return null;
+              const imageData = JSON.parse(currentAffair.imageUrl);
+              if (!Array.isArray(imageData) || imageData.length < 2 || !imageData[0]) return null;
+              
+              return (
+                <div className="relative aspect-video w-full mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+                  <Image
+                    src={imageData[0]}
+                    alt={imageData[1] || 'Current Affairs Image'}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+              );
+            } catch (error) {
+              console.error('Error parsing image URL:', error);
+              return null;
+            }
+          })()}
           <div className="max-w-4xl mx-auto">
             <div className="mt-4 mb-6">
               <p className="text-xl font-bold text-center text-[var(--surface-dark)] dark:text-white">
