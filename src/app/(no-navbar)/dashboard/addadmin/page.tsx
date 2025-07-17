@@ -100,125 +100,179 @@ export default function AddAdmin() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] bg-transparent">
-      <div className="w-full max-w-lg bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-10 border border-[var(--admin-bg-light)] mt-10 mb-10">
-        <h1
-          className={`${plusJakarta.className} text-2xl font-bold text-[var(--admin-bg-secondary)] mb-8 text-center`}
-        >
-          Add New Admin
-        </h1>
-        {error && (
-          <div className="mb-4 text-center text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 text-center text-green-600 bg-green-50 border border-green-200 rounded-md p-3">
-            {success}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-7">
-          <div>
-            <label className="block text-[var(--admin-bg-primary)] mb-1 font-medium">
-              Email
-            </label>
-            <div className="relative">
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)]">
-                <FaEnvelope />
-              </span>
-              <input
-                type="email"
-                required
-                value={adminData.email}
-                onChange={(e) =>
-                  setAdminData({ ...adminData, email: e.target.value })
-                }
-                className="w-full pl-9 border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-[var(--admin-primary)] transition-colors placeholder-[var(--admin-scroll-thumb-hover)]"
-                placeholder="admin@email.com"
-              />
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="p-8">
+            <div className="text-center mb-8">
+              <h1 className={`${plusJakarta.className} text-3xl font-extrabold text-gray-900`}>
+                Admin Management
+              </h1>
+              <p className="mt-2 text-sm text-gray-600">
+                Add new administrators to the system
+              </p>
             </div>
-          </div>
-          <div>
-            <label className="block text-[var(--admin-bg-primary)] mb-1 font-medium">
-              Password
-            </label>
-            <div className="relative">
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)]">
-                <FaLock />
-              </span>
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                value={adminData.password}
-                onChange={(e) =>
-                  setAdminData({ ...adminData, password: e.target.value })
-                }
-                className="w-full pl-9 pr-10 border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-[var(--admin-primary)] transition-colors placeholder-[var(--admin-scroll-thumb-hover)]"
-                placeholder="Password"
-              />
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)] hover:text-[var(--admin-bg-primary)]"
-                onClick={() => setShowPassword((prev) => !prev)}
-                tabIndex={-1}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-          </div>
-          <div>
-            <label className="block text-[var(--admin-bg-primary)] mb-1 font-medium">
-              Secret Key
-            </label>
-            <div className="relative">
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)]">
-                <FaKey />
-              </span>
-              <input
-                type={showSecret ? "text" : "password"}
-                required
-                value={adminData.secretKey}
-                onChange={(e) =>
-                  setAdminData({ ...adminData, secretKey: e.target.value })
-                }
-                className="w-full pl-9 pr-10 border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-[var(--admin-primary)] transition-colors placeholder-[var(--admin-scroll-thumb-hover)]"
-                placeholder="Secret Key"
-              />
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--admin-scroll-thumb-hover)] hover:text-[var(--admin-bg-primary)]"
-                onClick={() => setShowSecret((prev) => !prev)}
-                tabIndex={-1}
-              >
-                {showSecret ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="w-2/3 mx-auto block py-2 rounded-md bg-[var(--primary)] hover:bg-[var(--secondary)] text-white font-semibold transition-colors shadow-sm mt-2"
-          >
-            Add Admin
-          </button>
-        </form>
 
-        {/* List of Admins */}
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold text-[var(--admin-bg-secondary)] mb-4">
-            List of Admins
-          </h2>
-          <ul className="space-y-2">
-            {admins.map((admin, index) => (
-              <li
-                key={index}
-                className="p-2 bg-[var(--admin-bg-light)] rounded shadow-sm flex justify-between items-center"
-              >
-                <span className="text-[var(--admin-bg-primary)] font-medium">
-                  {admin.email}
-                </span>
-              </li>
-            ))}
-          </ul>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Add Admin Form */}
+              <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800 mb-6">Add New Admin</h2>
+                
+                {error && (
+                  <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                    {error}
+                  </div>
+                )}
+                
+                {success && (
+                  <div className="mb-6 p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
+                    {success}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Email Address
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaEnvelope className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="email"
+                        required
+                        value={adminData.email}
+                        onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
+                        className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg transition duration-150 ease-in-out"
+                        placeholder="admin@example.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Password
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaLock className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        required
+                        value={adminData.password}
+                        onChange={(e) => setAdminData({ ...adminData, password: e.target.value })}
+                        className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg transition duration-150 ease-in-out"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                        onClick={() => setShowPassword(!showPassword)}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? (
+                          <FaEyeSlash className="h-4 w-4" />
+                        ) : (
+                          <FaEye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Secret Key
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaKey className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type={showSecret ? "text" : "password"}
+                        required
+                        value={adminData.secretKey}
+                        onChange={(e) => setAdminData({ ...adminData, secretKey: e.target.value })}
+                        className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg transition duration-150 ease-in-out"
+                        placeholder="Enter secret key"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                        onClick={() => setShowSecret(!showSecret)}
+                        tabIndex={-1}
+                      >
+                        {showSecret ? (
+                          <FaEyeSlash className="h-4 w-4" />
+                        ) : (
+                          <FaEye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150"
+                    >
+                      Add New Admin
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Admin List */}
+              <div className="bg-white p-6 rounded-xl border border-gray-200">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-semibold text-gray-800">Admin List</h2>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {admins.length} {admins.length === 1 ? 'Admin' : 'Admins'}
+                  </span>
+                </div>
+
+                {admins.length > 0 ? (
+                  <div className="space-y-4">
+                    {admins.map((admin, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <span className="text-blue-600 font-medium">
+                              {admin.email.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{admin.email}</p>
+                            <p className="text-xs text-gray-500">
+                              Added on {new Date(admin.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Active
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="mx-auto h-16 w-16 text-gray-400 mb-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">No admins yet</h3>
+                    <p className="mt-1 text-sm text-gray-500">Add your first admin to get started.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
