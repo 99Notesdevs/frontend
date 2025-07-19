@@ -4,7 +4,11 @@ import { env } from "@/config/env";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const SearchBar = () => {
+interface SearchBarProps {
+  onClose?: () => void;
+}
+
+const SearchBar = ({ onClose }: SearchBarProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
@@ -49,41 +53,57 @@ const SearchBar = () => {
     handleSearch(value);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && query.trim()) {
+      e.preventDefault();
+      // Navigate to search results page with query parameter
+      router.push(`/search-result?q=${encodeURIComponent(query)}`);
+      if (onClose) onClose();
+    }
+  };
+
   const handleResultClick = (slug: string) => {
     // Redirect to the specific slug
     router.push(`/${slug}`);
   };
 
   return (
-    <div className="relative flex flex-col items-center w-full">
-      <div className={`relative group bg-white dark:bg-slate-800 border border-[var(--border-light)] dark:border-slate-700 rounded-xl w-full transition-colors duration-200`}>
+    <div className="relative w-full max-w-2xl mx-auto">
+      <div className="relative flex items-center">
         <input
           type="text"
-          placeholder="Search notes, subjects..."
-          className="w-full py-1.5 pl-8 pr-3 text-sm text-[var(--text-strong)] dark:text-slate-200 placeholder-[var(--text-tertiary)] dark:placeholder-slate-500 
-                    bg-transparent border-none outline-none"
           value={query}
           onChange={handleInputChange}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+          onKeyDown={handleKeyDown}
+          className="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-base"
+          placeholder="Search for articles, topics, or resources..."
+          autoFocus
         />
-        <div className="absolute inset-y-0 left-0 flex items-center pl-2.5">
-          <svg
-            className="w-4 h-4 text-[var(--text-tertiary)] dark:text-slate-400"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute right-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
           >
-            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        )}
       </div>
 
       {isFocused && query && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md shadow-lg dark:shadow-slate-900/50">
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md shadow-lg dark:shadow-slate-900/50">
           {isLoading ? (
             <div className="p-4 text-sm text-gray-500 dark:text-slate-400">Loading...</div>
           ) : results.length > 0 ? (
