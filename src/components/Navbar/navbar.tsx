@@ -192,6 +192,7 @@ function NestedNavigation({
 }
 
 export default function Navbar({ navigation }: NavbarProps) {
+  const [showSearch, setShowSearch] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
@@ -343,14 +344,31 @@ export default function Navbar({ navigation }: NavbarProps) {
                       </svg>
                     </Link>
                   ))}
+                  {/* Search icon */}
+                  <button 
+                    onClick={() => setShowSearch(!showSearch)}
+                    className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                  >
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="h-6 w-6" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
                   <ToggleMode />
                 </div>
               </div>
 
-              {/* Desktop search bar */}
-              <div className="hidden pr-25 max-w-[200px]">
-                <SearchBar />
-              </div>  
+              {/* Search bar that appears below navbar */}
+              {showSearch && (
+                <div className="absolute right-0 w-80 top-full bg-white dark:bg-gray-800 shadow-md z-50 p-4 mr-2">
+                  <SearchBar onClose={() => setShowSearch(false)} />
+                </div>
+              )}
 
               {/* Mobile menu button */}
               <div className="lg:hidden flex items-center gap-2">

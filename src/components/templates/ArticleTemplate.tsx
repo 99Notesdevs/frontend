@@ -375,7 +375,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     className="flex justify-left bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 
                         transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
                   >
-                    <div className="w-full mr-2">
+                    <div className="w-[100%] mr-2">
                       <SearchBar />
                     </div>
                     {isAuthorized && (
