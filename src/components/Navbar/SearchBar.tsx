@@ -53,6 +53,15 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
     handleSearch(value);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && query.trim()) {
+      e.preventDefault();
+      // Navigate to search results page with query parameter
+      router.push(`/search-result?q=${encodeURIComponent(query)}`);
+      if (onClose) onClose();
+    }
+  };
+
   const handleResultClick = (slug: string) => {
     // Redirect to the specific slug
     router.push(`/${slug}`);
@@ -67,6 +76,7 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
           onChange={handleInputChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+          onKeyDown={handleKeyDown}
           className="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-base"
           placeholder="Search for articles, topics, or resources..."
           autoFocus
