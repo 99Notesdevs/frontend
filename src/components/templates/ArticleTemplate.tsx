@@ -23,6 +23,8 @@ import Bookmark from "../ui/Bookmark";
 import Quiz from '@/components/quiz/quiz';
 import FAQPage from "@/components/FAQp/faqp";
 import { BackToTop } from "@/components/ui/reachtotop";
+import { DownloadPdf } from "@/components/ui/downloadpdf";
+import { WhatsAppPdf } from "@/components/ui/whatsapp-pdf";
 
 interface Question {
   id: number;
@@ -229,7 +231,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      
+
       // Process h2 headings
       const headings = doc.querySelectorAll('h2');
       headings.forEach((heading, index) => {
@@ -240,10 +242,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
           .replace(/\s+/g, '-')
           .replace(/-+/g, '-')
           .replace(/^-+|-+$/g, '') || `heading-${index}`;
-        
+
         heading.id = id;
       });
-      
+
       return doc.body.innerHTML;
     } catch (error) {
       console.error('Error processing content:', error);
@@ -326,32 +328,22 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Article Content */}
                 <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full mb-8 sm:mb-10 rounded-xl overflow-hidden">
                   <div className="p-5 sm:p-10">
                     <h1 className="text-2xl md:text-3xl font-bold text-[var(--primary)] mb-3 text-center">
-                        {page.title}
-                      </h1>
-        {/* PDF Download Section */}
-        {/* {pdfLink && (
-          <div className="mt-8 p-4 bg-[var(--bg-main)] rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-[var(--surface-darker)]">Download PDF Notes</h3>
-                <p className="text-sm text-[var(--text-base)]">Get offline access to these notes</p>
-              </div>
-              <a
-                href={pdfLink}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Download PDF
-              </a>
-            </div>
-          </div>
-        )} */}
+                      {page.title}
+                    </h1>
+
+                    <div className="flex gap-3 justify-center">
+                      <WhatsAppPdf
+                        phoneNumber="+919876543210" 
+                        message="Hello, I'd like to get the PDF notes for [Article Name]."
+                        className="w-full h-12" 
+                      />
+                      <DownloadPdf />
+                    </div>
                     <Tags tags={page.tags} />
                     <div
                       className="prose prose-lg max-w-none"
