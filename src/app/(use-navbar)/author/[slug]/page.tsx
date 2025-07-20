@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { env } from '@/config/env';
-import Cookies from 'js-cookie';
+import { api } from '@/config/api/route';
+
 interface Author {
   id: string;
   name: string;
@@ -33,14 +33,9 @@ export default function AuthorPage() {
 
     const fetchAuthor = async () => {
       try {
-        const response = await fetch(`${env.API}/author/${slug}`,{
-          headers: {
-            Authorization: `Bearer ${Cookies.get("token")}`,
-          },
-        });
-        if (!response.ok) throw new Error('Failed to fetch author data');
-        const data = await response.json();
-        setAuthor(data.data);
+        const response = await api.get(`/author/${slug}`) as { success: boolean, data: Author | null };
+        if (!response.success) throw new Error('Failed to fetch author data');
+        setAuthor(response.data);
         setError(null);
       } catch (err) {
         setError('Failed to load author information');

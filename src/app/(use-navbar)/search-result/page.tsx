@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, ArrowRight, Search as SearchIcon } from "lucide-react";
-import { env } from "@/config/env";
-import Link from 'next/link';
+import { Search as SearchIcon } from "lucide-react";
+import { api } from '@/config/api/route';
+import { env } from '@/config/env';
 
 interface SearchResultItem {
   id: string;
@@ -42,28 +40,17 @@ export default function SearchResult() {
       
       try {
         setIsLoading(true);
-        const searchUrl = `${env.API}/search/global?query=${encodeURIComponent(query)}`;
+        const searchUrl = `/search/global?query=${encodeURIComponent(query)}`;
         console.log('Fetching search results from:', searchUrl);
         
-        const response = await fetch(searchUrl, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
+        const response = await api.get(searchUrl) as { success: boolean, data: SearchResultItem[] | null };
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Search API error response:', {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorText
-          });
-          throw new Error(`Failed to fetch search results: ${response.status} ${response.statusText}`);
+        if (!response.success) {
+          console.error('Search API error response:');
+          throw new Error(`Failed to fetch search results: ${response.success}`);
         }
 
-        const data = await response.json();
+        const data = response.data;
         console.log('Search API Response:', data);
         
         // Convert the response object into an array of results

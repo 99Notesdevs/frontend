@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { env } from "@/config/env";
 import BlogCard from "@/components/Blogs/BlogCard";
+import { api } from "@/config/api/route";
 
 interface Blog {
   id: string;
@@ -32,30 +32,28 @@ const BlogsPage: React.FC = () => {
       let url: string;
       if (searchTerm) {
         // Use title search endpoint if there's a search term
-        url = `${env.API}/blog/title/${encodeURIComponent(searchTerm)}`;
+        url = `/blog/title/${encodeURIComponent(searchTerm)}`;
       } else {
         // Use paginated endpoint for regular listing
         const skip = (currentPage - 1) * ITEMS_PER_PAGE;
-        url = `${env.API}/blog?skip=${skip}&take=${ITEMS_PER_PAGE}`;
+        url = `/blog?skip=${skip}&take=${ITEMS_PER_PAGE}`;
       }
 
       // Fetch blogs
-      const response = await fetch(url);
-      if (!response.ok) {
+      const response = await api.get(url) as { success: boolean, data: Blog[] | null };
+      if (!response.success) {
         throw new Error("Failed to fetch blogs");
       }
 
-      const data = await response.json();
-      const blogsData = data.data || [];
+      const blogsData = response.data || [];
 
       // Get total count (only needed for pagination when not searching)
       let totalItems = blogsData.length;
       if (!searchTerm) {
         try {
-          const countResponse = await fetch(`${env.API}/blog/count`);
-          if (countResponse.ok) {
-            const countData = await countResponse.json();
-            totalItems = countData.data || 0;
+          const countResponse = await api.get(`/blog/count`) as { success: boolean, data: number | null };
+          if (countResponse.success) {
+            totalItems = countResponse.data || 0;
           }
         } catch (err) {
           console.warn("Could not fetch total count:", err);

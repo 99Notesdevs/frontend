@@ -4,9 +4,9 @@ import { UpscNotesTemplate } from "@/components/templates/UpscNotesTemplate";
 import { ArticleTemplate } from "@/components/templates/ArticleTemplate";
 import { GeneralStudiesTemplate } from "@/components/templates/GeneralStudiesTemplate";
 import { CurrentAffairTemplate } from "@/components/templates/CurrentAffairTemplate";
-import { env } from "@/config/env";
 import { Metadata } from "next";
 import { BlogTemplate } from "@/components/templates/BlogTemplate";
+import { api } from "@/config/api/route";
 
 // Map template IDs to components
 const TEMPLATE_MAP: Record<string, React.ComponentType<BaseTemplateProps>> = {
@@ -21,10 +21,9 @@ async function getPage(
   slug: string
 ): Promise<BaseTemplateProps["page"] | null> {
   try {
-    const response = await fetch(`${env.API}/page/slug/${slug}`);
-    const res = await response.json();
-    
-    if (!response.ok) {
+    const res = await api.get(`/page/slug/${slug}`) as { success: boolean, data: BaseTemplateProps["page"] | null };
+
+    if (!res.success) {
       console.error("API Error:", res);
       return null;
     }

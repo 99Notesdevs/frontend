@@ -3,22 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { env } from '@/config/env';
-import Cookies from 'js-cookie';
-import { redirect } from 'next/dist/server/api-utils';
+import { api } from '@/config/api/route';
 
 export default function SubscriptionPage() {
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSection, setSelectedSection] = useState<'Articles' | 'Books' | 'Notes'>('Articles');
-  const token = Cookies.get('token');
 
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await fetch(`${env.API}/product`);
-        if (!response.ok) throw new Error('Failed to fetch plans');
-        const { data } = await response.json();
+        const response = await api.get('/product') as { success: boolean, data: any[] };
+        if (!response.success) throw new Error('Failed to fetch plans');
+        const { data } = response;
         setPlans(data);
       } catch (error) {
         console.error('Error fetching plans:', error);
@@ -39,20 +36,13 @@ export default function SubscriptionPage() {
       billingAddress: "",
       shippingAddress: "",
     };
-    const response = await fetch(`${env.API}/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-    if (response.status === 403) {
+    const response = await api.post('/orders', data) as { success: boolean, data: any };
+    if (!response.success) {
       alert('Please login to continue');
       window.location.href = '/users/login';
       return;
     }
-    const responseData = await response.json();
+    const responseData = response.data;
     console.log("First ", responseData);
     const orderId = responseData.data.id;
     const orderData = {
@@ -63,16 +53,9 @@ export default function SubscriptionPage() {
       redirectUrl: "",
       validity: Number(plan.validity)
     }
-    const response2 = await fetch(`${env.API}/payment/create-order`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(orderData),
-    });
-    const responseData2 = await response2.json();
-    console.log(responseData2.data);
+    const response2 = await api.post(`/payment/create-order`, orderData) as { success: boolean, data: { redirectUrl: string } };
+    const responseData2 = response2.data;
+    console.log(responseData2);
     const redirectUrl = responseData2.redirectUrl;
     window.location.href = redirectUrl;
   };

@@ -1,7 +1,7 @@
 import Head from "next/head"
 import ClientImage from "@/components/About/CientImage"
-import { env } from "@/config/env"
 import SliderWrapper from "@/components/About/SliderWrapper"
+import { api } from "@/config/api/route"
 
 interface Content {
   heroImage: string
@@ -43,15 +43,14 @@ interface Content {
 }
 
 async function fetchContent(): Promise<{ title: string; content: Content }> {
-  const res = await fetch(`${env.API}/about-99-notes`)
+  const res = await api.get(`/about-99-notes`) as { success: boolean, data: { title: string; content: string } }
 
-  if (!res.ok) {
+  if (!res.success) {
     throw new Error("Failed to fetch content")
   }
 
-  const result = await res.json()
-  const title = result.data.title
-  const content: Content = JSON.parse(result.data.content)
+  const title = res.data.title
+  const content: Content = JSON.parse(res.data.content)
 
   return { title, content }
 }

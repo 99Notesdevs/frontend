@@ -2,9 +2,9 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import CurrentAffairsLayout from "@/components/CurrentAffairs/CurrentAffairsLayout";
-import { env } from "@/config/env";
 import { Metadata } from "next";
 import SearchBar from "@/components/Navbar/SearchBar";
+import { api } from "@/config/api/route";
 // Define interfaces to match the database schema
 interface Article {
   id: number;
@@ -43,9 +43,8 @@ async function getPage(
   try {
     const fullSlug = `current-affairs/${slug}`;
     const modifiedSlug = fullSlug.replace(/\s+/g, ' ');
-    const response = await fetch(`${env.API}/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`);
-    const res = await response.json();
-    const page = res.data;
+    const response = await api.get(`/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`) as { success: boolean, data: CurrentAffair | null };
+    const page = response.data;
 
     if (!page) {
       return null;
@@ -130,22 +129,13 @@ const CurrentAffairsSectionPage = async ({
     try {
       // For server components, use the backend API directly
       // Looking at the backend routes, the endpoint for getting a section by slug is /currentAffair/slug/:slug
-      const sectionResponse = await fetch(`${env.API}/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const sectionResponse = await api.get(`/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`) as { success: boolean, data: CurrentAffair | null };
 
-      if (!sectionResponse.ok) {
-        throw new Error(`Failed to fetch section data: ${sectionResponse.statusText}`);
+      if (!sectionResponse.success) {
+        throw new Error(`Failed to fetch section data: ${sectionResponse.data}`);
       }
 
-      const sectionData = await sectionResponse.json();
-      if (sectionData.status === 'success' && sectionData.data) {
-        currentAffair = sectionData.data;
-      } else {
-        throw new Error("Invalid response from server");
-      }
+      currentAffair = sectionResponse.data;
     } catch (fetchError) {
       console.error("Error fetching section data:", fetchError);
       error = "Failed to load section data. Please check your internet connection and try again.";
@@ -153,19 +143,15 @@ const CurrentAffairsSectionPage = async ({
 
     try {
       // Fetch all articles
-      const articlesResponse = await fetch(`${env.API}/currentArticle`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const articlesResponse = await api.get(`/currentArticle`) as { success: boolean, data: Article[] | null };
 
-      if (!articlesResponse.ok) {
-        throw new Error(`Failed to fetch articles: ${articlesResponse.statusText}`);
+      if (!articlesResponse.success) {
+        throw new Error(`Failed to fetch articles: ${articlesResponse.data}`);
       }
 
-      const articlesData = await articlesResponse.json();
-      if (articlesData.status === 'success' && articlesData.data) {
-        const allArticles = articlesData.data;
+      const articlesData = articlesResponse.data;
+      if (articlesData) {
+        const allArticles = articlesData;
         articles = allArticles.filter((article: Article) => {
           return article.parentSlug === fullSlug;
         });
