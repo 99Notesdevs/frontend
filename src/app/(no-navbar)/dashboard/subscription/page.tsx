@@ -26,6 +26,8 @@ const cardVariants = {
 };
 
 const token = Cookies.get("token");
+import { api } from "@/config/api/route";
+
 
 interface Order {
   id: string;
@@ -122,7 +124,7 @@ export default function OrdersPage() {
     }
   };
 
-  return (
+    return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-8">
       {/* Toast Notification */}
       <AnimatePresence>
@@ -146,12 +148,8 @@ export default function OrdersPage() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-extrabold text-slate-800 mb-2">
-            Subscription Management
-          </h1>
-          <p className="text-slate-600">
-            Create and manage your subscription plans
-          </p>
+          <h1 className="text-3xl font-extrabold text-slate-800 mb-2">Subscription Management</h1>
+          <p className="text-slate-600">Create and manage your subscription plans</p>
         </div>
 
         {/* Create New Subscription Plan */}
