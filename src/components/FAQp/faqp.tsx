@@ -69,9 +69,10 @@ const FAQPage: React.FC<FAQProps> = ({ data }) => {
                 className="w-full px-8 py-6 text-left focus:outline-none flex justify-between items-center group transition-colors duration-200"
                 onClick={() => toggleQuestion(index)}
               >
-                <h2 className="text-lg text-gray-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200 m-0">
-                  {faq.question}
-                </h2>
+                <h2 
+                  className="text-lg text-gray-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200 m-0"
+                  dangerouslySetInnerHTML={{ __html: faq.question }}
+                />
                 <span 
                   className={`transform transition-transform duration-300 text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 ${
                     openQuestion === index ? 'rotate-180' : ''
@@ -89,7 +90,10 @@ const FAQPage: React.FC<FAQProps> = ({ data }) => {
                 }`}
               >
                 <div className="px-8 py-6 border-t border-gray-100 dark:border-slate-700">
-                  <p className="text-gray-600 dark:text-slate-300 leading-relaxed">{faq.answer}</p>
+                  <div 
+                    className="text-gray-600 dark:text-slate-300 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: faq.answer }}
+                  />
                   
                   {faq.subQuestions && faq.subQuestions.length > 0 && (
                     <div className="mt-6 space-y-4">
@@ -105,9 +109,10 @@ const FAQPage: React.FC<FAQProps> = ({ data }) => {
                             className="w-full px-6 py-4 text-left focus:outline-none flex justify-between items-center group transition-colors duration-200"
                             onClick={() => toggleSubQuestion(index, subIndex)}
                           >
-                            <span className="text-gray-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
-                              {subQ.question}
-                            </span>
+                            <span 
+                              className="text-gray-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200"
+                              dangerouslySetInnerHTML={{ __html: subQ.question }}
+                            />
                             <span 
                               className={`transform transition-transform duration-300 text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 ${
                                 openSubQuestions[index] === subIndex ? 'rotate-180' : ''
@@ -123,9 +128,10 @@ const FAQPage: React.FC<FAQProps> = ({ data }) => {
                               openSubQuestions[index] === subIndex ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                             }`}
                           >
-                            <div className="px-6 py-4 text-gray-600 dark:text-slate-300">
-                              {subQ.answer}
-                            </div>
+                            <div 
+                              className="px-6 py-4 text-gray-600 dark:text-slate-300"
+                              dangerouslySetInnerHTML={{ __html: subQ.answer }}
+                            />
                           </div>
                         </div>
                       ))}
