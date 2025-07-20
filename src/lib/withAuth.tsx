@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { env } from "@/config/env";
+import { api } from "@/config/api/route";
 import LoadingSpinner from "@/components/Loading/loading";
 
 const withAuth = (WrappedComponent: React.ComponentType) => {
@@ -22,14 +22,11 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
 
         // Validate the token with the server
         try {
-          const response = await fetch(`${env.API}/admin/check`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (!response.ok) {
+          const response = (await api.get(`/admin/check`)) as {
+            success: boolean;
+          };
+          console.log(response);
+          if (!response.success) {
             // If token is invalid, redirect to login page
             router.push("/operator");
             Cookies.remove("token");

@@ -1,10 +1,13 @@
 "use client";
-import { useRouter } from 'next/navigation';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
-import withAuth from '@/lib/withAuth';
+import { useRouter } from "next/navigation";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import withAuth from "@/lib/withAuth";
 
-const inter = Inter({ subsets: ['latin'] });
-const plusJakarta = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
+const inter = Inter({ subsets: ["latin"] });
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 function Dashboard() {
   const router = useRouter();
@@ -28,7 +31,10 @@ function Dashboard() {
             </h1>
             <p className="max-w-[700px] text-[1.125rem] leading-7 text-[var(--admin-secondary)] mx-auto font-medium">
               Welcome to your{" "}
-              <span className="text-[var(--admin-bg-dark)]">content management hub</span>.
+              <span className="text-[var(--admin-bg-dark)]">
+                content management hub
+              </span>
+              .
             </p>
           </div>
         </div>

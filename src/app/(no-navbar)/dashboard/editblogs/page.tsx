@@ -1,14 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { env } from "@/config/env";
+import { api } from "@/config/api/route";
 import Cookie from "js-cookie";
 
-import {
-  PencilIcon,
-  TrashIcon,
- 
-} from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { BlogForm } from "@/components/dashboard/forms";
 import { BlogFormValues } from "@/components/dashboard/forms/BlogForm";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
@@ -42,36 +38,36 @@ export default function ArticlesPage() {
   const itemsPerPage = 2;
   const token = Cookie.get("token");
 
-  const fetchPages = async ( searchTerm = "") => {
+  const fetchPages = async (searchTerm = "") => {
     try {
       setError(null);
       setLoading(true);
 
       const skip = (currentPage - 1) * itemsPerPage;
       const url = searchTerm
-        ? `${
-            env.API
-          }/blog/search?skip=${skip}&take=${itemsPerPage}&query=${encodeURIComponent(
+        ? `/blog/search?skip=${skip}&take=${itemsPerPage}&query=${encodeURIComponent(
             searchTerm
           )}`
-        : `${env.API}/blog?skip=${skip}&take=${itemsPerPage}`;
+        : `/blog?skip=${skip}&take=${itemsPerPage}`;
 
-      const response = await fetch(url);
+      const response = (await api.get(url)) as {
+        success: boolean; data: BlogType[];
+      };
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error("Failed to fetch pages");
       }
 
-      const data = await response.json();
-      const pagesData = data.data || [];
+      const pagesData = response.data || [];
 
       // Get total count for pagination
-      const countResponse = await fetch(`${env.API}/blog/count`);
-      if (!countResponse.ok) {
+      const countResponse = (await api.get(`/blog/count`)) as {
+        success: boolean; data: number;
+      };
+      if (!countResponse.success) {
         throw new Error("Failed to fetch pages count");
       }
-      const countData = await countResponse.json();
-      const totalItems = countData.data || 0;
+      const totalItems = countResponse.data || 0;
 
       setPages(pagesData);
       setFilteredPages(pagesData);
@@ -111,12 +107,14 @@ export default function ArticlesPage() {
   const handleEdit = async (page: BlogType) => {
     setSelectedPage(page);
     setError(null);
-    
+
     // Scroll to the form container after a small delay to ensure the form is mounted
     setTimeout(() => {
-      const formContainer = document.querySelector('.bg-white.p-6.rounded-xl.shadow-md');
+      const formContainer = document.querySelector(
+        ".bg-white.p-6.rounded-xl.shadow-md"
+      );
       if (formContainer) {
-        formContainer.scrollIntoView({ behavior: 'smooth' });
+        formContainer.scrollIntoView({ behavior: "smooth" });
       }
     }, 100);
     setImagePreview(page.imageUrl || null);
@@ -146,7 +144,8 @@ export default function ArticlesPage() {
       console.log("I was here");
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
-      const fileNmae = (img.getAttribute("title") || getFormattedDate()) + ".png";
+      const fileNmae =
+        (img.getAttribute("title") || getFormattedDate()) + ".png";
 
       if (isBlob || isBase64) {
         try {
@@ -156,7 +155,9 @@ export default function ArticlesPage() {
           const formData = new FormData();
           formData.append("imageUrl", blob, "image.png");
 
-          const url = (await uploadImageToS3(formData, "BlogsContent", fileNmae)) || "error";
+          const url =
+            (await uploadImageToS3(formData, "BlogsContent", fileNmae)) ||
+            "error";
           img.setAttribute("src", url);
         } catch (error: unknown) {
           if (error instanceof Error) {
@@ -175,9 +176,9 @@ export default function ArticlesPage() {
         setError("Authentication required");
         return;
       }
-      
+
       // Log the raw form data
-      console.log('Raw form data:', formData);
+      console.log("Raw form data:", formData);
 
       // Generate slug from title
       // const baseSlug = formData.title
@@ -188,26 +189,26 @@ export default function ArticlesPage() {
 
       // Create metadata object
       const metadata = {
-        metaTitle: formData.metaTitle || '',
-        metaDescription: formData.metaDescription || '',
-        metaKeywords: formData.metaKeywords || '',
-        robots: formData.robots || '',
-        ogTitle: formData.ogTitle || '',
-        ogDescription: formData.ogDescription || '',
-        ogImage: formData.ogImage || '',
-        ogType: formData.ogType || '',
-        twitterCard: formData.twitterCard || '',
-        twitterTitle: formData.twitterTitle || '',
-        twitterDescription: formData.twitterDescription || '',
-        twitterImage: formData.twitterImage || '',
-        canonicalUrl: formData.canonicalUrl || '',
-        schemaData: formData.schemaData || '',
-        header: formData.header || '',
-        body: formData.body || ''
+        metaTitle: formData.metaTitle || "",
+        metaDescription: formData.metaDescription || "",
+        metaKeywords: formData.metaKeywords || "",
+        robots: formData.robots || "",
+        ogTitle: formData.ogTitle || "",
+        ogDescription: formData.ogDescription || "",
+        ogImage: formData.ogImage || "",
+        ogType: formData.ogType || "",
+        twitterCard: formData.twitterCard || "",
+        twitterTitle: formData.twitterTitle || "",
+        twitterDescription: formData.twitterDescription || "",
+        twitterImage: formData.twitterImage || "",
+        canonicalUrl: formData.canonicalUrl || "",
+        schemaData: formData.schemaData || "",
+        header: formData.header || "",
+        body: formData.body || "",
       };
 
       // Log the metadata object
-      console.log('Metadata object:', metadata);
+      console.log("Metadata object:", metadata);
 
       formData.content = await handleImageUpload(formData.content);
       const updateData = {
@@ -216,33 +217,28 @@ export default function ArticlesPage() {
         tags: formData.tags,
         slug: formData.slug,
         updatedAt: new Date(),
-        imageUrl: formData.imageUrl || '',
-        metadata: JSON.stringify(metadata)
+        imageUrl: formData.imageUrl || "",
+        metadata: JSON.stringify(metadata),
       };
 
       // Log the final update data that will be sent
-      console.log('Final update data to be sent:', updateData);
+      console.log("Final update data to be sent:", updateData);
 
       if (!selectedPage) {
         setError("No page selected");
         return;
       }
 
-      const response = await fetch(`${env.API}/blog/${selectedPage.id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
-      });
+      const response = (await api.put(
+        `/blog/${selectedPage.id}`,
+        updateData
+      )) as { success: boolean; data: BlogType };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update blog");
+      if (!response.success) {
+        throw new Error("Failed to update blog");
       }
 
-      const { data } = await response.json();
+      const { data } = response;
       setSelectedPage(data);
 
       // Clear error if any
@@ -264,16 +260,12 @@ export default function ArticlesPage() {
     }
 
     try {
-      const response = await fetch(`${env.API}/blog/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = (await api.delete(`/blog/${id}`)) as {
+        data: { success: boolean };
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete blog");
+      if (!response.data.success) {
+        throw new Error("Failed to delete blog");
       }
 
       // Refresh the page after successful update
@@ -318,7 +310,9 @@ export default function ArticlesPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 mt-4 text-[var(--admin-bg-secondary)] text-center">Manage Blogs</h1>
+      <h1 className="text-3xl font-bold mb-8 mt-4 text-[var(--admin-bg-secondary)] text-center">
+        Manage Blogs
+      </h1>
       <div className="flex flex-col gap-6">
         {/* Blog List */}
         <div className="bg-white p-6 rounded-xl shadow-md">
@@ -440,32 +434,39 @@ export default function ArticlesPage() {
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-bold mb-4">Edit Blog</h2>
           {selectedPage ? (
-          
             <BlogForm
               onSubmit={handleEditSubmit}
               defaultValues={{
-                title: selectedPage?.title || '',
-                content: selectedPage?.content || '',
-                slug: selectedPage?.slug || '',
+                title: selectedPage?.title || "",
+                content: selectedPage?.content || "",
+                slug: selectedPage?.slug || "",
                 order: selectedPage?.order || 0,
-                imageUrl: selectedPage?.imageUrl || '',
+                imageUrl: selectedPage?.imageUrl || "",
                 tags: selectedPage?.tags || [],
-                metaTitle: JSON.parse(selectedPage.metadata || '')?.metaTitle,
-                metaDescription: JSON.parse(selectedPage.metadata || '')?.metaDescription,
-                metaKeywords: JSON.parse(selectedPage.metadata || '').metaKeywords,
-                robots: JSON.parse(selectedPage.metadata || '').robots,
-                ogTitle: JSON.parse(selectedPage.metadata || '')?.ogTitle,
-                ogDescription: JSON.parse(selectedPage.metadata || '')?.ogDescription,
-                ogImage: JSON.parse(selectedPage.metadata || '')?.ogImage,
-                ogType: JSON.parse(selectedPage.metadata || '')?.ogType,
-                twitterCard: JSON.parse(selectedPage.metadata || '')?.twitterCard,
-                twitterTitle: JSON.parse(selectedPage.metadata || '')?.twitterTitle,
-                twitterDescription: JSON.parse(selectedPage.metadata || '')?.twitterDescription,
-                twitterImage: JSON.parse(selectedPage.metadata || '')?.twitterImage,
-                canonicalUrl: JSON.parse(selectedPage.metadata || '')?.canonicalUrl,
-                schemaData: JSON.parse(selectedPage.metadata || '')?.schemaData,
-                header: JSON.parse(selectedPage.metadata || '')?.header,
-                body: JSON.parse(selectedPage.metadata || '')?.body
+                metaTitle: JSON.parse(selectedPage.metadata || "")?.metaTitle,
+                metaDescription: JSON.parse(selectedPage.metadata || "")
+                  ?.metaDescription,
+                metaKeywords: JSON.parse(selectedPage.metadata || "")
+                  .metaKeywords,
+                robots: JSON.parse(selectedPage.metadata || "").robots,
+                ogTitle: JSON.parse(selectedPage.metadata || "")?.ogTitle,
+                ogDescription: JSON.parse(selectedPage.metadata || "")
+                  ?.ogDescription,
+                ogImage: JSON.parse(selectedPage.metadata || "")?.ogImage,
+                ogType: JSON.parse(selectedPage.metadata || "")?.ogType,
+                twitterCard: JSON.parse(selectedPage.metadata || "")
+                  ?.twitterCard,
+                twitterTitle: JSON.parse(selectedPage.metadata || "")
+                  ?.twitterTitle,
+                twitterDescription: JSON.parse(selectedPage.metadata || "")
+                  ?.twitterDescription,
+                twitterImage: JSON.parse(selectedPage.metadata || "")
+                  ?.twitterImage,
+                canonicalUrl: JSON.parse(selectedPage.metadata || "")
+                  ?.canonicalUrl,
+                schemaData: JSON.parse(selectedPage.metadata || "")?.schemaData,
+                header: JSON.parse(selectedPage.metadata || "")?.header,
+                body: JSON.parse(selectedPage.metadata || "")?.body,
               }}
             />
           ) : (
@@ -497,7 +498,7 @@ export default function ArticlesPage() {
           </div>
         </div>
       )}
-      <Drafts types={["blogDrafts"]}/>
+      <Drafts types={["blogDrafts"]} />
     </div>
   );
 }

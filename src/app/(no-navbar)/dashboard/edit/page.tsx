@@ -11,8 +11,7 @@ import {
   BlogForm,
   CustomLinkForm,
 } from "@/components/dashboard/forms";
-import Cookie from "js-cookie";
-import { env } from "@/config/env";
+import { api } from "@/config/api/route";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 import Drafts from "@/components/ui/drafts";
 
@@ -51,7 +50,6 @@ function PageList() {
   const [itemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const token = Cookie.get("token");
 
   const categories = [
     { id: "all", name: "All Pages" },
@@ -83,12 +81,11 @@ function PageList() {
 
   const fetchPages = async () => {
     try {
-      const response = await fetch(`${env.API}/page`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch pages");
-      const { data } = await response.json();
-      setPages(data);
+      const response = (await api.get(`/page`)) as {
+        success: boolean; data: Page[];
+      };
+      if (!response.success) throw new Error("Failed to fetch pages");
+      setPages(response.data);
     } catch (error) {
       console.error("Error fetching pages:", error);
     } finally {
@@ -98,12 +95,11 @@ function PageList() {
 
   const fetchPageById = async (pageId: number) => {
     try {
-      const response = await fetch(`${env.API}/page/id/${pageId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch page");
-      const { data } = await response.json();
-      setSelectedPage(data);
+      const response = (await api.get(`/page/id/${pageId}`)) as {
+        success: boolean; data: Page;
+      };
+      if (!response.success) throw new Error("Failed to fetch page");
+      setSelectedPage(response.data);
       setShowForm(true);
 
       // Scroll to the form container after a small delay to ensure the form is mounted
@@ -143,7 +139,8 @@ function PageList() {
       if (!src) continue;
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
-      const fileNmae = (img.getAttribute("title") || getFormattedDate()) + ".png";
+      const fileNmae =
+        (img.getAttribute("title") || getFormattedDate()) + ".png";
 
       if (isBlob || isBase64) {
         try {
@@ -239,16 +236,12 @@ function PageList() {
         metadata: JSON.stringify(pageData.metadata),
       };
 
-      const response = await fetch(`${env.API}/page/${selectedPage.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(apiPageData),
-      });
+      const response = (await api.put(
+        `/page/${selectedPage.id}`,
+        apiPageData
+      )) as { success: boolean };
 
-      if (!response.ok) throw new Error("Failed to update page");
+      if (!response.success) throw new Error("Failed to update page");
 
       // Refresh the page list
       fetchPages();
@@ -421,10 +414,10 @@ function PageList() {
     if (!pageIdToDelete) return;
 
     try {
-      await fetch(`${env.API}/page/${pageIdToDelete}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = (await api.delete(`/page/${pageIdToDelete}`)) as {
+        success: boolean;
+      };
+      if (!response.success) throw new Error("Failed to delete page");
       fetchPages();
       setShowDeleteModal(false);
       setPageIdToDelete(null);
@@ -613,7 +606,10 @@ function PageList() {
                   </p>
                 </div>
                 <div>
-                  <nav className="flex flex-wrap gap-1 justify-center" aria-label="Pagination">
+                  <nav
+                    className="flex flex-wrap gap-1 justify-center"
+                    aria-label="Pagination"
+                  >
                     <button
                       onClick={() => setCurrentPage(currentPage - 1)}
                       disabled={currentPage === 1}

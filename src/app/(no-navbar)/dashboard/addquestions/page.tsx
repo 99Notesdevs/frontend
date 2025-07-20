@@ -2,22 +2,20 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
 import CategorySelect from "@/components/testUtils/CategorySelect";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 const TiptapEditor = dynamic(
-  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
-  { 
+  () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
+  {
     ssr: false, // Disable server-side rendering for this component
     loading: () => (
       <div className="space-y-2">
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-64 w-full" />
       </div>
-    )
+    ),
   }
 );
 
@@ -41,6 +39,7 @@ interface Question {
 }
 
 import { useRef } from "react";
+import { api } from "@/config/api/route";
 
 export default function AddQuestionsPage() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -49,9 +48,8 @@ export default function AddQuestionsPage() {
   const [pageSize] = useState(10);
   const [creatorName, setCreatorName] = useState<string>("");
   // At the top of your component with other hooks
-const formRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [newQuestion, setNewQuestion] = useState<Question>({
-    
     id: "",
     question: "",
     answer: "",
@@ -62,7 +60,7 @@ const formRef = useRef<HTMLDivElement>(null);
     multipleCorrectType: false,
     pyq: false,
     year: null,
-    rating: null
+    rating: null,
   });
   const [toast, setToast] = useState<{
     message: string;
@@ -74,7 +72,7 @@ const formRef = useRef<HTMLDivElement>(null);
     isOpen: boolean;
     questionId: string | null;
   }>({ isOpen: false, questionId: null });
-  
+
   const [formKey, setFormKey] = useState(0);
 
   const resetForm = () => {
@@ -89,10 +87,10 @@ const formRef = useRef<HTMLDivElement>(null);
       multipleCorrectType: false,
       pyq: false,
       year: null,
-      rating: null
+      rating: null,
     });
     // Force re-render of the form to reset Tiptap editors
-    setFormKey(prev => prev + 1);
+    setFormKey((prev) => prev + 1);
   };
 
   // Fetch questions for selected category
@@ -111,15 +109,10 @@ const formRef = useRef<HTMLDivElement>(null);
 
     const fetchQuestions = async () => {
       try {
-        const token = Cookies.get("token");
-        const response = await fetch(
-          `${env.API_TEST}/questions/?categoryId=${selectedCategory}&limit=${pageSize}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        if (!response.ok) throw new Error("Failed to fetch questions");
-        const { data } = await response.json();
+        const response = (await api.get(
+          `/questions/?categoryId=${selectedCategory}&limit=${pageSize}`
+        )) as { data: Question[] };
+        const { data } = response;
         setQuestions(data);
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -131,20 +124,16 @@ const formRef = useRef<HTMLDivElement>(null);
   // Fetch user name
   useEffect(() => {
     const fetchUserName = async () => {
-      const token = Cookies.get("token");
-      const admin = await fetch(`${env.API}/admin/`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const admin = (await api.get(`/admin/`)) as {
+        data: { email: string };
+      };
       if (admin) {
-        const adminData = await admin.json();
+        const adminData = admin.data;
         setNewQuestion((prev) => ({
           ...prev,
-          creatorName: adminData.data.email || "",
+          creatorName: adminData.email || "",
         }));
-        setCreatorName(adminData.data.email || "");
+        setCreatorName(adminData.email || "");
       }
     };
     fetchUserName();
@@ -170,13 +159,17 @@ const formRef = useRef<HTMLDivElement>(null);
           const formData = new FormData();
           formData.append("imageUrl", blob, "image.png");
 
-          const url = (await uploadImageToS3(formData, "ContentImages")) || "error";
+          const url =
+            (await uploadImageToS3(formData, "ContentImages")) || "error";
           img.setAttribute("src", url);
         } catch (error: unknown) {
           if (error instanceof Error) {
             console.error("Error uploading image:", error.message);
           }
-          setToast({ message: "Failed to upload image. Please try again.", type: "error" });
+          setToast({
+            message: "Failed to upload image. Please try again.",
+            type: "error",
+          });
         }
       }
     }
@@ -186,79 +179,76 @@ const formRef = useRef<HTMLDivElement>(null);
   const handleCreateQuestion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Process all rich text fields for images
       const processedQuestion = await handleImageUpload(newQuestion.question);
       const processedOptions = await Promise.all(
-        newQuestion.options.map(option => handleImageUpload(option))
+        newQuestion.options.map((option) => handleImageUpload(option))
       );
-      const processedExplanation = await handleImageUpload(newQuestion.explaination);
-  
-      const answer = newQuestion.multipleCorrectType 
-        ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
+      const processedExplanation = await handleImageUpload(
+        newQuestion.explaination
+      );
+
+      const answer = newQuestion.multipleCorrectType
+        ? newQuestion.answer
+            .split(",")
+            .map((num) => parseInt(num) - 1)
+            .join(",")
         : (parseInt(newQuestion.answer) - 1).toString();
-      
-      const response = await fetch(`${env.API_TEST}/questions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Cookies.get("token")}`,
-        },
-        body: JSON.stringify({
-          ...newQuestion,
-          question: processedQuestion,
-          options: processedOptions,
-          explaination: processedExplanation,
-          answer,
-          categoryId: selectedCategory,
-          multipleCorrectType: newQuestion.multipleCorrectType
-        }),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create question");
-      }
-      
-      const createdQuestion = await response.json();
-      
+
+      const response = (await api.post(`/questions`, {
+        ...newQuestion,
+        question: processedQuestion,
+        options: processedOptions,
+        explaination: processedExplanation,
+        answer,
+        categoryId: selectedCategory,
+        multipleCorrectType: newQuestion.multipleCorrectType,
+      })) as { data: Question };
+
+      const createdQuestion = response.data;
+
       // Update the questions list with the new question
-      setQuestions(prevQuestions => [createdQuestion.data, ...prevQuestions]);
-      
+      setQuestions((prevQuestions) => [createdQuestion, ...prevQuestions]);
+
       // Show success message
       setToast({ message: "Question added successfully!", type: "success" });
-  
+
       // Reset form
       resetForm();
-      
+
       // Scroll to the top of the questions list
       if (formRef.current) {
-        formRef.current.scrollIntoView({ behavior: 'smooth' });
+        formRef.current.scrollIntoView({ behavior: "smooth" });
       }
-      
     } catch (error) {
       console.error("Error creating question:", error);
       setToast({
-        message: error instanceof Error ? error.message : "Failed to add question. Please try again.",
-        type: "error"
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to add question. Please try again.",
+        type: "error",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   const handleEditQuestion = async (question: Question) => {
     try {
       // Process all rich text fields for images
       const processedQuestion = await handleImageUpload(question.question);
       const processedOptions = await Promise.all(
-        question.options.map(option => handleImageUpload(option))
+        question.options.map((option) => handleImageUpload(option))
       );
-      const processedExplanation = await handleImageUpload(question.explaination);
-  
+      const processedExplanation = await handleImageUpload(
+        question.explaination
+      );
+
       setEditingQuestion(question);
       setNewQuestion({
         ...question,
@@ -266,9 +256,9 @@ const formRef = useRef<HTMLDivElement>(null);
         options: processedOptions,
         explaination: processedExplanation,
         categoryId: question.categoryId,
-        multipleCorrectType: question.multipleCorrectType
+        multipleCorrectType: question.multipleCorrectType,
       });
-      
+
       if (formRef.current) {
         formRef.current.scrollIntoView({ behavior: "smooth" });
       }
@@ -279,28 +269,25 @@ const formRef = useRef<HTMLDivElement>(null);
 
   const handleDeleteQuestion = async () => {
     if (!deleteConfirmation.questionId) return;
-    
-    try {
-      const response = await fetch(`${env.API_TEST}/questions/${deleteConfirmation.questionId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${Cookies.get('token')}`,
-        },
-      });
 
-      if (!response.ok) throw new Error('Failed to delete question');
+    try {
+      const response = await api.delete(
+        `/questions/${deleteConfirmation.questionId}`
+      );
 
       // Remove the question from the local state
-      setQuestions(prev => prev.filter(q => q.id !== deleteConfirmation.questionId));
-      
+      setQuestions((prev) =>
+        prev.filter((q) => q.id !== deleteConfirmation.questionId)
+      );
+
       // Close the confirmation dialog
       setDeleteConfirmation({ isOpen: false, questionId: null });
-      
+
       // Show success message
-      alert('Question deleted successfully');
+      alert("Question deleted successfully");
     } catch (error) {
-      console.error('Error deleting question:', error);
-      alert('Failed to delete question');
+      console.error("Error deleting question:", error);
+      alert("Failed to delete question");
       setDeleteConfirmation({ isOpen: false, questionId: null });
     }
   };
@@ -310,29 +297,20 @@ const formRef = useRef<HTMLDivElement>(null);
     if (!editingQuestion) return;
 
     try {
-      const token = Cookies.get("token");
-      const answer = newQuestion.multipleCorrectType 
-        ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
+      const answer = newQuestion.multipleCorrectType
+        ? newQuestion.answer
+            .split(",")
+            .map((num) => parseInt(num) - 1)
+            .join(",")
         : (parseInt(newQuestion.answer) - 1).toString();
-      
-      const response = await fetch(
-        `${env.API_TEST}/questions/${editingQuestion.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            ...newQuestion,
-            answer,
-            creatorName: creatorName || "",
-            multipleCorrectType: newQuestion.multipleCorrectType
-          }),
-        }
-      );
+
+      const response = await api.put(`/questions/${editingQuestion.id}`, {
+        ...newQuestion,
+        answer,
+        creatorName: creatorName || "",
+        multipleCorrectType: newQuestion.multipleCorrectType,
+      });
       console.log("creatorName", creatorName);
-      if (!response.ok) throw new Error("Failed to update question");
 
       // Update the question in the list
       setQuestions((prevQuestions) =>
@@ -354,7 +332,7 @@ const formRef = useRef<HTMLDivElement>(null);
         multipleCorrectType: false,
         pyq: false,
         year: null,
-        rating: null
+        rating: null,
       });
     } catch (error) {
       console.error("Error updating question:", error);
@@ -374,7 +352,7 @@ const formRef = useRef<HTMLDivElement>(null);
       multipleCorrectType: false,
       pyq: false,
       year: null,
-      rating: null
+      rating: null,
     });
   };
 
@@ -382,9 +360,9 @@ const formRef = useRef<HTMLDivElement>(null);
     <div className="min-h-screen w-full bg-gray-50 py-10 px-2 md:px-6 flex flex-col items-center relative">
       {/* Toast Notification */}
       {toast && (
-        <div 
+        <div
           className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium ${
-            toast.type === 'success' ? 'bg-slate-500' : 'bg-red-500'
+            toast.type === "success" ? "bg-slate-500" : "bg-red-500"
           } transition-opacity duration-300`}
         >
           {toast.message}
@@ -456,8 +434,13 @@ const formRef = useRef<HTMLDivElement>(null);
                       <div className="tiptap-editor-container flex-1">
                         <TiptapEditor
                           content={option}
-                          onChange={(content) => 
-                            setNewQuestion({ ...newQuestion, options: newQuestion.options.map((_, i) => i === index ? content : _) })
+                          onChange={(content) =>
+                            setNewQuestion({
+                              ...newQuestion,
+                              options: newQuestion.options.map((_, i) =>
+                                i === index ? content : _
+                              ),
+                            })
                           }
                         />
                       </div>
@@ -501,7 +484,7 @@ const formRef = useRef<HTMLDivElement>(null);
                       onChange={(e) => {
                         setNewQuestion({
                           ...newQuestion,
-                          multipleCorrectType: e.target.checked
+                          multipleCorrectType: e.target.checked,
                         });
                       }}
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -515,15 +498,17 @@ const formRef = useRef<HTMLDivElement>(null);
                     <Input
                       className="bg-white text-[#1e293b] border border-gray-200 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
                       type="text"
-                      placeholder={newQuestion.multipleCorrectType 
-                        ? "Enter comma-separated answer numbers (e.g., 1,3,4)"
-                        : "Enter answer number"}
+                      placeholder={
+                        newQuestion.multipleCorrectType
+                          ? "Enter comma-separated answer numbers (e.g., 1,3,4)"
+                          : "Enter answer number"
+                      }
                       value={newQuestion.answer}
                       onChange={(e) => {
                         const value = e.target.value;
                         setNewQuestion({
                           ...newQuestion,
-                          answer: value
+                          answer: value,
                         });
                       }}
                     />
@@ -592,27 +577,41 @@ const formRef = useRef<HTMLDivElement>(null);
                         id="pyq"
                         checked={newQuestion.pyq}
                         onChange={(e) =>
-                          setNewQuestion({ ...newQuestion, pyq: e.target.checked })
+                          setNewQuestion({
+                            ...newQuestion,
+                            pyq: e.target.checked,
+                          })
                         }
                         className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors cursor-pointer"
                       />
                     </div>
-                    <label htmlFor="pyq" className="text-sm font-medium text-gray-700 cursor-pointer select-none">
+                    <label
+                      htmlFor="pyq"
+                      className="text-sm font-medium text-gray-700 cursor-pointer select-none"
+                    >
                       Previous Year Question (PYQ)
                     </label>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="year" className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="year"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Year <span className="text-red-500">*</span>
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <input
                         type="number"
                         id="year"
-                        value={newQuestion.year || ''}
+                        value={newQuestion.year || ""}
                         onChange={(e) =>
-                          setNewQuestion({ ...newQuestion, year: e.target.value ? parseInt(e.target.value) : null })
+                          setNewQuestion({
+                            ...newQuestion,
+                            year: e.target.value
+                              ? parseInt(e.target.value)
+                              : null,
+                          })
                         }
                         className="block w-full rounded-md border-gray-300 pl-4 pr-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm"
                         placeholder="e.g., 2023"
@@ -622,26 +621,45 @@ const formRef = useRef<HTMLDivElement>(null);
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <span className="text-gray-500 sm:text-sm">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </span>
                       </div>
                     </div>
-                    <p className="mt-1 text-xs text-gray-500">Between 1900-2100</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Between 1900-2100
+                    </p>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="rating" className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="rating"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Rating
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <input
                         type="number"
                         id="rating"
-                        value={newQuestion.rating || ''}
+                        value={newQuestion.rating || ""}
                         onChange={(e) =>
-                          setNewQuestion({ ...newQuestion, rating: e.target.value ? parseInt(e.target.value) : null })
+                          setNewQuestion({
+                            ...newQuestion,
+                            rating: e.target.value
+                              ? parseInt(e.target.value)
+                              : null,
+                          })
                         }
                         className="block w-full rounded-md border-gray-300 pl-4 pr-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm"
                         placeholder="e.g., 75"
@@ -693,20 +711,24 @@ const formRef = useRef<HTMLDivElement>(null);
                   >
                     <div className="flex-1 min-w-0">
                       <div className="mb-3">
-                        <div 
+                        <div
                           className="text-[#0f172a] text-base leading-relaxed [&_table]:border [&_table]:border-gray-200 [&_table]:rounded [&_table]:overflow-hidden [&_table]:w-full [&_td]:p-3 [&_th]:p-3 [&_th]:bg-gray-50 [&_tr:not(:last-child)]:border-b [&_tr:not(:last-child)]:border-gray-100"
-                          dangerouslySetInnerHTML={{ __html: question.question }}
+                          dangerouslySetInnerHTML={{
+                            __html: question.question,
+                          }}
                         />
                       </div>
                       <div className="mt-4 flex flex-wrap items-center gap-4">
                         <div className="mt-3">
-                          <div className="text-xs font-medium text-gray-500 mb-1">Options:</div>
+                          <div className="text-xs font-medium text-gray-500 mb-1">
+                            Options:
+                          </div>
                           <div className="flex flex-wrap gap-2">
                             {question.options.map((opt, idx) => (
-                              <div 
+                              <div
                                 key={idx}
                                 className="px-3 py-1.5 rounded-md bg-gray-50 text-[#0f172a] text-sm border border-gray-200 max-w-full overflow-hidden"
-                                title={opt.replace(/<[^>]*>?/gm, '')}
+                                title={opt.replace(/<[^>]*>?/gm, "")}
                                 dangerouslySetInnerHTML={{ __html: opt }}
                               />
                             ))}
@@ -722,15 +744,15 @@ const formRef = useRef<HTMLDivElement>(null);
                         </p>
                       </div>
                       {question.pyq && question.year && (
-                          <div className="p-3 bg-blue-50 rounded-md border border-blue-100">
-                            <p className="text-sm text-blue-700 font-medium">
-                              PYQ Year:{" "}
-                              <span className="font-semibold">
-                                {question.year}
-                              </span>
-                            </p>
-                          </div>
-                        )}
+                        <div className="p-3 bg-blue-50 rounded-md border border-blue-100">
+                          <p className="text-sm text-blue-700 font-medium">
+                            PYQ Year:{" "}
+                            <span className="font-semibold">
+                              {question.year}
+                            </span>
+                          </p>
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 mt-4 md:mt-0 md:ml-4">
                       <Button
@@ -747,7 +769,10 @@ const formRef = useRef<HTMLDivElement>(null);
                         className="rounded bg-red-600 hover:bg-red-700"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setDeleteConfirmation({ isOpen: true, questionId: question.id });
+                          setDeleteConfirmation({
+                            isOpen: true,
+                            questionId: question.id,
+                          });
                         }}
                       >
                         Delete
@@ -765,12 +790,19 @@ const formRef = useRef<HTMLDivElement>(null);
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Question</h3>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete this question? This action cannot be undone.</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Delete Question
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this question? This action cannot
+              be undone.
+            </p>
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
-                onClick={() => setDeleteConfirmation({ isOpen: false, questionId: null })}
+                onClick={() =>
+                  setDeleteConfirmation({ isOpen: false, questionId: null })
+                }
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Cancel
@@ -788,4 +820,4 @@ const formRef = useRef<HTMLDivElement>(null);
       )}
     </div>
   );
-};
+}

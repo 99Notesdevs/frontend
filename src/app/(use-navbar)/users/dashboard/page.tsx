@@ -32,7 +32,8 @@ const Dashboard = () => {
         headers: {
           "Authorization": `Bearer ${Cookies.get('token')}`,
           "Content-Type": "application/json",
-        }
+        },
+        credentials: 'include'
       });
       
       if (response.ok) {

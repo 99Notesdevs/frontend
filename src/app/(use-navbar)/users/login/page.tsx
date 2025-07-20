@@ -5,6 +5,7 @@ import axios from "axios";
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
 import { isAuth } from "@/lib/isAuth";
+import { api } from "@/config/api/route";
 
 // Extend the Window interface to include the google property
 declare global {
@@ -24,11 +25,10 @@ const Login = () => {
   const router = useRouter();
   const token = Cookies.get("token");
   useEffect(() => {
-
     const checkAuth = async () => {
       const auth = await isAuth();
       if (auth.isAuthenticated && auth.role === "user") {
-        router.push("/users/dashboard");
+        window.location.href = `${env.TEST_PORTAL}/dashboard`;
       }
     };
     checkAuth();
@@ -43,19 +43,16 @@ const Login = () => {
   }, []);
 
   const handleCredentialResponse = async (response: any) => {
-    console.log("Atlease i am here", response);
-    const res = await fetch(`${env.API}/user/google`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ credential: response.credential }),
-    });
+    console.log("Atleast I am here", response);
 
-    const data = await res.json();
-    console.log(data);
-    if (data.token) {
-      Cookies.set("token", data.token?.split(" ")[1]);
-      localStorage.setItem("token", data.token);
-      router.push("/users/dashboard");
+    const res = (await api.post(`/user/google`, {
+      body: JSON.stringify({ credential: response.credential }),
+    })) as { success: boolean };
+
+    if (res.success) {
+      window.location.href = `${env.TEST_PORTAL}/dashboard`;
+    } else {
+      alert("Login failed");
     }
   };
 
@@ -70,21 +67,17 @@ const Login = () => {
   const checkUser = async () => {
     try {
       if (token) {
-        const res = await axios.get(`${env.API}/user/check`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (res.data.success) {
-          router.push("/users/dashboard");
+        const res = (await api.get(`/user/check`)) as { success: boolean };
+        if (res.success) {
+          window.location.href = `${env.TEST_PORTAL}/dashboard`;
         }
       }
     } catch (error) {
       console.error("Error checking user authentication: ", error);
       if (axios.isAxiosError(error) && error.response?.status !== 200) {
         console.warn("Unauthorized! Redirecting to login...");
-        Cookies.remove("token"); // Remove invalid token
-        window.location.href = "/users/login"; // Redirect user
+        Cookies.remove("token");
+        window.location.href = `${env.MAIN_PORTAL}/users/login`;
       } else {
         if (axios.isAxiosError(error)) {
           console.error(
@@ -106,28 +99,18 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${env.API}/user/`, {
+      const response = (await api.post(`/user`, {
         email,
         password,
-      });
-      if (response.data.success) {
-        const data = response.data.data;
-        if (!data) {
-          showToast(
-            "No token received from server. Please try again later.",
-            "error"
-          );
-          return;
-        }
-        const cookie = data.split(" ")[1];
-        Cookies.set("token", cookie, { expires: 5 });
-        const userData = await axios.get(`${env.API}/user`, {
-          headers: {
-            Authorization: `Bearer ${cookie}`,
-          },
-        });
-        localStorage.setItem("userId", userData.data.data.id);
-        router.push("/users/dashboard");
+      })) as { success: boolean };
+      console.log(response);
+      if (response.success) {
+        const userData = (await api.get(`/user`)) as {
+          success: boolean;
+          data: { id: string };
+        };
+        localStorage.setItem("userId", userData.data.id);
+        window.location.href = `${env.TEST_PORTAL}/dashboard`;
         showToast("Login successful!", "success");
       } else {
         showToast("Incorrect username or password.", "error");
@@ -174,7 +157,10 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"
+              >
                 Email address
               </label>
               <input
@@ -191,7 +177,10 @@ const Login = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"
+              >
                 Password
               </label>
               <div className="relative">
@@ -258,13 +247,19 @@ const Login = () => {
                   type="checkbox"
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-slate-600 rounded dark:bg-slate-700"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-slate-300">
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-900 dark:text-slate-300"
+                >
                   Remember me
                 </label>
               </div>
 
               <div className="text-sm">
-                <a href="/users/password-reset" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
+                <a
+                  href="/users/password-reset"
+                  className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                >
                   Forgot your password?
                 </a>
               </div>

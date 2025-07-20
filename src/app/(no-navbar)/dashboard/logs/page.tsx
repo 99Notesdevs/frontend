@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
+import { api } from "@/config/api/route";
 
 interface AdminLog {
   id: number;
@@ -29,20 +28,16 @@ export default function AdminLogsPage() {
     try {
       setLoading(true);
       const skip = (page - 1) * limit;
-      const response = await fetch(`${env.API}/admin-logs?skip=${skip}&take=${limit}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
-        },
-      });
-      
-      if (!response.ok) {
+      const response = await api.get(`/admin-logs?skip=${skip}&take=${limit}`) as { success: boolean; data: AdminLog[] };
+
+      if (!response.success) {
         throw new Error("Failed to fetch logs");
       }
-      
-      const data = await response.json();
-      
+
+      const data = response.data;
+
       // Parse details if they exist
-      const parsedLogs = data.data.map((log: any) => ({
+      const parsedLogs = data.map((log: any) => ({
         ...log,
         details: log.details ? JSON.parse(log.details) : null
       }));

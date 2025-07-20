@@ -1,48 +1,44 @@
-import Cookies from 'js-cookie'
-import { env } from '@/config/env'
+import Cookies from "js-cookie";
+import { api } from "@/config/api/route";
 
 export interface AuthResponse {
   isAuthenticated: boolean;
-  role: 'admin' | 'editor' | 'author' | 'user' | null;
+  role: "admin" | "editor" | "author" | "user" | null;
   userId: string | null;
 }
 
 export async function isAuth(): Promise<AuthResponse> {
   try {
-    const token = Cookies.get('token');
-    
+    const token = Cookies.get("token");
+
     if (!token) {
       return {
         isAuthenticated: false,
         role: null,
-        userId: null
-      }
+        userId: null,
+      };
     }
 
     // First, check the role
     const checkEndpoints = {
-      admin: `${env.API}/admin/check`,
-      editor: `${env.API}/editor/check`,
-      author: `${env.API}/author/check`,
-      user: `${env.API}/user/check`
+      admin: `/admin/check`,
+      editor: `/editor/check`,
+      author: `/author/check`,
+      user: `/user/check`,
     };
 
     // Try each endpoint in order of hierarchy (admin > editor > author)
     for (const [role, endpoint] of Object.entries(checkEndpoints)) {
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = (await api.get(endpoint)) as {
+        success: boolean;
+        data: { userId: string };
+      };
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.success) {
         return {
           isAuthenticated: true,
-          role: role as 'admin' | 'editor' | 'author' | 'user',
-          userId: data.userId
+          role: role as "admin" | "editor" | "author" | "user",
+          userId: response.data.userId,
         };
       }
     }
@@ -51,15 +47,14 @@ export async function isAuth(): Promise<AuthResponse> {
     return {
       isAuthenticated: false,
       role: null,
-      userId: null
+      userId: null,
     };
-
   } catch (error) {
-    console.error('Error verifying authentication:', error);
+    console.error("Error verifying authentication:", error);
     return {
       isAuthenticated: false,
       role: null,
-      userId: null
-    }
+      userId: null,
+    };
   }
 }

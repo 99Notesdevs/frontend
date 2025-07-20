@@ -1,14 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { CustomLinkForm, type CustomLinkFormData } from '@/components/dashboard/forms/CustomLinkForm';
-import { env } from '@/config/env';
-import Cookie from 'js-cookie';
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  CustomLinkForm,
+  type CustomLinkFormData,
+} from "@/components/dashboard/forms/CustomLinkForm";
+import { api } from "@/config/api/route";
+import Cookie from "js-cookie";
 
-import { PencilIcon, TrashIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
-import { CurrentArticleForm, CurrentArticleFormValues } from '@/components/dashboard/forms';
-import Drafts from '@/components/ui/drafts';
+import {
+  PencilIcon,
+  TrashIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
+import {
+  CurrentArticleForm,
+  CurrentArticleFormValues,
+} from "@/components/dashboard/forms";
+import Drafts from "@/components/ui/drafts";
 
 interface CurrentAffairType {
   id: number;
@@ -36,20 +46,24 @@ interface CurrentAffairType {
 }
 
 export default function ArticlesPage() {
-  const [selectedPage, setSelectedPage] = useState<CurrentAffairType | null>(null);
+  const [selectedPage, setSelectedPage] = useState<CurrentAffairType | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState<CurrentAffairType[]>([]);
-  const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
-  const token = Cookie.get('token');
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    selectedPage?.imageUrl || null
+  );
+  const token = Cookie.get("token");
 
   const handleEditSubmit = async (formData: CurrentArticleFormValues) => {
     try {
       // Generate slug from title
       const baseSlug = formData.title
         .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
       const slug = `current-affairs/${baseSlug}`;
 
       const updateData = {
@@ -57,11 +71,11 @@ export default function ArticlesPage() {
         content: formData.content,
         author: formData.author,
         link: null,
-        parentSlug: selectedPage?.parentSlug || '',
-        slug: selectedPage?.slug || '',
+        parentSlug: selectedPage?.parentSlug || "",
+        slug: selectedPage?.slug || "",
         updatedAt: new Date(),
         imageUrl: formData.imageUrl,
-        quizQuestions: formData.quizQuestions || '[]', // Ensure we have a valid string
+        quizQuestions: formData.quizQuestions || "[]", // Ensure we have a valid string
         metadata: JSON.stringify({
           metaTitle: formData.metaTitle,
           metaDescription: formData.metaDescription,
@@ -78,48 +92,43 @@ export default function ArticlesPage() {
           canonicalUrl: formData.canonicalUrl,
           schemaData: formData.schemaData,
           header: formData.header,
-          body: formData.body
-        })
+          body: formData.body,
+        }),
       };
 
       if (!selectedPage) {
-        setError('No page selected');
+        setError("No page selected");
         return;
       }
-      
-      const response = await fetch(`${env.API}/currentArticle/${selectedPage.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update article');
+
+      const response = (await api.put(
+        `/currentArticle/${selectedPage.id}`,
+        updateData
+      )) as { success: boolean; data: CurrentAffairType };
+      if (!response.success) {
+        throw new Error("Failed to update article");
       }
 
-      const { data } = await response.json();
+      const { data } = response;
       setSelectedPage(data);
-      
+
       // Refresh the page list
       const urlParams = new URLSearchParams(window.location.search);
-      const parentSlug = urlParams.get('parentPageName');
+      const parentSlug = urlParams.get("parentPageName");
       if (parentSlug) {
         fetchPages(parentSlug);
       }
-      
+
       // Refresh the page after successful submission
       window.location.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
   const handleCustomLinkSubmit = async (formData: CustomLinkFormData) => {
     try {
       if (!selectedPage) {
-        setError('No page selected');
+        setError("No page selected");
         return;
       }
 
@@ -128,44 +137,39 @@ export default function ArticlesPage() {
         link: formData.link,
         showInNav: formData.showInNav,
         content: "dummy",
-        slug:"dummy",
-        parentSlug:selectedPage.parentSlug,
-        author:"dummy",
+        slug: "dummy",
+        parentSlug: selectedPage.parentSlug,
+        author: "dummy",
         updatedAt: new Date(),
         imageUrl: "",
-        metadata: ""
+        metadata: "",
       };
 
-      const response = await fetch(`${env.API}/currentArticle/${selectedPage.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update page');
+      const response = (await api.put(
+        `/currentArticle/${selectedPage.id}`,
+        updateData
+      )) as { success: boolean };
+      if (!response.success) {
+        throw new Error("Failed to update page");
       }
 
       // Refresh the page list/ Refresh the page list
       const urlParams = new URLSearchParams(window.location.search);
-      const parentSlug = urlParams.get('parentPageName');
+      const parentSlug = urlParams.get("parentPageName");
       if (parentSlug) {
         fetchPages(parentSlug);
       }
-      
+
       // Refresh the page after successful submission
       window.location.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const parentSlug = urlParams.get('parentPageName');
+    const parentSlug = urlParams.get("parentPageName");
     if (parentSlug) {
       fetchPages(parentSlug);
     }
@@ -173,34 +177,36 @@ export default function ArticlesPage() {
 
   useEffect(() => {
     if (selectedPage) {
-      console.log('Selected page content:', selectedPage);
-      
+      console.log("Selected page content:", selectedPage);
+
       // Parse metadata string into object if it exists
-      const parsedMetadata = selectedPage.metadata ? JSON.parse(selectedPage.metadata) : {};
-      
+      const parsedMetadata = selectedPage.metadata
+        ? JSON.parse(selectedPage.metadata)
+        : {};
+
       // Prepare default values for the form
       const defaultValues = {
         title: selectedPage.title,
-        content: selectedPage.content || '',
-        author: selectedPage.author || '',
-        imageUrl: selectedPage.imageUrl || '',
-        metaTitle: parsedMetadata.metaTitle || '',
-        metaDescription: parsedMetadata.metaDescription || '',
-        metaKeywords: parsedMetadata.metaKeywords || '',
-        robots: parsedMetadata.robots || '',
-        ogTitle: parsedMetadata.ogTitle || '',
-        ogDescription: parsedMetadata.ogDescription || '',
-        ogImage: parsedMetadata.ogImage || '',
-        ogType: parsedMetadata.ogType || '',
-        twitterCard: parsedMetadata.twitterCard || '',
-        twitterTitle: parsedMetadata.twitterTitle || '',
-        twitterDescription: parsedMetadata.twitterDescription || '',
-        twitterImage: parsedMetadata.twitterImage || '',
-        canonicalUrl: parsedMetadata.canonicalUrl || '',
-        schemaData: parsedMetadata.schemaData || '',
-        header: parsedMetadata.header || '',
-        body: parsedMetadata.body || '',
-        quizQuestions: selectedPage.quizQuestions || '[]', // Ensure we always have a valid JSON string
+        content: selectedPage.content || "",
+        author: selectedPage.author || "",
+        imageUrl: selectedPage.imageUrl || "",
+        metaTitle: parsedMetadata.metaTitle || "",
+        metaDescription: parsedMetadata.metaDescription || "",
+        metaKeywords: parsedMetadata.metaKeywords || "",
+        robots: parsedMetadata.robots || "",
+        ogTitle: parsedMetadata.ogTitle || "",
+        ogDescription: parsedMetadata.ogDescription || "",
+        ogImage: parsedMetadata.ogImage || "",
+        ogType: parsedMetadata.ogType || "",
+        twitterCard: parsedMetadata.twitterCard || "",
+        twitterTitle: parsedMetadata.twitterTitle || "",
+        twitterDescription: parsedMetadata.twitterDescription || "",
+        twitterImage: parsedMetadata.twitterImage || "",
+        canonicalUrl: parsedMetadata.canonicalUrl || "",
+        schemaData: parsedMetadata.schemaData || "",
+        header: parsedMetadata.header || "",
+        body: parsedMetadata.body || "",
+        quizQuestions: selectedPage.quizQuestions || "[]", // Ensure we always have a valid JSON string
       };
 
       setImagePreview(selectedPage.imageUrl || null);
@@ -208,59 +214,51 @@ export default function ArticlesPage() {
   }, [selectedPage]);
 
   const handleDelete = async (pageId: number) => {
-    if (!window.confirm('Are you sure you want to delete this page?')) return;
+    if (!window.confirm("Are you sure you want to delete this page?")) return;
 
     try {
-      const response = await fetch(`${env.API}/currentArticle/${pageId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete page');
+      const response = (await api.delete(`/currentArticle/${pageId}`)) as {
+        success: boolean;
+      };
+      if (!response.success) {
+        throw new Error("Failed to delete page");
       }
 
       // Refresh the page list
       const urlParams = new URLSearchParams(window.location.search);
-      const parentSlug = urlParams.get('parentPageName');
+      const parentSlug = urlParams.get("parentPageName");
       if (parentSlug) {
         fetchPages(parentSlug);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
   const fetchPages = async (parentSlug: string) => {
     try {
       setLoading(true);
-      const response = await fetch(`${env.API}/currentArticle/parent/${parentSlug}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = (await api.get(
+        `/currentArticle/parent/${parentSlug}`
+      )) as { success: boolean; data: CurrentAffairType[] };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch pages');
+      if (!response.success) {
+        throw new Error("Failed to fetch pages");
       }
 
-      const { data } = await response.json();
+      const { data } = response;
       setPages(data || []);
     } catch (error) {
-      console.error('Error fetching current affairs:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      console.error("Error fetching current affairs:", {
+        error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
         name: error instanceof Error ? error.name : undefined,
-        type: error instanceof Error ? error.constructor.name : typeof error
+        type: error instanceof Error ? error.constructor.name : typeof error,
       });
 
-      setError(error instanceof Error ? error.message : 'Failed to fetch pages');
+      setError(
+        error instanceof Error ? error.message : "Failed to fetch pages"
+      );
     } finally {
       setLoading(false);
     }
@@ -271,9 +269,7 @@ export default function ArticlesPage() {
       <div className="mb-8">
         <div className="bg-[var(--admin-bg-secondary)] rounded-lg p-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white">
-              Edit Articles
-            </h1>
+            <h1 className="text-2xl font-bold text-white">Edit Articles</h1>
             <div className="flex items-center gap-4">
               <Button
                 variant="outline"
@@ -313,16 +309,16 @@ export default function ArticlesPage() {
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
-                <div
-                  className="text-[var(--admin-secondary)] text-sm mb-4 line-clamp-3"
-                  dangerouslySetInnerHTML={{
-                    __html: page.content ? (
-                      page.content.substring(0, 100)
-                    ) : (
-                      <p>No content Available</p>
-                    ),
-                  }}
-                ></div>
+              <div
+                className="text-[var(--admin-secondary)] text-sm mb-4 line-clamp-3"
+                dangerouslySetInnerHTML={{
+                  __html: page.content ? (
+                    page.content.substring(0, 100)
+                  ) : (
+                    <p>No content Available</p>
+                  ),
+                }}
+              ></div>
 
               <div className="flex justify-end space-x-2">
                 <Button
@@ -332,9 +328,11 @@ export default function ArticlesPage() {
                     setSelectedPage(page);
                     // Scroll to the form container after a small delay to ensure it's mounted
                     setTimeout(() => {
-                      const formContainer = document.querySelector('.bg-white.rounded-lg.shadow-sm');
+                      const formContainer = document.querySelector(
+                        ".bg-white.rounded-lg.shadow-sm"
+                      );
                       if (formContainer) {
-                        formContainer.scrollIntoView({ behavior: 'smooth' });
+                        formContainer.scrollIntoView({ behavior: "smooth" });
                       }
                     }, 100);
                   }}
@@ -370,7 +368,7 @@ export default function ArticlesPage() {
                   initialData={{
                     title: selectedPage.title,
                     link: selectedPage.link,
-                    showInNav:  false
+                    showInNav: false,
                   }}
                   onSubmit={handleCustomLinkSubmit}
                 />
@@ -379,35 +377,69 @@ export default function ArticlesPage() {
                   onSubmit={handleEditSubmit}
                   defaultValues={{
                     title: selectedPage.title,
-                    content: selectedPage.content || '',
-                  author: selectedPage.author || '',
-                  blogs: selectedPage.blogs || [],  
-                  slug: selectedPage.slug || '',
-                  imageUrl: selectedPage.imageUrl || '',
-                  metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
-                  metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',
-                  metaKeywords: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaKeywords || '' : '',
-                  robots: selectedPage.metadata ? JSON.parse(selectedPage.metadata).robots || '' : '',
-                  ogTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogTitle || '' : '',
-                  ogDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogDescription || '' : '',
-                  ogImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogImage || '' : '',
-                  ogType: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogType || '' : '',
-                  twitterCard: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterCard || '' : '',
-                  twitterTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterTitle || '' : '',
-                  twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
-                  twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
-                  canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
-                  schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
-                  quizQuestions: selectedPage.quizQuestions || '[]', // Ensure we always have a valid JSON string
-                  header: selectedPage.metadata ? JSON.parse(selectedPage.metadata).header || '' : '',
-                  body: selectedPage.metadata ? JSON.parse(selectedPage.metadata).body || '' : ''
-                }}
-              />)}
+                    content: selectedPage.content || "",
+                    author: selectedPage.author || "",
+                    blogs: selectedPage.blogs || [],
+                    slug: selectedPage.slug || "",
+                    imageUrl: selectedPage.imageUrl || "",
+                    metaTitle: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).metaTitle || ""
+                      : "",
+                    metaDescription: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).metaDescription || ""
+                      : "",
+                    metaKeywords: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).metaKeywords || ""
+                      : "",
+                    robots: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).robots || ""
+                      : "",
+                    ogTitle: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogTitle || ""
+                      : "",
+                    ogDescription: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogDescription || ""
+                      : "",
+                    ogImage: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogImage || ""
+                      : "",
+                    ogType: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogType || ""
+                      : "",
+                    twitterCard: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterCard || ""
+                      : "",
+                    twitterTitle: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterTitle || ""
+                      : "",
+                    twitterDescription: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterDescription ||
+                        ""
+                      : "",
+                    twitterImage: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterImage || ""
+                      : "",
+                    canonicalUrl: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).canonicalUrl || ""
+                      : "",
+                    schemaData: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).schemaData || ""
+                      : "",
+                    quizQuestions: selectedPage.quizQuestions || "[]", // Ensure we always have a valid JSON string
+                    header: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).header || ""
+                      : "",
+                    body: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).body || ""
+                      : "",
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
       )}
-      <Drafts/>
+      <Drafts />
     </div>
   );
 }

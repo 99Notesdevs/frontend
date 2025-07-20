@@ -1,8 +1,5 @@
-'use client';
-import { useState, useEffect } from "react";
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
-import axios from "axios";
+"use client";
+import { useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import { FiUserPlus, FiRefreshCw, FiCheck, FiX, FiUser, FiMail, FiLock, FiCalendar, FiDollarSign } from "react-icons/fi";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,81 +14,105 @@ const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
 };
+import { api } from "@/config/api/route";
+
 
 interface User {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-    userData: {
-        paidUser: boolean;
-        validTill: string;
-    }
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  userData: {
+    paidUser: boolean;
+    validTill: string;
+  };
 }
 
 function ManageUsers() {
-    const token = Cookies.get("token");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [id, setId] = useState("");
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [paidUser, setPaidUser] = useState("false");
-    const [validityDays, setValidityDays] = useState(0);
-    const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [id, setId] = useState("");
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [paidUser, setPaidUser] = useState("false");
+  const [validityDays, setValidityDays] = useState(0);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "error" | "success";
+  } | null>(null);
 
-    // Add new user
-    const addUser = async (user: any) => {
-        try {
-            const response = await axios.post(`${env.API}/user/signup`, user, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            if (!response.data.success) throw new Error("Failed to add user");
-            setToast({ message: "User added successfully", type: 'success' });
-            setFirstName("");
-            setLastName("");
-            setEmail("");
-            setPassword("");
-        } catch (error: any) {
-            console.error("Error adding user:", error);
-            setToast({ message: error.message || "Error adding user", type: 'error' });
-        }
-    };
+  // Add new user
+  const addUser = async (user: any) => {
+    try {
+      const response = (await api.post(`/user/signup`, user)) as {
+        success: boolean; data: any;
+      };
+      if (!response.success) throw new Error("Failed to add user");
+      setToast({ message: "User added successfully", type: "success" });
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPassword("");
+    } catch (error: any) {
+      console.error("Error adding user:", error);
+      setToast({
+        message: error.message || "Error adding user",
+        type: "error",
+      });
+    }
+  };
 
-    // Fetch single user
-    const fetchUser = async (id: string) => {
-        try {
-            const response = await axios.get(`${env.API}/user/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            setSelectedUser(response.data.data as User);
-            setPaidUser(response.data.data.userData.paidUser || false);
-            setValidityDays(response.data.data.userData.validTill ? Math.ceil((new Date(response.data.data.userData.validTill).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0);
-        } catch (error: any) {
-            console.error("Error fetching user:", error);
-            setToast({ message: error.message || "Error fetching user", type: 'error' });
-        }
-    };
+  // Fetch single user
+  const fetchUser = async (id: string) => {
+    try {
+      const response = (await api.get(`/user/${id}`)) as {
+        success: boolean; data: User;
+      };
+      setSelectedUser(response.data as User);
+      setPaidUser(response.data.userData.paidUser ? "true" : "false");
+      setValidityDays(
+        response.data.userData.validTill
+          ? Math.ceil(
+              (new Date(response.data.userData.validTill).getTime() -
+                Date.now()) /
+                (1000 * 60 * 60 * 24)
+            )
+          : 0
+      );
+    } catch (error: any) {
+      console.error("Error fetching user:", error);
+      setToast({
+        message: error.message || "Error fetching user",
+        type: "error",
+      });
+    }
+  };
 
-    // Update subscription
-    const updateSubscription = async () => {
-        try {
-            const response = await axios.put(`${env.API}/user/updateUser/${id}`, {
-                paidUser,
-                validTill: new Date(Date.now() + (validityDays * 24 * 60 * 60 * 1000))
-            }, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!response.data.success) throw new Error("Failed to update subscription");
-            setToast({ message: "Subscription updated successfully", type: 'success' });
-            setSelectedUser(null);
-            setId("");
-        } catch (error: any) {
-            console.error("Error updating subscription:", error);
-            setToast({ message: error.message || "Error updating subscription", type: 'error' });
-        }
-    };
+  // Update subscription
+  const updateSubscription = async () => {
+    try {
+      const response = (await api.put(`/user/updateUser/${id}`, {
+        paidUser,
+        validTill: new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000),
+      })) as { success: boolean };
+      if (!response.success)
+        throw new Error("Failed to update subscription");
+      setToast({
+        message: "Subscription updated successfully",
+        type: "success",
+      });
+      setSelectedUser(null);
+      setId("");
+    } catch (error: any) {
+      console.error("Error updating subscription:", error);
+      setToast({
+        message: error.message || "Error updating subscription",
+        type: "error",
+      });
+    }
+  };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-8">

@@ -8,8 +8,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
+import { api } from "@/config/api/route";
 
 // Define the type for a page
 interface Page {
@@ -32,12 +31,13 @@ interface Page {
 
 // Fetch pages from the API with parent-child relationships
 const fetchPages = async (): Promise<Page[]> => {
-  const res = await fetch(`${env.API}/page/order`)
-  if (!res.ok) {
-    throw new Error("Failed to fetch pages")
+  const res = (await api.get(`/page/order`)) as {
+    success: boolean; data: Page[];
+  };
+  if (!res.success) {
+    throw new Error("Failed to fetch pages");
   }
-  const { data } = await res.json();
-  return buildHierarchy(data);
+  return buildHierarchy(res.data);
 };
 
 // Helper function to build hierarchical structure from flat array
@@ -93,10 +93,16 @@ const SortableItem = ({ page }: { page: Page }) => {
       className="article-item bg-white shadow-sm rounded-lg p-4 mb-2 border border-[var(--admin-border)] cursor-move"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-[var(--admin-bg-secondary)]">{page.title}</h3>
+        <h3 className="text-lg font-semibold text-[var(--admin-bg-secondary)]">
+          {page.title}
+        </h3>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-[var(--admin-primary)]">Level: {page.level}</span>
-          <span className="text-sm text-[var(--admin-primary)]">Order: {page.order}</span>
+          <span className="text-sm text-[var(--admin-primary)]">
+            Level: {page.level}
+          </span>
+          <span className="text-sm text-[var(--admin-primary)]">
+            Order: {page.order}
+          </span>
           <span className="text-sm text-[var(--admin-primary)]">
             Parent: {page.parentId || "None"}
           </span>
@@ -109,7 +115,6 @@ const SortableItem = ({ page }: { page: Page }) => {
 const ArticleList = () => {
   const [pages, setPages] = useState<Page[]>([]);
   const [flattenedPages, setFlattenedPages] = useState<Page[]>([]);
-  const token = Cookies.get("token");
 
   // Flatten the hierarchy while maintaining level information
   const flattenHierarchy = (pages: Page[]): Page[] => {
@@ -135,7 +140,7 @@ const ArticleList = () => {
         setPages(pagesData);
         setFlattenedPages(flattenHierarchy(pagesData));
       } catch (error) {
-        console.error("Error fetching pages:", error)
+        console.error("Error fetching pages:", error);
       }
     };
     getPages();
@@ -244,16 +249,11 @@ const ArticleList = () => {
     try {
       // Only update the pages that were reordered (the siblings)
       const updatePromises = updatedSiblings.map((page) => {
-        return fetch(`${env.API}/page/order`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ pageId: page.id, newOrder: page.order }),
+        return api.put(`/page/order`, {
+          pageId: page.id,
+          newOrder: page.order,
         });
       });
-
       await Promise.all(updatePromises);
     } catch (error) {
       console.error("Error updating page order:", error);
@@ -263,9 +263,13 @@ const ArticleList = () => {
   return (
     <div className="container mx-auto px-2 sm:px-4 py-8 max-w-2xl">
       <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6">
-        <h1 className="text-2xl font-bold text-[var(--admin-bg-secondary)] mb-6 text-center">Sort Pages</h1>
+        <h1 className="text-2xl font-bold text-[var(--admin-bg-secondary)] mb-6 text-center">
+          Sort Pages
+        </h1>
         {flattenedPages.length === 0 ? (
-          <p className="text-[var(--admin-primary)] text-center">No pages found.</p>
+          <p className="text-[var(--admin-primary)] text-center">
+            No pages found.
+          </p>
         ) : (
           <DndContext
             collisionDetection={closestCenter}
@@ -277,7 +281,10 @@ const ArticleList = () => {
             >
               <div className="space-y-4">
                 {flattenedPages.map((page) => (
-                  <div key={page.id} className="bg-[var(--admin-bg-lightest)] rounded-lg shadow flex items-center px-4 py-3 border border-[var(--admin-border)] hover:bg-[var(--admin-bg-light)] transition-all">
+                  <div
+                    key={page.id}
+                    className="bg-[var(--admin-bg-lightest)] rounded-lg shadow flex items-center px-4 py-3 border border-[var(--admin-border)] hover:bg-[var(--admin-bg-light)] transition-all"
+                  >
                     <SortableItem page={page} />
                   </div>
                 ))}
@@ -287,7 +294,7 @@ const ArticleList = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ArticleList
+export default ArticleList;

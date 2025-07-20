@@ -1,14 +1,14 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Plus_Jakarta_Sans } from 'next/font/google';
-import { env } from '@/config/env';
-import Cookies from 'js-cookie';
-import { FaEnvelope, FaLock, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus_Jakarta_Sans } from "next/font/google";
+import Cookies from "js-cookie";
+import { FaEnvelope, FaLock, FaKey, FaEye, FaEyeSlash } from "react-icons/fa";
+import { api } from "@/config/api/route";
 
 const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export default function AddAdmin() {
@@ -16,7 +16,7 @@ export default function AddAdmin() {
   const [adminData, setAdminData] = useState({
     email: "",
     password: "",
-    secretKey: ""
+    secretKey: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -31,19 +31,11 @@ export default function AddAdmin() {
         const token = Cookies.get("token");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch(`${env.API}/admin/all `, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = (await api.get(`/admin/all`)) as {
+          data: { admins: any[] };
+        };
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch admins");
-        }
-
-        const { data } = await response.json();
-        setAdmins(data || []); // Assuming the API returns an array of admins in `data.admins`
+        setAdmins(response.data.admins || []); // Assuming the API returns an array of admins in `data.admins`
       } catch (err) {
         console.error("Error fetching admins:", err);
       }
@@ -54,47 +46,37 @@ export default function AddAdmin() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     try {
-      const token = Cookies.get('token');
-      if (!token) throw new Error('No token found');
+      const token = Cookies.get("token");
+      if (!token) throw new Error("No token found");
 
-      const response = await fetch(`${env.API}/admin/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(adminData),
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        const errorMessage = data.error || 'Failed to create admin';
-        throw new Error(errorMessage);
-      }
+      const data = await api.post(`/admin/signup`, adminData);
 
       // Reset form
       setAdminData({
         email: "",
         password: "",
-        secretKey: ""
+        secretKey: "",
       });
-      
+
       // Update admin list
-      setAdmins(prev => [...prev, data]);
-      
+      setAdmins((prev) => [...prev, data]);
+
       // Show success message
-      setSuccess('Admin added successfully');
+      setSuccess("Admin added successfully");
       setError(null);
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while adding admin');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while adding admin"
+      );
       setSuccess(null);
     }
   };

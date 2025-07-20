@@ -1,6 +1,5 @@
 "use client";
 
-import { env } from "@/config/env";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { FiPlus, FiEdit2, FiTrash2, FiDollarSign, FiCalendar, FiPackage, FiGrid } from "react-icons/fi";
@@ -19,6 +18,8 @@ const cardVariants = {
 };
 
 const token = Cookies.get("token");
+import { api } from "@/config/api/route";
+
 
 interface Order {
   id: string;
@@ -40,30 +41,33 @@ interface Category {
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  );
   const [newOrderTitle, setNewOrderTitle] = useState("");
   const [newOrderDescription, setNewOrderDescription] = useState("");
   const [newOrderAmount, setNewOrderAmount] = useState<number>(0);
   const [newOrderValidity, setNewOrderValidity] = useState<number>(0);
   const [newOrderStock, setNewOrderStock] = useState<number>(0);
-  const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "error" | "success";
+  } | null>(null);
 
   const fetchOrders = async () => {
-    const response = await fetch(`${env.API}/product`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Failed to fetch orders");
-    const { data } = await response.json();
-    setOrders(data);
+    const response = (await api.get(`/product`)) as {
+      success: boolean; data: Order[];
+    };
+    if (!response.success) throw new Error("Failed to fetch orders");
+    setOrders(response.data);
   };
 
   const fetchCategories = async () => {
-    const response = await fetch(`${env.API}/category`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Failed to fetch categories");
-    const { data } = await response.json();
-    setCategories(data);
+    const response = (await api.get(`/category`)) as {
+      success: boolean; data: Category[];
+    };
+    if (!response.success) throw new Error("Failed to fetch categories");
+    setCategories(response.data);
   };
 
   useEffect(() => {
@@ -84,23 +88,16 @@ export default function OrdersPage() {
       return;
     }
 
-    const response = await fetch(`${env.API}/product`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: newOrderTitle,
-        description: newOrderDescription,
-        price: newOrderAmount,
-        stock: newOrderStock, // Include stock
-        validity: newOrderValidity,
-        categoryId: selectedCategoryId, // Pass the selected category ID
-      }),
-    });
+    const response = (await api.post(`/product`, {
+      name: newOrderTitle,
+      description: newOrderDescription,
+      price: newOrderAmount,
+      stock: newOrderStock, // Include stock
+      validity: newOrderValidity,
+      categoryId: selectedCategoryId, // Pass the selected category ID
+    })) as { success: boolean; data: Order };
 
-    if (response.ok) {
+    if (response.success) {
       setNewOrderTitle("");
       setNewOrderDescription("");
       setNewOrderAmount(0);
@@ -108,9 +105,12 @@ export default function OrdersPage() {
       setNewOrderValidity(0);
       setSelectedCategoryId(null);
       await fetchOrders();
-      setToast({ message: "Product created successfully", type: 'success' });
+      setToast({ message: "Product created successfully", type: "success" });
     } else {
-      setToast({ message: "Failed to create the product. Please try again.", type: 'error' });
+      setToast({
+        message: "Failed to create the product. Please try again.",
+        type: "error",
+      });
     }
   };
 
