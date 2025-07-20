@@ -25,10 +25,10 @@ const MediaLibrary = () => {
         setLoading(true);
         setError(null);
         const response = (await api.get(`/aws/get-all-images`)) as {
-          data: { success: boolean; data: string[] };
+          success: boolean; data: string[];
         };
-        setMediaFiles(response.data.data || []);
-        setFilteredMediaFiles(response.data.data || []);
+        setMediaFiles(response.data || []);
+        setFilteredMediaFiles(response.data || []);
       } catch (err) {
         setError("Failed to fetch media files.");
       } finally {
@@ -64,8 +64,8 @@ const MediaLibrary = () => {
     try {
       const response = (await api.delete(`/aws/delete-image`, {
         data: { selectedFiles },
-      })) as { data: { success: boolean; message: string } };
-      if (response.data.success) {
+      })) as { success: boolean; message: string };
+      if (response.success) {
         setMediaFiles((prev) =>
           prev.filter((file) => !selectedFiles.includes(file))
         );

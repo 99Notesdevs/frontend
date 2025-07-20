@@ -28,13 +28,13 @@ export default function AdminLogsPage() {
     try {
       setLoading(true);
       const skip = (page - 1) * limit;
-      const response = await api.get(`/admin-logs?skip=${skip}&take=${limit}`) as { data: { success: boolean; data: AdminLog[] } };
+      const response = await api.get(`/admin-logs?skip=${skip}&take=${limit}`) as { success: boolean; data: AdminLog[] };
 
-      if (!response.data.success) {
+      if (!response.success) {
         throw new Error("Failed to fetch logs");
       }
 
-      const data = response.data.data;
+      const data = response.data;
 
       // Parse details if they exist
       const parsedLogs = data.map((log: any) => ({

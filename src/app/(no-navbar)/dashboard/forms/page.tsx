@@ -28,8 +28,8 @@ const FormsPage = () => {
     try {
       const response = (await api.post(`${backendUrl}/bulk-delete`, {
         ids,
-      })) as { data: { success: boolean; data: any[] } };
-      if (!response.data.success) throw new Error("Failed to delete forms");
+      })) as { success: boolean; data: any[] };
+      if (!response.success) throw new Error("Failed to delete forms");
       setForms((prev) => prev.filter((form) => !ids.includes(form.id)));
     } catch (error) {
       console.error("Error deleting forms:", error);
@@ -45,10 +45,10 @@ const FormsPage = () => {
     setIsLoading(true);
     try {
       const response = (await api.get(`${backendUrl}/all`)) as {
-        data: { success: boolean; data: Form[] };
+        success: boolean; data: Form[];
       };
-      if (!response.data.success) throw new Error("Failed to fetch forms");
-      setForms(response.data.data);
+      if (!response.success) throw new Error("Failed to fetch forms");
+      setForms(response.data);
     } catch (error) {
       console.error("Error fetching forms:", error);
     } finally {

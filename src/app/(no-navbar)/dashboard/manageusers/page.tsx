@@ -32,9 +32,9 @@ function ManageUsers() {
   const addUser = async (user: any) => {
     try {
       const response = (await api.post(`/user/signup`, user)) as {
-        data: { success: boolean; data: any };
+        success: boolean; data: any;
       };
-      if (!response.data.success) throw new Error("Failed to add user");
+      if (!response.success) throw new Error("Failed to add user");
       setToast({ message: "User added successfully", type: "success" });
       setFirstName("");
       setLastName("");
@@ -53,14 +53,14 @@ function ManageUsers() {
   const fetchUser = async (id: string) => {
     try {
       const response = (await api.get(`/user/${id}`)) as {
-        data: { success: boolean; data: User };
+        success: boolean; data: User;
       };
-      setSelectedUser(response.data.data as User);
-      setPaidUser(response.data.data.userData.paidUser ? "true" : "false");
+      setSelectedUser(response.data as User);
+      setPaidUser(response.data.userData.paidUser ? "true" : "false");
       setValidityDays(
-        response.data.data.userData.validTill
+        response.data.userData.validTill
           ? Math.ceil(
-              (new Date(response.data.data.userData.validTill).getTime() -
+              (new Date(response.data.userData.validTill).getTime() -
                 Date.now()) /
                 (1000 * 60 * 60 * 24)
             )
@@ -81,8 +81,8 @@ function ManageUsers() {
       const response = (await api.put(`/user/updateUser/${id}`, {
         paidUser,
         validTill: new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000),
-      })) as { data: { success: boolean } };
-      if (!response.data.success)
+      })) as { success: boolean };
+      if (!response.success)
         throw new Error("Failed to update subscription");
       setToast({
         message: "Subscription updated successfully",

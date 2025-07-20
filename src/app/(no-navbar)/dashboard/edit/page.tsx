@@ -82,10 +82,10 @@ function PageList() {
   const fetchPages = async () => {
     try {
       const response = (await api.get(`/page`)) as {
-        data: { success: boolean; data: Page[] };
+        success: boolean; data: Page[];
       };
-      if (!response.data.success) throw new Error("Failed to fetch pages");
-      setPages(response.data.data);
+      if (!response.success) throw new Error("Failed to fetch pages");
+      setPages(response.data);
     } catch (error) {
       console.error("Error fetching pages:", error);
     } finally {
@@ -96,10 +96,10 @@ function PageList() {
   const fetchPageById = async (pageId: number) => {
     try {
       const response = (await api.get(`/page/id/${pageId}`)) as {
-        data: { success: boolean; data: Page };
+        success: boolean; data: Page;
       };
-      if (!response.data.success) throw new Error("Failed to fetch page");
-      setSelectedPage(response.data.data);
+      if (!response.success) throw new Error("Failed to fetch page");
+      setSelectedPage(response.data);
       setShowForm(true);
 
       // Scroll to the form container after a small delay to ensure the form is mounted
@@ -239,9 +239,9 @@ function PageList() {
       const response = (await api.put(
         `/page/${selectedPage.id}`,
         apiPageData
-      )) as { data: { success: boolean } };
+      )) as { success: boolean };
 
-      if (!response.data.success) throw new Error("Failed to update page");
+      if (!response.success) throw new Error("Failed to update page");
 
       // Refresh the page list
       fetchPages();
@@ -415,9 +415,9 @@ function PageList() {
 
     try {
       const response = (await api.delete(`/page/${pageIdToDelete}`)) as {
-        data: { success: boolean };
+        success: boolean;
       };
-      if (!response.data.success) throw new Error("Failed to delete page");
+      if (!response.success) throw new Error("Failed to delete page");
       fetchPages();
       setShowDeleteModal(false);
       setPageIdToDelete(null);

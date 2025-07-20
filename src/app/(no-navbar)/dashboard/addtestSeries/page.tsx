@@ -60,10 +60,11 @@ export default function AddTestSeries() {
       const url = `/questions?categoryId=${categoryId}&limit=${pageSize}&page=${page}`;
 
       const response = (await api.get(url)) as {
-        data: { data: Question[]; total: number };
+        data: Question[];
+        total: number;
       };
 
-      const { data, total } = response.data;
+      const { data, total } = response;
 
       // If this is the first page or switching categories, reset questions
       if (page === 1) {

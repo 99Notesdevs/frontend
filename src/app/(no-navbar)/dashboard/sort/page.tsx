@@ -32,12 +32,12 @@ interface Page {
 // Fetch pages from the API with parent-child relationships
 const fetchPages = async (): Promise<Page[]> => {
   const res = (await api.get(`/page/order`)) as {
-    data: { success: boolean; data: Page[] };
+    success: boolean; data: Page[];
   };
-  if (!res.data.success) {
+  if (!res.success) {
     throw new Error("Failed to fetch pages");
   }
-  return buildHierarchy(res.data.data);
+  return buildHierarchy(res.data);
 };
 
 // Helper function to build hierarchical structure from flat array

@@ -125,15 +125,15 @@ export default function AddQuestionsPage() {
   useEffect(() => {
     const fetchUserName = async () => {
       const admin = (await api.get(`/admin/`)) as {
-        data: { data: { email: string } };
+        data: { email: string };
       };
       if (admin) {
         const adminData = admin.data;
         setNewQuestion((prev) => ({
           ...prev,
-          creatorName: adminData.data.email || "",
+          creatorName: adminData.email || "",
         }));
-        setCreatorName(adminData.data.email || "");
+        setCreatorName(adminData.email || "");
       }
     };
     fetchUserName();

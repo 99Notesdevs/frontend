@@ -42,9 +42,9 @@ export default function CategoryPage() {
   const fetchCategories = async () => {
     try {
       const response = (await api.get(`/categories`)) as {
-        data: { success: boolean; data: any[] };
+        success: boolean; data: any[];
       };
-      const result = response.data;
+      const result = response;
       if (result.success && Array.isArray(result.data)) {
         // Convert the data to match our Category type
         const categories = result.data.map((item: any) => ({
@@ -87,9 +87,9 @@ export default function CategoryPage() {
       const weightResponse = (await api.put(
         `/categories/${currentCategory.id}/weight`,
         { weight: formData.weight }
-      )) as { data: { success: boolean } };
+      )) as { success: boolean };
 
-      if (!weightResponse.data.success)
+      if (!weightResponse.success)
         throw new Error("Failed to update category weight");
 
       // Then update other fields using the regular update endpoint
@@ -102,9 +102,9 @@ export default function CategoryPage() {
             ? Number(formData.parentTagId)
             : null,
         }
-      )) as { data: { success: boolean } };
+      )) as { success: boolean };
 
-      if (!updateResponse.data.success) {
+      if (!updateResponse.success) {
         console.error("Update error details!");
         throw new Error("Failed to update category");
       }
@@ -135,10 +135,10 @@ export default function CategoryPage() {
 
     try {
       const response = (await api.delete(`/categories/${id}`)) as {
-        data: { success: boolean };
+        success: boolean;
       };
 
-      if (!response.data.success) throw new Error("Failed to delete category");
+      if (!response.success) throw new Error("Failed to delete category");
 
       toast.success("Category deleted successfully");
       fetchCategories();

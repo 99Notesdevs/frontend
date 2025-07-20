@@ -23,12 +23,12 @@ const fetchCurrentAffairsByType = async (
   type: "daily" | "monthly" | "yearly"
 ): Promise<CurrentAffair[]> => {
   const res = (await api.get(`/currentAffair/type/${type}`)) as {
-    data: { success: boolean; data: CurrentAffair[] };
+    success: boolean; data: CurrentAffair[];
   };
-  if (!res.data.success) {
+  if (!res.success) {
     throw new Error(`Failed to fetch ${type} current affairs`);
   }
-  return res.data.data;
+  return res.data;
 };
 
 // Sortable Item Component

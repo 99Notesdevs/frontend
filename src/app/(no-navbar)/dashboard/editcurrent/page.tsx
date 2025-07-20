@@ -184,13 +184,13 @@ export default function PageListCurrent() {
       const response = (await api.put(
         `/currentAffair/${selectedPage.id}`,
         updateData
-      )) as { data: { success: boolean; data: CurrentAffairType } };
+      )) as { success: boolean; data: CurrentAffairType };
 
-      if (!response.data.success) {
+      if (!response.success) {
         throw new Error("Failed to update page");
       }
 
-      const { data } = response.data;
+      const { data } = response;
       setSelectedPage(data);
       if (selectedType) {
         fetchPages(selectedType);
@@ -225,9 +225,9 @@ export default function PageListCurrent() {
       const response = (await api.put(
         `/currentAffair/${selectedPage.id}`,
         updateData
-      )) as { data: { success: boolean; data: CurrentAffairType } };
+      )) as { success: boolean; data: CurrentAffairType };
 
-      if (!response.data.success) {
+      if (!response.success) {
         throw new Error("Failed to update page");
       }
 
@@ -292,10 +292,10 @@ export default function PageListCurrent() {
 
     try {
       const response = (await api.delete(`/currentAffair/${pageId}`)) as {
-        data: { success: boolean };
+        success: boolean;
       };
 
-      if (!response.data.success) {
+      if (!response.success) {
         throw new Error("Failed to delete page");
       }
 
@@ -312,14 +312,14 @@ export default function PageListCurrent() {
     try {
       setLoading(true);
       const response = (await api.get(`/currentAffair/type/${type}`)) as {
-        data: { success: boolean; data: CurrentAffairType[] };
+        success: boolean; data: CurrentAffairType[];
       };
 
-      if (!response.data.success) {
+      if (!response.success) {
         throw new Error("Failed to fetch pages");
       }
 
-      const { data } = response.data;
+      const { data } = response;
       setPages(data || []);
     } catch (error) {
       console.error("Error fetching current affairs:", {

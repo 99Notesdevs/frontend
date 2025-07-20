@@ -39,18 +39,18 @@ export default function OrdersPage() {
 
   const fetchOrders = async () => {
     const response = (await api.get(`/product`)) as {
-      data: { success: boolean; data: Order[] };
+      success: boolean; data: Order[];
     };
-    if (!response.data.success) throw new Error("Failed to fetch orders");
-    setOrders(response.data.data);
+    if (!response.success) throw new Error("Failed to fetch orders");
+    setOrders(response.data);
   };
 
   const fetchCategories = async () => {
     const response = (await api.get(`/category`)) as {
-      data: { success: boolean; data: Category[] };
+      success: boolean; data: Category[];
     };
-    if (!response.data.success) throw new Error("Failed to fetch categories");
-    setCategories(response.data.data);
+    if (!response.success) throw new Error("Failed to fetch categories");
+    setCategories(response.data);
   };
 
   useEffect(() => {
@@ -78,9 +78,9 @@ export default function OrdersPage() {
       stock: newOrderStock, // Include stock
       validity: newOrderValidity,
       categoryId: selectedCategoryId, // Pass the selected category ID
-    })) as { data: { success: boolean; data: Order } };
+    })) as { success: boolean; data: Order };
 
-    if (response.data.success) {
+    if (response.success) {
       setNewOrderTitle("");
       setNewOrderDescription("");
       setNewOrderAmount(0);

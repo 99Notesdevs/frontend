@@ -51,23 +51,23 @@ export default function ArticlesPage() {
         : `/blog?skip=${skip}&take=${itemsPerPage}`;
 
       const response = (await api.get(url)) as {
-        data: { success: boolean; data: BlogType[] };
+        success: boolean; data: BlogType[];
       };
 
-      if (!response.data.success) {
+      if (!response.success) {
         throw new Error("Failed to fetch pages");
       }
 
-      const pagesData = response.data.data || [];
+      const pagesData = response.data || [];
 
       // Get total count for pagination
       const countResponse = (await api.get(`/blog/count`)) as {
-        data: { success: boolean; data: number };
+        success: boolean; data: number;
       };
-      if (!countResponse.data.success) {
+      if (!countResponse.success) {
         throw new Error("Failed to fetch pages count");
       }
-      const totalItems = countResponse.data.data || 0;
+      const totalItems = countResponse.data || 0;
 
       setPages(pagesData);
       setFilteredPages(pagesData);
@@ -232,14 +232,14 @@ export default function ArticlesPage() {
       const response = (await api.put(
         `/blog/${selectedPage.id}`,
         updateData
-      )) as { data: { success: boolean; data: BlogType } };
+      )) as { success: boolean; data: BlogType };
 
-      if (!response.data.success) {
+      if (!response.success) {
         throw new Error("Failed to update blog");
       }
 
       const { data } = response;
-      setSelectedPage(data.data);
+      setSelectedPage(data);
 
       // Clear error if any
       setError(null);
