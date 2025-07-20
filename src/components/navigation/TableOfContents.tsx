@@ -278,38 +278,50 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
   return (
     <Card className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm transition-colors duration-200">
       <CardContent className="p-4 sm:p-6">
-        <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+        <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white border-b border-gray-200 dark:border-slate-700 pb-2">
           Table of Contents
         </h2>
-        <nav className="space-y-2">
-          {headings.map((heading) => (
-            <div 
-              key={heading.id} 
-              className={`mb-1.5 transition-colors duration-200 rounded-md ${
-                activeId === heading.id ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'
-              }`}
-            >
-              <a
-                href={`#${heading.id}`}
-                className={`block py-1.5 px-3 text-sm transition-colors duration-200 rounded-md
-                  ${heading.level === 1 ? 'font-medium' : 'font-normal'}
-                  ${heading.level > 1 ? `pl-${(heading.level - 1) * 4 + 4}` : ''}
-                  ${
-                    activeId === heading.id
-                      ? 'text-blue-600 dark:text-blue-400 font-medium'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                  }`}
-                onClick={(e) => handleLinkClick(e, heading)}
+        <nav className="space-y-1">
+          {headings.map((heading) => {
+            const paddingLeft = `${(heading.level - 1) * 16}px`; // Increased base indentation
+            const bulletColor = activeId === heading.id 
+              ? 'text-blue-500 dark:text-blue-400' 
+              : 'text-gray-400 dark:text-gray-500';
+            const textColor = activeId === heading.id 
+              ? 'text-blue-600 dark:text-blue-400' 
+              : 'text-gray-700 dark:text-gray-300';
+            const hoverBg = activeId === heading.id 
+              ? 'bg-blue-50 dark:bg-blue-900/20' 
+              : 'hover:bg-gray-50 dark:hover:bg-slate-700/50';
+
+            return (
+              <div 
+                key={heading.id}
+                className={`group flex items-start transition-colors duration-200 rounded-md ${hoverBg} ${
+                  heading.level === 1 ? 'mt-1' : ''
+                }`}
+                style={{ paddingLeft: heading.level > 1 ? paddingLeft : '4px' }}
               >
-                <div className="flex items-center">
-                  {activeId === heading.id && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 mr-2.5 flex-shrink-0"></span>
-                  )}
-                  <span className="line-clamp-1">{heading.text}</span>
-                </div>
-              </a>
-            </div>
-          ))}
+                <span className={`mr-2 mt-1.5 text-xs ${bulletColor}`}>
+                  {heading.level === 1 ? '•' : '◦'}
+                </span>
+                <a
+                  href={`#${heading.id}`}
+                  className={`block py-1.5 pr-3 text-sm transition-colors duration-200 w-full rounded-md ${textColor} ${
+                    heading.level === 1 ? 'font-medium' : 'font-normal'
+                  }`}
+                  onClick={(e) => handleLinkClick(e, heading)}
+                >
+                  <div className="flex items-center">
+                    {activeId === heading.id && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 mr-2.5 flex-shrink-0"></span>
+                    )}
+                    <span className="line-clamp-1">{heading.text}</span>
+                  </div>
+                </a>
+              </div>
+            );
+          })}
         </nav>
       </CardContent>
       <style jsx global>{`

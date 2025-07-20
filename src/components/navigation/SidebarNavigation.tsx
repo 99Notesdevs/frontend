@@ -91,9 +91,10 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           href={page.link ? page.link : `/${page.slug}`}
           className={`
             group flex items-center py-2 px-4 text-[15px] rounded-md transition-all duration-200
-            ${isCurrentPage 
-              ? 'text-blue-600 bg-blue-50/70 font-medium' 
-              : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50 dark:text-slate-200 dark:hover:text-blue-400 dark:hover:bg-slate-700/50'
+            ${
+              isCurrentPage 
+                ? 'text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-900/30 font-medium' 
+                : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50 dark:text-slate-200 dark:hover:text-blue-400 dark:hover:bg-slate-700/50'
             }
             ${level === 0 ? 'font-medium text-slate-800 dark:text-slate-100' : ''}
             ${level === 1 ? 'font-normal' : ''}
@@ -102,7 +103,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         >
           {level >= 2 && (
             <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700/70">
-              <span className="mr-2 text-slate-400 text-xs dark:text-slate-500">•</span>
+              <span className="mr-2 text-slate-400 dark:text-slate-500 text-xs">•</span>
             </div>
           )}
           {page.title}
@@ -120,7 +121,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     return (
       <div className="animate-pulse space-y-2 p-4">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-5 bg-slate-100 rounded-md w-full"></div>
+          <div key={i} className="h-5 bg-slate-100 dark:bg-slate-700 rounded-md w-full"></div>
         ))}
       </div>
     );
@@ -128,7 +129,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 
   if (error) {
     return (
-      <div className="text-red-500 text-sm p-4 bg-red-50 rounded-lg">
+      <div className="text-red-600 dark:text-red-400 text-sm p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
         {error}
       </div>
     );
@@ -153,6 +154,17 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #94a3b8;
+        }
+        @media (prefers-color-scheme: dark) {
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+          }
         }
       `}</style>
     </nav>

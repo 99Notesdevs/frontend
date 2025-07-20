@@ -147,23 +147,23 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
               }`}
           >
             <button
-  className="bg-gray-100 hover:bg-gray-200 text-[var(--text-tertiary)] p-2.5 rounded-full shadow-xl transition-colors duration-200"
-  onClick={() => handleComponentClick('toc')}
->
-  <List className="w-4 h-4" />
-</button>
-<button
-  className="bg-gray-100 hover:bg-gray-200 text-[var(--text-tertiary)] p-2.5 rounded-full shadow-xl transition-colors duration-200"
-  onClick={() => handleComponentClick('nav')}
->
-  <Navigation2 className="w-4 h-4" />
-</button>
+              className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 p-2.5 rounded-full shadow-xl transition-colors duration-200 border border-gray-200 dark:border-gray-700"
+              onClick={() => handleComponentClick('toc')}
+            >
+              <List className="w-4 h-4" />
+            </button>
+            <button
+              className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 p-2.5 rounded-full shadow-xl transition-colors duration-200 border border-gray-200 dark:border-gray-700"
+              onClick={() => handleComponentClick('nav')}
+            >
+              <Navigation2 className="w-4 h-4" />
+            </button>
           </div>
         )}
 
         <button
           onClick={handleAssistiveClick}
-          className="inline-flex items-center justify-center p-3 rounded-full text-[var(--text-tertiary)] bg-blue-200 hover:text-[var(--text-tertiary)] hover:bg-blue-300 focus:outline-none transition-colors shadow-xl"
+          className="inline-flex items-center justify-center p-3 rounded-full text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none transition-colors shadow-xl"
           aria-label={isOpen ? 'Close assistive menu' : 'Open assistive menu'}
         >
           <span className="sr-only">{isOpen ? 'Close assistive menu' : 'Open assistive menu'}</span>
@@ -219,8 +219,8 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
               </button>
             </div>
 
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-blue-200 pb-2">
+            <div className="p-6 dark:bg-[var(--surface-dark)] ">
+              <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] dark:text-[var(--text-tertiay)] border-b-2 border-blue-200 pb-2">
                 {showComponent === 'toc' ? '📑 Table of Contents' : '🗄️ Navigation'}
               </h3>
 

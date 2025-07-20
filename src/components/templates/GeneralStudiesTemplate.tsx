@@ -13,6 +13,7 @@ import Quiz from '@/components/quiz/quiz';
 import { env } from "@/config/env";
 import Cookies from "js-cookie";
 import Breadcrumb from "@/components/ui/breadcrumb";
+import { BackToTop } from "@/components/ui/reachtotop";
 interface Question {
   id: number;
   question: string;
@@ -491,6 +492,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                 </aside>
               </div>
             </div>
+            <BackToTop />
           </div>
         </main>
       </>
