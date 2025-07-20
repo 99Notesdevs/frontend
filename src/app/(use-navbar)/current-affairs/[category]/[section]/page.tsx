@@ -1,13 +1,12 @@
 import React from "react";
 import Link from "next/link";
-import { env } from "@/config/env";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import { Metadata } from "next";
 import QuizWrapper from "@/components/quiz/QuizWrapper";
 import Whatsapp from "@/components/ui/whatsapp";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { Tag } from "lucide-react";
-import { Tags } from "@/components/ui/tags/Tags";
+import { api } from "@/config/api/route";
 
 // Define types for the data
 interface Tag {
@@ -382,36 +381,23 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
     const fullSlug = `current-affairs/${category}/${articleSlug}`;
     
     // Make a direct API call to get the article by its full slug
-    const response = await fetch(`${env.API}/currentArticle/slug/${encodeURIComponent(fullSlug)}`, {
-      headers: {
-        "Content-Type": "application/json",
-      }
-    });
-    
-    
-    if (response.ok) {
-      const data = await response.json();
-      
-      if (data.status === 'success' && data.data) {
-        return data.data;
+    const response = await api.get(`/currentArticle/slug/${encodeURIComponent(fullSlug)}`) as { success: boolean, data: CurrentAffairArticle | null };
+
+    if (response.success) {
+      const data = response.data;
+
+      if (response.success && data) {
+        return data;
       } else {
         console.log(`API returned success but no article data was found`);
       }
     } else {      
       // Try a different approach - fetch all articles and find a match
-      const allArticlesResponse = await fetch(`${env.API}/currentArticle`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // cache: 'no-store'
-      });
-      
-      if (allArticlesResponse.ok) {
-        const allArticlesData = await allArticlesResponse.json();
-        
-        if (allArticlesData.status === 'success' && allArticlesData.data) {
-          const allArticles = allArticlesData.data;
-          
+      const allArticlesResponse = await api.get(`/currentArticle`) as { success: boolean, data: CurrentAffairArticle[] | null };
+
+        if (allArticlesResponse.success && allArticlesResponse.data) {
+          const allArticles = allArticlesResponse.data;
+
           // Try to find an article that matches our criteria
           const matchingArticle = allArticles.find((a: any) => {
             // Try exact match on full slug
@@ -436,23 +422,16 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
           
           if (matchingArticle) {            
             // Fetch the full article with content
-            const fullArticleResponse = await fetch(`${env.API}/currentArticle/slug/${encodeURIComponent(matchingArticle.slug)}`, {
-              headers: {
-                "Content-Type": "application/json",
-              },
-              // cache: 'no-store'
-            });
-            
-            if (fullArticleResponse.ok) {
-              const fullArticleData = await fullArticleResponse.json();
-              if (fullArticleData.status === 'success' && fullArticleData.data) {
-                return fullArticleData.data;
-              }
+            const fullArticleResponse = await api.get(`/currentArticle/slug/${encodeURIComponent(matchingArticle.slug)}`) as { success: boolean, data: CurrentAffairArticle | null };
+
+            if (fullArticleResponse.success) {
+              const fullArticleData = fullArticleResponse.data;
+              return fullArticleData;
             }
           }
         }
       }
-    }
+    
     
     console.error(`Article not found for slug: ${articleSlug}`);
     return null;

@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { env } from "@/config/env";
 import { BaseTemplateProps } from "@/components/templates/types";
 import { Metadata } from "next";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { RelatedTopics } from "@/components/Blogs/relatedTopics";
 import { Tags } from "@/components/ui/tags/Tags";
+import { api } from "@/config/api/route";
 
 async function getPage(
   slug: string
@@ -13,9 +13,8 @@ async function getPage(
   try {
     const normalizedSlug = slug.replace(/\s+/g, "-"); // Normalize slug by replacing spaces with hyphens
     console.log("NORMALIZED SLUG", normalizedSlug);
-    const response = await fetch(`${env.API}/blog/slug/${normalizedSlug}`);
-    const res = await response.json();
-    const page = res.data;
+    const response = await api.get(`/blog/slug/${normalizedSlug}`) as { success: boolean, data: BaseTemplateProps["page"] | null };
+    const page = response.data;
     console.log("PAGE", page);
     if (!page) {
       return null;

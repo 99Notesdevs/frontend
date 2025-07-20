@@ -3,9 +3,9 @@ import type { BaseTemplateProps } from '@/components/templates/types';
 import { UpscNotesTemplate } from '@/components/templates/UpscNotesTemplate';
 import { ArticleTemplate } from '@/components/templates/ArticleTemplate';
 import { GeneralStudiesTemplate } from '@/components/templates/GeneralStudiesTemplate';
-import { env } from '@/config/env';
 import { CurrentAffairTemplate } from '@/components/templates/CurrentAffairTemplate';
 import { Metadata } from 'next';
+import { api } from '@/config/api/route';
 
 // Map template IDs to components
 const TEMPLATE_MAP: Record<string, React.FC<any>> = {
@@ -19,8 +19,7 @@ const TEMPLATE_MAP: Record<string, React.FC<any>> = {
 async function getPage(slug: string, section: string[]): Promise<BaseTemplateProps['page'] | null> {
   try {
     const fullPath = `${slug} ${section.join(' ')}`; // slugs seperated by space will be rejoined with / in the backend 
-    const response = await fetch(`${env.API}/page/slug/${fullPath}`);
-    const res = await response.json();
+    const res = await api.get(`/page/slug/${fullPath}`) as { data: BaseTemplateProps['page'] | null };
     const page = res.data;
 
     if (!page) {

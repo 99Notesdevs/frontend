@@ -37,9 +37,7 @@ export default function QuizPage() {
       }
 
       const response = await fetch(`${env.API_TEST}/questions/practice?categoryId=${categoryId}&limit=500`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {

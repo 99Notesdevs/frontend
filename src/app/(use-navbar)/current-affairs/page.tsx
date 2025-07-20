@@ -2,8 +2,8 @@ import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
-import { env } from '@/config/env';
 import ContactForm from "@/components/common/ContactForm/ContactForm";
+import { api } from '@/config/api/route';
 
 interface CurrentAffairPage {
   id: string;
@@ -24,19 +24,19 @@ const formatContent = (content: string) => {
 const CurrentAffairsIndex = async () => {
   try {
     // Fetch daily current affairs
-    const dailyResponse = await fetch(`${env.API}/currentAffair/type/daily`);
-    const dailyData = await dailyResponse.json();
-    const dailyPages = dailyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
+    const dailyResponse = await api.get(`/currentAffair/type/daily`) as { success: boolean, data: CurrentAffairPage[] | null };
+    const dailyData = dailyResponse.data;
+    const dailyPages = dailyData?.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     // Fetch monthly current affairs
-    const monthlyResponse = await fetch(`${env.API}/currentAffair/type/monthly`);
-    const monthlyData = await monthlyResponse.json();
-    const monthlyPages = monthlyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
+    const monthlyResponse = await api.get(`/currentAffair/type/monthly`) as { success: boolean, data: CurrentAffairPage[] | null };
+    const monthlyData = monthlyResponse.data;
+    const monthlyPages = monthlyData?.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     // Fetch yearly current affairs
-    const yearlyResponse = await fetch(`${env.API}/currentAffair/type/yearly`);
-    const yearlyData = await yearlyResponse.json();
-    const yearlyPages = yearlyData.data.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
+    const yearlyResponse = await api.get(`/currentAffair/type/yearly`) as { success: boolean, data: CurrentAffairPage[] | null };
+    const yearlyData = yearlyResponse.data;
+    const yearlyPages = yearlyData?.filter((page: CurrentAffairPage) => !page.link) as CurrentAffairPage[];
 
     return (
       <>

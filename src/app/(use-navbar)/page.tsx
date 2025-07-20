@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
-import { env } from '@/config/env';
 import ContactForm from "@/components/common/ContactForm/ContactForm";
 import StudyMaterials from "@/components/StudyMaterials/Studymaterials";
 import CurrentAffairs from "@/components/CurrentAffairs/CurrentAffairs";
@@ -12,6 +10,7 @@ import FAQ from "@/components/common/FAQ/FAQ";
 import ContactMap from "@/components/common/Contact/ContactMap";
 import Reason99notes from "@/components/CoachingInfo/Reason99notes";
 import Slider from "@/components/About/Slider";
+import { api } from '@/config/api/route';
 
 interface HomeProps {
   Hero:{
@@ -56,19 +55,17 @@ interface HomeProps {
 
 export default function Home() {
   const [homeData, setHomeData] = useState<HomeProps | null>(null);
-  const [coreMemberImages, setCoreMemberImages] = useState([]);
+  const [coreMemberImages, setCoreMemberImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [membersResponse, homeResponse] = await Promise.all([
-          axios.get(`${env.API}/about-99-notes/coreMembers`),
-          axios.get(`${env.API}/about-99-notes/home`)
-        ]);
+        const membersResponse = await api.get('/about-99-notes/coreMembers') as { data: any[] };
+        const homeResponse = await api.get('/about-99-notes/home') as { data: any };
         
-        setCoreMemberImages(membersResponse.data.data);
-        const pageData = homeResponse.data.data;
+        setCoreMemberImages(membersResponse.data);
+        const pageData = homeResponse.data;
         setHomeData(JSON.parse(pageData.content));
       } catch (error) {
         console.error('Error fetching data:', error);

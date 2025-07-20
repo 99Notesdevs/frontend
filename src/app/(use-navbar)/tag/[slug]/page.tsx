@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, ArrowRight, Tag as TagIcon } from "lucide-react";
-import { env } from "@/config/env";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, ArrowRight, Tag as TagIcon } from "lucide-react";
+import { api } from '@/config/api/route';
 
 interface Page {
   id: number;
@@ -85,26 +84,26 @@ export default function TagPage() {
     const fetchCounts = async () => {
       try {
         // Fetch pages count
-        const pagesCountResponse = await fetch(`${env.API}/tag/count/${slug}`);
-        const pagesCountData = await pagesCountResponse.json();
+        const pagesCountResponse = await api.get(`/tag/count/${slug}`) as { success: boolean, data: number };
+        const pagesCountData = pagesCountResponse.data;
         
         // Fetch blogs count
-        const blogsCountResponse = await fetch(`${env.API}/tag/blogs/count/${slug}`);
-        const blogsCountData = await blogsCountResponse.json();
-        
+        const blogsCountResponse = await api.get(`/tag/blogs/count/${slug}`) as { success: boolean, data: number };
+        const blogsCountData = blogsCountResponse.data;
+
         //Fetch currentBlog Count
-        const currentBlogCountResponse = await fetch(`${env.API}/tag/currentBlog/count/${slug}`);
-        const currentBlogCountData = await currentBlogCountResponse.json();
-        
+        const currentBlogCountResponse = await api.get(`/tag/currentBlog/count/${slug}`) as { success: boolean, data: number };
+        const currentBlogCountData = currentBlogCountResponse.data;
+
         setTotalItems({
-          pages: pagesCountData.data,
-          blogs: blogsCountData.data,
-          currentBlog: currentBlogCountData.data
+          pages: pagesCountData,
+          blogs: blogsCountData,
+          currentBlog: currentBlogCountData
         });
         setTotalPages({
-          pages: Math.ceil(pagesCountData.data / itemsPerPage),
-          blogs: Math.ceil(blogsCountData.data / itemsPerPage),
-          currentBlog: Math.ceil(currentBlogCountData.data / itemsPerPage)
+          pages: Math.ceil(pagesCountData / itemsPerPage),
+          blogs: Math.ceil(blogsCountData / itemsPerPage),
+          currentBlog: Math.ceil(currentBlogCountData / itemsPerPage)
         });
       } catch (error) {
         console.error('Error fetching counts:', error);
@@ -115,21 +114,18 @@ export default function TagPage() {
       try {
         // Fetch pages
         const skipPages = (currentPage.pages - 1) * itemsPerPage;
-        const responsePages = await fetch(`${env.API}/tag/${slug}?skip=${skipPages}&take=${itemsPerPage}`);
-        const dataPages = await responsePages.json();
-        setPages(dataPages.data);
+        const responsePages = await api.get(`/tag/${slug}?skip=${skipPages}&take=${itemsPerPage}`) as { success: boolean, data: Page[] };
+        setPages(responsePages.data);
 
         // Fetch blogs
         const skipBlogs = (currentPage.blogs - 1) * itemsPerPage;
-        const responseBlogs = await fetch(`${env.API}/tag/blogs/${slug}?skip=${skipBlogs}&take=${itemsPerPage}`);
-        const dataBlogs = await responseBlogs.json();
-        setBlogs(dataBlogs.data);
+        const responseBlogs = await api.get(`/tag/blogs/${slug}?skip=${skipBlogs}&take=${itemsPerPage}`) as { success: boolean, data: Blog[] };
+        setBlogs(responseBlogs.data);
 
         // Fetch currentBlog
         const skipCurrentBlog = (currentPage.currentBlog - 1) * itemsPerPage;
-        const responseCurrentBlog = await fetch(`${env.API}/tag/currentBlog/${slug}?skip=${skipCurrentBlog}&take=${itemsPerPage}`);
-        const dataCurrentBlog = await responseCurrentBlog.json();
-        setCurrentBlog(dataCurrentBlog.data);
+        const responseCurrentBlog = await api.get(`/tag/currentBlog/${slug}?skip=${skipCurrentBlog}&take=${itemsPerPage}`) as { success: boolean, data: CurrentArticleBlog };
+        setCurrentBlog(responseCurrentBlog.data);
       } catch (error) {
         console.error('Error fetching content:', error);
       } finally {
