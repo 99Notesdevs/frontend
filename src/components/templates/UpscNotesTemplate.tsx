@@ -6,6 +6,7 @@ import SocialMedia from "@/components/navigation/socialmedia";
 import { BaseTemplateProps } from "./types";
 import Ads from "../navigation/Ads";
 import Breadcrumb from "@/components/ui/breadcrumb";
+import { BackToTop } from "@/components/ui/reachtotop";
 
 export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
@@ -230,6 +231,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
               </main>
             </div>
           </div>
+          <BackToTop />
         </div>
       </main>
       </>

@@ -22,6 +22,9 @@ import { Link } from "lucide-react";
 import Bookmark from "../ui/Bookmark";
 import Quiz from '@/components/quiz/quiz';
 import FAQPage from "@/components/FAQp/faqp";
+import { BackToTop } from "@/components/ui/reachtotop";
+import { DownloadPdf } from "@/components/ui/downloadpdf";
+import { WhatsAppPdf } from "@/components/ui/whatsapp-pdf";
 
 interface Question {
   id: number;
@@ -47,7 +50,7 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   console.log("page", page);
-  const { title, content, metadata } = page;
+  const { title, content, metadata, } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
@@ -228,7 +231,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      
+
       // Process h2 headings
       const headings = doc.querySelectorAll('h2');
       headings.forEach((heading, index) => {
@@ -239,10 +242,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
           .replace(/\s+/g, '-')
           .replace(/-+/g, '-')
           .replace(/^-+|-+$/g, '') || `heading-${index}`;
-        
+
         heading.id = id;
       });
-      
+
       return doc.body.innerHTML;
     } catch (error) {
       console.error('Error processing content:', error);
@@ -325,13 +328,23 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                   </div>
                 )}
-                <Tags tags={page.tags} />
+
                 {/* Article Content */}
                 <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full mb-8 sm:mb-10 rounded-xl overflow-hidden">
                   <div className="p-5 sm:p-10">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--surface-darker)] dark:text-white mb-3 text-center">
+                    <h1 className="text-2xl md:text-3xl font-bold text-[var(--primary)] mb-3 text-center">
                       {page.title}
                     </h1>
+
+                    <div className="flex gap-3 justify-center">
+                      <WhatsAppPdf
+                        phoneNumber="+919876543210" 
+                        message="Hello, I'd like to get the PDF notes for [Article Name]."
+                        className="w-full h-12" 
+                      />
+                      <DownloadPdf />
+                    </div>
+                    <Tags tags={page.tags} />
                     <div
                       className="prose prose-lg max-w-none"
                       dangerouslySetInnerHTML={{ __html: mainContentFinal }}
@@ -362,7 +375,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     className="flex justify-left bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 
                         transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
                   >
-                    <div className="w-full mr-2">
+                    <div className="w-[100%] mr-2">
                       <SearchBar />
                     </div>
                     {isAuthorized && (
@@ -505,8 +518,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
 
                   {/* Social Media Section */}
-                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] rounded-xl shadow-lg p-4 sm:p-6 mt-4">
-                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] dark:text-white border-b-2 border-[var(--info-surface)] pb-2 flex items-center gap-2">
                       <span className="text-[var(--action-primary)]">🌐</span>
                       <span>Connect With Us</span>
                     </h3>
@@ -516,12 +529,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
 
                   {/* Contact Form Section */}
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg mt-4">
                     <ContactForm />
                   </div>
 
                   {/* Ads Section */}
-                  <div className="bg-white border border-[var(--info-surface)] rounded-xl shadow-lg mt-4">
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg mt-4">
                     <Ads imageUrl="/" altText="ads" />
                   </div>
 
@@ -566,6 +579,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
             </div>
           </div>
         </div>
+        <BackToTop />
       </main>
     </>
   );

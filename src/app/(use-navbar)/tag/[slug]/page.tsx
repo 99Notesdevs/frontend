@@ -172,10 +172,10 @@ export default function TagPage() {
 
   // Empty state component
   const EmptyState = ({ type }: { type: 'pages' | 'blogs' | 'current affairs' }) => (
-    <div className="text-center py-12 border rounded-lg">
-      <TagIcon className="mx-auto h-12 w-12 text-gray-400" />
+    <div className="text-center py-12 border rounded-lg bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+      <TagIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
       <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No {type} found</h3>
-      <p className="mt-1 text-gray-500 dark:text-gray-400">
+      <p className="mt-1 text-gray-500 dark:text-slate-400">
         There are no {type} associated with this tag yet.
       </p>
     </div>
@@ -216,7 +216,7 @@ export default function TagPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8 dark:bg-slate-900">
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-2">
           Tag: <span className="text-[var(--nav-primary)]">{slug}</span>
@@ -268,7 +268,7 @@ export default function TagPage() {
             {pages.map((page) => (
               <Card 
                 key={page.id}
-                className="group h-full flex flex-col hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+                className="group h-full flex flex-col hover:shadow-lg dark:hover:shadow-slate-900/50 transition-all duration-300 cursor-pointer overflow-hidden bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700"
                 onClick={() => handlePageClick(page.slug)}
               >
                 {page.imageUrl && (
@@ -282,7 +282,7 @@ export default function TagPage() {
                   </div>
                 )}
                 <CardHeader className="flex-1">
-                  <CardTitle className="text-xl font-bold line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-xl font-bold line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-gray-900 dark:text-white">
                     {page.title}
                   </CardTitle>
                 </CardHeader>
@@ -357,7 +357,7 @@ export default function TagPage() {
             {blogs.map((blog) => (
               <Card 
                 key={blog.id}
-                className="group h-full flex flex-col hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+                className="group h-full flex flex-col hover:shadow-lg dark:hover:shadow-slate-900/50 transition-all duration-300 cursor-pointer overflow-hidden bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700"
                 onClick={() => handleBlogClick(blog.slug)}
               >
                 {blog.imageUrl && (
@@ -371,7 +371,7 @@ export default function TagPage() {
                   </div>
                 )}
                 <CardHeader className="flex-1">
-                  <CardTitle className="text-xl font-bold line-clamp-2 group-hover:text-green-600 transition-colors">
+                  <CardTitle className="text-xl font-bold line-clamp-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors text-gray-900 dark:text-white">
                     {blog.title}
                   </CardTitle>
                 </CardHeader>
@@ -384,7 +384,7 @@ export default function TagPage() {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="ml-auto group-hover:text-green-600 transition-colors"
+                    className="ml-auto group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleBlogClick(blog.slug);
@@ -452,7 +452,7 @@ export default function TagPage() {
                   {currentBlog.tags.map((tag) => (
                     <span 
                       key={tag.id}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200"
                     >
                       <TagIcon className="h-3 w-3 mr-1" />
                       {tag.name}
@@ -463,7 +463,7 @@ export default function TagPage() {
             </CardHeader>
             <CardContent className="flex-1">
               <div 
-                className="prose max-w-none line-clamp-3 text-muted-foreground"
+                className="prose dark:prose-invert max-w-none line-clamp-3 text-muted-foreground prose-p:text-gray-600 dark:prose-p:text-gray-300"
                 dangerouslySetInnerHTML={{ __html: currentBlog.content }}
               />
             </CardContent>
