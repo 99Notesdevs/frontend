@@ -34,7 +34,7 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
@@ -124,31 +124,31 @@ const CustomImage = Image.extend({
       title: { default: null },
       width: {
         default: "auto",
-        renderHTML: (attributes) => ({
+        renderHTML: (attributes: any) => ({
           width: attributes.width,
         }),
       },
       height: {
         default: "auto",
-        renderHTML: (attributes) => ({
+        renderHTML: (attributes: any) => ({
           height: attributes.height,
         }),
       },
       float: {
         default: "none",
-        renderHTML: (attributes) => ({
+        renderHTML: (attributes: any) => ({
           float: attributes.float,
         }),
       },
       margin: {
         default: "0 16px 16px 0",
-        renderHTML: (attributes) => ({
+        renderHTML: (attributes: any) => ({
           margin: attributes.margin,
         }),
       },
     };
   },
-  renderHTML({ HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }: any) {
     // Map float to Tailwind classes
     let floatClass = "";
     let marginClass = "mb-4";
@@ -183,7 +183,7 @@ const CustomImage = Image.extend({
     return ["img", attrs];
   },
   addNodeView() {
-    return ({ node, getPos, editor }) => {
+    return ({ node, getPos, editor }: any) => {
       // Create the image element
       const img = document.createElement("img");
       const {
@@ -341,8 +341,8 @@ const CustomOrderedList = OrderedList.extend({
       ...this.parent?.(),
       'data-list-style': {
         default: 'decimal',
-        parseHTML: element => element.getAttribute('data-list-style') || 'decimal',
-        renderHTML: attributes => ({
+        parseHTML: (element: any) => element.getAttribute('data-list-style') || 'decimal',
+        renderHTML: (attributes: any) => ({
           'data-list-style': attributes['data-list-style'] || 'decimal',
           style: `list-style-type: ${attributes['data-list-style'] || 'decimal'}`,
         }),
@@ -353,7 +353,7 @@ const CustomOrderedList = OrderedList.extend({
     return [
       {
         tag: 'ol',
-        getAttrs: node => {
+        getAttrs: (node: any) => {
           const element = node as HTMLElement;
           // Try to get list style from data attribute first, then from style attribute
           const listStyle = element.getAttribute('data-list-style') || 
@@ -365,7 +365,7 @@ const CustomOrderedList = OrderedList.extend({
       },
     ];
   },
-  renderHTML({ HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }: any) {
     const listStyle = HTMLAttributes['data-list-style'] || 'decimal';
     
     return ['ol', { 
@@ -405,6 +405,7 @@ interface ListMenuProps {
 
 const ListMenu = ({ editor }: ListMenuProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [showTemplates, setShowTemplates] = React.useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -1067,6 +1068,14 @@ const FONT_SIZES = {
   Huge: "32px",
 };
 
+const debounce = (fn: Function, delay: number) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
+};
+
 const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkData, setLinkData] = useState({
@@ -1292,10 +1301,15 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     ],
     content: content,
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      if (html !== content) {
-        onChange(html); // Ensure the updated content is passed to the parent
-      }
+      const handleUpdate = debounce(() => {
+        if (editor) {
+          const html = editor.getHTML();
+          if (html !== content) {
+            onChange(html); // Ensure the updated content is passed to the parent
+          }
+        }
+      }, 300);
+      handleUpdate();
     },
     editorProps: {
       handleDOMEvents: {
