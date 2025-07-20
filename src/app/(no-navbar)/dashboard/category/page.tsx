@@ -1,13 +1,20 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Pencil, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { env } from '@/config/env';
-import Cookies from 'js-cookie';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { api } from "@/config/api/route";
+
 type Category = {
   id: string;
   name: string;
@@ -25,38 +32,34 @@ export default function CategoryPage() {
   const [currentCategory, setCurrentCategory] = useState<Partial<Category>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    weight: '0.0',
-    pageId: '',
-    parentTagId: ''
+    name: "",
+    weight: "0.0",
+    pageId: "",
+    parentTagId: "",
   });
 
   // Fetch all categories
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${env.API_TEST}/categories`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Cookies.get('token')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch categories');
-      const result = await response.json();
+      const response = (await api.get(`/categories`)) as {
+        data: { success: boolean; data: any[] };
+      };
+      const result = response.data;
       if (result.success && Array.isArray(result.data)) {
         // Convert the data to match our Category type
         const categories = result.data.map((item: any) => ({
           ...item,
-          id: item.id?.toString() || '',
-          pageId: item.pageId?.toString() || '',
-          parentTagId: item.parentTagId?.toString() || '',
+          id: item.id?.toString() || "",
+          pageId: item.pageId?.toString() || "",
+          parentTagId: item.parentTagId?.toString() || "",
         }));
         setCategories(categories);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast.error('Failed to load categories');
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to load categories");
     } finally {
       setLoading(false);
     }
@@ -66,62 +69,52 @@ export default function CategoryPage() {
     fetchCategories();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-        // First update the weight using the specific endpoint
-        const weightResponse = await fetch(
-          `${env.API_TEST}/categories/${currentCategory.id}/weight`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${Cookies.get('token')}`,
-            },
-            body: JSON.stringify({ weight: formData.weight }),
-          }
-        );
+      // First update the weight using the specific endpoint
+      const weightResponse = (await api.put(
+        `/categories/${currentCategory.id}/weight`,
+        { weight: formData.weight }
+      )) as { data: { success: boolean } };
 
-        if (!weightResponse.ok) throw new Error('Failed to update category weight');
-        
-        // Then update other fields using the regular update endpoint
-      const updateResponse = await fetch(
-        `${env.API_TEST}/categories/${currentCategory.id}`,
+      if (!weightResponse.data.success)
+        throw new Error("Failed to update category weight");
+
+      // Then update other fields using the regular update endpoint
+      const updateResponse = (await api.put(
+        `/categories/${currentCategory.id}`,
         {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Cookies.get('token')}`,
-          },
-          body: JSON.stringify({
-            name: formData.name,
-              pageId: Number(formData.pageId), // Convert to number
-              parentTagId: formData.parentTagId ? Number(formData.parentTagId) : null, // Convert to number or null
-          }),
+          name: formData.name,
+          pageId: Number(formData.pageId), // Convert to number
+          parentTagId: formData.parentTagId
+            ? Number(formData.parentTagId)
+            : null,
         }
-      );
+      )) as { data: { success: boolean } };
 
-      if (!updateResponse.ok) {
-        const errorData = await updateResponse.json().catch(() => ({}));
-        console.error('Update error details:', errorData);
-        throw new Error(errorData.message || 'Failed to update category');
+      if (!updateResponse.data.success) {
+        console.error("Update error details!");
+        throw new Error("Failed to update category");
       }
-      
-      toast.success('Category updated successfully');
+
+      toast.success("Category updated successfully");
       resetForm();
       fetchCategories();
     } catch (error) {
-      console.error('Error:', error);
-      toast.error(error instanceof Error ? error.message : 'An error occurred');
+      console.error("Error:", error);
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
@@ -131,36 +124,32 @@ export default function CategoryPage() {
       name: category.name,
       weight: category.weight,
       pageId: category.pageId.toString(),
-      parentTagId: category.parentTagId?.toString() || ''
+      parentTagId: category.parentTagId?.toString() || "",
     });
     setIsEditing(true);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
-    
-    try {
-      const response = await fetch(`${env.API_TEST}/categories/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Cookies.get('token')}`,
-        },
-      });
+    if (!confirm("Are you sure you want to delete this category?")) return;
 
-      if (!response.ok) throw new Error('Failed to delete category');
-      
-      toast.success('Category deleted successfully');
+    try {
+      const response = (await api.delete(`/categories/${id}`)) as {
+        data: { success: boolean };
+      };
+
+      if (!response.data.success) throw new Error("Failed to delete category");
+
+      toast.success("Category deleted successfully");
       fetchCategories();
     } catch (error) {
-      console.error('Error deleting category:', error);
-      toast.error('Failed to delete category');
+      console.error("Error deleting category:", error);
+      toast.error("Failed to delete category");
     }
   };
 
   const resetForm = () => {
-    setFormData({ name: '', weight: '0.0', pageId: '', parentTagId: '' });
+    setFormData({ name: "", weight: "0.0", pageId: "", parentTagId: "" });
     setCurrentCategory({});
     setIsEditing(false);
     setIsModalOpen(false);
@@ -187,12 +176,8 @@ export default function CategoryPage() {
                 <CardTitle>{category.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Weight: {category.weight}
-                </CardDescription>
-                <CardDescription>
-                  Page ID: {category.pageId}
-                </CardDescription>
+                <CardDescription>Weight: {category.weight}</CardDescription>
+                <CardDescription>Page ID: {category.pageId}</CardDescription>
                 <CardDescription>
                   Parent Tag ID: {category.parentTagId}
                 </CardDescription>
@@ -231,17 +216,18 @@ export default function CategoryPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">
-                Edit Category
-              </h2>
+              <h2 className="text-xl font-semibold">Edit Category</h2>
               <Button variant="ghost" size="icon" onClick={resetForm}>
                 &times;
               </Button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium mb-1"
+                >
                   Name *
                 </label>
                 <Input
@@ -252,9 +238,12 @@ export default function CategoryPage() {
                   required
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="weight" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="weight"
+                  className="block text-sm font-medium mb-1"
+                >
                   Weight
                 </label>
                 <Input
@@ -266,14 +255,12 @@ export default function CategoryPage() {
                   onChange={handleInputChange}
                 />
               </div>
-              
+
               <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" variant="outline" onClick={resetForm}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  Update Category
-                </Button>
+                <Button type="submit">Update Category</Button>
               </div>
             </form>
           </div>

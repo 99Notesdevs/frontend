@@ -1,20 +1,24 @@
 "use client";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { env } from '@/config/env';
-import { EnvelopeIcon, LockClosedIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "@/config/api/route";
+import {
+  EnvelopeIcon,
+  LockClosedIcon,
+  KeyIcon,
+  EyeIcon,
+  EyeSlashIcon,
+} from "@heroicons/react/24/outline";
 
 export default function LoginPage() {
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [showEditorForm, setShowEditorForm] = useState(false);
   const [showAuthorForm, setShowAuthorForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [secret, setSecret] = useState('');
+  const [error, setError] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [secret, setSecret] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
   const router = useRouter();
@@ -22,24 +26,23 @@ export default function LoginPage() {
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await axios.post(`${env.API}/admin`, {
+      const response = (await api.post(`/admin`, {
         email: username,
         password: password,
         secretKey: secret,
-      });
+      })) as { success: boolean };
 
-      if (response.data.success) {
-        Cookies.set('token', response.data.data.token, { expires: 5 });
-        router.push('/dashboard/manageemployees');
+      if (response.success) {
+        router.push("/dashboard/manageemployees");
       } else {
-        setError('wrong-password');
+        setError("wrong-password");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('wrong-password');
+      console.error("Login error:", error);
+      setError("wrong-password");
     } finally {
       setLoading(false);
     }
@@ -48,23 +51,22 @@ export default function LoginPage() {
   const handleEditorLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await axios.post(`${env.API}/editor/login`, {
+      const response = (await api.post(`/editor/login`, {
         email: username,
         password: password,
-      });
+      })) as { success: boolean };
 
-      if (response.data.success) {
-        Cookies.set('token', response.data.data, { expires: 5 });
-        router.push('/dashboard/edit');
+      if (response.success) {
+        router.push("/dashboard/edit");
       } else {
-        setError('wrong-password');
+        setError("wrong-password");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('wrong-password');
+      console.error("Login error:", error);
+      setError("wrong-password");
     } finally {
       setLoading(false);
     }
@@ -73,23 +75,22 @@ export default function LoginPage() {
   const handleAuthorLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await axios.post(`${env.API}/author/login`, {
+      const response = (await api.post(`/author/login`, {
         email: username,
         password: password,
-      });
+      })) as { success: boolean };
 
-      if (response.data.success) {
-        Cookies.set('token', response.data.data, { expires: 5 });
-        router.push('/dashboard/add');
+      if (response.success) {
+        router.push("/dashboard/add");
       } else {
-        setError('wrong-password');
+        setError("wrong-password");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('wrong-password');
+      console.error("Login error:", error);
+      setError("wrong-password");
     } finally {
       setLoading(false);
     }
@@ -151,7 +152,10 @@ export default function LoginPage() {
           </div>
         )}
         {showAdminForm && (
-          <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleAdminLogin}>
+          <form
+            className="mt-8 space-y-6 animate-fade-in"
+            onSubmit={handleAdminLogin}
+          >
             <div className="space-y-4 p-6">
               <div className="relative flex items-center">
                 <EnvelopeIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
@@ -172,7 +176,7 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={password}
@@ -198,7 +202,7 @@ export default function LoginPage() {
                 <input
                   id="secret"
                   name="secret"
-                  type={showSecret ? 'text' : 'password'}
+                  type={showSecret ? "text" : "password"}
                   required
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
@@ -219,7 +223,7 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-            {error === 'wrong-password' && (
+            {error === "wrong-password" && (
               <div className="text-[var(--critical)] text-sm mt-2 text-center animate-shake">
                 Wrong password. Please try again.
               </div>
@@ -230,13 +234,16 @@ export default function LoginPage() {
                 disabled={loading}
                 className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] disabled:opacity-70"
               >
-                {loading ? 'Logging in...' : 'Sign in'}
+                {loading ? "Logging in..." : "Sign in"}
               </button>
             </div>
           </form>
         )}
         {showEditorForm && (
-          <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleEditorLogin}>
+          <form
+            className="mt-8 space-y-6 animate-fade-in"
+            onSubmit={handleEditorLogin}
+          >
             <div className="space-y-4 p-6">
               <div className="relative flex items-center">
                 <EnvelopeIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
@@ -257,7 +264,7 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={password}
@@ -279,7 +286,7 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-            {error === 'wrong-password' && (
+            {error === "wrong-password" && (
               <div className="text-[var(--critical)] text-sm mt-2 text-center animate-shake">
                 Wrong password. Please try again.
               </div>
@@ -290,13 +297,16 @@ export default function LoginPage() {
                 disabled={loading}
                 className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] disabled:opacity-70"
               >
-                {loading ? 'Logging in...' : 'Sign in'}
+                {loading ? "Logging in..." : "Sign in"}
               </button>
             </div>
           </form>
         )}
         {showAuthorForm && (
-          <form className="mt-8 space-y-6 animate-fade-in" onSubmit={handleAuthorLogin}>
+          <form
+            className="mt-8 space-y-6 animate-fade-in"
+            onSubmit={handleAuthorLogin}
+          >
             <div className="space-y-4 p-6">
               <div className="relative flex items-center">
                 <EnvelopeIcon className="h-5 w-5 text-[var(--admin-scroll-thumb-hover)] mr-2" />
@@ -317,7 +327,7 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={password}
@@ -339,7 +349,7 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-            {error === 'wrong-password' && (
+            {error === "wrong-password" && (
               <div className="text-[var(--critical)] text-sm mt-2 text-center animate-shake">
                 Wrong password. Please try again.
               </div>
@@ -350,7 +360,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="group relative w-2/3 mx-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-base font-semibold rounded-lg text-white bg-[var(--primary)] shadow-sm hover:bg-[var(--secondary)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] disabled:opacity-70"
               >
-                {loading ? 'Logging in...' : 'Sign in'}
+                {loading ? "Logging in..." : "Sign in"}
               </button>
             </div>
           </form>

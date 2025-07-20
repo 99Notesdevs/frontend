@@ -1,15 +1,28 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { CurrentAffairPageForm, type CurrentAffairPageFormValues } from '@/components/dashboard/forms/CurrentAffairPageForm';
-import { CustomLinkForm, type CustomLinkFormData } from '@/components/dashboard/forms/CustomLinkForm';
-import { env } from '@/config/env';
-import Cookie from 'js-cookie';
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  CurrentAffairPageForm,
+  type CurrentAffairPageFormValues,
+} from "@/components/dashboard/forms/CurrentAffairPageForm";
+import {
+  CustomLinkForm,
+  type CustomLinkFormData,
+} from "@/components/dashboard/forms/CustomLinkForm";
+import Cookie from "js-cookie";
+import { api } from "@/config/api/route";
 
-import { PencilIcon, TrashIcon, EyeIcon, ArrowLeftIcon, CalendarIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
-import { uploadImageToS3 } from '@/config/imageUploadS3';
-import Drafts from '@/components/ui/drafts';
+import {
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  ArrowLeftIcon,
+  CalendarIcon,
+  CalendarDaysIcon,
+} from "@heroicons/react/24/outline";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
+import Drafts from "@/components/ui/drafts";
 
 interface CurrentAffairType {
   id: number;
@@ -50,20 +63,26 @@ interface CurrentAffairArticleType {
     schemaData?: string;
     header?: string;
     body?: string;
-  }
+  };
   createdAt: Date;
   updatedAt: Date;
   parentSlug: string;
 }
 
 export default function PageListCurrent() {
-  const [selectedPage, setSelectedPage] = useState<CurrentAffairType | null>(null);
+  const [selectedPage, setSelectedPage] = useState<CurrentAffairType | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState<CurrentAffairType[]>([]);
-  const [selectedType, setSelectedType] = useState<'daily' | 'monthly' | 'yearly' | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(selectedPage?.imageUrl || null);
-  const token = Cookie.get('token');
+  const [selectedType, setSelectedType] = useState<
+    "daily" | "monthly" | "yearly" | null
+  >(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    selectedPage?.imageUrl || null
+  );
+  const token = Cookie.get("token");
 
   const getFormattedDate = () => {
     const uid = Math.random().toString(36).slice(2, 6);
@@ -79,47 +98,52 @@ export default function PageListCurrent() {
   };
 
   const handleImageUpload = async (content: string) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(content, "text/html");
-        const imgTags = doc.querySelectorAll("img");
-    
-        for (const img of imgTags) {
-          const src = img.getAttribute("src");
-          if (!src) continue;
-          console.log("I was here");
-          const isBlob = src.startsWith("blob:");
-          const isBase64 = src.startsWith("data:image");
-          const fileNmae = (img.getAttribute("title") || getFormattedDate()) + ".png";
-    
-          if (isBlob || isBase64) {
-            try {
-              const response = await fetch(src);
-              const blob = await response.blob();
-    
-              const formData = new FormData();
-              formData.append("imageUrl", blob, "image.png");
-    
-              const url =
-                (await uploadImageToS3(formData, "CurrentAffairImages", fileNmae)) || "error";
-              img.setAttribute("src", url);
-            } catch (error: unknown) {
-              if (error instanceof Error) {
-                console.error("Error uploading image:", error.message);
-              }
-            }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+    const imgTags = doc.querySelectorAll("img");
+
+    for (const img of imgTags) {
+      const src = img.getAttribute("src");
+      if (!src) continue;
+      console.log("I was here");
+      const isBlob = src.startsWith("blob:");
+      const isBase64 = src.startsWith("data:image");
+      const fileNmae =
+        (img.getAttribute("title") || getFormattedDate()) + ".png";
+
+      if (isBlob || isBase64) {
+        try {
+          const response = await fetch(src);
+          const blob = await response.blob();
+
+          const formData = new FormData();
+          formData.append("imageUrl", blob, "image.png");
+
+          const url =
+            (await uploadImageToS3(
+              formData,
+              "CurrentAffairImages",
+              fileNmae
+            )) || "error";
+          img.setAttribute("src", url);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error("Error uploading image:", error.message);
           }
         }
-    
-        return doc.body.innerHTML; // ⬅️ Only return after finishing all images
-      };
+      }
+    }
+
+    return doc.body.innerHTML; // ⬅️ Only return after finishing all images
+  };
 
   const handleEditSubmit = async (formData: CurrentAffairPageFormValues) => {
     try {
       // Generate slug from title
       const baseSlug = formData.title
         .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
       const slug = `current-affairs/${baseSlug}`;
 
       const content = await handleImageUpload(formData.content || "");
@@ -127,7 +151,7 @@ export default function PageListCurrent() {
       const updateData = {
         title: formData.title,
         content: content,
-        type: selectedType || 'daily',
+        type: selectedType || "daily",
         slug,
         showInNav: formData.showInNav,
         updatedAt: new Date(),
@@ -148,46 +172,41 @@ export default function PageListCurrent() {
           canonicalUrl: formData.canonicalUrl,
           schemaData: formData.schemaData,
           header: formData.header,
-          body: formData.body
-        })
+          body: formData.body,
+        }),
       };
 
       if (!selectedPage) {
-        setError('No page selected');
+        setError("No page selected");
         return;
       }
-      
-      const response = await fetch(`${env.API}/currentAffair/${selectedPage.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update page');
+      const response = (await api.put(
+        `/currentAffair/${selectedPage.id}`,
+        updateData
+      )) as { data: { success: boolean; data: CurrentAffairType } };
+
+      if (!response.data.success) {
+        throw new Error("Failed to update page");
       }
 
-      const { data } = await response.json();
+      const { data } = response.data;
       setSelectedPage(data);
       if (selectedType) {
         fetchPages(selectedType);
       }
-      
+
       // Refresh the page after successful submission
       window.location.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
   const handleCustomLinkSubmit = async (formData: CustomLinkFormData) => {
     try {
       if (!selectedPage) {
-        setError('No page selected');
+        setError("No page selected");
         return;
       }
 
@@ -196,97 +215,88 @@ export default function PageListCurrent() {
         link: formData.link,
         showInNav: formData.showInNav,
         content: "dummy",
-        type: selectedType || 'daily',
-        slug:"dummy",
+        type: selectedType || "daily",
+        slug: "dummy",
         updatedAt: new Date(),
         imageUrl: "",
-        metadata: ""
+        metadata: "",
       };
 
-      const response = await fetch(`${env.API}/currentAffair/${selectedPage.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
+      const response = (await api.put(
+        `/currentAffair/${selectedPage.id}`,
+        updateData
+      )) as { data: { success: boolean; data: CurrentAffairType } };
 
-      if (!response.ok) {
-        throw new Error('Failed to update page');
+      if (!response.data.success) {
+        throw new Error("Failed to update page");
       }
 
       // Refresh the page list
       if (selectedType) {
         fetchPages(selectedType);
       }
-      
+
       // Refresh the page after successful submission
       window.location.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
   useEffect(() => {
-    fetchPages('daily'); // Fetch daily pages on initial load
+    fetchPages("daily"); // Fetch daily pages on initial load
   }, []);
 
   useEffect(() => {
     if (selectedPage) {
-      console.log('Selected page content:', selectedPage);
-      
+      console.log("Selected page content:", selectedPage);
+
       // Parse metadata string into object if it exists
-      const parsedMetadata =  JSON.parse(selectedPage.metadata || '{}');
-      
+      const parsedMetadata = JSON.parse(selectedPage.metadata || "{}");
+
       // Prepare default values for the form
       const defaultValues = {
         title: selectedPage.title,
-        content: selectedPage.content || '',
-        imageUrl: selectedPage.imageUrl || '',
+        content: selectedPage.content || "",
+        imageUrl: selectedPage.imageUrl || "",
         showInNav: selectedPage.showInNav || false,
-        metaTitle: parsedMetadata.metaTitle || '',
-        metaDescription: parsedMetadata.metaDescription || '',
-        metaKeywords: parsedMetadata.metaKeywords || '',
-        robots: parsedMetadata.robots || '',
-        ogTitle: parsedMetadata.ogTitle || '',
-        ogDescription: parsedMetadata.ogDescription || '',
-        ogImage: parsedMetadata.ogImage || '',
-        ogType: parsedMetadata.ogType || '',
-        twitterCard: parsedMetadata.twitterCard || '',
-        twitterTitle: parsedMetadata.twitterTitle || '',
-        twitterDescription: parsedMetadata.twitterDescription || '',
-        twitterImage: parsedMetadata.twitterImage || '',
-        canonicalUrl: parsedMetadata.canonicalUrl || '',
-        schemaData: parsedMetadata.schemaData || '',
-        header: parsedMetadata.header || '',
-        body: parsedMetadata.body || ''
+        metaTitle: parsedMetadata.metaTitle || "",
+        metaDescription: parsedMetadata.metaDescription || "",
+        metaKeywords: parsedMetadata.metaKeywords || "",
+        robots: parsedMetadata.robots || "",
+        ogTitle: parsedMetadata.ogTitle || "",
+        ogDescription: parsedMetadata.ogDescription || "",
+        ogImage: parsedMetadata.ogImage || "",
+        ogType: parsedMetadata.ogType || "",
+        twitterCard: parsedMetadata.twitterCard || "",
+        twitterTitle: parsedMetadata.twitterTitle || "",
+        twitterDescription: parsedMetadata.twitterDescription || "",
+        twitterImage: parsedMetadata.twitterImage || "",
+        canonicalUrl: parsedMetadata.canonicalUrl || "",
+        schemaData: parsedMetadata.schemaData || "",
+        header: parsedMetadata.header || "",
+        body: parsedMetadata.body || "",
       };
 
       setImagePreview(selectedPage.imageUrl || null);
     }
   }, [selectedPage, selectedType]);
 
-  const handleTypeChange = (type: 'daily' | 'monthly' | 'yearly') => {
+  const handleTypeChange = (type: "daily" | "monthly" | "yearly") => {
     setSelectedType(type);
     fetchPages(type);
   };
 
   const handleDelete = async (pageId: number) => {
-    if (!window.confirm('Are you sure you want to delete this page?')) return;
+    if (!window.confirm("Are you sure you want to delete this page?")) return;
 
     try {
-      const response = await fetch(`${env.API}/currentAffair/${pageId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = (await api.delete(`/currentAffair/${pageId}`)) as {
+        data: { success: boolean };
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete page');
+      if (!response.data.success) {
+        throw new Error("Failed to delete page");
       }
 
       // Refresh the page list
@@ -294,36 +304,34 @@ export default function PageListCurrent() {
         fetchPages(selectedType);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
-  const fetchPages = async (type: 'daily' | 'monthly' | 'yearly') => {
+  const fetchPages = async (type: "daily" | "monthly" | "yearly") => {
     try {
       setLoading(true);
-      const response = await fetch(`${env.API}/currentAffair/type/${type}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = (await api.get(`/currentAffair/type/${type}`)) as {
+        data: { success: boolean; data: CurrentAffairType[] };
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch pages');
+      if (!response.data.success) {
+        throw new Error("Failed to fetch pages");
       }
 
-      const { data } = await response.json();
+      const { data } = response.data;
       setPages(data || []);
     } catch (error) {
-      console.error('Error fetching current affairs:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      console.error("Error fetching current affairs:", {
+        error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
         name: error instanceof Error ? error.name : undefined,
-        type: error instanceof Error ? error.constructor.name : typeof error
+        type: error instanceof Error ? error.constructor.name : typeof error,
       });
 
-      setError(error instanceof Error ? error.message : 'Failed to fetch pages');
+      setError(
+        error instanceof Error ? error.message : "Failed to fetch pages"
+      );
     } finally {
       setLoading(false);
     }
@@ -341,9 +349,7 @@ export default function PageListCurrent() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() =>
-                  (window.location.href = "/dashboard")
-                }
+                onClick={() => (window.location.href = "/dashboard")}
                 className="border-[var(--admin-bg-primary)] text-white bg-[var(--admin-bg-primary)] hover:bg-[var(--admin-bg-primary)]"
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-2" />
@@ -418,7 +424,7 @@ export default function PageListCurrent() {
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">{page.title}</h3>
-                {/* <div
+              {/* <div
                   className="text-gray-600 text-sm mb-4 line-clamp-3"
                   dangerouslySetInnerHTML={{
                     __html: page.content ? (
@@ -433,9 +439,7 @@ export default function PageListCurrent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    (window.location.href = `/${page.slug}`)
-                  }
+                  onClick={() => (window.location.href = `/${page.slug}`)}
                   className="border-[var(--admin-border)] text-[var(--admin-bg-dark)] hover:bg-[var(--admin-bg-light)]"
                 >
                   <EyeIcon className="w-4 h-4 mr-2 text-[var(--admin-primary)]" />
@@ -448,9 +452,11 @@ export default function PageListCurrent() {
                     setSelectedPage(page);
                     // Scroll to the form container after a small delay to ensure it's mounted
                     setTimeout(() => {
-                      const formContainer = document.querySelector('.bg-white.rounded-lg.shadow-sm');
+                      const formContainer = document.querySelector(
+                        ".bg-white.rounded-lg.shadow-sm"
+                      );
                       if (formContainer) {
-                        formContainer.scrollIntoView({ behavior: 'smooth' });
+                        formContainer.scrollIntoView({ behavior: "smooth" });
                       }
                     }, 100);
                   }}
@@ -498,7 +504,7 @@ export default function PageListCurrent() {
                   initialData={{
                     title: selectedPage.title,
                     link: selectedPage.link,
-                    showInNav: selectedPage.showInNav || false
+                    showInNav: selectedPage.showInNav || false,
                   }}
                   onSubmit={handleCustomLinkSubmit}
                 />
@@ -506,34 +512,68 @@ export default function PageListCurrent() {
                 <CurrentAffairPageForm
                   defaultValues={{
                     title: selectedPage.title,
-                    content: selectedPage.content || '',
+                    content: selectedPage.content || "",
                     showInNav: selectedPage.showInNav || false,
-                    imageUrl: selectedPage.imageUrl || '',
-                    metaTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaTitle || '' : '',
-                    metaDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaDescription || '' : '',
-                    metaKeywords: selectedPage.metadata ? JSON.parse(selectedPage.metadata).metaKeywords || '' : '',
-                    robots: selectedPage.metadata ? JSON.parse(selectedPage.metadata).robots || '' : '',
-                    ogTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogTitle || '' : '',
-                    ogDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogDescription || '' : '',
-                    ogImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogImage || '' : '',
-                    ogType: selectedPage.metadata ? JSON.parse(selectedPage.metadata).ogType || '' : '',
-                    twitterCard: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterCard || '' : '',
-                    twitterTitle: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterTitle || '' : '',
-                    twitterDescription: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterDescription || '' : '',
-                    twitterImage: selectedPage.metadata ? JSON.parse(selectedPage.metadata).twitterImage || '' : '',
-                    canonicalUrl: selectedPage.metadata ? JSON.parse(selectedPage.metadata).canonicalUrl || '' : '',
-                    schemaData: selectedPage.metadata ? JSON.parse(selectedPage.metadata).schemaData || '' : '',
-                    header: selectedPage.metadata ? JSON.parse(selectedPage.metadata).header || '' : '',
-                    body: selectedPage.metadata ? JSON.parse(selectedPage.metadata).body || '' : ''
+                    imageUrl: selectedPage.imageUrl || "",
+                    metaTitle: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).metaTitle || ""
+                      : "",
+                    metaDescription: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).metaDescription || ""
+                      : "",
+                    metaKeywords: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).metaKeywords || ""
+                      : "",
+                    robots: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).robots || ""
+                      : "",
+                    ogTitle: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogTitle || ""
+                      : "",
+                    ogDescription: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogDescription || ""
+                      : "",
+                    ogImage: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogImage || ""
+                      : "",
+                    ogType: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).ogType || ""
+                      : "",
+                    twitterCard: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterCard || ""
+                      : "",
+                    twitterTitle: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterTitle || ""
+                      : "",
+                    twitterDescription: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterDescription ||
+                        ""
+                      : "",
+                    twitterImage: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).twitterImage || ""
+                      : "",
+                    canonicalUrl: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).canonicalUrl || ""
+                      : "",
+                    schemaData: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).schemaData || ""
+                      : "",
+                    header: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).header || ""
+                      : "",
+                    body: selectedPage.metadata
+                      ? JSON.parse(selectedPage.metadata).body || ""
+                      : "",
                   }}
-                  onSubmit={handleEditSubmit} folder={"CurrentAffairs"}
+                  onSubmit={handleEditSubmit}
+                  folder={"CurrentAffairs"}
                 />
               )}
             </div>
           </div>
         </div>
       )}
-      <Drafts/>
+      <Drafts />
     </div>
   );
 }

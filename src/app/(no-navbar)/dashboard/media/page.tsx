@@ -1,38 +1,34 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import axios from "axios";
-import { env } from "@/config/env";
 import LoadingSpinner from "@/components/Loading/loading";
-import Cookies from "js-cookie";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
+import { api } from "@/config/api/route";
 
 const MediaLibrary = () => {
   const [mediaFiles, setMediaFiles] = useState<string[]>([]);
   const [filteredMediaFiles, setFilteredMediaFiles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]); 
-  const [currentPage, setCurrentPage] = useState(1); 
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState("all");
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedFolder, setSelectedFolder] =
     useState<string>("GeneralStudies");
   const [uploading, setUploading] = useState(false);
-  const itemsPerPage = 20; 
+  const itemsPerPage = 20;
 
   useEffect(() => {
     const fetchMediaFiles = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get(`${env.API}/aws/get-all-images`, {
-            headers: {
-                Authorization: `Bearer ${Cookies.get("token")}`,
-            }
-        }); 
+        const response = (await api.get(`/aws/get-all-images`)) as {
+          data: { success: boolean; data: string[] };
+        };
         setMediaFiles(response.data.data || []);
-        setFilteredMediaFiles(response.data.data || []); 
+        setFilteredMediaFiles(response.data.data || []);
       } catch (err) {
         setError("Failed to fetch media files.");
       } finally {
@@ -45,7 +41,7 @@ const MediaLibrary = () => {
 
   const handleFilterChange = (filter: string) => {
     setFilter(filter);
-    setCurrentPage(1); 
+    setCurrentPage(1);
 
     if (filter === "all") {
       setFilteredMediaFiles(mediaFiles);
@@ -66,19 +62,18 @@ const MediaLibrary = () => {
 
   const bulkDeleteMediaFiles = async () => {
     try {
-      await axios.delete(`${env.API}/aws/delete-image`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
-        },
+      const response = (await api.delete(`/aws/delete-image`, {
         data: { selectedFiles },
-      });
-      setMediaFiles((prev) =>
-        prev.filter((file) => !selectedFiles.includes(file))
-      );
-      setFilteredMediaFiles((prev) =>
-        prev.filter((file) => !selectedFiles.includes(file))
-      );
-      setSelectedFiles([]);
+      })) as { data: { success: boolean; message: string } };
+      if (response.data.success) {
+        setMediaFiles((prev) =>
+          prev.filter((file) => !selectedFiles.includes(file))
+        );
+        setFilteredMediaFiles((prev) =>
+          prev.filter((file) => !selectedFiles.includes(file))
+        );
+        setSelectedFiles([]);
+      }
     } catch (err) {
       alert("Failed to delete selected media files.");
     }
@@ -209,7 +204,11 @@ const MediaLibrary = () => {
                 title="Copy URL"
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+                  if (
+                    typeof navigator !== "undefined" &&
+                    navigator.clipboard &&
+                    navigator.clipboard.writeText
+                  ) {
                     navigator.clipboard.writeText(url);
                   } else {
                     // Fallback for older browsers

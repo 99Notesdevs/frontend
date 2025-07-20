@@ -1,9 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import CurrentAffairsLayout from "@/components/CurrentAffairs/CurrentAffairsLayout";
-import { sectionConfig } from "@/config/currentAffairs";
 import { env } from "@/config/env";
 import { Metadata } from "next";
 import SearchBar from "@/components/Navbar/SearchBar";

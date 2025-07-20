@@ -23,8 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
+import { api } from "@/config/api/route";
 
 // Utility: Convert CSS variable object to :root CSS string
 function cssVarsObjectToRootString(vars: Record<string, string>): string {
@@ -48,20 +47,14 @@ export default function UpdateCssPage() {
     const fetchCurrentCss = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${env.API}/admin/ops`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Cookies.get("token")}`,
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
+        const response = (await api.get(`/admin/ops`)) as {
+          success: boolean; data: { globalCss: string };
+        };
+        if (response.success) {
+          const data = response.data;
           // Accepts either a CSS string or an object of variables
           console.log("Fetched CSS:", data);
-          const currentCss = JSON.parse(data.data.globalCss) || "";
+          const currentCss = JSON.parse(data.globalCss) || "";
           setCss(currentCss);
           setOriginalCss(currentCss);
         } else {
@@ -165,21 +158,15 @@ export default function UpdateCssPage() {
 
     setIsSaving(true);
     try {
-      const response = await fetch(`${env.API}/admin/ops`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Cookies.get("token")}`,
-        },
-        body: JSON.stringify({ globalCss: JSON.stringify(css) }),
-      });
+      const response = (await api.put(`/admin/ops`, {
+        globalCss: JSON.stringify(css),
+      })) as { success: boolean; message: string };
 
-      if (response.ok) {
+      if (response.success) {
         setOriginalCss(css);
         toast.success("CSS updated successfully");
       } else {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to update CSS");
+        throw new Error(response.message || "Failed to update CSS");
       }
     } catch (error: any) {
       console.error("Error updating CSS:", error);

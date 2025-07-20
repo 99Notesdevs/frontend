@@ -1,26 +1,31 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Plus_Jakarta_Sans } from 'next/font/google';
-import { env } from '@/config/env';
-import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaExclamationTriangle } from 'react-icons/fa';
-import Cookies from 'js-cookie';
+import { useState, useEffect } from "react";
+import { Plus_Jakarta_Sans } from "next/font/google";
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaEye,
+  FaEyeSlash,
+  FaExclamationTriangle,
+} from "react-icons/fa";
+import { api } from "@/config/api/route";
+import Cookies from "js-cookie";
 
 const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 interface Employee {
   id: string;
   name?: string; // Only for authors
   email: string;
-  role: 'editor' | 'author';
+  role: "editor" | "author";
   createdAt: string;
 }
 
 export default function ManageEmployees() {
-  const router = useRouter();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -34,7 +39,7 @@ export default function ManageEmployees() {
     role: "editor" | "author";
     password: string;
   }>({
-    id: '',
+    id: "",
     name: "",
     email: "",
     role: "editor",
@@ -54,204 +59,187 @@ export default function ManageEmployees() {
 
   const fetchEmployees = async () => {
     try {
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
-      const [editorsResponse, authorsResponse] = await Promise.all([
-        fetch(`${env.API}/editor`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }),
-        fetch(`${env.API}/author`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        })
-      ]);
+      const [editorsResponse, authorsResponse] = (await Promise.all([
+        api.get(`/editor`),
+        api.get(`/author`),
+      ])) as { success: boolean; data: any[] }[];
 
-      if (!editorsResponse.ok || !authorsResponse.ok) {
-        throw new Error('Failed to fetch employees');
+      if (!editorsResponse.success || !authorsResponse.success) {
+        throw new Error("Failed to fetch employees");
       }
 
-      const [editorsData, authorsData] = await Promise.all([
-        editorsResponse.json(),
-        authorsResponse.json()
-      ]);
+      const [editorsData, authorsData] = [
+        editorsResponse.data,
+        authorsResponse.data,
+      ];
 
       // Transform the data to match our Employee interface
-      const editors = editorsData.data.map((editor: any) => ({
+      const editors = editorsData.map((editor: any) => ({
         id: editor.id.toString(),
         email: editor.email,
-        role: 'editor',
-        createdAt: editor.createdAt
+        role: "editor" as "editor",
+        createdAt: editor.createdAt,
       }));
 
-      const authors = authorsData.data.map((author: any) => ({
+      const authors = authorsData.map((author: any) => ({
         id: author.id.toString(),
         name: author.name,
         email: author.email,
-        role: 'author',
-        createdAt: author.createdAt
+        role: "author" as "author",
+        createdAt: author.createdAt,
       }));
 
       setEmployees([...editors, ...authors]);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching employees:', error);
-      setError('Failed to load employees');
+      console.error("Error fetching employees:", error);
+      setError("Failed to load employees");
       setLoading(false);
     }
   };
 
   const handleAddEmployee = async () => {
     try {
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
-      const response = await fetch(`${env.API}/${newEmployee.role === 'editor' ? 'editor' : 'author'}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(newEmployee),
-      });
+      const response = (await api.post(
+        `/${newEmployee.role === "editor" ? "editor" : "author"}`,
+        newEmployee
+      )) as { success: boolean; error?: string };
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        const errorMessage = data.error || 'Failed to add employee';
+      if (!response.success) {
+        const errorMessage = response.error || "Failed to add employee";
         throw new Error(errorMessage);
       }
 
       setShowAddForm(false);
       setNewEmployee({
-        id: '',
+        id: "",
         name: "",
         email: "",
         role: "editor",
         password: "",
       });
       fetchEmployees();
-      setSuccess('Employee added successfully');
+      setSuccess("Employee added successfully");
       setError(null);
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred while adding employee');
+      setError(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while adding employee"
+      );
       setSuccess(null);
     }
   };
 
   const handleUpdateEmployee = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     if (!editingEmployee) return;
 
     const updatedEmployee = {
       ...newEmployee,
       id: editingEmployee.id,
-      role: editingEmployee.role
+      role: editingEmployee.role,
     };
 
     try {
-      const token = Cookies.get('token');
-      if (!token) throw new Error('No token found');
+      const token = Cookies.get("token");
+      if (!token) throw new Error("No token found");
 
-      const response = await fetch(`${env.API}/${updatedEmployee.role === 'editor' ? 'editor' : 'author'}/${updatedEmployee.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedEmployee),
-      });
+      const response = (await api.put(
+        `/${updatedEmployee.role === "editor" ? "editor" : "author"}/${
+          updatedEmployee.id
+        }`,
+        updatedEmployee
+      )) as { success: boolean };
 
-      if (!response.ok) {
-        throw new Error('Failed to update employee');
+      if (!response.success) {
+        throw new Error("Failed to update employee");
       }
 
       // Update the form state with the new data
       setNewEmployee({
-        id: '',
+        id: "",
         name: "",
         email: "",
         role: "editor",
-        password: ""
+        password: "",
       });
 
       setEditingEmployee(null);
       fetchEmployees();
       setShowAddForm(false);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
-  const handleDeleteEmployee = async (id: string, role: 'editor' | 'author') => {
+  const handleDeleteEmployee = async (
+    id: string,
+    role: "editor" | "author"
+  ) => {
     try {
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
-      const response = await fetch(`${env.API}/${role}/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = (await api.delete(`/${role}/${id}`)) as {
+        success: boolean;
+      };
 
-      if (!response.ok) {
-        throw new Error('Failed to delete employee');
+      if (!response.success) {
+        throw new Error("Failed to delete employee");
       }
 
       fetchEmployees();
     } catch (error) {
-      setError('Failed to delete employee');
+      setError("Failed to delete employee");
     }
   };
 
   const handleEditEmployee = async (updatedEmployee: Employee) => {
     try {
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
-      const response = await fetch(`${env.API}/${updatedEmployee.role === 'editor' ? 'editor' : 'author'}/${updatedEmployee.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedEmployee),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update employee');
+      const response = (await api.put(
+        `/${updatedEmployee.role === "editor" ? "editor" : "author"}/${
+          updatedEmployee.id
+        }`,
+        updatedEmployee
+      )) as { success: boolean };
+      if (!response.success) {
+        throw new Error("Failed to update employee");
       }
 
       // Update the form state with the new data
       setNewEmployee({
         ...updatedEmployee,
-        password: '' // Clear password field
+        password: "", // Clear password field
       });
 
       setEditingEmployee(null);
       fetchEmployees();
     } catch (error) {
-      setError('Failed to update employee');
+      setError("Failed to update employee");
     }
   };
 
@@ -262,7 +250,7 @@ export default function ManageEmployees() {
       name: employee.name,
       email: employee.email,
       role: employee.role,
-      password: ''
+      password: "",
     });
   };
 
@@ -277,7 +265,7 @@ export default function ManageEmployees() {
 
   const confirmDeleteEmployee = async () => {
     if (!deleteEmployeeId) return;
-    await handleDeleteEmployee(deleteEmployeeId, 'editor');
+    await handleDeleteEmployee(deleteEmployeeId, "editor");
     setShowDeleteModal(false);
     setDeleteEmployeeId(null);
   };
@@ -292,7 +280,11 @@ export default function ManageEmployees() {
 
   return (
     <div className="container mx-auto max-w-5xl px-2 sm:px-6 py-8 min-h-[80vh]">
-      <h1 className={`${plusJakarta.className} text-2xl font-bold text-[var(--admin-bg-secondary)] mb-8 text-center mt-16 sm:mt-10`}>Manage Employees</h1>
+      <h1
+        className={`${plusJakarta.className} text-2xl font-bold text-[var(--admin-bg-secondary)] mb-8 text-center mt-16 sm:mt-10`}
+      >
+        Manage Employees
+      </h1>
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setShowAddForm(!showAddForm)}
@@ -323,7 +315,9 @@ export default function ManageEmployees() {
                 <input
                   type="text"
                   value={newEmployee.name}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewEmployee({ ...newEmployee, name: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -333,7 +327,9 @@ export default function ManageEmployees() {
                 <input
                   type="email"
                   value={newEmployee.email}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+                  onChange={(e) =>
+                    setNewEmployee({ ...newEmployee, email: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -342,7 +338,12 @@ export default function ManageEmployees() {
                 <label className="block text-sm font-medium mb-1">Role</label>
                 <select
                   value={newEmployee.role}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value as 'editor' | 'author' })}
+                  onChange={(e) =>
+                    setNewEmployee({
+                      ...newEmployee,
+                      role: e.target.value as "editor" | "author",
+                    })
+                  }
                   className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="editor">Editor</option>
@@ -350,11 +351,15 @@ export default function ManageEmployees() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Password</label>
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
                 <input
                   type="password"
                   value={newEmployee.password}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
+                  onChange={(e) =>
+                    setNewEmployee({ ...newEmployee, password: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-[var(--admin-scroll-thumb)] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -397,10 +402,12 @@ export default function ManageEmployees() {
             </thead>
             <tbody className="divide-y divide-[var(--admin-border)]">
               {employees
-                .filter((e) => e.role === 'editor')
+                .filter((e) => e.role === "editor")
                 .map((employee) => (
                   <tr key={employee.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">{employee.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">
+                      {employee.email}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">
                       {new Date(employee.createdAt).toLocaleDateString()}
                     </td>
@@ -445,11 +452,15 @@ export default function ManageEmployees() {
             </thead>
             <tbody className="divide-y divide-[var(--admin-border)]">
               {employees
-                .filter((e) => e.role === 'author')
+                .filter((e) => e.role === "author")
                 .map((employee) => (
                   <tr key={employee.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">{employee.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">{employee.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">
+                      {employee.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">
+                      {employee.email}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--admin-bg-dark)]">
                       {new Date(employee.createdAt).toLocaleDateString()}
                     </td>
@@ -485,13 +496,15 @@ export default function ManageEmployees() {
             </button>
             <h2 className="text-xl font-semibold mb-6">Edit Employee</h2>
             <form onSubmit={handleUpdateEmployee}>
-              {editingEmployee.role === 'author' && (
+              {editingEmployee.role === "author" && (
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-1">Name</label>
                   <input
                     type="text"
                     value={newEmployee.name}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, name: e.target.value })
+                    }
                     className="w-full border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
                     required
                   />
@@ -502,18 +515,27 @@ export default function ManageEmployees() {
                 <input
                   type="email"
                   value={newEmployee.email}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+                  onChange={(e) =>
+                    setNewEmployee({ ...newEmployee, email: e.target.value })
+                  }
                   className="w-full border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors"
                   required
                 />
               </div>
               <div className="mb-6">
-                <label className="block text-sm font-medium mb-1">Password</label>
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
                 <div className="relative">
                   <input
                     type={showEditPassword ? "text" : "password"}
                     value={newEmployee.password}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        password: e.target.value,
+                      })
+                    }
                     className="w-full border-0 border-b-2 border-[var(--admin-scroll-thumb)] bg-transparent focus:outline-none focus:ring-0 focus:border-slate-500 transition-colors pr-10"
                   />
                   <button
@@ -551,8 +573,13 @@ export default function ManageEmployees() {
           <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full relative">
             <div className="flex flex-col items-center">
               <FaExclamationTriangle className="text-yellow-500 text-4xl mb-3" />
-              <h2 className="text-lg font-bold text-[var(--admin-bg-secondary)] mb-2">Confirm Deletion</h2>
-              <p className="text-[var(--admin-primary)] mb-6 text-center">Are you sure you want to delete this employee? This action cannot be undone.</p>
+              <h2 className="text-lg font-bold text-[var(--admin-bg-secondary)] mb-2">
+                Confirm Deletion
+              </h2>
+              <p className="text-[var(--admin-primary)] mb-6 text-center">
+                Are you sure you want to delete this employee? This action
+                cannot be undone.
+              </p>
               <div className="flex gap-4 w-full justify-center">
                 <button
                   className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white font-semibold"

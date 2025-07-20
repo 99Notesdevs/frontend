@@ -8,8 +8,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
+import { api } from "@/config/api/route";
 
 // Define the type for a Current Affair
 interface CurrentAffair {
@@ -23,12 +22,13 @@ interface CurrentAffair {
 const fetchCurrentAffairsByType = async (
   type: "daily" | "monthly" | "yearly"
 ): Promise<CurrentAffair[]> => {
-  const res = await fetch(`${env.API}/currentAffair/type/${type}`);
-  if (!res.ok) {
+  const res = (await api.get(`/currentAffair/type/${type}`)) as {
+    data: { success: boolean; data: CurrentAffair[] };
+  };
+  if (!res.data.success) {
     throw new Error(`Failed to fetch ${type} current affairs`);
   }
-  const { data } = await res.json();
-  return data;
+  return res.data.data;
 };
 
 // Sortable Item Component
@@ -50,8 +50,12 @@ const SortableItem = ({ affair }: { affair: CurrentAffair }) => {
       className="bg-[var(--admin-bg-lightest)] shadow rounded-xl p-4 mb-2 border border-[var(--admin-border)] cursor-move hover:bg-[var(--admin-bg-light)] transition-all"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--admin-bg-secondary)]">{affair.title}</h3>
-        <span className="text-xs text-[var(--admin-primary)] bg-[var(--admin-bg-light)] px-2 py-1 rounded">Order: {affair.order}</span>
+        <h3 className="text-base font-semibold text-[var(--admin-bg-secondary)]">
+          {affair.title}
+        </h3>
+        <span className="text-xs text-[var(--admin-primary)] bg-[var(--admin-bg-light)] px-2 py-1 rounded">
+          Order: {affair.order}
+        </span>
       </div>
     </div>
   );
@@ -61,7 +65,6 @@ const CurrentAffairsList = () => {
   const [dailyAffairs, setDailyAffairs] = useState<CurrentAffair[]>([]);
   const [monthlyAffairs, setMonthlyAffairs] = useState<CurrentAffair[]>([]);
   const [yearlyAffairs, setYearlyAffairs] = useState<CurrentAffair[]>([]);
-  const token = Cookies.get("token");
 
   useEffect(() => {
     const getCurrentAffairs = async () => {
@@ -128,16 +131,11 @@ const CurrentAffairsList = () => {
     try {
       const updatePromises = updatedAffairs.map((affair) => {
         console.log("order", affair.order);
-        return fetch(`${env.API}/currentAffair/update/order`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ id: affair.id, newOrder: affair.order }),
+        return api.put(`/currentAffair/update/order`, {
+          id: affair.id,
+          newOrder: affair.order,
         });
       });
-
       await Promise.all(updatePromises);
     } catch (error) {
       console.error("Error updating current affairs order:", error);
@@ -152,7 +150,9 @@ const CurrentAffairsList = () => {
 
       {/* Daily Affairs */}
       <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6 mb-8">
-        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">Daily Affairs</h2>
+        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">
+          Daily Affairs
+        </h2>
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, "daily")}
@@ -172,7 +172,9 @@ const CurrentAffairsList = () => {
 
       {/* Monthly Affairs */}
       <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6 mb-8">
-        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">Monthly Affairs</h2>
+        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">
+          Monthly Affairs
+        </h2>
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, "monthly")}
@@ -192,7 +194,9 @@ const CurrentAffairsList = () => {
 
       {/* Yearly Affairs */}
       <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6 mb-8">
-        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">Yearly Affairs</h2>
+        <h2 className="text-lg font-bold text-[var(--admin-bg-primary)] mb-4 text-center">
+          Yearly Affairs
+        </h2>
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, "yearly")}

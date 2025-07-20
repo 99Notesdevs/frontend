@@ -1,21 +1,20 @@
 "use client";
 import { Inter } from "next/font/google";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "@/styles/globals.css";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { FaPlus, FaEdit, FaAdjust, FaAirbnb, FaTextHeight } from "react-icons/fa";
+import {
+  FaPlus,
+  FaEdit,
+  FaAdjust,
+  FaAirbnb,
+} from "react-icons/fa";
 import { isAuth, AuthResponse } from "@/lib/isAuth";
 import { useState, useEffect } from "react";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const inter = Inter({
   subsets: ["latin"],
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 // Navigation items organized by role and category
@@ -24,23 +23,43 @@ const navigationItems = {
     {
       category: "Admin",
       items: [
-        { icon: FaEdit, text: "Manage Employees", path: "/dashboard/manageemployees" },
+        {
+          icon: FaEdit,
+          text: "Manage Employees",
+          path: "/dashboard/manageemployees",
+        },
         { icon: FaPlus, text: "Add Admin", path: "/dashboard/addadmin" },
         { icon: FaEdit, text: "Manage Users", path: "/dashboard/manageusers" },
-        { icon: FaEdit, text: "Manage Subscriptions", path: "/dashboard/subscription" },
-        { icon: FaEdit, text: "Admin Permissions", path: "/dashboard/adminpermissions" },
-        { icon: FaAirbnb, text: "Admin Logs", path: "/dashboard/logs" }
-      ]
+        {
+          icon: FaEdit,
+          text: "Manage Subscriptions",
+          path: "/dashboard/subscription",
+        },
+        {
+          icon: FaEdit,
+          text: "Admin Permissions",
+          path: "/dashboard/adminpermissions",
+        },
+        { icon: FaAirbnb, text: "Admin Logs", path: "/dashboard/logs" },
+      ],
     },
     {
       category: "Test Management",
       items: [
-        { icon: FaPlus, text: "Add Questions", path: "/dashboard/addquestions" },
-        { icon: FaPlus, text: "Add Test Series", path: "/dashboard/addtestSeries" },
+        {
+          icon: FaPlus,
+          text: "Add Questions",
+          path: "/dashboard/addquestions",
+        },
+        {
+          icon: FaPlus,
+          text: "Add Test Series",
+          path: "/dashboard/addtestSeries",
+        },
         { icon: FaAdjust, text: "Test Forms", path: "/dashboard/testForms" },
         { icon: FaAdjust, text: "Test Series", path: "/dashboard/testSeries" },
         { icon: FaPlus, text: "Add Test", path: "/dashboard/addtest" },
-      ]
+      ],
     },
     {
       category: "Article Management",
@@ -48,48 +67,66 @@ const navigationItems = {
         { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
         { icon: FaEdit, text: "Edit Articles", path: "/dashboard/edit" },
         { icon: FaEdit, text: "Sort Articles", path: "/dashboard/sort" },
-      ]
+      ],
     },
     {
       category: "Current Affairs Management",
       items: [
-        { icon: FaPlus, text: "Add Current Affair", path: "/dashboard/current-affair" },
-        { icon: FaEdit, text: "Edit Current Affairs", path: "/dashboard/editcurrent" },
-        { icon: FaEdit, text: "Sort Current Affairs", path: "/dashboard/sortCurrent" }
-      ]
+        {
+          icon: FaPlus,
+          text: "Add Current Affair",
+          path: "/dashboard/current-affair",
+        },
+        {
+          icon: FaEdit,
+          text: "Edit Current Affairs",
+          path: "/dashboard/editcurrent",
+        },
+        {
+          icon: FaEdit,
+          text: "Sort Current Affairs",
+          path: "/dashboard/sortCurrent",
+        },
+      ],
     },
     {
       category: "Blogs Management",
       items: [
         { icon: FaPlus, text: "Add Blogs", path: "/dashboard/blogs" },
-        { icon: FaEdit, text: "Manage Blogs", path: "/dashboard/editblogs" }
-      ]
+        { icon: FaEdit, text: "Manage Blogs", path: "/dashboard/editblogs" },
+      ],
     },
     {
       category: "Site Management",
       items: [
         { icon: FaEdit, text: "Edit About99", path: "/dashboard/update-about" },
         { icon: FaEdit, text: "Edit Home", path: "/dashboard/update-home" },
-        {icon:FaEdit,text:"Update Global CSS",path:"/dashboard/update-css"},
-        { icon: FaEdit, text: "Manage Forms", path: "/dashboard/forms" }
-      ]
+        {
+          icon: FaEdit,
+          text: "Update Global CSS",
+          path: "/dashboard/update-css",
+        },
+        { icon: FaEdit, text: "Manage Forms", path: "/dashboard/forms" },
+      ],
     },
     {
       category: "Media Management",
-      items: [
-        { icon: FaEdit, text: "Manage Media", path: "/dashboard/media" }
-      ]
-    }
+      items: [{ icon: FaEdit, text: "Manage Media", path: "/dashboard/media" }],
+    },
   ],
   author: [
     {
       category: "Content Creation",
       items: [
         { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
-        { icon: FaPlus, text: "Add Current Affair", path: "/dashboard/current-affair" },
-        { icon: FaPlus, text: "Add Blogs", path: "/dashboard/blogs" }
-      ]
-    }
+        {
+          icon: FaPlus,
+          text: "Add Current Affair",
+          path: "/dashboard/current-affair",
+        },
+        { icon: FaPlus, text: "Add Blogs", path: "/dashboard/blogs" },
+      ],
+    },
   ],
   editor: [
     {
@@ -97,10 +134,14 @@ const navigationItems = {
       items: [
         { icon: FaEdit, text: "Edit Articles", path: "/dashboard/edit" },
         { icon: FaEdit, text: "Manage Blogs", path: "/dashboard/editblogs" },
-        { icon: FaEdit, text: "Edit Current Affairs", path: "/dashboard/editcurrent" }
-      ]
-    }
-  ]
+        {
+          icon: FaEdit,
+          text: "Edit Current Affairs",
+          path: "/dashboard/editcurrent",
+        },
+      ],
+    },
+  ],
 };
 
 export default function DashboardLayout({
@@ -117,24 +158,24 @@ export default function DashboardLayout({
     const checkAuth = async () => {
       try {
         const auth = await isAuth();
-        
+
         // If not authenticated, clear everything and redirect
         if (!auth.isAuthenticated) {
           // Clear all auth data
-          Cookies.remove('token', { path: '/' });
+          Cookies.remove("token");
           sessionStorage.clear();
-          router.replace('/operator');
+          router.replace("/operator");
           return;
         }
-        
+
         // If authenticated, set the auth state
         setAuthState(auth);
       } catch (error) {
-        console.error('Auth check failed:', error);
+        console.error("Auth check failed:", error);
         // On error, clear all auth data and redirect
-        Cookies.remove('token', { path: '/' });
+        Cookies.remove("token");
         sessionStorage.clear();
-        router.replace('/operator');
+        router.replace("/operator");
       }
     };
 
@@ -145,7 +186,9 @@ export default function DashboardLayout({
   if (!authState) {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[var(--admin-bg-secondary)] via-[var(--admin-bg-primary)] to-[var(--admin-bg-dark)]">
-        <span className="text-[var(--admin-border)] text-lg font-medium animate-pulse">Verifying authentication...</span>
+        <span className="text-[var(--admin-border)] text-lg font-medium animate-pulse">
+          Verifying authentication...
+        </span>
       </div>
     );
   }
@@ -218,35 +261,35 @@ export default function DashboardLayout({
           <button
             onClick={() => {
               // Clear all auth data
-              Cookies.remove('token', { path: '/' });
+              Cookies.remove("token", { path: "/" });
               sessionStorage.clear();
               // Force a full page reload to clear any cached state
-              window.location.href = '/operator';
+              window.location.href = "/operator";
             }}
             className="text-gray-300 hover:text-white transition-colors focus:outline-none"
             aria-label="Logout"
             style={{
               background: "none",
               border: "none",
-              padding: '4px',
+              padding: "4px",
               cursor: "pointer",
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5" 
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
           </button>
@@ -338,9 +381,7 @@ export default function DashboardLayout({
         </button>
       )}
       {/* Main content */}
-      <div className="flex-1 min-w-0 overflow-y-auto">
-        {children}
-      </div>
+      <div className="flex-1 min-w-0 overflow-y-auto">{children}</div>
     </div>
   );
 }
