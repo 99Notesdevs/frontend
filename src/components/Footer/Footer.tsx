@@ -23,7 +23,9 @@ const Footer = ({ footerSections }: FooterProps) => {
           {footerSections.map((section) => (
             <div key={section.slug} className="flex flex-col">
               <Link href={section.link ? section.link : `/${section.slug}`}>
-                <h3 className="text-xl font-semibold mb-4 text-primary dark:text-white">{section.title}</h3>
+                <h3 className="text-xl font-semibold mb-4 text-primary dark:text-white">
+                  {section.title}
+                </h3>
               </Link>
               <ul className="space-y-2">
                 {section.children.map((link) => (
@@ -55,7 +57,11 @@ const Footer = ({ footerSections }: FooterProps) => {
           </div>
           <div className="text-center mt-6">
             <p className="text-sm text-secondary dark:text-gray-400">
-              &copy; {new Date().getFullYear()} <a href="/" className="dark:text-white">99notes.in</a> All Rights Reserved
+              &copy; {new Date().getFullYear()}{" "}
+              <a href="/" className="dark:text-white">
+                99notes.in
+              </a>{" "}
+              All Rights Reserved
             </p>
           </div>
         </div>

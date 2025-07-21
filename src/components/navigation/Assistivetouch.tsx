@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { TableOfContents } from './TableOfContents';
-import { SidebarNavigation } from './SidebarNavigation';
-import { List, Navigation2, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { TableOfContents } from "./TableOfContents";
+import { SidebarNavigation } from "./SidebarNavigation";
+import { List, Navigation2, X } from "lucide-react";
 
 interface AssistiveTouchProps {
   content: string;
@@ -11,10 +11,12 @@ interface AssistiveTouchProps {
 
 export default function AssistiveTouch({ content }: AssistiveTouchProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showComponent, setShowComponent] = useState<'toc' | 'nav' | null>(null);
+  const [showComponent, setShowComponent] = useState<"toc" | "nav" | null>(
+    null
+  );
   const [showBackdrop, setShowBackdrop] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 100 });
-  const [expandDirection, setExpandDirection] = useState<'up' | 'down'>('up');
+  const [expandDirection, setExpandDirection] = useState<"up" | "down">("up");
 
   const buttonRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -42,16 +44,16 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
       isDragging.current = false;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('touchmove', handleTouchMove);
-    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
     };
   }, []);
 
@@ -97,7 +99,7 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
   const handleAssistiveClick = () => {
     if (isDragging.current) return; // prevent click when dragging
     const threshold = window.innerHeight / 2;
-    setExpandDirection(position.y < threshold ? 'down' : 'up');
+    setExpandDirection(position.y < threshold ? "down" : "up");
     setIsOpen(!isOpen);
     if (!isOpen) {
       setShowComponent(null);
@@ -108,14 +110,14 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
     event.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
       setIsOpen(false);
       setShowBackdrop(false);
       setShowComponent(null);
     }
   };
 
-  const handleComponentClick = (component: 'toc' | 'nav') => {
+  const handleComponentClick = (component: "toc" | "nav") => {
     setShowComponent(component);
     setShowBackdrop(true);
   };
@@ -143,18 +145,19 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
       >
         {isOpen && (
           <div
-            className={`flex flex-col items-end space-y-2 absolute ${expandDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
-              }`}
+            className={`flex flex-col items-end space-y-2 absolute ${
+              expandDirection === "up" ? "bottom-full mb-2" : "top-full mt-2"
+            }`}
           >
             <button
               className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 p-2.5 rounded-full shadow-xl transition-colors duration-200 border border-gray-200 dark:border-gray-700"
-              onClick={() => handleComponentClick('toc')}
+              onClick={() => handleComponentClick("toc")}
             >
               <List className="w-4 h-4" />
             </button>
             <button
               className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 p-2.5 rounded-full shadow-xl transition-colors duration-200 border border-gray-200 dark:border-gray-700"
-              onClick={() => handleComponentClick('nav')}
+              onClick={() => handleComponentClick("nav")}
             >
               <Navigation2 className="w-4 h-4" />
             </button>
@@ -164,9 +167,11 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
         <button
           onClick={handleAssistiveClick}
           className="inline-flex items-center justify-center p-3 rounded-full text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none transition-colors shadow-xl"
-          aria-label={isOpen ? 'Close assistive menu' : 'Open assistive menu'}
+          aria-label={isOpen ? "Close assistive menu" : "Open assistive menu"}
         >
-          <span className="sr-only">{isOpen ? 'Close assistive menu' : 'Open assistive menu'}</span>
+          <span className="sr-only">
+            {isOpen ? "Close assistive menu" : "Open assistive menu"}
+          </span>
           {isOpen ? (
             <svg
               className="block h-7 w-7"
@@ -221,14 +226,19 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
 
             <div className="p-6 dark:bg-[var(--surface-dark)] ">
               <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] dark:text-[var(--text-tertiay)] border-b-2 border-blue-200 pb-2">
-                {showComponent === 'toc' ? '📑 Table of Contents' : '🗄️ Navigation'}
+                {showComponent === "toc"
+                  ? "📑 Table of Contents"
+                  : "🗄️ Navigation"}
               </h3>
 
               <div className="space-y-4 max-h-[70vh] overflow-y-auto">
-                {showComponent === 'toc' && (
-                  <TableOfContents content={content} onLinkClick={handleTocLinkClick} />
+                {showComponent === "toc" && (
+                  <TableOfContents
+                    content={content}
+                    onLinkClick={handleTocLinkClick}
+                  />
                 )}
-                {showComponent === 'nav' && <SidebarNavigation />}
+                {showComponent === "nav" && <SidebarNavigation />}
               </div>
             </div>
           </div>

@@ -1,18 +1,18 @@
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface AdProps {
   imageUrl: string;
   altText?: string;
 }
 
-const Ads: React.FC<AdProps> = ({ imageUrl, altText = 'Advertisement' }) => {
+const Ads: React.FC<AdProps> = ({ imageUrl, altText = "Advertisement" }) => {
   return (
     <div className="w-full my-4 rounded-lg overflow-hidden shadow-md hover:shadow-lg dark:shadow-slate-900/20 dark:hover:shadow-slate-800/30 transition-all duration-300 border border-gray-200 dark:border-slate-700 dark:hover:border-slate-600 bg-white dark:bg-slate-800">
-      <Link 
-        href="https://shop.99notes.in/" 
-        target="_blank" 
+      <Link
+        href="https://shop.99notes.in/"
+        target="_blank"
         rel="noopener noreferrer"
         className="block group h-full flex flex-col"
       >

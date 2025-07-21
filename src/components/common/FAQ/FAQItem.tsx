@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 // Define types for the props
 interface FAQItemProps {
@@ -12,7 +12,13 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, number }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-[var(--border-light)] dark:border-slate-700 overflow-hidden transition-all duration-200 ${isOpen ? 'shadow-md dark:shadow-slate-900/50' : 'hover:shadow dark:hover:shadow-slate-900/30'}`}>
+    <div
+      className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-[var(--border-light)] dark:border-slate-700 overflow-hidden transition-all duration-200 ${
+        isOpen
+          ? "shadow-md dark:shadow-slate-900/50"
+          : "hover:shadow dark:hover:shadow-slate-900/30"
+      }`}
+    >
       <button
         className="w-full py-5 px-6 flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-[var(--tertiary)]"
         onClick={() => setIsOpen(!isOpen)}
@@ -24,13 +30,21 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, number }) => {
               {number}
             </span>
           )}
-          <h3 className="text-lg font-medium text-[var(--surface-darker)] dark:text-white leading-tight font-opensans">{question}</h3>
+          <h3 className="text-lg font-medium text-[var(--surface-darker)] dark:text-white leading-tight font-opensans">
+            {question}
+          </h3>
         </div>
         <div className="flex-shrink-0">
-          <span className={`flex items-center justify-center h-8 w-8 rounded-full border border-[var(--border-light)] dark:border-slate-600 ${isOpen ? 'bg-[var(--tertiary)] text-[var(--primary)]' : 'bg-[var(--bg-main)] dark:bg-slate-700 text-[var(--text-tertiary)] dark:text-gray-300'} transition-colors duration-200`}>
+          <span
+            className={`flex items-center justify-center h-8 w-8 rounded-full border border-[var(--border-light)] dark:border-slate-600 ${
+              isOpen
+                ? "bg-[var(--tertiary)] text-[var(--primary)]"
+                : "bg-[var(--bg-main)] dark:bg-slate-700 text-[var(--text-tertiary)] dark:text-gray-300"
+            } transition-colors duration-200`}
+          >
             <svg
               className={`w-4 h-4 transform transition-transform duration-300 ${
-                isOpen ? 'rotate-180' : ''
+                isOpen ? "rotate-180" : ""
               }`}
               fill="none"
               stroke="currentColor"
@@ -46,12 +60,18 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, number }) => {
           </span>
         </div>
       </button>
-      <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-        isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-      }`}>
+      <div
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
         <div className="p-6 pt-0 text-[var(--text-strong)] dark:text-gray-300 border-t border-[var(--border-light)] dark:border-slate-700">
           <div className="prose prose-sm sm:prose max-w-none font-opensans">
-            {typeof answer === 'string' ? <p className="dark:text-gray-300">{answer}</p> : answer}
+            {typeof answer === "string" ? (
+              <p className="dark:text-gray-300">{answer}</p>
+            ) : (
+              answer
+            )}
           </div>
         </div>
       </div>

@@ -1,16 +1,14 @@
 "use client";
 import Image from "next/image";
 import { BlogTemplateProps } from "./types";
-import { format } from "date-fns";
 import { useEffect } from "react";
-import { RelatedTopics } from "../Blogs/relatedTopics";
 import { Tags } from "@/components/ui/tags/Tags";
 import Breadcrumb from "@/components/ui/breadcrumb";
 import { BackToTop } from "@/components/ui/reachtotop";
 
 export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
   const { title, content, metadata, imageUrl, slug } = page;
-  const displayImagearray = JSON.parse(imageUrl || "") ;
+  const displayImagearray = JSON.parse(imageUrl || "");
   const displayImage = displayImagearray[0];
   const displayImageAlt = displayImagearray[1];
   const parsedMetadata =
@@ -172,12 +170,16 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
                       prose-ol:pl-4 sm:prose-ol:pl-6
                       [&>*]:w-full"
                     >
-                      <div dangerouslySetInnerHTML={{ __html: content || "" }}></div>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: content || "" }}
+                      ></div>
                     </div>
 
                     {tags && tags.length > 0 && (
                       <div className="mt-8">
-                        <h3 className="text-lg font-semibold mb-4 dark:text-white">Tags</h3>
+                        <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                          Tags
+                        </h3>
                         <Tags tags={tags} />
                       </div>
                     )}
@@ -188,8 +190,12 @@ export const BlogTemplate: React.FC<BlogTemplateProps> = ({ page }) => {
               {/* Sidebar */}
               <aside className="lg:col-start-10 lg:col-span-3 xl:col-start-10 xl:col-span-3 space-y-4 sm:space-y-8">
                 <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-slate-900/50 p-6 transition-colors duration-200">
-                  <h2 className="text-lg font-semibold mb-4 dark:text-white">Related Topics</h2>
-                  <p className="text-[var(--text-base)] dark:text-slate-300">Coming soon...</p>
+                  <h2 className="text-lg font-semibold mb-4 dark:text-white">
+                    Related Topics
+                  </h2>
+                  <p className="text-[var(--text-base)] dark:text-slate-300">
+                    Coming soon...
+                  </p>
                 </div>
               </aside>
             </div>

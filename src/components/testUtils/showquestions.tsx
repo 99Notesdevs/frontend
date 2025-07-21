@@ -1,8 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
+import { useState } from "react";
 
 interface Question {
   id: number;
@@ -13,29 +11,29 @@ interface Question {
 }
 
 interface ShowQuestionsProps {
-  questions: Question[]
-  pageSize?: number
-  onQuestionSelect?: (questionId: number) => void
-  selectedQuestionIds?: number[]
+  questions: Question[];
+  pageSize?: number;
+  onQuestionSelect?: (questionId: number) => void;
+  selectedQuestionIds?: number[];
 }
 
-export default function ShowQuestions({ 
-  questions, 
+export default function ShowQuestions({
+  questions,
   pageSize = 10,
   onQuestionSelect,
-  selectedQuestionIds = []
+  selectedQuestionIds = [],
 }: ShowQuestionsProps) {
-  const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = Math.ceil(questions.length / pageSize)
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(questions.length / pageSize);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   const currentQuestions = questions.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
-  )
+  );
 
   return (
     <div className="space-y-6">
@@ -46,7 +44,9 @@ export default function ShowQuestions({
             className="flex items-center justify-between p-4 border rounded-lg bg-gray-50"
           >
             <div>
-              <p className="font-semibold text-[#0f172a]">{question.question}</p>
+              <p className="font-semibold text-[#0f172a]">
+                {question.question}
+              </p>
               <div className="mt-1 flex flex-wrap gap-2">
                 {question.options.map((opt, idx) => (
                   <span
@@ -92,5 +92,5 @@ export default function ShowQuestions({
         </div>
       )}
     </div>
-  )
+  );
 }

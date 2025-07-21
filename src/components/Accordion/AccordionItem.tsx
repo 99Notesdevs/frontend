@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode } from "react";
 
 interface AccordionItemProps {
   title: string;
@@ -16,13 +16,17 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ title, children }) => {
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
-        <span className="text-lg font-semibold text-gray-800 dark:text-slate-100 flex-1 pr-4">{title}</span>
-        <div className={`w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center transition-all duration-300 ${
-          isOpen ? 'bg-amber-100 dark:bg-amber-800/30' : ''
-        }`}>
+        <span className="text-lg font-semibold text-gray-800 dark:text-slate-100 flex-1 pr-4">
+          {title}
+        </span>
+        <div
+          className={`w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center transition-all duration-300 ${
+            isOpen ? "bg-amber-100 dark:bg-amber-800/30" : ""
+          }`}
+        >
           <svg
             className={`w-5 h-5 text-[var(--primary)] dark:text-amber-400 transform transition-transform duration-300 ${
-              isOpen ? 'rotate-180' : ''
+              isOpen ? "rotate-180" : ""
             }`}
             fill="none"
             stroke="currentColor"
@@ -39,15 +43,17 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ title, children }) => {
       </button>
       <div
         className={`overflow-hidden transition-all duration-500 ease-in-out ${
-          isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+          isOpen ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className={`p-5 pt-2 border-t border-[var(--border-light)] dark:border-slate-700 transition-all duration-300 ${
-          isOpen ? 'transform translate-y-0 opacity-100' : 'transform -translate-y-4 opacity-0'
-        }`}>
-          <div className="text-gray-700 dark:text-slate-300">
-            {children}
-          </div>
+        <div
+          className={`p-5 pt-2 border-t border-[var(--border-light)] dark:border-slate-700 transition-all duration-300 ${
+            isOpen
+              ? "transform translate-y-0 opacity-100"
+              : "transform -translate-y-4 opacity-0"
+          }`}
+        >
+          <div className="text-gray-700 dark:text-slate-300">{children}</div>
         </div>
       </div>
     </div>

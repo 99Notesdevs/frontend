@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { StaticImageData } from 'next/image';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { StaticImageData } from "next/image";
 
 interface CurrentAffairsCardProps {
   title: string;
@@ -11,7 +11,11 @@ interface CurrentAffairsCardProps {
   link: string;
 }
 
-const CurrentAffairsCard: React.FC<CurrentAffairsCardProps> = ({ title, icon, link }) => {
+const CurrentAffairsCard: React.FC<CurrentAffairsCardProps> = ({
+  title,
+  icon,
+  link,
+}) => {
   return (
     <Link
       href={link}
@@ -22,13 +26,13 @@ const CurrentAffairsCard: React.FC<CurrentAffairsCardProps> = ({ title, icon, li
           <h3 className="text-xl font-medium text-[var(--surface-darker)] dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors font-opensans">
             {title}
           </h3>
-          {typeof icon === 'object' && 'image' in icon ? (
+          {typeof icon === "object" && "image" in icon ? (
             <div className="text-2xl text-blue-600 dark:text-blue-400">
-              <Image 
-                src={icon.image} 
-                alt={title} 
-                width={32} 
-                height={32} 
+              <Image
+                src={icon.image}
+                alt={title}
+                width={32}
+                height={32}
                 className="transition-transform group-hover:scale-110"
               />
             </div>

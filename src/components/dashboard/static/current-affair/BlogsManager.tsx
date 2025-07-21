@@ -5,26 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TagInput } from "@/components/ui/tags/tag-input";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, X, Pencil, Trash2 } from "lucide-react";
-import { env } from "@/config/env";
 import Cookie from "js-cookie";
+import { api } from "@/config/api/route";
+
 const TiptapEditor = dynamic(
-  () => import('@/components/ui/tiptapeditor').then((mod) => mod.default),
-  { 
+  () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
+  {
     ssr: false, // Disable server-side rendering for this component
     loading: () => (
       <div className="space-y-2">
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-64 w-full" />
       </div>
-    )
+    ),
   }
 );
 
 export interface Blog {
-  id?: string;  
+  id?: string;
   title: string;
   content: string;
   tags: string[];
@@ -42,11 +43,11 @@ interface BlogsManagerProps {
   currentAffairAuthor?: string;
 }
 
-export function BlogsManager({ 
-  initialBlogs = [], 
+export function BlogsManager({
+  initialBlogs = [],
   onChange,
   currentAffairSlug,
-  currentAffairAuthor 
+  currentAffairAuthor,
 }: BlogsManagerProps) {
   const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
   const [isEditing, setIsEditing] = useState<string | null>(null);
@@ -62,56 +63,50 @@ export function BlogsManager({
     if (!currentBlog.title || !currentBlog.slug) return;
 
     try {
-      const token = Cookie.get('token');
+      const token = Cookie.get("token");
       if (!token) {
-        console.error('No authentication token found');
+        console.error("No authentication token found");
         return;
       }
 
       // Prepare the blog data
       const blogData = {
         title: currentBlog.title,
-        content: currentBlog.content || '',
+        content: currentBlog.content || "",
         slug: currentBlog.slug,
         tags: currentBlog.tags || [],
         parentSlug: currentAffairSlug,
-        author: currentAffairAuthor || ""
+        author: currentAffairAuthor || "",
       };
 
       // If we're editing an existing blog, update it
       if (isEditing) {
-        const response = await fetch(`${env.API}/currentBlog`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(blogData)
-        });
+        const response = (await api.post(`/currentBlog`, blogData)) as {
+          success: boolean;
+        };
 
-        if (!response.ok) {
-          throw new Error('Failed to add blog');
+        if (!response.success) {
+          throw new Error("Failed to add blog");
         }
 
-        const updatedBlogs = blogs.map(blog => 
+        const updatedBlogs = blogs.map((blog) =>
           blog.id === isEditing ? { ...blog, ...blogData } : blog
         );
-        
+
         setBlogs(updatedBlogs);
         onChange(updatedBlogs);
-      } 
+      }
       // Otherwise, create a new blog
       else {
         const updatedBlogs = [...blogs, { ...currentBlog, ...blogData }];
-        
+
         setBlogs(updatedBlogs);
         onChange(updatedBlogs);
       }
 
       resetForm();
-      
     } catch (error) {
-      console.error('Error saving blog:', error);
+      console.error("Error saving blog:", error);
       // Handle error (e.g., show error message to user)
     }
   };
@@ -120,33 +115,28 @@ export function BlogsManager({
     if (!isEditing || !currentBlog.title || !currentBlog.slug) return;
 
     try {
-      const token = Cookie.get('token');
+      const token = Cookie.get("token");
       if (!token) {
-        console.error('No authentication token found');
+        console.error("No authentication token found");
         return;
       }
 
       const updatedBlog = {
         ...currentBlog,
-        title: currentBlog.title || '',
-        content: currentBlog.content || '',
-        slug: currentBlog.slug || '',
+        title: currentBlog.title || "",
+        content: currentBlog.content || "",
+        slug: currentBlog.slug || "",
         tags: currentBlog.tags || [],
       };
 
       // Update the blog via API
-      const response = await fetch(`${env.API}/currentBlog/${currentBlog.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedBlog)
-      });
+      const response = (await api.put(
+        `/currentBlog/${currentBlog.id}`,
+        updatedBlog
+      )) as { success: boolean };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update blog');
+      if (!response.success) {
+        throw new Error("Failed to update blog");
       }
 
       // Update local state with the updated blog
@@ -157,9 +147,8 @@ export function BlogsManager({
       setBlogs(updatedBlogs);
       onChange(updatedBlogs);
       resetForm();
-      
     } catch (error) {
-      console.error('Error updating blog:', error);
+      console.error("Error updating blog:", error);
       // Handle error (e.g., show error message to user)
     }
   };
@@ -167,21 +156,16 @@ export function BlogsManager({
   const handleDeleteBlog = async (id?: string) => {
     if (!id) return;
     const updatedBlogs = blogs.filter((blog) => blog.id !== id);
-    const token = Cookie.get('token');
+    const token = Cookie.get("token");
     if (!token) {
-      console.error('No authentication token found');
+      console.error("No authentication token found");
       return;
     }
-    const response = await fetch(`${env.API}/currentBlog/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to delete blog');
+    const response = (await api.delete(`/currentBlog/${id}`)) as {
+      success: boolean;
+    };
+    if (!response.success) {
+      throw new Error("Failed to delete blog");
     }
     setBlogs(updatedBlogs);
     onChange(updatedBlogs);
@@ -191,9 +175,9 @@ export function BlogsManager({
     setCurrentBlog({
       ...blog,
       // Ensure tags are in the correct format for the input
-      tags: blog.tags ? blog.tags.map(tag => 
-        typeof tag === 'string' ? tag : tag || ''
-      ) : []
+      tags: blog.tags
+        ? blog.tags.map((tag) => (typeof tag === "string" ? tag : tag || ""))
+        : [],
     });
     setIsEditing(blog.id || null);
     setShowForm(true);
@@ -213,17 +197,19 @@ export function BlogsManager({
   // Convert tag objects to strings if needed
   const normalizeTags = (tags: any[] | undefined) => {
     if (!tags) return [];
-    return tags.map(tag => typeof tag === 'string' ? tag : tag.name || '').filter(Boolean);
+    return tags
+      .map((tag) => (typeof tag === "string" ? tag : tag.name || ""))
+      .filter(Boolean);
   };
 
   const handleTagChange = (id: string, tags: any[]) => {
-    const normalizedTags = tags.map(tag => 
-      typeof tag === 'string' ? tag : tag.name || ''
+    const normalizedTags = tags.map((tag) =>
+      typeof tag === "string" ? tag : tag.name || ""
     );
-    
+
     setCurrentBlog({
       ...currentBlog,
-      tags: normalizedTags
+      tags: normalizedTags,
     });
   };
 
@@ -244,7 +230,11 @@ export function BlogsManager({
           size="sm"
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? <X className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+          {showForm ? (
+            <X className="h-4 w-4 mr-2" />
+          ) : (
+            <Plus className="h-4 w-4 mr-2" />
+          )}
           {showForm ? "Cancel" : "Add Blog"}
         </Button>
       </div>
@@ -267,9 +257,9 @@ export function BlogsManager({
             <Input
               value={currentBlog.slug || ""}
               onChange={(e) =>
-                setCurrentBlog({ 
-                  ...currentBlog, 
-                  slug: e.target.value
+                setCurrentBlog({
+                  ...currentBlog,
+                  slug: e.target.value,
                 })
               }
               placeholder="Enter URL slug"
@@ -281,7 +271,7 @@ export function BlogsManager({
             <div className="border rounded-md overflow-hidden">
               <TiptapEditor
                 content={currentBlog.content || ""}
-                onChange={(html) => 
+                onChange={(html) =>
                   setCurrentBlog({ ...currentBlog, content: html })
                 }
               />
@@ -299,11 +289,7 @@ export function BlogsManager({
           </div>
 
           <div className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={resetForm}
-            >
+            <Button type="button" variant="outline" onClick={resetForm}>
               Cancel
             </Button>
             <Button

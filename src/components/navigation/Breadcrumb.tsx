@@ -1,16 +1,16 @@
-"use client"
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
+"use client";
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 export const Breadcrumb = () => {
   const pathname = usePathname();
-  const segments = pathname.split('/').filter(Boolean);
+  const segments = pathname.split("/").filter(Boolean);
 
   return (
     <nav className="flex items-center text-sm text-[var(--text-base)] dark:text-[var(--text-tertiary)] mb-6">
-      <Link 
+      <Link
         href="/"
         className="flex items-center hover:text-[var(--action-primary)] p-1 rounded-md"
       >
@@ -18,11 +18,12 @@ export const Breadcrumb = () => {
       </Link>
 
       {segments.map((segment, index) => {
-        const path = `/${segments.slice(0, index + 1).join('/')}`;
+        const path = `/${segments.slice(0, index + 1).join("/")}`;
         const isLast = index === segments.length - 1;
-        const label = segment.split('-').map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' ');
+        const label = segment
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
 
         return (
           <React.Fragment key={path}>

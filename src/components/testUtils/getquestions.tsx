@@ -1,7 +1,5 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import Cookies from "js-cookie";
 import { env } from "@/config/env";
 
 interface Question {
@@ -24,8 +22,8 @@ interface GetQuestionsProps {
   onLoadMore?: () => void;
 }
 
-export default function GetQuestions({ 
-  categoryId, 
+export default function GetQuestions({
+  categoryId,
   testSeriesId,
   onQuestionSelect,
   selectedQuestionIds,
@@ -37,43 +35,40 @@ export default function GetQuestions({
 }: GetQuestionsProps) {
   const fetchQuestions = async () => {
     try {
-      const token = Cookies.get("token");
-      const limit = 10
-      const offset = 0
-      
-      let url = `${env.API_TEST}/questions/practice?categoryId=${categoryId}&limit=${limit}&offset=${offset}`
-      
+      const limit = 10;
+      const offset = 0;
+
+      let url = `${env.API_TEST}/questions/practice?categoryId=${categoryId}&limit=${limit}&offset=${offset}`;
+
       if (testSeriesId) {
-        url += `&testSeriesId=${testSeriesId}`
+        url += `&testSeriesId=${testSeriesId}`;
       }
 
       const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to fetch questions");
-      
+
       const { data, total } = await response.json();
       return { data, total };
     } catch (error) {
       console.error("Error fetching questions:", error);
       throw error;
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
-      {loading && (
-        <div className="text-center py-8">Loading questions...</div>
-      )}
+      {loading && <div className="text-center py-8">Loading questions...</div>}
 
-      {error && (
-        <div className="text-center text-red-500 py-8">{error}</div>
-      )}
+      {error && <div className="text-center text-red-500 py-8">{error}</div>}
 
       {questions.length === 0 && !loading && !error && (
         <p className="text-center text-gray-500">
-          {categoryId ? "No questions found" : "Select a category to view questions"}
+          {categoryId
+            ? "No questions found"
+            : "Select a category to view questions"}
         </p>
       )}
 
@@ -104,7 +99,9 @@ export default function GetQuestions({
                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
               <span className="text-sm text-gray-600">
-                {selectedQuestionIds?.includes(question.id) ? 'Selected' : 'Not selected'}
+                {selectedQuestionIds?.includes(question.id)
+                  ? "Selected"
+                  : "Not selected"}
               </span>
             </div>
           )}
@@ -120,5 +117,5 @@ export default function GetQuestions({
         </button>
       )}
     </div>
-  )
+  );
 }

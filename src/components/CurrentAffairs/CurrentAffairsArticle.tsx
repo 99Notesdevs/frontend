@@ -1,5 +1,5 @@
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
 interface CurrentAffairsArticleProps {
   title: string;
@@ -32,7 +32,9 @@ const CurrentAffairsArticle: React.FC<CurrentAffairsArticleProps> = ({
           <span className="mr-4">•</span>
           <span>UPSC Current Affairs</span>
         </div>
-        <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-6">{title}</h1>
+        <h1 className="text-3xl font-bold text-[var(--surface-darker)] mb-6">
+          {title}
+        </h1>
         <div className="flex flex-wrap gap-2">
           {topics.map((topic, index) => (
             <span
@@ -47,17 +49,19 @@ const CurrentAffairsArticle: React.FC<CurrentAffairsArticleProps> = ({
 
       {/* Article Content */}
       <div className="p-8">
-        <div className="prose max-w-none">
-          {content}
-        </div>
+        <div className="prose max-w-none">{content}</div>
 
         {/* PDF Download Section */}
         {pdfLink && (
           <div className="mt-8 p-4 bg-[var(--bg-main)] rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-[var(--surface-darker)]">Download PDF Notes</h3>
-                <p className="text-sm text-[var(--text-base)]">Get offline access to these notes</p>
+                <h3 className="text-lg font-semibold text-[var(--surface-darker)]">
+                  Download PDF Notes
+                </h3>
+                <p className="text-sm text-[var(--text-base)]">
+                  Get offline access to these notes
+                </p>
               </div>
               <a
                 href={pdfLink}
@@ -74,10 +78,12 @@ const CurrentAffairsArticle: React.FC<CurrentAffairsArticleProps> = ({
         {/* Related Articles */}
         {relatedArticles && relatedArticles.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-[var(--surface-darker)] mb-6">Related Articles</h2>
+            <h2 className="text-2xl font-bold text-[var(--surface-darker)] mb-6">
+              Related Articles
+            </h2>
             <div className="grid gap-6">
               {relatedArticles.map((article, index) => (
-                <Link 
+                <Link
                   key={index}
                   href={article.path}
                   className="block p-4 bg-[var(--bg-main)] rounded-lg hover:bg-gray-100 transition-colors"

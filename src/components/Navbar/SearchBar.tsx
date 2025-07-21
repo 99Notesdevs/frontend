@@ -1,8 +1,8 @@
 "use client";
 
-import { env } from "@/config/env";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "@/config/api/route";
 
 interface SearchBarProps {
   onClose?: () => void;
@@ -24,15 +24,15 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${env.API}/search/global?query=${encodeURIComponent(searchQuery)}`
-      );
+      const response = (await api.get(
+        `/search/global?query=${encodeURIComponent(searchQuery)}`
+      )) as { success: boolean; data: any[] };
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error("Failed to fetch search results");
       }
 
-      const data = await response.json();
+      const data = response.data;
 
       // Convert the response object into an array of results
       const formattedResults = Object.values(data);
@@ -54,7 +54,7 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && query.trim()) {
+    if (e.key === "Enter" && query.trim()) {
       e.preventDefault();
       // Navigate to search results page with query parameter
       router.push(`/search-result?q=${encodeURIComponent(query)}`);
@@ -105,7 +105,9 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
       {isFocused && query && (
         <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md shadow-lg dark:shadow-slate-900/50">
           {isLoading ? (
-            <div className="p-4 text-sm text-gray-500 dark:text-slate-400">Loading...</div>
+            <div className="p-4 text-sm text-gray-500 dark:text-slate-400">
+              Loading...
+            </div>
           ) : results.length > 0 ? (
             <ul className="py-1">
               {results.map((result: any, index: number) => (
@@ -134,7 +136,9 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
               ))}
             </ul>
           ) : (
-            <div className="p-4 text-sm text-gray-500 dark:text-slate-400">No results found</div>
+            <div className="p-4 text-sm text-gray-500 dark:text-slate-400">
+              No results found
+            </div>
           )}
         </div>
       )}
