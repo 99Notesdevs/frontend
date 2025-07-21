@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useEffect } from "react"
 
 // This component ensures the dark class is properly set on the HTML element

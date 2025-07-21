@@ -17,14 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { env } from "@/config/env";
 import Cookie from "js-cookie";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
-import {
-  Checkbox,
-} from "@/components/ui/Checkbox";
 import Drafts from "@/components/ui/drafts";
-import { date } from "zod";
+import { api } from "@/config/api/route";
 
 interface TemplateType {
   id: string;
@@ -36,24 +32,24 @@ interface TemplateType {
 }
 
 interface Page {
-    id: string;
-    title: string;
-    slug: string;
-    level: number;
-    showInNav: boolean;
-    parentId?: string | null;
-    categories?: {
-        id: number;
-        name: string;
-        pageId: string;
-        parentTagId: string;
-    }[];
+  id: string;
+  title: string;
+  slug: string;
+  level: number;
+  showInNav: boolean;
+  parentId?: string | null;
+  categories?: {
+    id: number;
+    name: string;
+    pageId: string;
+    parentTagId: string;
+  }[];
 }
 
 interface PageWithRelations extends Page {
-    parent: PageWithRelations | null;
-    children: PageWithRelations[];
-    data?: any;
+  parent: PageWithRelations | null;
+  children: PageWithRelations[];
+  data?: any;
 }
 
 interface PageFormProps {
@@ -72,7 +68,7 @@ interface PageFormData extends Record<string, any> {
   link?: string;
   tags?: string[];
   questionNumber?: number;
-  FAQ?:string;
+  FAQ?: string;
   parentTagId?: string;
   metadata?: {
     metaTitle?: string;
@@ -124,11 +120,12 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
   const fetchPages = async () => {
     try {
-      const response = await fetch(`${env.API}/page`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch pages");
-      const { data } = await response.json();
+      const response = (await api.get(`/page`)) as {
+        success: boolean;
+        data: PageWithRelations[];
+      };
+      if (!response.success) throw new Error("Failed to fetch pages");
+      const { data } = response;
 
       setPages(data);
     } catch (error) {
@@ -140,13 +137,14 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const fetchTemplates = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${env.API}/template`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch templates");
-      const data = await response.json();
+      const response = (await api.get(`/template`)) as {
+        success: boolean;
+        data: TemplateType[];
+      };
+      if (!response.success) throw new Error("Failed to fetch templates");
+      const { data } = response;
 
-      setTemplates(data.templates || []);
+      setTemplates(data || []);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching templates:", error);
@@ -158,20 +156,20 @@ export function PageForm({ editPage = null }: PageFormProps) {
   const handleLevelChange = (level: number, value: string) => {
     const newLevels = [...selectedLevels];
     const newCategories = [...selectedCategories];
-    
+
     // Get the selected page to get its category ID
-    const selectedPage = pages.find(p => p.id === value);
+    const selectedPage = pages.find((p) => p.id === value);
     const category = selectedPage?.categories?.[0]?.id;
-    
+
     newLevels[level] = value === "_none" ? "" : value;
     newCategories[level] = category?.toString() || "";
-    
+
     // Clear all subsequent levels and their categories
     for (let i = level + 1; i < newLevels.length; i++) {
       newLevels[i] = "";
       newCategories[i] = "";
     }
-    
+
     setSelectedLevels(newLevels);
     setSelectedCategories(newCategories);
   };
@@ -187,9 +185,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
     // Filter by both parent ID, level, and showInNav to prevent duplicate levels
     return pages.filter(
-      (page) => 
-        page.parent?.id === parentId && 
-        page.level === level + 1 && 
+      (page) =>
+        page.parent?.id === parentId &&
+        page.level === level + 1 &&
         page.showInNav
     );
   };
@@ -233,7 +231,8 @@ export function PageForm({ editPage = null }: PageFormProps) {
       if (!src) continue;
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
-      const fileName = (img.getAttribute("title") || getFormattedDate()) + '.png';
+      const fileName =
+        (img.getAttribute("title") || getFormattedDate()) + ".png";
 
       if (isBlob || isBase64) {
         try {
@@ -243,7 +242,9 @@ export function PageForm({ editPage = null }: PageFormProps) {
           const formData = new FormData();
           formData.append("imageUrl", blob, "image.png");
 
-          const url = (await uploadImageToS3(formData, "ContentImages", fileName)) || "error";
+          const url =
+            (await uploadImageToS3(formData, "ContentImages", fileName)) ||
+            "error";
           img.setAttribute("src", url);
         } catch (error: unknown) {
           if (error instanceof Error) {
@@ -307,7 +308,10 @@ export function PageForm({ editPage = null }: PageFormProps) {
         parentTagId: Number(categoryId) || "",
         FAQ: formData.FAQ || "",
         questionNumber: Number(formData.questionNumber) || undefined,
-        content: currentTemplate.id === "custom-link" ? "dummyContent" : formData.content, // Directly use the HTML content
+        content:
+          currentTemplate.id === "custom-link"
+            ? "dummyContent"
+            : formData.content, // Directly use the HTML content
         metadata: {
           lastUpdated: new Date().toISOString(),
           metaTitle: formData.metaTitle || "",
@@ -344,44 +348,30 @@ export function PageForm({ editPage = null }: PageFormProps) {
       };
 
       // Submit to API
-      const response = await fetch(`${env.API}/page`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(apiPageData),
-      });
+      const response = (await api.post(`/page`, apiPageData)) as {
+        success: boolean;
+        data: any;
+      };
 
-      const responseData = await response.json().catch(() => ({}));
-      
-      if (!response.ok) {
+      const responseData = response.data;
+
+      if (!response.success) {
         throw new Error(
           responseData.message || responseData.error || "Failed to create page"
         );
       }
 
       // Create chat room for the new page
-      
-      if(currentTemplate.id === "article"){
-        const chatResponse = await fetch(`${env.API}/chat/room`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            articleId: responseData.data.id,
-            // name: `Chat for ${apiPageData.title}`
-          }),
-        });
-        if (!chatResponse.ok) {
-          console.error("Failed to create chat room:", await chatResponse.json());
+
+      if (currentTemplate.id === "article") {
+        const chatResponse = (await api.post(`/chat/room`, {
+          articleId: responseData.data.id,
+          // name: `Chat for ${apiPageData.title}`
+        })) as { success: boolean; data: any };
+        if (!chatResponse.success) {
+          console.error("Failed to create chat room:", chatResponse.data);
         }
       }
-
-        
-      
 
       // Reset form and refresh
       setSelectedTemplate("");
@@ -394,7 +384,12 @@ export function PageForm({ editPage = null }: PageFormProps) {
       showToast("Page created successfully!", "success");
     } catch (error: unknown) {
       console.error("Error creating page:", error);
-      showToast(error instanceof Error ? error.message : "Failed to create page. Please try again.", "error");
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "Failed to create page. Please try again.",
+        "error"
+      );
     }
   };
 
@@ -436,7 +431,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     const formProps = {
       onSubmit: handleSubmit,
       defaultValues: editPage?.data || undefined,
-      folder: "GeneralStudies"
+      folder: "GeneralStudies",
     };
 
     // Map template IDs to form components
@@ -444,7 +439,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       article: ArticleForm,
       "general-studies": GeneralStudiesForm,
       "upsc-notes": UpscNotesForm,
-      "blog": BlogForm,
+      blog: BlogForm,
       "current-affairs": CurrentAffairForm,
       "custom-link": CustomLinkForm,
     };
@@ -641,7 +636,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
       </div>
 
       {renderStepContent()}
-      <Drafts/>
+      <Drafts />
     </div>
   );
 }

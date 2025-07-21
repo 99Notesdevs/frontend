@@ -1,6 +1,11 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import { env } from "@/config/env";
 
 interface Category {
@@ -14,10 +19,10 @@ interface CategorySelectProps {
   className?: string;
 }
 
-export default function CategorySelect({ 
-  selectedCategoryId, 
+export default function CategorySelect({
+  selectedCategoryId,
   onCategoryChange,
-  className = ""
+  className = "",
 }: CategorySelectProps) {
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -25,9 +30,8 @@ export default function CategorySelect({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = Cookies.get("token");
         const response = await fetch(`${env.API_TEST}/categories`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         });
         if (!response.ok) throw new Error("Failed to fetch categories");
         const { data } = await response.json();

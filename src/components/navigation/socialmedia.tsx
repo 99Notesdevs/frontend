@@ -1,4 +1,10 @@
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaYoutube } from 'react-icons/fa';
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaTwitter,
+  FaYoutube,
+} from "react-icons/fa";
 
 const SocialMedia = () => {
   const socialLinks = [
@@ -47,7 +53,7 @@ const SocialMedia = () => {
             hover:border-transparent 
             flex items-center justify-center
             group`}
-          aria-label={`Visit our ${social.url.split('.com/')[1]} page`}
+          aria-label={`Visit our ${social.url.split(".com/")[1]} page`}
         >
           <span className="group-hover:scale-110 transition-transform duration-300">
             {social.icon}

@@ -1,35 +1,55 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import dynamic from "next/dynamic"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useEffect, useState, useCallback } from "react"
-import Image from "next/image"
-import { uploadImageToS3 } from "@/config/imageUploadS3"
-import { Alert } from "@/components/ui/alert"
-import { QuizQuestions } from "@/components/dashboard/static/current-affair/QuizQuestions"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TagInput } from "@/components/ui/tags/tag-input"
-import DraftDialog from "@/components/ui/DraftDialog"
-import { BlogsManager, type Blog } from "@/components/dashboard/static/current-affair/BlogsManager"
-import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
+import { uploadImageToS3 } from "@/config/imageUploadS3";
+import { Alert } from "@/components/ui/alert";
+import { QuizQuestions } from "@/components/dashboard/static/current-affair/QuizQuestions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TagInput } from "@/components/ui/tags/tag-input";
+import DraftDialog from "@/components/ui/DraftDialog";
+import {
+  BlogsManager,
+  type Blog,
+} from "@/components/dashboard/static/current-affair/BlogsManager";
+import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts";
 
-const TiptapEditor = dynamic(() => import("@/components/ui/tiptapeditor").then((mod) => mod.default), {
-  ssr: false,
-  loading: () => (
-    <div className="space-y-2">
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-64 w-full" />
-    </div>
-  ),
-})
+const TiptapEditor = dynamic(
+  () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    ),
+  }
+);
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -56,46 +76,49 @@ const formSchema = z.object({
   body: z.string().optional(),
   author: z.string().optional(),
   blogs: z.array(z.any()).optional(),
-})
+});
 
-export type CurrentArticleFormValues = z.infer<typeof formSchema>
+export type CurrentArticleFormValues = z.infer<typeof formSchema>;
 
 interface CurrentArticleFormProps {
-  onSubmit: (data: CurrentArticleFormValues) => void
-  defaultValues?: Partial<CurrentArticleFormValues>
+  onSubmit: (data: CurrentArticleFormValues) => void;
+  defaultValues?: Partial<CurrentArticleFormValues>;
 }
 
-export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFormProps) {
+export function CurrentArticleForm({
+  onSubmit,
+  defaultValues,
+}: CurrentArticleFormProps) {
   const parseImageUrl = (url: string | undefined): [string, string] => {
     try {
-      return JSON.parse(url || "[]") as [string, string]
+      return JSON.parse(url || "[]") as [string, string];
     } catch (error) {
-      return ["", ""]
+      return ["", ""];
     }
-  }
+  };
 
   const getImageUrl = (url: string | undefined): string => {
-    const [imageUrl] = parseImageUrl(url)
-    return imageUrl
-  }
+    const [imageUrl] = parseImageUrl(url);
+    return imageUrl;
+  };
 
   const getImageAlt = (url: string | undefined): string => {
-    const [, altText] = parseImageUrl(url)
-    return altText
-  }
+    const [, altText] = parseImageUrl(url);
+    return altText;
+  };
 
   const [imagePreview, setImagePreview] = useState<string | null>(
-    defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null,
-  )
+    defaultValues?.imageUrl ? getImageUrl(defaultValues.imageUrl) : null
+  );
   const [ogimagePreview, setOgImagePreview] = useState<string | null>(
-    defaultValues?.ogImage ? getImageUrl(defaultValues.ogImage) : null,
-  )
-  const [isUploading, setIsUploading] = useState(false)
+    defaultValues?.ogImage ? getImageUrl(defaultValues.ogImage) : null
+  );
+  const [isUploading, setIsUploading] = useState(false);
   const [alert, setAlert] = useState<{
-    message: string
-    type: "success" | "error"
-  } | null>(null)
-  const [showDraftDialog, setShowDraftDialog] = useState(false)
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
 
   const {
     drafts,
@@ -111,7 +134,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
     draftType: "currentArticle",
     defaultTitle: "Untitled Current Article",
     autoSaveInterval: 30000,
-  })
+  });
 
   const defaultFormValues: CurrentArticleFormValues = {
     title: "",
@@ -146,7 +169,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
     header: "",
     body: "",
     author: "",
-  }
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -154,7 +177,7 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
       ...defaultFormValues,
       ...defaultValues,
     },
-  })
+  });
 
   const handleBlogsChange = (blogs: Blog[]) => {
     const normalizedBlogs = blogs.map((blog) => ({
@@ -162,21 +185,23 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
       title: blog.title,
       content: blog.content,
       slug: blog.slug,
-      tags: blog.tags?.map((tag) => (typeof tag === "string" ? tag : tag || "")) || [],
+      tags:
+        blog.tags?.map((tag) => (typeof tag === "string" ? tag : tag || "")) ||
+        [],
       author: blog.author,
       parentSlug: blog.parentSlug,
       createdAt: blog.createdAt,
       updatedAt: blog.updatedAt,
-    }))
+    }));
 
-    form.setValue("blogs", normalizedBlogs)
-  }
+    form.setValue("blogs", normalizedBlogs);
+  };
 
   useEffect(() => {
     if (drafts.length > 0 && !isLoadingDrafts && !currentDraftId) {
-      setShowDraftDialog(true)
+      setShowDraftDialog(true);
     }
-  }, [drafts, isLoadingDrafts, currentDraftId])
+  }, [drafts, isLoadingDrafts, currentDraftId]);
 
   const slug =
     defaultValues?.slug ||
@@ -184,45 +209,45 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
       .watch("title")
       .toLowerCase()
       .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
+      .replace(/[^a-z0-9-]/g, "");
 
   const loadDraft = async () => {
-    await loadDrafts()
+    await loadDrafts();
     if (drafts.length > 0) {
-      setShowDraftDialog(true)
+      setShowDraftDialog(true);
     }
-  }
+  };
 
   const selectDraft = useCallback(
     async (draftId: string) => {
       try {
-        const selectedDraft = await getDraft(draftId)
+        const selectedDraft = await getDraft(draftId);
         if (selectedDraft) {
-          const draftData = { ...selectedDraft.data }
-          form.reset(draftData)
-          setCurrentDraftId(selectedDraft.id!)
-          setImagePreview(getImageUrl(selectedDraft.data.imageUrl))
+          const draftData = { ...selectedDraft.data };
+          form.reset(draftData);
+          setCurrentDraftId(selectedDraft.id!);
+          setImagePreview(getImageUrl(selectedDraft.data.imageUrl));
           if (selectedDraft.data.ogImage) {
-            setOgImagePreview(getImageUrl(selectedDraft.data.ogImage))
+            setOgImagePreview(getImageUrl(selectedDraft.data.ogImage));
           }
-          setShowDraftDialog(false)
+          setShowDraftDialog(false);
         }
       } catch (error) {
-        console.error("Error selecting draft:", error)
+        console.error("Error selecting draft:", error);
         setAlert({
           message: "Failed to load draft. Please try again.",
           type: "error",
-        })
+        });
       }
     },
-    [getDraft, form, setCurrentDraftId],
-  )
+    [getDraft, form, setCurrentDraftId]
+  );
 
   const saveDraft = useCallback(async () => {
     try {
-      const draftTitle = form.getValues("title") || "Untitled Draft"
-      const draftData = form.getValues()
-      const currentBlogs = form.getValues("blogs") || []
+      const draftTitle = form.getValues("title") || "Untitled Draft";
+      const draftData = form.getValues();
+      const currentBlogs = form.getValues("blogs") || [];
 
       const dataToSave = {
         ...draftData,
@@ -231,9 +256,10 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
           tags:
             blog.tags
               ?.map((tag: any) => {
-                if (typeof tag === "string") return tag
-                if (tag && typeof tag === "object" && "name" in tag) return tag.name
-                return String(tag)
+                if (typeof tag === "string") return tag;
+                if (tag && typeof tag === "object" && "name" in tag)
+                  return tag.name;
+                return String(tag);
               })
               .filter(Boolean) || [],
         })),
@@ -250,8 +276,8 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
               explanation: "",
             },
           ]),
-      }
-      await saveDraftToDB(draftTitle, dataToSave)
+      };
+      await saveDraftToDB(draftTitle, dataToSave);
       // if(savedId==null){
       //   return;
       // }
@@ -262,107 +288,123 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
       setAlert({
         message: "Draft saved successfully!",
         type: "success",
-      })
+      });
     } catch (error) {
-      console.error("Error saving draft:", error)
+      console.error("Error saving draft:", error);
       setAlert({
         message: "Failed to save draft. Please try again.",
         type: "error",
-      })
+      });
     }
-  }, [form, saveDraftToDB, currentDraftId, setCurrentDraftId, imagePreview])
+  }, [form, saveDraftToDB, currentDraftId, setCurrentDraftId, imagePreview]);
 
   const startNew = useCallback(() => {
-    form.reset(defaultFormValues)
-    setCurrentDraftId(null)
-    setImagePreview(null)
-    setOgImagePreview(null)
-    setShowDraftDialog(false)
-  }, [form, setCurrentDraftId])
+    form.reset(defaultFormValues);
+    setCurrentDraftId(null);
+    setImagePreview(null);
+    setOgImagePreview(null);
+    setShowDraftDialog(false);
+  }, [form, setCurrentDraftId]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault()
-    const file = e.target.files?.[0]
+    e.preventDefault();
+    const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true)
-      const reader = new FileReader()
+      setIsUploading(true);
+      const reader = new FileReader();
       reader.onloadend = async () => {
         try {
-          const result = reader.result as string
-          setImagePreview(result)
+          const result = reader.result as string;
+          setImagePreview(result);
 
-          const formData = new FormData()
-          formData.append("imageUrl", file)
+          const formData = new FormData();
+          formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "CurrentArticle", file.name)
+          const s3Url = await uploadImageToS3(
+            formData,
+            "CurrentArticle",
+            file.name
+          );
           if (s3Url) {
             form.setValue("imageUrl", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
-            })
+            });
           } else {
-            form.setValue("imageUrl", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
-              shouldValidate: true,
-            })
+            form.setValue(
+              "imageUrl",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
+                shouldValidate: true,
+              }
+            );
           }
         } catch (error) {
-          console.error("Error uploading image:", error)
+          console.error("Error uploading image:", error);
         } finally {
-          setIsUploading(false)
+          setIsUploading(false);
         }
-      }
-      reader.readAsDataURL(file)
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleOGUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault()
-    const file = e.target.files?.[0]
+    e.preventDefault();
+    const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true)
-      const reader = new FileReader()
+      setIsUploading(true);
+      const reader = new FileReader();
       reader.onloadend = async () => {
         try {
-          const result = reader.result as string
-          setOgImagePreview(result)
+          const result = reader.result as string;
+          setOgImagePreview(result);
 
-          const formData = new FormData()
-          formData.append("imageUrl", file)
+          const formData = new FormData();
+          formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, "BlogOGImages", file.name)
+          const s3Url = await uploadImageToS3(
+            formData,
+            "BlogOGImages",
+            file.name
+          );
           if (s3Url) {
             form.setValue("ogImage", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
-            })
+            });
           } else {
-            form.setValue("ogImage", JSON.stringify(["/www.google.com/fallbackUrl", ""]), {
-              shouldValidate: true,
-            })
-            throw new Error("Failed to upload image to S3")
+            form.setValue(
+              "ogImage",
+              JSON.stringify(["/www.google.com/fallbackUrl", ""]),
+              {
+                shouldValidate: true,
+              }
+            );
+            throw new Error("Failed to upload image to S3");
           }
         } catch (error) {
-          console.error("Error uploading image:", error)
+          console.error("Error uploading image:", error);
         } finally {
-          setIsUploading(false)
+          setIsUploading(false);
         }
-      }
-      reader.readAsDataURL(file)
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const draftData = form.getValues()
+      const draftData = form.getValues();
       if (draftData.title && draftData.title.trim().length > 0) {
         try {
-          await saveDraft()
+          await saveDraft();
         } catch (error) {
-          console.error("Auto-save failed:", error)
+          console.error("Auto-save failed:", error);
         }
       }
-    }, 30000)
+    }, 30000);
 
-    return () => clearInterval(interval)
-  }, [saveDraft])
+    return () => clearInterval(interval);
+  }, [saveDraft]);
 
   return (
     <div className="relative">
@@ -379,7 +421,13 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
         }))}
         onSelectDraft={selectDraft}
       />
-      {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* Title */}
@@ -388,7 +436,9 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">Title *</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Title *
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter title"
@@ -408,7 +458,9 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
               name="author"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-500 font-medium">Author *</FormLabel>
+                  <FormLabel className="text-gray-500 font-medium">
+                    Author *
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter author"
@@ -439,13 +491,18 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
                           <Input
                             value={getImageAlt(altField.value || "")}
                             onChange={(e) => {
-                              const [imageUrl, altText] = parseImageUrl(altField.value || "")
-                              altField.onChange(JSON.stringify([imageUrl, e.target.value]))
+                              const [imageUrl, altText] = parseImageUrl(
+                                altField.value || ""
+                              );
+                              altField.onChange(
+                                JSON.stringify([imageUrl, e.target.value])
+                              );
                             }}
                           />
                         </FormControl>
                         <FormDescription>
-                          Describe the image for accessibility. This will be used as the alt text.
+                          Describe the image for accessibility. This will be
+                          used as the alt text.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -471,10 +528,16 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
                         priority
                       />
                     </div>
-                    <p className="text-sm text-green-500">Image uploaded successfully</p>
+                    <p className="text-sm text-green-500">
+                      Image uploaded successfully
+                    </p>
                   </div>
                 )}
-                {isUploading && <div className="text-sm text-blue-500 mt-2">Uploading image...</div>}
+                {isUploading && (
+                  <div className="text-sm text-blue-500 mt-2">
+                    Uploading image...
+                  </div>
+                )}
               </div>
             )}
           />
@@ -485,7 +548,9 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">Content *</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Content *
+                </FormLabel>
                 <FormControl>
                   <div className="border border-blue-100 rounded-lg overflow-hidden">
                     <TiptapEditor
@@ -505,12 +570,14 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             name="quizQuestions"
             render={({ field: { value, onChange } }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">Quiz Questions</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Quiz Questions
+                </FormLabel>
                 <FormControl>
                   <QuizQuestions
                     defaultValue={value || "[]"}
                     onChange={(questions) => {
-                      onChange(questions)
+                      onChange(questions);
                     }}
                   />
                 </FormControl>
@@ -525,10 +592,17 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             name="tags"
             render={({ field: { onChange, value, ...field } }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">Tags</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Tags
+                </FormLabel>
                 <FormControl>
                   <div className="space-y-2">
-                    <TagInput value={value || []} onChange={onChange} placeholder="Add tags..." className="w-full" />
+                    <TagInput
+                      value={value || []}
+                      onChange={onChange}
+                      placeholder="Add tags..."
+                      className="w-full"
+                    />
                   </div>
                 </FormControl>
                 <FormMessage />
@@ -542,7 +616,9 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             name="metaTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">Meta Title</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Meta Title
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter meta title"
@@ -560,24 +636,47 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             name="robots"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">Robots</FormLabel>
+                <FormLabel className="text-gray-500 font-medium">
+                  Robots
+                </FormLabel>
                 <FormControl>
-                  <Select value={field.value || "noindex,nofollow"} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value || "noindex,nofollow"}
+                    onValueChange={field.onChange}
+                  >
                     <SelectTrigger className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg">
                       <SelectValue placeholder="No index, No follow" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="index,follow">Index & Follow (Default)</SelectItem>
-                      <SelectItem value="noindex,follow">No Index, Follow</SelectItem>
-                      <SelectItem value="index,nofollow">Index, No Follow</SelectItem>
-                      <SelectItem value="noindex,nofollow">No Index & No Follow</SelectItem>
+                      <SelectItem value="index,follow">
+                        Index & Follow (Default)
+                      </SelectItem>
+                      <SelectItem value="noindex,follow">
+                        No Index, Follow
+                      </SelectItem>
+                      <SelectItem value="index,nofollow">
+                        Index, No Follow
+                      </SelectItem>
+                      <SelectItem value="noindex,nofollow">
+                        No Index & No Follow
+                      </SelectItem>
                       <SelectItem value="noarchive">No Archive</SelectItem>
                       <SelectItem value="nosnippet">No Snippet</SelectItem>
-                      <SelectItem value="data-nosnippet">Data No Snippet</SelectItem>
-                      <SelectItem value="max-snippet:0">Max Snippet: None</SelectItem>
-                      <SelectItem value="max-snippet:-1">Max Snippet: Unlimited</SelectItem>
-                      <SelectItem value="max-snippet:50">Max Snippet: 50 Characters</SelectItem>
-                      <SelectItem value="noimageindex">No Image Index</SelectItem>
+                      <SelectItem value="data-nosnippet">
+                        Data No Snippet
+                      </SelectItem>
+                      <SelectItem value="max-snippet:0">
+                        Max Snippet: None
+                      </SelectItem>
+                      <SelectItem value="max-snippet:-1">
+                        Max Snippet: Unlimited
+                      </SelectItem>
+                      <SelectItem value="max-snippet:50">
+                        Max Snippet: 50 Characters
+                      </SelectItem>
+                      <SelectItem value="noimageindex">
+                        No Image Index
+                      </SelectItem>
                       <SelectItem value="nocache">No Cache</SelectItem>
                       <SelectItem value="none">None</SelectItem>
                       <SelectItem value="all">All</SelectItem>
@@ -613,7 +712,9 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
                         className="object-cover"
                       />
                     </div>
-                    <p className="text-sm text-green-500">Image uploaded successfully</p>
+                    <p className="text-sm text-green-500">
+                      Image uploaded successfully
+                    </p>
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500">No image uploaded</p>
@@ -630,9 +731,10 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
                 tags:
                   blog.tags
                     ?.map((tag: any) => {
-                      if (typeof tag === "string") return tag
-                      if (tag && typeof tag === "object" && "name" in tag) return tag.name
-                      return String(tag)
+                      if (typeof tag === "string") return tag;
+                      if (tag && typeof tag === "object" && "name" in tag)
+                        return tag.name;
+                      return String(tag);
                     })
                     .filter(Boolean) || [],
               }))}
@@ -642,7 +744,11 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
             />
           </div>
 
-          <Button type="button" onClick={saveDraft} className="bg-gray-300 hover:bg-gray-400 mr-5">
+          <Button
+            type="button"
+            onClick={saveDraft}
+            className="bg-gray-300 hover:bg-gray-400 mr-5"
+          >
             Save as draft
           </Button>
 
@@ -658,5 +764,5 @@ export function CurrentArticleForm({ onSubmit, defaultValues }: CurrentArticleFo
         </form>
       </Form>
     </div>
-  )
+  );
 }

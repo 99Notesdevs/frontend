@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { MessageSquare, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { env } from "@/config/env";
-import Cookies from "js-cookie";
+import { api } from "@/config/api/route";
 
 interface Comment {
   id: string;
@@ -28,16 +27,18 @@ export const Comments = ({ parentId }: { parentId: string }) => {
   const [isReplyingTo, setIsReplyingTo] = useState<string | null>(null);
   const [loadingReplies, setLoadingReplies] = useState<string | null>(null); // Tracks which comment's replies are being loaded
   const [visibleReplies, setVisibleReplies] = useState<Set<string>>(new Set()); // Tracks visible replies
-  const token = Cookies.get("token");
 
   // Fetch comments for the page
   const fetchComments = async () => {
     try {
       setIsLoading(true);
       const parentSlug = parentId.replace(/\//g, " ");
-      const response = await fetch(`${env.API}/comments/page/${parentSlug}`);
-      if (!response.ok) throw new Error("Failed to fetch comments");
-      const { data } = await response.json();
+      const response = (await api.get(`/comments/page/${parentSlug}`)) as {
+        success: boolean;
+        data: Comment[];
+      };
+      if (!response.success) throw new Error("Failed to fetch comments");
+      const { data } = response;
       setComments(data);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -50,9 +51,12 @@ export const Comments = ({ parentId }: { parentId: string }) => {
   const fetchReplies = async (commentId: string) => {
     try {
       setLoadingReplies(commentId);
-      const response = await fetch(`${env.API}/comments/reply/${commentId}`);
-      if (!response.ok) throw new Error("Failed to fetch replies");
-      const { data } = await response.json();
+      const response = (await api.get(`/comments/reply/${commentId}`)) as {
+        success: boolean;
+        data: Comment[];
+      };
+      if (!response.success) throw new Error("Failed to fetch replies");
+      const { data } = response;
       setComments((prev) =>
         prev.map((comment) =>
           comment.id === commentId ? { ...comment, replies: data } : comment
@@ -70,22 +74,15 @@ export const Comments = ({ parentId }: { parentId: string }) => {
     try {
       setIsLoading(true);
       const type = isReplyingTo ? "Reply" : "Comment";
-      const response = await fetch(`${env.API}/comments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          content,
-          type,
-          parent: parentId,
-        }),
-      });
+      const response = (await api.post(`/comments`, {
+        content,
+        type,
+        parent: parentId,
+      })) as { success: boolean; data: Comment };
 
-      if (!response.ok) throw new Error("Failed to post comment");
+      if (!response.success) throw new Error("Failed to post comment");
 
-      const newComment: Comment = (await response.json()).data.data;
+      const newComment: Comment = response.data;
 
       if (isReplyingTo) {
         // Add the reply to the parent comment
@@ -160,7 +157,8 @@ export const Comments = ({ parentId }: { parentId: string }) => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm text-slate-500">
-                  {comment?.user?.firstName} {comment?.user?.lastName} - {new Date(comment.createdAt).toLocaleString()}
+                  {comment?.user?.firstName} {comment?.user?.lastName} -{" "}
+                  {new Date(comment.createdAt).toLocaleString()}
                 </p>
               </div>
               {depth === 0 && ( // Only show buttons for top-level comments

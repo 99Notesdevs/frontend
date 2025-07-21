@@ -16,24 +16,29 @@ interface BlogContent {
 interface TableOfContentsProps {
   content?: string;
   blogs?: BlogContent[];
-  onLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>, id: string) => void;
+  onLinkClick?: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    id: string
+  ) => void;
 }
 
 export const TableOfContents: React.FC<TableOfContentsProps> = ({
-  content = '',
+  content = "",
   blogs = [],
   onLinkClick,
 }) => {
   const [headings, setHeadings] = useState<TOCItem[]>([]);
   const [activeId, setActiveId] = useState<string>("");
-  const contentRef = useRef<string>('');
+  const contentRef = useRef<string>("");
   const blogsRef = useRef<BlogContent[]>([]);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const isInitialMount = useRef(true);
 
   // Function to close the TOC
   const closeToc = useCallback((): void => {
-    const tocCheckbox = document.getElementById('toc-toggle') as HTMLInputElement;
+    const tocCheckbox = document.getElementById(
+      "toc-toggle"
+    ) as HTMLInputElement;
     if (tocCheckbox) {
       tocCheckbox.checked = false;
     }
@@ -43,97 +48,103 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
   const generateSlug = (text: string): string => {
     return text
       .toLowerCase()
-      .replace(/[^\w\s]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/[^\w\s]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
   };
 
   // Process content and extract headings
   const processContent = useCallback((): void => {
-    if ((!content || content === contentRef.current) && 
-        (!blogs.length || JSON.stringify(blogs) === JSON.stringify(blogsRef.current))) {
+    if (
+      (!content || content === contentRef.current) &&
+      (!blogs.length ||
+        JSON.stringify(blogs) === JSON.stringify(blogsRef.current))
+    ) {
       return;
     }
 
-    contentRef.current = content || '';
+    contentRef.current = content || "";
     blogsRef.current = [...blogs];
 
     const elements: TOCItem[] = [];
     const processedIds = new Set<string>();
-    
+
     // Process main content
     if (content) {
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "text/html");
-        
+
         // Process h2 headings
         Array.from(doc.querySelectorAll("h2")).forEach((element, index) => {
-          const text = element.textContent || '';
+          const text = element.textContent || "";
           const id = generateSlug(text) || `heading-${index}`;
-          
+
           // Set the ID on the heading element
           element.id = id;
-          
+
           if (!processedIds.has(id)) {
             processedIds.add(id);
             elements.push({
               id,
               text,
               level: 2,
-              isBlog: false
+              isBlog: false,
             });
           }
         });
-        
+
         // Update the content with the modified HTML
         const updatedContent = doc.body.innerHTML;
         if (updatedContent) {
           contentRef.current = updatedContent;
         }
       } catch (error) {
-        console.error('Error parsing main content:', error);
+        console.error("Error parsing main content:", error);
       }
     }
-    
+
     // Process blog content
     blogs.forEach((blog, blogIndex) => {
       if (!blog?.content) return;
-      
+
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(blog.content, "text/html");
         let contentModified = false;
-        
+
         Array.from(doc.querySelectorAll("h2")).forEach((element, index) => {
-          const text = element.textContent || '';
+          const text = element.textContent || "";
           const id = generateSlug(text) || `blog-${blogIndex}-${index}`;
-          
+
           // Set the ID on the heading element
           element.id = id;
           contentModified = true;
-          
+
           if (!processedIds.has(id)) {
             processedIds.add(id);
             elements.push({
               id,
               text,
               level: 2,
-              isBlog: true
+              isBlog: true,
             });
           }
         });
-        
+
         // Update the blog content with the modified HTML if needed
         if (contentModified) {
           blog.content = doc.body.innerHTML;
         }
       } catch (error) {
-        console.error(`Error parsing blog content at index ${blogIndex}:`, error);
+        console.error(
+          `Error parsing blog content at index ${blogIndex}:`,
+          error
+        );
       }
     });
-    
+
     setHeadings(elements);
   }, [content, blogs]);
 
@@ -147,7 +158,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
           const id = entry.target.id;
           setActiveId(id);
           if (window.location.hash !== `#${id}`) {
-            window.history.replaceState({}, '', `#${id}`);
+            window.history.replaceState({}, "", `#${id}`);
           }
         }
       });
@@ -161,15 +172,15 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
     // Create new observer
     observerRef.current = new IntersectionObserver(callback, {
       rootMargin: "-100px 0px -66%",
-      threshold: 0.5
+      threshold: 0.5,
     });
 
     // Observe all headings
     const headingElements = headings
-      .map(h => document.getElementById(h.id))
+      .map((h) => document.getElementById(h.id))
       .filter((element): element is HTMLElement => element !== null);
 
-    headingElements.forEach(element => {
+    headingElements.forEach((element) => {
       if (observerRef.current) {
         observerRef.current.observe(element);
       }
@@ -201,7 +212,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
     heading: TOCItem
   ) => {
     e.preventDefault();
-    
+
     if (onLinkClick) {
       onLinkClick(e, heading.id);
       return;
@@ -209,21 +220,23 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
 
     // Close the TOC
     closeToc();
-    
+
     // Update URL
-    window.history.pushState({}, '', `#${heading.id}`);
-    
+    window.history.pushState({}, "", `#${heading.id}`);
+
     const scrollToHeading = () => {
       // First try direct ID match
       let target = document.getElementById(heading.id);
-      
+
       // If not found, try to find in blog content
       if (!target) {
         // Try all blog containers if it's a blog heading
         if (heading.isBlog) {
           const blogContainers = document.querySelectorAll(`[id^="blog-"]`);
           for (const container of Array.from(blogContainers)) {
-            const blogTarget = container.querySelector(`#${CSS.escape(heading.id)}`);
+            const blogTarget = container.querySelector(
+              `#${CSS.escape(heading.id)}`
+            );
             if (blogTarget) {
               target = blogTarget as HTMLElement;
               break;
@@ -231,12 +244,12 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
           }
         }
       }
-      
+
       // If still not found, try to find by text content as last resort
       if (!target) {
-        const allHeadings = Array.from(document.querySelectorAll('h2'));
+        const allHeadings = Array.from(document.querySelectorAll("h2"));
         const matchingHeading = allHeadings.find(
-          h => h.textContent?.trim() === heading.text.trim()
+          (h) => h.textContent?.trim() === heading.text.trim()
         );
         if (matchingHeading) {
           target = matchingHeading as HTMLElement;
@@ -246,31 +259,31 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
           }
         }
       }
-      
+
       if (target) {
         // Calculate scroll position with navbar offset
-        const navbar = document.querySelector('nav');
+        const navbar = document.querySelector("nav");
         const navbarHeight = navbar?.offsetHeight || 0;
         const offset = navbarHeight + 20;
-        
+
         // Get the target's position relative to the viewport
         const targetRect = target.getBoundingClientRect();
         const targetPosition = targetRect.top + window.scrollY - offset;
-        
+
         // Smooth scroll to target
         window.scrollTo({
           top: targetPosition,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
-        
+
         // Add a temporary highlight to the target
-        target.classList.add('highlight-heading');
+        target.classList.add("highlight-heading");
         setTimeout(() => {
-          target?.classList.remove('highlight-heading');
+          target?.classList.remove("highlight-heading");
         }, 2000);
       }
     };
-    
+
     // Small delay to ensure any content updates are rendered
     setTimeout(scrollToHeading, 50);
   };
@@ -284,31 +297,34 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
         <nav className="space-y-1">
           {headings.map((heading) => {
             const paddingLeft = `${(heading.level - 1) * 16}px`; // Increased base indentation
-            const bulletColor = activeId === heading.id 
-              ? 'text-blue-500 dark:text-blue-400' 
-              : 'text-gray-400 dark:text-gray-500';
-            const textColor = activeId === heading.id 
-              ? 'text-blue-600 dark:text-blue-400' 
-              : 'text-gray-700 dark:text-gray-300';
-            const hoverBg = activeId === heading.id 
-              ? 'bg-blue-50 dark:bg-blue-900/20' 
-              : 'hover:bg-gray-50 dark:hover:bg-slate-700/50';
+            const bulletColor =
+              activeId === heading.id
+                ? "text-blue-500 dark:text-blue-400"
+                : "text-gray-400 dark:text-gray-500";
+            const textColor =
+              activeId === heading.id
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-gray-700 dark:text-gray-300";
+            const hoverBg =
+              activeId === heading.id
+                ? "bg-blue-50 dark:bg-blue-900/20"
+                : "hover:bg-gray-50 dark:hover:bg-slate-700/50";
 
             return (
-              <div 
+              <div
                 key={heading.id}
                 className={`group flex items-start transition-colors duration-200 rounded-md ${hoverBg} ${
-                  heading.level === 1 ? 'mt-1' : ''
+                  heading.level === 1 ? "mt-1" : ""
                 }`}
-                style={{ paddingLeft: heading.level > 1 ? paddingLeft : '4px' }}
+                style={{ paddingLeft: heading.level > 1 ? paddingLeft : "4px" }}
               >
                 <span className={`mr-2 mt-1.5 text-xs ${bulletColor}`}>
-                  {heading.level === 1 ? '•' : '◦'}
+                  {heading.level === 1 ? "•" : "◦"}
                 </span>
                 <a
                   href={`#${heading.id}`}
                   className={`block py-1.5 pr-3 text-sm transition-colors duration-200 w-full rounded-md ${textColor} ${
-                    heading.level === 1 ? 'font-medium' : 'font-normal'
+                    heading.level === 1 ? "font-medium" : "font-normal"
                   }`}
                   onClick={(e) => handleLinkClick(e, heading)}
                 >
@@ -329,16 +345,24 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
           animation: highlight 2s ease-out;
           position: relative;
         }
-        
+
         @keyframes highlight {
-          0% { background-color: rgba(59, 130, 246, 0.2); }
-          100% { background-color: transparent; }
+          0% {
+            background-color: rgba(59, 130, 246, 0.2);
+          }
+          100% {
+            background-color: transparent;
+          }
         }
-        
+
         @media (prefers-color-scheme: dark) {
           @keyframes highlight {
-            0% { background-color: rgba(96, 165, 250, 0.3); }
-            100% { background-color: transparent; }
+            0% {
+              background-color: rgba(96, 165, 250, 0.3);
+            }
+            100% {
+              background-color: transparent;
+            }
           }
         }
       `}</style>

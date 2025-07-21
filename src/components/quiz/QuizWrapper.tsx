@@ -1,6 +1,6 @@
 // components/quiz/QuizWrapper.tsx
-'use client'
-import Quiz  from './quiz'
+"use client";
+import Quiz from "./quiz";
 
 interface Question {
   id: number;
@@ -16,5 +16,5 @@ interface QuizWrapperProps {
 }
 
 export default function QuizWrapper({ questions }: QuizWrapperProps) {
-  return <Quiz questions={questions} onQuizComplete={() => {}} />
+  return <Quiz questions={questions} onQuizComplete={() => {}} />;
 }

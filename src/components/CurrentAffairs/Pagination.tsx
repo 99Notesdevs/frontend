@@ -1,12 +1,15 @@
-import React from 'react';
-import { PaginationInfo } from '@/types/currentAffairs';
+import React from "react";
+import { PaginationInfo } from "@/types/currentAffairs";
 
 interface PaginationProps {
   pagination: PaginationInfo;
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange }) => {
+const Pagination: React.FC<PaginationProps> = ({
+  pagination,
+  onPageChange,
+}) => {
   const { currentPage, totalPages } = pagination;
 
   // Generate page numbers to show
@@ -20,20 +23,24 @@ const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange }) => 
     } else {
       // Show first page
       pages.push(1);
-      
+
       if (currentPage > 3) {
-        pages.push('...');
+        pages.push("...");
       }
-      
+
       // Show pages around current page
-      for (let i = Math.max(2, currentPage - 1); i <= Math.min(currentPage + 1, totalPages - 1); i++) {
+      for (
+        let i = Math.max(2, currentPage - 1);
+        i <= Math.min(currentPage + 1, totalPages - 1);
+        i++
+      ) {
         pages.push(i);
       }
-      
+
       if (currentPage < totalPages - 2) {
-        pages.push('...');
+        pages.push("...");
       }
-      
+
       // Show last page
       pages.push(totalPages);
     }
@@ -48,8 +55,8 @@ const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange }) => 
           disabled={currentPage === 1}
           className={`px-3 py-1 border rounded text-sm ${
             currentPage === 1
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-gray-700 hover:bg-gray-50'
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-gray-700 hover:bg-gray-50"
           }`}
         >
           Previous
@@ -57,15 +64,15 @@ const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange }) => 
 
         {getPageNumbers().map((page, index) => (
           <React.Fragment key={index}>
-            {typeof page === 'string' ? (
+            {typeof page === "string" ? (
               <span className="px-3 py-1 text-gray-500">...</span>
             ) : (
               <button
                 onClick={() => onPageChange(page)}
                 className={`px-3 py-1 rounded text-sm ${
                   currentPage === page
-                    ? 'bg-blue-600 text-white'
-                    : 'border text-gray-700 hover:bg-gray-50'
+                    ? "bg-blue-600 text-white"
+                    : "border text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 {page}
@@ -79,8 +86,8 @@ const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange }) => 
           disabled={currentPage === totalPages}
           className={`px-3 py-1 border rounded text-sm ${
             currentPage === totalPages
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-gray-700 hover:bg-gray-50'
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-gray-700 hover:bg-gray-50"
           }`}
         >
           Next
@@ -93,4 +100,4 @@ const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange }) => 
   );
 };
 
-export default Pagination; 
+export default Pagination;

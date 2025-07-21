@@ -9,22 +9,19 @@ import ContactForm from "@/components/common/ContactForm/ContactForm";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { Comments } from "@/components/ui/comments";
 import Ads from "../navigation/Ads";
-import { env } from "@/config/env";
-import axios from "axios";
 import Cookies from "js-cookie";
-import WhatsApp from "@/components/ui/whatsapp";
 import { isLocked } from "@/lib/islocked";
 import Breadcrumb from "@/components/ui/breadcrumb";
 // import { LiveChat } from "@/components/livechat/livechat";
 import { Tags } from "@/components/ui/tags/Tags";
-import { useRouter } from "next/navigation";
-import { Link } from "lucide-react";
 import Bookmark from "../ui/Bookmark";
-import Quiz from '@/components/quiz/quiz';
+import Quiz from "@/components/quiz/quiz";
 import FAQPage from "@/components/FAQp/faqp";
 import { BackToTop } from "@/components/ui/reachtotop";
 import { DownloadPdf } from "@/components/ui/downloadpdf";
 import { WhatsAppPdf } from "@/components/ui/whatsapp-pdf";
+import { api } from "@/config/api/route";
+import { env } from "@/config/env";
 
 interface Question {
   id: number;
@@ -50,7 +47,7 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   console.log("page", page);
-  const { title, content, metadata, } = page;
+  const { title, content, metadata } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};
 
@@ -110,25 +107,24 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
     setError(null);
 
     try {
-      const limit = page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
+      const limit =
+        page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
       const response = await fetch(
         `${env.API_TEST}/questions/practice?categoryId=${page.categories[0].id}&limit=${limit}`,
         {
-          headers: {
-            'Authorization': `Bearer ${Cookies.get('token')}`,
-          },
+          credentials: "include",
         }
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch questions');
+        throw new Error("Failed to fetch questions");
       }
 
       const { data } = await response.json();
       setCurrentQuestions(data);
     } catch (err) {
-      console.error('Error fetching questions:', err);
-      setError('Failed to load questions. Please try again.');
+      console.error("Error fetching questions:", err);
+      setError("Failed to load questions. Please try again.");
       setCurrentQuestions([]);
     } finally {
       setIsLoading(false);
@@ -212,12 +208,8 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
       }
 
       try {
-        const res = await axios.get(`${env.API}/user/check`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setIsAuthorized(res.data.success);
+        const res = (await api.get(`/user/check`)) as { success: boolean };
+        setIsAuthorized(res.success);
       } catch (error) {
         setIsAuthorized(false);
       }
@@ -230,25 +222,26 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const processContentWithIds = useCallback((html: string): string => {
     try {
       const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+      const doc = parser.parseFromString(html, "text/html");
 
       // Process h2 headings
-      const headings = doc.querySelectorAll('h2');
+      const headings = doc.querySelectorAll("h2");
       headings.forEach((heading, index) => {
-        const text = heading.textContent || '';
-        const id = text
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-')
-          .replace(/^-+|-+$/g, '') || `heading-${index}`;
+        const text = heading.textContent || "";
+        const id =
+          text
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-+|-+$/g, "") || `heading-${index}`;
 
         heading.id = id;
       });
 
       return doc.body.innerHTML;
     } catch (error) {
-      console.error('Error processing content:', error);
+      console.error("Error processing content:", error);
       return html;
     }
   }, []);
@@ -287,10 +280,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const displayImageAlt = displayImagearray[1];
   const formattedDate = page.createdAt
     ? new Date(page.createdAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
     : "N/A";
 
   return (
@@ -338,9 +331,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
                     <div className="flex gap-3 justify-center">
                       <WhatsAppPdf
-                        phoneNumber="+919876543210" 
+                        phoneNumber="+919876543210"
                         message="Hello, I'd like to get the PDF notes for [Article Name]."
-                        className="w-full h-12" 
+                        className="w-full h-12"
                       />
                       <DownloadPdf />
                     </div>

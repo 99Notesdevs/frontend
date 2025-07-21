@@ -1,32 +1,35 @@
-import { useState, useEffect } from 'react'
-import Cookies from "js-cookie"
-import { env } from "@/config/env"
-
 interface Question {
-  id: number
-  question: string
-  answer: string
-  options: string[]
-  explaination: string
-  creatorName: string
-  pyq: boolean
-  multipleCorrectType: boolean
-  year: number | null
-  acceptance: number | null
-  rating: number | null
-  createdAt: string
-  updatedAt: string
-  categoryId: number
+  id: number;
+  question: string;
+  answer: string;
+  options: string[];
+  explaination: string;
+  creatorName: string;
+  pyq: boolean;
+  multipleCorrectType: boolean;
+  year: number | null;
+  acceptance: number | null;
+  rating: number | null;
+  createdAt: string;
+  updatedAt: string;
+  categoryId: number;
 }
 
 interface SelectedQuestionsProps {
-  questions: Question[]
-  onQuestionRemove: (questionId: number) => void
+  questions: Question[];
+  onQuestionRemove: (questionId: number) => void;
 }
 
-export default function SelectedQuestions({ questions, onQuestionRemove }: SelectedQuestionsProps) {
+export default function SelectedQuestions({
+  questions,
+  onQuestionRemove,
+}: SelectedQuestionsProps) {
   if (!questions || questions.length === 0) {
-    return <div className="text-center py-4 text-gray-500">No questions selected</div>
+    return (
+      <div className="text-center py-4 text-gray-500">
+        No questions selected
+      </div>
+    );
   }
 
   return (
@@ -63,5 +66,5 @@ export default function SelectedQuestions({ questions, onQuestionRemove }: Selec
         </div>
       ))}
     </div>
-  )
+  );
 }

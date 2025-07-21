@@ -1,6 +1,5 @@
 "use client";
 
-import { Link } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 const WhatsApp: React.FC = () => {

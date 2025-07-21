@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import axios from "axios";
-import { env } from "@/config/env";
+import { api } from "@/config/api/route";
 
 interface StudyMaterial {
   title: string;
@@ -39,11 +38,14 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
   useEffect(() => {
     const fetchPages = async () => {
       try {
-        const navigationResponse = await axios.get(`${env.API}/page/upsc-notes`);
-        const navigationData = navigationResponse.data.data;
+        const navigationResponse = (await api.get(`/page/upsc-notes`)) as {
+          success: boolean;
+          data: Page[];
+        };
+        const navigationData = navigationResponse.data;
         setPages(navigationData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -52,13 +54,17 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
 
   const getFilteredMaterials = () => {
     if (selectedCategory === "All") {
-      return pages.filter(page => page.level === 3);
+      return pages.filter((page) => page.level === 3);
     }
-    return pages.filter(page => page.title.toLowerCase() === selectedCategory.toLowerCase());
+    return pages.filter(
+      (page) => page.title.toLowerCase() === selectedCategory.toLowerCase()
+    );
   };
 
   const renderCategoryItems = (category: string) => {
-    const items = pages.filter(page => page.parentId === pages.find(p => p.title === category)?.id);
+    const items = pages.filter(
+      (page) => page.parentId === pages.find((p) => p.title === category)?.id
+    );
     return items.map((item) => (
       <div
         key={item.id}
@@ -144,14 +150,18 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
                   className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
                 >
                   <Image
-                    src={JSON.parse(page?.imageUrl)[0] || "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"}
+                    src={
+                      JSON.parse(page?.imageUrl)[0] ||
+                      "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"
+                    }
                     alt={JSON.parse(page?.imageUrl)[1]}
                     width={500}
                     height={192}
                     className="w-full h-48 object-cover"
                     onError={(e) => {
                       const img = e.target as HTMLImageElement;
-                      img.src = "https://via.placeholder.com/500x192?text=Image+Not+Available";
+                      img.src =
+                        "https://via.placeholder.com/500x192?text=Image+Not+Available";
                     }}
                   />
                   <div className="p-6">

@@ -51,7 +51,7 @@ export interface PaginationInfo {
 
 export interface FilterOptions {
   topic?: string;
-  sortBy?: 'latest' | 'oldest' | 'popular';
+  sortBy?: "latest" | "oldest" | "popular";
   search?: string;
   dateRange?: {
     start: Date;

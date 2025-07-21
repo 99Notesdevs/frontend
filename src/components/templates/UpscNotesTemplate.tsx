@@ -14,10 +14,12 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const jsonLD = JSON.parse(metadata)?.schemaData || "";
   const parsedMetadata = JSON.parse(metadata);
   const headScripts =
-    parsedMetadata?.header?.split("||")?.map((script: string) => script.trim()) ||
-    [];
+    parsedMetadata?.header
+      ?.split("||")
+      ?.map((script: string) => script.trim()) || [];
   const bodyScripts =
-    parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) || [];
+    parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
+    [];
 
   useEffect(() => {
     // Inject head scripts
@@ -48,7 +50,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
     // Inject body scripts
     if (bodyScripts) {
       bodyScripts.forEach((script: string) => {
-        console.log(script)
+        console.log(script);
         try {
           if (script.startsWith("<script")) {
             // Parse the full <script> tag and extract attributes
@@ -72,7 +74,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   }, [headScripts, bodyScripts]);
 
   return (
-      <>
+    <>
       <section>
         <script
           type="application/ld+json"
@@ -110,7 +112,9 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                     {/* Contact Form */}
                     <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-800/50">
                       <h3 className="text-lg font-semibold mb-4 text-blue-600 dark:text-blue-400 border-b-2 border-gray-200 dark:border-slate-700 pb-2 flex items-center gap-2">
-                        <span className="text-blue-600 dark:text-blue-400">📝</span>
+                        <span className="text-blue-600 dark:text-blue-400">
+                          📝
+                        </span>
                         <span>Contact Us</span>
                       </h3>
                       <div className="dark:bg-slate-800/50 dark:p-4 dark:rounded-lg">
@@ -121,18 +125,36 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                     {/* Practice Questions Section */}
                     <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-800/50">
                       <h3 className="text-lg font-semibold mb-4 text-blue-600 dark:text-blue-400 border-b-2 border-gray-200 dark:border-slate-700 pb-2 flex items-center gap-2">
-                        <span className="text-blue-600 dark:text-blue-400">📚</span>
+                        <span className="text-blue-600 dark:text-blue-400">
+                          📚
+                        </span>
                         <span>Practice Questions</span>
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">Test your knowledge with these practice questions based on this article.</p>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+                        Test your knowledge with these practice questions based
+                        on this article.
+                      </p>
                       <div className="text-center">
                         <button
-                          onClick={() => window.location.href = `/quiz?categoryId=${page?.categories?.[0].id}`}
+                          onClick={() =>
+                            (window.location.href = `/quiz?categoryId=${page?.categories?.[0].id}`)
+                          }
                           className="group relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 focus:ring-opacity-50 w-full"
                         >
                           <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-700 to-blue-800 dark:from-blue-800 dark:to-blue-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></span>
-                          <svg className="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                          <svg
+                            className="w-5 h-5 mr-2 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                            ></path>
                           </svg>
                           <span className="relative">Start Practicing</span>
                         </button>
@@ -142,7 +164,9 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
                     {/* Social Media Section */}
                     <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-800/50">
                       <h3 className="text-lg font-semibold mb-4 text-blue-600 dark:text-blue-400 border-b-2 border-gray-200 dark:border-slate-700 pb-2 flex items-center gap-2">
-                        <span className="text-blue-600 dark:text-blue-400">🌐</span>
+                        <span className="text-blue-600 dark:text-blue-400">
+                          🌐
+                        </span>
                         <span>Connect With Us</span>
                       </h3>
                       <div className="py-2">
@@ -234,7 +258,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
           <BackToTop />
         </div>
       </main>
-      </>
+    </>
   );
 };
 
