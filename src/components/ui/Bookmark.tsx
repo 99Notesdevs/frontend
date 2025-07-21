@@ -1,9 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Bookmark as BookmarkIcon, BookmarkCheck } from "lucide-react";
-import Cookies from "js-cookie";
-import axios from "axios";
-import { env } from "@/config/env";
+import { api } from "@/config/api/route";
 
 interface BookmarkProps {
   articleId: string;
@@ -16,18 +14,22 @@ const Bookmark: React.FC<BookmarkProps> = ({
 }) => {
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const [loading, setLoading] = useState(false);
-  console.log("Bookmark component mounted with articleId:", articleId, "bookmarked:", initialBookmarked);
+  console.log(
+    "Bookmark component mounted with articleId:",
+    articleId,
+    "bookmarked:",
+    initialBookmarked
+  );
 
   const handleBookmark = async () => {
     setLoading(true);
     try {
-        // Toogle bookmark
-        await axios.post(
-          `${env.API}/page/bookmark`,
-          { pageId: articleId, state: !bookmarked },
-          { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
-        );
-        setBookmarked(prev => !prev);
+      // Toogle bookmark
+      await api.post(`/page/bookmark`, {
+        pageId: articleId,
+        state: !bookmarked,
+      });
+      setBookmarked((prev) => !prev);
     } catch (error) {
       console.error("Bookmark error:", error);
     } finally {
