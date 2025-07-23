@@ -1,10 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
 import { env } from "@/config/env";
-import Cookies from "js-cookie";
 import { isAuth } from "@/lib/isAuth";
+import { api } from "@/config/api/route";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +13,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
-  const router = useRouter();
 
   const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
     setToast({ message, type });
@@ -26,7 +23,7 @@ const Register = () => {
     const checkAuth = async () => {
       const auth = await isAuth();
       if (auth.isAuthenticated && auth.role === 'user') {
-        router.push('/users/dashboard');
+        window.location.href = `${env.TEST_PORTAL}/dashboard`;
       }
     };
     checkAuth();
@@ -41,20 +38,19 @@ const Register = () => {
     
     setLoading(true);
     try {
-      const response = await axios.post(`${env.API}/user/signup`, {
+      const response = await api.post(`/user/signup`, {
         email,
         firstName,
         lastName,
         password,
-      });
-      if (response.data.success) {
-        const data = response.data.data;
+      }) as { success: boolean; message?: string; data?: any };
+      if (response.success) {
+        const data = response.data;
         if (!data) {
           showToast("No token received from server. Please try again later.", "error");
           return;
         }
-        Cookies.set('token', data.split(" ")[1], { expires: 5 });
-        router.push('/users/dashboard');
+        window.location.href = `${env.TEST_PORTAL}/dashboard`;
         showToast("Registration successful!", "success");
       } else {
         showToast(response.data.message, "error");
