@@ -16,7 +16,7 @@ export default function GoogleOneTap() {
       body: JSON.stringify({ credential: response.credential }),
     })) as { success: boolean };
     if (res.success) {
-      window.location.href = `${env.TEST_PORTAL}/dashboard`;
+      window.location.href = window.location.href;
     } else {
       alert("Login failed");
     }
