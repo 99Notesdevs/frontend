@@ -6,6 +6,7 @@ import { getNavigationTree, getFooterLinks } from "@/lib/navigation";
 import { Suspense } from "react";
 import GlobalScriptsLoader from "@/components/GlobalScriptsLoader";
 import { ThemeProvider } from "@/components/ui/themeprovider";
+import GoogleOneTap from "@/components/GoogleOneTap";
 
 const inter = Inter({
   subsets: ["latin"]
@@ -47,6 +48,7 @@ export default async function RootLayout({
             <Navbar navigation={navigation} />
           </Suspense>
           <main className="min-h-[calc(100vh-64px)] bg-background dark:bg-slate-900 text-foreground">
+            <GoogleOneTap />
             {children}
           </main>
           <Suspense

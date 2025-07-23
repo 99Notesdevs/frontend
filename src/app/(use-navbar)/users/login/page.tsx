@@ -7,13 +7,6 @@ import Cookies from "js-cookie";
 import { isAuth } from "@/lib/isAuth";
 import { api } from "@/config/api/route";
 
-// Extend the Window interface to include the google property
-declare global {
-  interface Window {
-    google?: any;
-  }
-}
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,29 +25,7 @@ const Login = () => {
       }
     };
     checkAuth();
-    if (typeof window === "undefined" || !window.google) return;
-    window.google.accounts.id.initialize({
-      client_id: env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      callback: handleCredentialResponse,
-      auto_select: true,
-      cancel_on_tap_outside: false,
-    });
-    window.google.accounts.id.prompt();
   }, []);
-
-  const handleCredentialResponse = async (response: any) => {
-    console.log("Atleast I am here", response);
-
-    const res = (await api.post(`/user/google`, {
-      body: JSON.stringify({ credential: response.credential }),
-    })) as { success: boolean };
-
-    if (res.success) {
-      window.location.href = `${env.TEST_PORTAL}/dashboard`;
-    } else {
-      alert("Login failed");
-    }
-  };
 
   const showToast = (
     message: string,
