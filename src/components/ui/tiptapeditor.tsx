@@ -1266,8 +1266,16 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
           class: "text-blue-500 underline hover:text-blue-700",
         },
       }),
-      CustomImage, // Use our custom resizable image extension
-      TextAlign.configure({ types: ["heading", "paragraph", "image"] }),
+      // Configure the image extension to work within tables
+      CustomImage.configure({
+        inline: true,
+        allowBase64: true,
+        HTMLAttributes: {
+          class: "max-w-full h-auto",
+        },
+      }),
+      
+      TextAlign.configure({ types: ["heading", "paragraph", "image", "tableCell"],}),
       Color,
       TextStyle,
       FontSize,

@@ -310,7 +310,7 @@ export default function Navbar({ navigation }: NavbarProps) {
           }`}
         >
           <div className="container w-full max-w-[2000px] px-2 lg:px-12">
-            <div className="flex justify-between items-center h-[72px] lg:px-5">
+            <div className="flex justify-between items-center h-[72px] lg:px-3">
               {/* Logo */}
               <div className="flex-shrink-0 min-w-[35px] mx-2 flex items-center">
                 <Link href="/" passHref>
@@ -496,9 +496,9 @@ export default function Navbar({ navigation }: NavbarProps) {
         >
           <div className="px-2 pt-2 pb-3 space-y-1">
             {/* Search Bar in mobile menu */}
-            {/* <div className="px-3 py-2">
-              <SearchBar />
-            </div> */}
+            <div className="px-3 py-2 mb-2 border-b border-gray-200 dark:border-slate-700">
+              <SearchBar onClose={() => setIsOpen(false)} compact={true} />
+            </div>
             {navigation.map((item) => (
               <div key={item.slug} className="py-1">
                 <div className="flex items-center justify-between">

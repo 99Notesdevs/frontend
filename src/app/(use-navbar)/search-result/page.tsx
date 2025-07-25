@@ -43,26 +43,18 @@ export default function SearchResult() {
         const searchUrl = `/search/global?query=${encodeURIComponent(query)}`;
         console.log('Fetching search results from:', searchUrl);
         
-        const response = await api.get(searchUrl) as { success: boolean, data: SearchResultItem[] | null };
-
-        if (!response.success) {
-          console.error('Search API error response:');
-          throw new Error(`Failed to fetch search results: ${response.success}`);
-        }
-
-        const data = response.data;
-        console.log('Search API Response:', data);
+        const response = await api.get<SearchResultItem[] | { [key: string]: SearchResultItem[] }>(searchUrl);
+        console.log('Search API Response:', response);
         
-        // Convert the response object into an array of results
-        let searchResults: any[] = [];
+        let searchResults: SearchResultItem[] = [];
         
-        // If data is an array, use it directly
-        if (Array.isArray(data)) {
-          searchResults = data;
+        // If response is an array, use it directly
+        if (Array.isArray(response)) {
+          searchResults = response;
         } 
-        // If data is an object with arrays as values, flatten them
-        else if (data && typeof data === 'object') {
-          searchResults = Object.values(data).flat();
+        // If response is an object with arrays as values, flatten them
+        else if (response && typeof response === 'object') {
+          searchResults = Object.values(response).flat();
         }
         
         console.log('Processed search results:', searchResults);
@@ -194,7 +186,7 @@ export default function SearchResult() {
         <div className="grid grid-cols-1 gap-4">
           {results.map((item, index) => (
             <div 
-              key={item.id || index}
+              key={`${item.id || 'item'}-${item.type || 'unknown'}-${index}`}
               className="group flex items-start p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow duration-200 cursor-pointer"
               onClick={() => router.push(`/${item.slug}`)}
             >
@@ -230,7 +222,7 @@ export default function SearchResult() {
                 
                 {item.slug && (
                   <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                    {new URL(env.API).hostname}/{item.slug}
+                    {item.slug}
                   </div>
                 )}
               </div>
