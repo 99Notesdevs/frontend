@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ArticleTemplateProps } from "./types";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import SearchBar from "@/components/Navbar/SearchBar";
+import QuizWrapper from "@/components/quiz/QuizWrapper";
 import Image from "next/image";
 import SocialMedia from "@/components/navigation/socialmedia";
 import ContactForm from "@/components/common/ContactForm/ContactForm";
@@ -22,6 +23,7 @@ import { DownloadPdf } from "@/components/ui/downloadpdf";
 import { WhatsAppPdf } from "@/components/ui/whatsapp-pdf";
 import { api } from "@/config/api/route";
 import { env } from "@/config/env";
+import { SuggestedArticles } from "@/components/navigation/suggested-article";
 
 interface Question {
   id: number;
@@ -271,7 +273,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   // @ts-ignore
   const parentId = page.slug;
 
-  const { tags, coverImage } = parsedMetadata || {};
+  const { tags, coverImage, relatedArticles } = parsedMetadata || {};
 
   // Use either the content image or the metadata coverImage
   // @ts-ignore
@@ -280,10 +282,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const displayImageAlt = displayImagearray[1];
   const formattedDate = page.createdAt
     ? new Date(page.createdAt).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
     : "N/A";
 
   return (
@@ -299,7 +301,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
           {/* Assistive Touch */}
           <AssistiveTouch content={mainContentFinal} />
 
-          <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-10 py-4 sm:py-6">
+          <div className="w-full max-w-[1400px] mx-auto px-2 lg:px-10 py-4 sm:py-6">
             <Breadcrumb
               containerClasses="bg-muted/40 px-4 py-2 rounded-md"
               activeClasses="font-semibold"
@@ -321,22 +323,48 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                     </div>
                   </div>
                 )}
+                <h1 className="text-3xl md:text-4xl font-bold text-[var(--primary)] mb-3 text-center">
+                  {page.title}
+                </h1>
 
-                {/* Article Content */}
-                <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full mb-8 sm:mb-10 rounded-xl overflow-hidden">
-                  <div className="p-5 sm:p-10">
-                    <h1 className="text-2xl md:text-3xl font-bold text-[var(--primary)] mb-3 text-center">
-                      {page.title}
-                    </h1>
+                <div className="flex gap-3 justify-center">
+                  <WhatsAppPdf
+                    phoneNumber="+919876543210"
+                    message="Hello, I'd like to get the PDF notes for [Article Name]."
+                    className="w-full h-12"
+                  />
+                  <DownloadPdf />
+                </div>
+                <div className="lg:hidden sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/50">
+                    <div className="bg-gradient-to-br from-white to-[#f8f9fa] dark:from-slate-800 dark:to-slate-900 border-2 border-[var(--info-surface)] dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl dark:shadow-slate-900/50">
+                      <div className="p-3">
+                        <h2 className="text-xl font-semibold mb-4 text-[var(--surface-dark)] dark:text-slate-200 border-b-2 border-[var(--info-surface)] dark:border-slate-600 pb-2">
+                          Practice Questions
+                        </h2>
+                        <QuizWrapper
+                          questions={currentQuestions}
+                          onQuizComplete={handleQuizComplete}
+                          onRetry={fetchQuestions}
+                          isLoading={isLoading}
+                          error={error}
+                        />
+                      </div>
 
-                    <div className="flex gap-3 justify-center">
-                      <WhatsAppPdf
-                        phoneNumber="+919876543210"
-                        message="Hello, I'd like to get the PDF notes for [Article Name]."
-                        className="w-full h-12"
-                      />
-                      <DownloadPdf />
+                      {!isLoading && !error && (
+                        <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                          <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
+                            <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                            </svg>
+                            {currentQuestions.length} Questions
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  </div>
+                {/* Article Content */}
+                <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full  mb-8 sm:mb-10 rounded-xl overflow-hidden">
+                  <div className="p-2 pt-5">
                     <Tags tags={page.tags} />
                     <div
                       className="prose prose-lg max-w-none"
@@ -357,6 +385,14 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </button> */}
 
                 {isAuthorized && <Comments parentId={parentId} />}
+
+                {/* Suggested Articles Section */}
+                <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-700/50">
+                  <SuggestedArticles
+                    articles={relatedArticles || []}
+                    currentArticleId={page.id}
+                  />
+                </div>
               </main>
 
               {/* Right Sidebar */}
@@ -365,7 +401,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 <div>
                   {/* Search Bar */}
                   <div
-                    className="flex justify-left bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 
+                    className="hidden lg:block flex justify-left bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 
                         transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
                   >
                     <div className="w-[100%] mr-2">
@@ -393,118 +429,29 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   </div>
 
                   {/* Practice Questions Section - Sticky Footer */}
-                  <div className="sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/50">
+                  <div className="hidden lg:block sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/50">
                     <div className="bg-gradient-to-br from-white to-[#f8f9fa] dark:from-slate-800 dark:to-slate-900 border-2 border-[var(--info-surface)] dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl dark:shadow-slate-900/50">
-                      <div className="bg-gradient-to-r from-yellow-400 to-amber-300 px-6 py-4">
-                        <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                          <span className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-6 w-6"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                              />
-                            </svg>
-                          </span>
-                          <span className="drop-shadow-sm">Practice PYQs</span>
-                        </h3>
-                        <p className="text-white/90 text-sm mt-1">
-                          Test your knowledge with these practice questions
-                        </p>
-                      </div>
-
                       <div className="p-3">
-                        {isLoading ? (
-                          <div className="flex flex-col items-center justify-center py-8">
-                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-100 mb-4"></div>
-                            <p className="text-gray-600 font-medium">
-                              Loading Questions...
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              Preparing your practice session
-                            </p>
-                          </div>
-                        ) : error ? (
-                          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-                            <div className="flex">
-                              <div className="flex-shrink-0">
-                                <svg
-                                  className="h-5 w-5 text-red-500"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </div>
-                              <div className="ml-3">
-                                <p className="text-sm text-red-700">{error}</p>
-                                <button
-                                  onClick={fetchQuestions}
-                                  className="mt-2 text-sm font-medium text-red-700 hover:text-red-600 underline"
-                                >
-                                  Try Again
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="animate-fade-in">
-                            <Quiz
-                              questions={currentQuestions}
-                              onQuizComplete={handleQuizComplete}
-                            />
-                          </div>
-                        )}
+                        <h2 className="text-xl font-semibold mb-4 text-[var(--surface-dark)] dark:text-slate-200 border-b-2 border-[var(--info-surface)] dark:border-slate-600 pb-2">
+                          Practice Questions
+                        </h2>
+                        <QuizWrapper
+                          questions={currentQuestions}
+                          onQuizComplete={handleQuizComplete}
+                          onRetry={fetchQuestions}
+                          isLoading={isLoading}
+                          error={error}
+                        />
                       </div>
 
                       {!isLoading && !error && (
                         <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
                           <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
-                            <svg
-                              className="h-4 w-4 mr-1.5 text-yellow-500"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                clipRule="evenodd"
-                              />
+                            <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                             </svg>
                             {currentQuestions.length} Questions
                           </div>
-                          <button
-                            onClick={() =>
-                              window.scrollTo({ top: 0, behavior: "smooth" })
-                            }
-                            className="text-sm font-medium text-yellow-600 hover:text-yellow-700 dark:text-amber-400 dark:hover:text-amber-300 flex items-center"
-                          >
-                            <span>Back to Top</span>
-                            <svg
-                              className="h-4 w-4 ml-1"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 10l7-7m0 0l7 7m-7-7v18"
-                              />
-                            </svg>
-                          </button>
                         </div>
                       )}
                     </div>
