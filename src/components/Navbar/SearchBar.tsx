@@ -6,9 +6,10 @@ import { api } from "@/config/api/route";
 
 interface SearchBarProps {
   onClose?: () => void;
+  compact?: boolean;
 }
 
-const SearchBar = ({ onClose }: SearchBarProps) => {
+const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
@@ -24,19 +25,22 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
     setIsLoading(true);
 
     try {
-      const response = (await api.get(
+      const response = await api.get<any[] | { [key: string]: any[] }>(
         `/search/global?query=${encodeURIComponent(searchQuery)}`
-      )) as { success: boolean; data: any[] };
+      );
 
-      if (!response.success) {
-        throw new Error("Failed to fetch search results");
+      let searchResults: any[] = [];
+      
+      // If response is an array, use it directly
+      if (Array.isArray(response)) {
+        searchResults = response;
+      } 
+      // If response is an object with arrays as values, flatten them
+      else if (response && typeof response === 'object') {
+        searchResults = Object.values(response).flat();
       }
-
-      const data = response.data;
-
-      // Convert the response object into an array of results
-      const formattedResults = Object.values(data);
-      setResults(formattedResults);
+      
+      setResults(searchResults);
     } catch (error) {
       console.error("Error fetching search results:", error);
       setResults([]);
@@ -68,7 +72,7 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto">
+    <div className={`relative w-full ${compact ? 'max-w-full' : 'max-w-2xl mx-auto'}`}>
       <div className="relative flex items-center">
         <input
           type="text"
@@ -77,9 +81,11 @@ const SearchBar = ({ onClose }: SearchBarProps) => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           onKeyDown={handleKeyDown}
-          className="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-base"
+          className={`w-full px-4 pr-10 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
+            compact ? 'py-2 text-sm' : 'py-3 text-base'
+          }`}
           placeholder="Search for articles, topics, or resources..."
-          autoFocus
+          autoFocus={!compact}
         />
         {onClose && (
           <button
