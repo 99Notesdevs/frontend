@@ -48,6 +48,7 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 };
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
+  const [activeTab, setActiveTab] = useState<'article' | 'practice' | 'community'>('article');
   console.log("page", page);
   const { title, content, metadata } = page;
   const parsedMetadata =
@@ -335,8 +336,38 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   />
                   <DownloadPdf />
                 </div>
-                <div className="lg:hidden sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/50">
-                    <div className="bg-gradient-to-br from-white to-[#f8f9fa] dark:from-slate-800 dark:to-slate-900 border-2 border-[var(--info-surface)] dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl dark:shadow-slate-900/50">
+                {/* Mobile Navigation Tabs */}
+                <div className="lg:hidden sticky bottom-6 mt-6">
+                  {/* Tab Buttons */}
+                  <div className="flex bg-white dark:bg-slate-800 rounded-t-xl shadow-lg overflow-hidden border border-b-0 border-[var(--info-surface)] dark:border-slate-700">
+                    <button
+                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors ${activeTab === 'article' ? 'bg-[var(--info-surface)] text-[var(--primary)]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+                      onClick={() => setActiveTab('article')}
+                    >
+                      Article
+                    </button>
+                    <button
+                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors relative ${activeTab === 'practice' ? 'bg-[var(--info-surface)] text-[var(--primary)]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+                      onClick={() => setActiveTab('practice')}
+                    >
+                      Practice
+                      {currentQuestions.length > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          {currentQuestions.length}
+                        </span>
+                      )}
+                    </button>
+                    <button
+                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors ${activeTab === 'community' ? 'bg-[var(--info-surface)] text-[var(--primary)]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+                      onClick={() => setActiveTab('community')}
+                    >
+                      Community
+                    </button>
+                  </div>
+
+                  {/* Tab Content */}
+                  <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-b-xl shadow-lg overflow-hidden">
+                    {activeTab === 'practice' && (
                       <div className="p-3">
                         <h2 className="text-xl font-semibold mb-4 text-[var(--surface-dark)] dark:text-slate-200 border-b-2 border-[var(--info-surface)] dark:border-slate-600 pb-2">
                           Practice Questions
@@ -348,20 +379,25 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                           isLoading={isLoading}
                           error={error}
                         />
-                      </div>
-
-                      {!isLoading && !error && (
-                        <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
-                          <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
-                            <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                            </svg>
-                            {currentQuestions.length} Questions
+                        {!isLoading && !error && (
+                          <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                            <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
+                              <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                              </svg>
+                              {currentQuestions.length} Questions
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )}
+                    {activeTab === 'community' && (
+                      <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+                        <p>Community features coming soon!</p>
+                      </div>
+                    )}
                   </div>
+                </div>
                 {/* Article Content */}
                 <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full  mb-8 sm:mb-10 rounded-xl overflow-hidden">
                   <div className="p-2 pt-5">
