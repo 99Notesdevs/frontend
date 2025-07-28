@@ -201,11 +201,18 @@ export function SuggestedArticles({
 
   if (isLoading) {
     return (
-      <div className={cn("w-full max-w-xs mx-auto lg:mx-0 lg:absolute lg:right-0 lg:top-24", className)}>
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-            Loading suggestions...
-          </h3>
+      <div className={cn("w-full", className)}>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-5 border border-gray-100 dark:border-gray-800 animate-pulse">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="flex space-x-4 overflow-hidden">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex-shrink-0 w-64">
+                <div className="bg-gray-200 dark:bg-gray-700 rounded-lg aspect-[16/9] mb-3"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5 mb-2"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -214,75 +221,86 @@ export function SuggestedArticles({
   if (suggestedArticles.length === 0) return null;
 
   return (
-    <>
+    <div className={cn("w-full", className)}>
       <div
         ref={sidebarRef}
         className={cn(
-          "w-full mx-auto lg:absolute lg:right-0 lg:top-24 transition-all duration-200",
-          isSticky ? "lg:sticky lg:top-24" : "lg:relative lg:top-0",
-          className
+          "w-full transition-all duration-200",
+          isSticky ? "lg:sticky lg:top-6" : "relative"
         )}
       >
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              You might also like
-            </h3>
-            {articleCount > 0 && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {articleCount}+ related articles
-              </span>
-            )}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          {/* Header */}
+          <div className="px-6 pt-5 pb-3 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v7h-2l-2.5-3-2.5 3-2.5-3L7 12H5V5z" />
+                </svg>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  You might also like
+                </h3>
+              </div>
+              {articleCount > 0 && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                  {articleCount}+ related articles
+                </span>
+              )}
+            </div>
           </div>
-          <div className="relative">
+          
+          {/* Articles Carousel */}
+          <div className="relative py-4">
             <div 
               ref={scrollContainerRef}
-              className="flex overflow-x-auto gap-4 pb-4 -mx-2 px-2 scrollbar-hide"
+              className="flex overflow-x-auto gap-5 pb-6 px-5 scrollbar-hide snap-x"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
-                maskImage: 'linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
-                WebkitMaskImage: '-webkit-linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
-                scrollBehavior: 'auto', // Disable default smooth scrolling for better control
+                scrollBehavior: 'smooth',
+                scrollPadding: '0 20px',
+                WebkitOverflowScrolling: 'touch'
               }}
             >
               {suggestedArticles.map((article) => (
                 <div 
                   key={article.id}
-                  className="flex-shrink-0 w-64 rounded-lg overflow-hidden transition-all duration-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 group"
+                  className="flex-shrink-0 w-64 snap-start group"
                   style={{ scrollSnapAlign: 'start' }}
                 >
                   <Link
                     href={`/articles/${article.slug}`}
-                    className="block h-full p-4"
+                    className="block h-full p-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200"
                   >
-                    <div className="flex flex-col">
-                      <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 mb-3">
+                    <div className="flex flex-col h-full">
+                      <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700/50 mb-3 group-hover:shadow-md transition-all duration-300">
                         <Image
                           src={article.image || '/placeholder-article.jpg'}
                           alt={article.title}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
                           sizes="(max-width: 768px) 100vw, 256px"
                           priority={false}
                         />
+                        {/* Gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 transition-colors duration-200 mb-2 text-center">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 transition-colors duration-200 mb-2 px-1">
                         {article.title}
                       </h4>
                       {article.tags?.length > 0 && (
-                        <div className="flex flex-wrap justify-center gap-1">
+                        <div className="flex flex-wrap gap-1.5 px-1 mt-auto">
                           {article.tags.slice(0, 2).map((tag, i) => (
                             <span 
                               key={i}
-                              className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200"
+                              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 transition-colors duration-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50"
                             >
                               {tag.name}
                             </span>
                           ))}
                           {article.tags.length > 2 && (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              +{article.tags.length - 2}
+                            <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400">
+                              +{article.tags.length - 2} more
                             </span>
                           )}
                         </div>
@@ -292,43 +310,90 @@ export function SuggestedArticles({
                 </div>
               ))}
             </div>
-            <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none" />
+            
+            {/* Gradient fade effect */}
+            <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none" />
+            
+            {/* Scroll indicators */}
+            {suggestedArticles.length > 1 && (
+              <div className="flex justify-center gap-2 mt-4 px-2">
+                {suggestedArticles.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      if (scrollContainerRef.current) {
+                        const container = scrollContainerRef.current;
+                        const cardWidth = 256; // w-64
+                        const scrollPosition = index * (cardWidth + 20); // card width + gap
+                        container.scrollTo({
+                          left: scrollPosition,
+                          behavior: 'smooth'
+                        });
+                      }
+                    }}
+                    className={`w-2.5 h-1.5 rounded-full transition-all duration-200 ${
+                      index === 0 ? 'w-6 bg-blue-500' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                    aria-label={`Go to article ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {/* Navigation arrows for larger screens */}
+            <button 
+              onClick={() => {
+                if (scrollContainerRef.current) {
+                  scrollContainerRef.current.scrollBy({
+                    left: -200,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
+              className="hidden md:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-md border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Scroll left"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button 
+              onClick={() => {
+                if (scrollContainerRef.current) {
+                  scrollContainerRef.current.scrollBy({
+                    left: 200,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
+              className="hidden md:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-md border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Scroll right"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
-          {/* Enhanced scroll indicators */}
-          {suggestedArticles.length > 1 && (
-            <div className="flex justify-center gap-1.5 mt-3">
-              {suggestedArticles.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    if (scrollContainerRef.current) {
-                      const container = scrollContainerRef.current;
-                      const scrollPosition = index * (container.scrollWidth / suggestedArticles.length);
-                      container.scrollTo({
-                        left: scrollPosition,
-                        behavior: 'smooth'
-                      });
-                    }
-                  }}
-                  className="w-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
-                  aria-label={`Go to article ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </div>
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
+          width: 0;
         }
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
+        .snap-x {
+          scroll-snap-type: x mandatory;
+        }
+        .snap-start {
+          scroll-snap-align: start;
+        }
       `}</style>
-    </>
+    </div>
   );
 }
 

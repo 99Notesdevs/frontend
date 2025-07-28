@@ -423,9 +423,10 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 {isAuthorized && <Comments parentId={parentId} />}
 
                 {/* Suggested Articles Section */}
-                <div className="bg-white w-full dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg sm:p-4 mb-4 sm:mb-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-700/50">
+                <div className="w-full mb-8">
                   <SuggestedArticles
                     currentArticle={page}
+                    className="max-w-full"
                   />
                 </div>
               </main>
