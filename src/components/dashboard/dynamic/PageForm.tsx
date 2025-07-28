@@ -139,12 +139,13 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setIsLoading(true);
       const response = (await api.get(`/template`)) as {
         success: boolean;
-        data: TemplateType[];
+        templates: TemplateType[];
       };
+      console.log("response", response);
       if (!response.success) throw new Error("Failed to fetch templates");
-      const { data } = response;
+      const { templates } = response;
 
-      setTemplates(data || []);
+      setTemplates(templates || []);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching templates:", error);
@@ -365,7 +366,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
 
       if (currentTemplate.id === "article") {
         const chatResponse = (await api.post(`/chat/room`, {
-          articleId: responseData.data.id,
+          articleId: responseData.id,
           // name: `Chat for ${apiPageData.title}`
         })) as { success: boolean; data: any };
         if (!chatResponse.success) {

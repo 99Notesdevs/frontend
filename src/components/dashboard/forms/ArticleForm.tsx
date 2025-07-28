@@ -182,13 +182,13 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         };
       }
 
-      if (!values.imageUrl || !getImageUrl(values.imageUrl)) {
-        messages.push("Image is required");
-        errors = {
-          ...errors,
-          imageUrl: "Image URL is required",
-        };
-      }
+      // if (!values.imageUrl || !getImageUrl(values.imageUrl)) {
+      //   messages.push("Image is required");
+      //   errors = {
+      //     ...errors,
+      //     imageUrl: "Image URL is required",
+      //   };
+      // }
 
       if (messages.length > 0) {
         setAlert({
