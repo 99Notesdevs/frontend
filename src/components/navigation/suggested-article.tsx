@@ -107,44 +107,73 @@ export function SuggestedArticles({
     fetchRelatedArticles();
   }, [currentArticle]);
 
-  // Auto-scroll functionality
+  // Simple and reliable auto-scroll functionality
   const startAutoScroll = useCallback(() => {
     if (!scrollContainerRef.current || suggestedArticles.length <= 1) return;
 
     const container = scrollContainerRef.current;
-    const scrollWidth = container.scrollWidth;
-    const clientWidth = container.clientWidth;
-    let scrollLeft = 0;
+    let scrollPosition = 0;
     const scrollSpeed = 1; // pixels per frame
+    let isPaused = false;
+    let animationFrameId: number;
 
     const scroll = () => {
-      if (!scrollContainerRef.current) return;
+      if (!scrollContainerRef.current || isPaused) return;
       
-      scrollLeft += scrollSpeed;
+      const { scrollWidth, clientWidth } = container;
+      const maxScroll = scrollWidth - clientWidth;
       
       // If we've scrolled to the end, reset to start
-      if (scrollLeft >= scrollWidth - clientWidth) {
-        scrollLeft = 0;
-        // Add a small delay before starting again
+      if (scrollPosition >= maxScroll) {
+        scrollPosition = 0;
+        container.scrollTo({ left: 0, behavior: 'auto' });
+        // Wait a bit before starting to scroll again
         setTimeout(() => {
-          if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-          }
-        }, 500);
-      } else {
-        scrollContainerRef.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+          animationFrameId = requestAnimationFrame(scroll);
+        }, 2000); // 2 second pause at the end
+        return;
+      }
+      
+      // Update scroll position
+      scrollPosition += scrollSpeed;
+      container.scrollTo({ left: scrollPosition, behavior: 'auto' });
+      
+      // Continue the animation
+      animationFrameId = requestAnimationFrame(scroll);
+    };
+
+    // Start scrolling after a short delay
+    const timeout = setTimeout(() => {
+      animationFrameId = requestAnimationFrame(scroll);
+    }, 1000);
+
+    // Pause on hover
+    const pauseScroll = () => {
+      isPaused = true;
+    };
+    
+    const resumeScroll = () => {
+      if (isPaused) {
+        isPaused = false;
+        animationFrameId = requestAnimationFrame(scroll);
       }
     };
 
-    // Start scrolling after 0.5s delay
-    const timeout = setTimeout(() => {
-      scrollInterval.current = setInterval(scroll, 30); // ~30fps
-    }, 500);
+    if (container) {
+      container.addEventListener('mouseenter', pauseScroll);
+      container.addEventListener('touchstart', pauseScroll);
+      container.addEventListener('mouseleave', resumeScroll);
+      container.addEventListener('touchend', resumeScroll);
+    }
 
     return () => {
       clearTimeout(timeout);
-      if (scrollInterval.current) {
-        clearInterval(scrollInterval.current);
+      cancelAnimationFrame(animationFrameId);
+      if (container) {
+        container.removeEventListener('mouseenter', pauseScroll);
+        container.removeEventListener('touchstart', pauseScroll);
+        container.removeEventListener('mouseleave', resumeScroll);
+        container.removeEventListener('touchend', resumeScroll);
       }
     };
   }, [suggestedArticles.length]);
@@ -189,7 +218,7 @@ export function SuggestedArticles({
       <div
         ref={sidebarRef}
         className={cn(
-          "w-full max-w-xs mx-auto lg:mx-0 lg:absolute lg:right-0 lg:top-24 transition-all duration-200",
+          "w-full mx-auto lg:absolute lg:right-0 lg:top-24 transition-all duration-200",
           isSticky ? "lg:sticky lg:top-24" : "lg:relative lg:top-0",
           className
         )}
@@ -205,53 +234,85 @@ export function SuggestedArticles({
               </span>
             )}
           </div>
-          <div 
-            ref={scrollContainerRef}
-            className="flex overflow-x-auto gap-4 pb-4 -mx-2 px-2 scrollbar-hide snap-x snap-mandatory scroll-smooth"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}
-          >
-            {suggestedArticles.map((article) => (
-              <div 
-                key={article.id}
-                className="flex-shrink-0 w-64 rounded-lg p-2 transition-colors duration-200"
-                style={{ scrollSnapAlign: 'start' }}
-              >
-                <Link
-                  href={`/articles/${article.slug}`}
-                  className="group block h-full"
+          <div className="relative">
+            <div 
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto gap-4 pb-4 -mx-2 px-2 scrollbar-hide"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                maskImage: 'linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
+                WebkitMaskImage: '-webkit-linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
+                scrollBehavior: 'auto', // Disable default smooth scrolling for better control
+              }}
+            >
+              {suggestedArticles.map((article) => (
+                <div 
+                  key={article.id}
+                  className="flex-shrink-0 w-64 rounded-lg overflow-hidden transition-all duration-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 group"
+                  style={{ scrollSnapAlign: 'start' }}
                 >
-                  <div className="flex items-start gap-3">
-                    {article.image && (
-                      <div className="flex-shrink-0 w-16 h-16 relative rounded-md overflow-hidden">
+                  <Link
+                    href={`/articles/${article.slug}`}
+                    className="block h-full p-4"
+                  >
+                    <div className="flex flex-col">
+                      <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 mb-3">
                         <Image
-                          src={article.image}
+                          src={article.image || '/placeholder-article.jpg'}
                           alt={article.title}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-200"
-                          sizes="64px"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, 256px"
+                          priority={false}
                         />
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 transition-colors duration-200 mb-2 text-center">
                         {article.title}
                       </h4>
+                      {article.tags?.length > 0 && (
+                        <div className="flex flex-wrap justify-center gap-1">
+                          {article.tags.slice(0, 2).map((tag, i) => (
+                            <span 
+                              key={i}
+                              className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200"
+                            >
+                              {tag.name}
+                            </span>
+                          ))}
+                          {article.tags.length > 2 && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              +{article.tags.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </Link>
-              </div>
-            ))}
+                  </Link>
+                </div>
+              ))}
+            </div>
+            <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none" />
           </div>
-          {/* Scroll indicators */}
+          {/* Enhanced scroll indicators */}
           {suggestedArticles.length > 1 && (
-            <div className="flex justify-center gap-2 mt-2">
+            <div className="flex justify-center gap-1.5 mt-3">
               {suggestedArticles.map((_, index) => (
-                <div 
+                <button
                   key={index}
-                  className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+                  onClick={() => {
+                    if (scrollContainerRef.current) {
+                      const container = scrollContainerRef.current;
+                      const scrollPosition = index * (container.scrollWidth / suggestedArticles.length);
+                      container.scrollTo({
+                        left: scrollPosition,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  className="w-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+                  aria-label={`Go to article ${index + 1}`}
                 />
               ))}
             </div>
