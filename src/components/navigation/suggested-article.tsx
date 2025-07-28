@@ -92,7 +92,7 @@ export function SuggestedArticles({
         );
         
         // Convert map values back to array and take first 3
-        const filteredArticles = Array.from(uniqueArticles.values()).slice(0, 3);
+        const filteredArticles = Array.from(uniqueArticles.values()).slice(0, 15);
         
         setSuggestedArticles(filteredArticles);
         setArticleCount(countResponse.success ? countResponse.count : 0);
@@ -223,7 +223,7 @@ export function SuggestedArticles({
           className
         )}
       >
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
               You might also like
