@@ -269,7 +269,7 @@ export function SuggestedArticles({
                   style={{ scrollSnapAlign: 'start' }}
                 >
                   <Link
-                    href={`/articles/${article.slug}`}
+                    href={`/${article.slug}`}
                     className="block h-full p-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200"
                   >
                     <div className="flex flex-col h-full">
