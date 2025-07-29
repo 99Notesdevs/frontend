@@ -362,7 +362,7 @@ const CurrentAffairArticlePage = async ({
         {quizQuestions.length > 0 && (
           <div className="mt-8 bg-white rounded-lg shadow p-6">
             <h2 className="text-2xl font-bold mb-4">Quiz</h2>
-            <QuizWrapper questions={quizQuestions} />
+            {/* <QuizWrapper questions={quizQuestions} /> */}
           </div>
         )}
       </div>
