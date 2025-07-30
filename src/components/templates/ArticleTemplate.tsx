@@ -118,7 +118,6 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
           credentials: "include",
         }
       );
-
       if (!response.ok) {
         throw new Error("Failed to fetch questions");
       }

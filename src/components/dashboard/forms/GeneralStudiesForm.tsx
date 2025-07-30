@@ -134,7 +134,7 @@ export function GeneralStudiesForm({
   const defaultFormValues: GeneralStudiesFormValues = {
     title: "",
     content: "",
-    imageUrl: JSON.stringify(["", ""]),
+    imageUrl: "",
     showInNav: true,
     category: [],
     metaTitle: "",
@@ -178,13 +178,13 @@ export function GeneralStudiesForm({
         };
       }
 
-      if (!values.imageUrl) {
-        messages.push("Image is required");
-        errors = {
-          ...errors,
-          imageUrl: { message: "" },
-        };
-      }
+      // if (!values.imageUrl) {
+      //   messages.push("Image is required");
+      //   errors = {
+      //     ...errors,
+      //     imageUrl: { message: "" },
+      //   };
+      // }
 
       if (messages.length > 0) {
         setAlert({
@@ -318,7 +318,7 @@ export function GeneralStudiesForm({
     onSubmit(transformedData);
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
@@ -332,7 +332,11 @@ export function GeneralStudiesForm({
           const formData = new FormData();
           formData.append("imageUrl", file);
 
-          const s3Url = await uploadImageToS3(formData, folder, file.name);
+          const s3Url = await uploadImageToS3(
+            formData,
+            folder,
+            file.name
+          );
           if (s3Url) {
             form.setValue("imageUrl", JSON.stringify([s3Url, ""]), {
               shouldValidate: true,
@@ -345,6 +349,7 @@ export function GeneralStudiesForm({
                 shouldValidate: true,
               }
             );
+            throw new Error("Failed to upload image to S3");
           }
         } catch (error) {
           console.error("Error uploading image:", error);
