@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import Cookies from "js-cookie";
 import { FaEnvelope, FaLock, FaKey, FaEye, FaEyeSlash } from "react-icons/fa";
 import { api } from "@/config/api/route";
 
@@ -11,8 +9,12 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
+interface admin {
+  id: number;
+  email: string;
+}
+
 export default function AddAdmin() {
-  const router = useRouter();
   const [adminData, setAdminData] = useState({
     email: "",
     password: "",
@@ -22,20 +24,17 @@ export default function AddAdmin() {
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
-  const [admins, setAdmins] = useState<any[]>([]); // State to store the list of admins
+  const [admins, setAdmins] = useState<admin[]>([]); // State to store the list of admins
 
   // Fetch the list of admins
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const token = Cookies.get("token");
-        if (!token) throw new Error("No token found");
-
         const response = (await api.get(`/admin/all`)) as {
-          data: { admins: any[] };
+          data: admin[];
         };
-
-        setAdmins(response.data.admins || []); // Assuming the API returns an array of admins in `data.admins`
+        
+        setAdmins(response.data || []); // Assuming the API returns an array of admins in `data.admins`
       } catch (err) {
         console.error("Error fetching admins:", err);
       }
@@ -48,20 +47,11 @@ export default function AddAdmin() {
     event.preventDefault();
 
     try {
-      const token = Cookies.get("token");
-      if (!token) throw new Error("No token found");
+      const data = await api.post(`/admin/signup`, adminData) as {
+        success: boolean;
+      };
 
-      const data = await api.post(`/admin/signup`, adminData);
-
-      // Reset form
-      setAdminData({
-        email: "",
-        password: "",
-        secretKey: "",
-      });
-
-      // Update admin list
-      setAdmins((prev) => [...prev, data]);
+      if (!data.success) throw new Error("Failed to add admin");
 
       // Show success message
       setSuccess("Admin added successfully");
@@ -226,18 +216,8 @@ export default function AddAdmin() {
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900">{admin.email}</p>
-                            <p className="text-xs text-gray-500">
-                              Added on {new Date(admin.createdAt).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
-                            </p>
                           </div>
                         </div>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          Active
-                        </span>
                       </div>
                     ))}
                   </div>

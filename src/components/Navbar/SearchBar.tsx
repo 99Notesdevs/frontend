@@ -25,19 +25,19 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
     setIsLoading(true);
 
     try {
-      const response = await api.get<any[] | { [key: string]: any[] }>(
+      const response = await api.get<any | { [key: string]: any[] }>(
         `/search/global?query=${encodeURIComponent(searchQuery)}`
-      );
+      ) as {success: boolean; data: any};
 
       let searchResults: any[] = [];
       
       // If response is an array, use it directly
-      if (Array.isArray(response)) {
-        searchResults = response;
+      if (Array.isArray(response.data)) {
+        searchResults = response.data;
       } 
       // If response is an object with arrays as values, flatten them
-      else if (response && typeof response === 'object') {
-        searchResults = Object.values(response).flat();
+      else if (response && typeof response.data === 'object') {
+        searchResults = Object.values(response.data).flat();
       }
       
       setResults(searchResults);

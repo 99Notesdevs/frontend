@@ -139,13 +139,13 @@ export function PageForm({ editPage = null }: PageFormProps) {
       setIsLoading(true);
       const response = (await api.get(`/template`)) as {
         success: boolean;
-        templates: TemplateType[];
+        data: TemplateType[];
       };
       console.log("response", response);
       if (!response.success) throw new Error("Failed to fetch templates");
-      const { templates } = response;
+      const { data } = response;
 
-      setTemplates(templates || []);
+      setTemplates(data || []);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching templates:", error);

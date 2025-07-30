@@ -21,7 +21,6 @@ const loadGlobals = async () => {
       ?.split("||")
       ?.map((script: string) => script.trim());
     localStorage.setItem("practiceQuestions", practiceQuestions);
-    console.log(data.data);
 
     // Add scripts to the head
     if (headScripts && Array.isArray(headScripts)) {

@@ -6,6 +6,7 @@ import { env } from '@/config/env';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 import Link from 'next/link';
+import { api } from '@/config/api/route';
 
 interface Article {
   id: number;
@@ -28,17 +29,10 @@ const Dashboard = () => {
 
   const checkSubscription = async () => {
     try {
-      const response = await fetch(`${env.API}/user/validate`, {
-        headers: {
-          "Authorization": `Bearer ${Cookies.get('token')}`,
-          "Content-Type": "application/json",
-        },
-        credentials: 'include'
-      });
+      const response = await api.get(`/user/validate`) as { success: boolean, data: any };
       
-      if (response.ok) {
-        const data = await response.json();
-        setIsSubscribed(data.data.paidUser || false);
+      if (response.success) {
+        setIsSubscribed(response.data.paidUser || false);
       } else {
         setIsSubscribed(false);
       }
@@ -51,22 +45,17 @@ const Dashboard = () => {
   const fetchArticles = async () => {
     try {
       setLoading(true);
-      const [articlesRes] = await Promise.all([
-        fetch(`${env.API}/page/articles-with-lock`, {
-          headers: {
-            "Authorization": `Bearer ${Cookies.get('token')}`,
-            "Content-Type": "application/json",
-          }
-        }),
-        checkSubscription()
+      const [articlesRes] = await Promise.all<[Promise<{ success: boolean, data: Article[] }>]>([
+        api.get(`/page/articles-with-lock`),
       ]);
+      checkSubscription()
       
-      if (!articlesRes.ok) {
+      if (!articlesRes.success) {
         throw new Error('Failed to fetch articles');
       }
       
-      const data = await articlesRes.json();
-      const articlesData = Array.isArray(data.data) ? data.data : [];
+      const articlesData = articlesRes.data;
+      
       
       // Parse imageUrl and check for locked content
       const processedArticles = articlesData.map((article: Article) => ({

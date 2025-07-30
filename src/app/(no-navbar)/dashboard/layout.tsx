@@ -44,24 +44,6 @@ const navigationItems = {
       ],
     },
     {
-      category: "Test Management",
-      items: [
-        {
-          icon: FaPlus,
-          text: "Add Questions",
-          path: "/dashboard/addquestions",
-        },
-        {
-          icon: FaPlus,
-          text: "Add Test Series",
-          path: "/dashboard/addtestSeries",
-        },
-        { icon: FaAdjust, text: "Test Forms", path: "/dashboard/testForms" },
-        { icon: FaAdjust, text: "Test Series", path: "/dashboard/testSeries" },
-        { icon: FaPlus, text: "Add Test", path: "/dashboard/addtest" },
-      ],
-    },
-    {
       category: "Article Management",
       items: [
         { icon: FaPlus, text: "Add Article", path: "/dashboard/add" },
