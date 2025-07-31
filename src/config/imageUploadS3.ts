@@ -1,16 +1,20 @@
-import { api } from "./api/route";
+import { env } from "./env";
 
 export const uploadImageToS3 = async (
   formData: FormData,
   folder: string,
   name?: string
 ): Promise<string | null> => {
-  const res = (await api.post(
-    `/aws/upload-image?folder=${folder}&name=${name}`,
-    formData
-  )) as { success: boolean; data: string };
+  const res = await fetch(
+    `${env.API}/aws/upload-image?folder=${folder}&name=${name}`,
+    {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    }
+  );
+  const result = await res.json();
+  if (!res.ok) return null;
 
-  if (!res.success) return null;
-
-  return res.data || null;
+  return result.data || null;
 };
