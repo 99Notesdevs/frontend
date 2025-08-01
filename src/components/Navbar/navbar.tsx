@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { isAuth } from "@/lib/isAuth";
 import logo from "../../../public/Logo.svg";
+import logoDark from "../../../public/Logo-Dark.png";
 import SearchBar from "./SearchBar";
 import { NavItem } from "@/types/navigation";
 import { Plus_Jakarta_Sans } from "next/font/google";
@@ -314,14 +315,22 @@ export default function Navbar({ navigation }: NavbarProps) {
               {/* Logo */}
               <div className="flex-shrink-0 min-w-[35px] mx-2 flex items-center">
                 <Link href="/" passHref>
-                  <Image
-                    src={logo}
-                    alt="99Notes"
-                    width={180}
-                    height={60}
-                    className="h-16 w-auto object-contain"
-                    priority
-                  />
+                    <Image
+                      src={logo}
+                      alt="99Notes"
+                      width={180}
+                      height={60}
+                      className="h-16 w-auto object-contain dark:hidden"
+                      priority
+                    />
+                    <Image
+                      src={logoDark}
+                      alt="99Notes"
+                      width={180}
+                      height={60}
+                      className="h-12 w-auto object-contain hidden dark:block"
+                      priority
+                    />
                 </Link>
               </div>
               <div className="hidden lg:flex flex-1 justify-end items-center gap-1 2xl:pr-8 ">

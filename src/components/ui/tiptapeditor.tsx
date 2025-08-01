@@ -1098,7 +1098,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     to: number;
   } | null>(null); // For Tiptap selection
 
-  // Add styles for the resizable image
+  // Add styles for the resizable image and list wrapping
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
@@ -1118,6 +1118,29 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         line-height: 1.6;
       }
       
+      /* Fix for list items wrapping around floated images */
+      .ProseMirror ul, .ProseMirror ol {
+        overflow: hidden; /* Contain the float */
+        padding-left: 1.5em; /* Standard list indentation */
+      }
+      
+      .ProseMirror li {
+        position: relative;
+        overflow: visible; /* Allow content to flow around floats */
+      }
+      
+      /* Fix for nested lists */
+      .ProseMirror li > ul,
+      .ProseMirror li > ol {
+        margin: 0.25em 0;
+        padding-left: 1.5em;
+      }
+      
+      /* Ensure list markers stay in place */
+      .ProseMirror li > p:first-child {
+        display: inline;
+      }
+      
       .ProseMirror img.floating-image {
         margin: 0.5rem 1rem 1rem 1rem;
       }
@@ -1126,11 +1149,14 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         float: left;
         margin-right: 1.5rem;
         margin-left: 0;
+        clear: left;
       }
       
       .ProseMirror img[data-float="right"] {
         float: right;
         margin-left: 1.5rem;
+        margin-right: 0;
+        clear: right;
         margin-right: 0;
       }
       
