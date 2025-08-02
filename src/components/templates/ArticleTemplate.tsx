@@ -399,7 +399,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                 </div>
                 {/* Article Content */}
                 <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-slate-900/50 w-full  mb-8 sm:mb-10 rounded-xl overflow-hidden">
-                  <div className="p-2 pt-5">
+                  <div className="px-4 md:px-6 py-1">
                     <Tags tags={page.tags} />
                     <div
                       className="prose prose-lg max-w-none"

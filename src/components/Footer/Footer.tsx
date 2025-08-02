@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../../../public/Logo.svg";
+import logoDark from "../../../public/Logo-Dark.png";
 import SocialMedia from "../navigation/socialmedia";
 
 interface FooterLink {
@@ -48,7 +49,22 @@ const Footer = ({ footerSections }: FooterProps) => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <Link href="/">
-                <Image src={logo} alt="Logo" className="h-20 w-auto" />
+                <div className="relative h-20 w-auto">
+                  <Image 
+                    src={logo} 
+                    alt="99Notes" 
+                    width={200}
+                    height={80}
+                    className="h-16 w-auto dark:hidden"
+                  />
+                  <Image 
+                    src={logoDark} 
+                    alt="99Notes" 
+                    width={200}
+                    height={80}
+                    className="h-14 w-auto hidden dark:block"
+                  />
+                </div>
               </Link>
             </div>
             <div className="w-full md:w-auto max-w-sm">
