@@ -16,7 +16,6 @@ import Breadcrumb from "@/components/ui/breadcrumb";
 // import { LiveChat } from "@/components/livechat/livechat";
 import { Tags } from "@/components/ui/tags/Tags";
 import Bookmark from "../ui/Bookmark";
-import Quiz from "@/components/quiz/quiz";
 import FAQPage from "@/components/FAQp/faqp";
 import { BackToTop } from "@/components/ui/reachtotop";
 import { DownloadPdf } from "@/components/ui/downloadpdf";
@@ -299,7 +298,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
       <main>
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white dark:from-slate-900 dark:to-slate-900">
           {/* Assistive Touch */}
-          <AssistiveTouch content={mainContentFinal} />
+          <div className="relative group">
+            <AssistiveTouch content={mainContentFinal} />
+          </div>
 
           <div className="w-full max-w-[1400px] mx-auto px-2 lg:px-10 py-4 sm:py-6">
             <Breadcrumb
@@ -340,14 +341,22 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                   {/* Tab Buttons */}
                   <div className="flex bg-white dark:bg-slate-800 rounded-t-xl shadow-lg overflow-hidden border border-b-0 border-[var(--info-surface)] dark:border-slate-700">
                     <button
-                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors ${activeTab === 'article' ? 'bg-[var(--info-surface)] text-[var(--primary)]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
-                      onClick={() => setActiveTab('article')}
+                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors ${
+                        activeTab === "article"
+                          ? "bg-[var(--info-surface)] text-[var(--primary)]"
+                          : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                      }`}
+                      onClick={() => setActiveTab("article")}
                     >
                       Article
                     </button>
                     <button
-                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors relative ${activeTab === 'practice' ? 'bg-[var(--info-surface)] text-[var(--primary)]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
-                      onClick={() => setActiveTab('practice')}
+                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors relative ${
+                        activeTab === "practice"
+                          ? "bg-[var(--info-surface)] text-[var(--primary)]"
+                          : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                      }`}
+                      onClick={() => setActiveTab("practice")}
                     >
                       Practice
                       {currentQuestions.length > 0 && (
@@ -357,8 +366,12 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       )}
                     </button>
                     <button
-                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors ${activeTab === 'community' ? 'bg-[var(--info-surface)] text-[var(--primary)]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
-                      onClick={() => setActiveTab('community')}
+                      className={`flex-1 py-3 px-2 text-center font-medium transition-colors ${
+                        activeTab === "community"
+                          ? "bg-[var(--info-surface)] text-[var(--primary)]"
+                          : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                      }`}
+                      onClick={() => setActiveTab("community")}
                     >
                       Community
                     </button>
@@ -366,7 +379,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
                   {/* Tab Content */}
                   <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-b-xl shadow-lg overflow-hidden">
-                    {activeTab === 'practice' && (
+                    {activeTab === "practice" && (
                       <div className="p-3">
                         <h2 className="text-xl font-semibold mb-4 text-[var(--surface-dark)] dark:text-slate-200 border-b-2 border-[var(--info-surface)] dark:border-slate-600 pb-2">
                           Practice Questions
@@ -381,8 +394,16 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                         {!isLoading && !error && (
                           <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
                             <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
-                              <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                              <svg
+                                className="h-4 w-4 mr-1.5 text-yellow-500"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                               {currentQuestions.length} Questions
                             </div>
@@ -390,7 +411,7 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                         )}
                       </div>
                     )}
-                    {activeTab === 'community' && (
+                    {activeTab === "community" && (
                       <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                         <p>Community features coming soon!</p>
                       </div>
@@ -482,8 +503,16 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       {!isLoading && !error && (
                         <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
                           <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
-                            <svg className="h-4 w-4 mr-1.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                            <svg
+                              className="h-4 w-4 mr-1.5 text-yellow-500"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                             {currentQuestions.length} Questions
                           </div>
