@@ -168,14 +168,14 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
                     <h3 className="text-xl text-black dark:text-white font-semibold mb-2">
                       {page.title}
                     </h3>
-                    <p
+                    {/* <p
                       className="text-black dark:text-gray-300 mb-4"
                       dangerouslySetInnerHTML={{
                         __html: page.content
                           ? page.content.substring(0, 100) + "..."
                           : "No description available",
                       }}
-                    />
+                    /> */}
                     <Link
                       href={`${page.slug}`}
                       className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium inline-flex items-center"
