@@ -38,8 +38,14 @@ const Login = () => {
   const checkUser = async () => {
     try {
       if (token) {
-        const res = (await api.get(`/user/check`)) as { success: boolean };
-        if (res.success) {
+        const res = await fetch(`${env.API_AUTH}/user/check`, {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          }        });
+        const response = await res.json();
+        
+        if (response.success) {
           window.location.href = `${env.TEST_PORTAL}/dashboard`;
         }
       }
@@ -70,17 +76,23 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = (await api.post(`/user`, {
-        email,
-        password,
-      })) as { success: boolean };
+      const res = (await fetch(`${env.API_AUTH}/user`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }));
+      const response = await res.json();
       console.log(response);
       if (response.success) {
-        const userData = (await api.get(`/user`)) as {
-          success: boolean;
-          data: { id: string };
-        };
-        localStorage.setItem("userId", userData.data.id);
+        const userData = (await fetch(`${env.API_AUTH}/user`, {credentials: "include"}));
+        const data = await userData.json();
+        localStorage.setItem("userId", data.data.id);
         window.location.href = `${env.TEST_PORTAL}/dashboard`;
         showToast("Login successful!", "success");
       } else {
