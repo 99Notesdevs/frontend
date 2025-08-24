@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/config/api/route';
+import { env } from '@/config/env';
 
 export default function SubscriptionPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -39,7 +40,7 @@ export default function SubscriptionPage() {
     const response = await api.post('/orders', data) as { success: boolean, data: any };
     if (!response.success) {
       alert('Please login to continue');
-      window.location.href = '/users/login';
+      window.location.href = `${env.AUTH_PORTAL}/login`;
       return;
     }
     const responseData = response.data;

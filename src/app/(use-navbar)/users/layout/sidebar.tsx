@@ -11,31 +11,28 @@ const Sidebar = ({ onClose, isMobileOpen }: { onClose?: () => void, isMobileOpen
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const token = Cookies.get('token');
+  // const token = Cookies.get('token');
 
   const logout = async () => {
     try {
-      Cookies.remove('token');
-      if(token) {
-        const response = await axios.post(`${env.API}/user/logout`, {
-          headers: {
-            Authorization: `Bearer ${token}`
+      // Cookies.remove('token');
+      // if(token) {
+        const response = await axios.post(`${env.API_AUTH}/user/logout`, {
+          headers: { 
+            credentials:"include"
           }
         });
         if(response.data.success) {
-          router.push('/users/login');
+          router.push(`${env.AUTH_PORTAL}/login`);
         } else {
-          router.push('/users/login');
+          router.push(`${env.AUTH_PORTAL}/login`);
         }
-      } else {
-        router.push('/users/login');
-      }
     } catch(error) {
       console.error("Error checking user authentication: ", error);
         if (axios.isAxiosError(error) && error.response?.status !== 200) {
           console.warn("Unauthorized! Redirecting to login...");
-          Cookies.remove('token'); // Remove invalid token
-          window.location.href = "/users/login"; // Redirect user
+          // Cookies.remove('token'); // Remove invalid token
+          window.location.href = `${env.AUTH_PORTAL}/login`;
         } else {
           if (axios.isAxiosError(error)) {
             console.error("API Error:", error.response?.status, error.response?.data);
