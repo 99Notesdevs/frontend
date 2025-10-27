@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import { FiUserPlus, FiRefreshCw, FiCheck, FiX, FiUser, FiMail, FiLock, FiCalendar, FiDollarSign } from "react-icons/fi";
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { env } from "@/config/env";
 const toastVariants = {
   hidden: { y: -50, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.3 } },
@@ -45,10 +45,18 @@ function ManageUsers() {
   // Add new user
   const addUser = async (user: any) => {
     try {
-      const response = (await api.post(`/user/signup`, user)) as {
+      const response = await fetch(`${env.API_AUTH}/user/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      credentials: "include",
+      body: JSON.stringify(user)
+    });
+      const data = await response.json() as {
         success: boolean; data: any;
       };
-      if (!response.success) throw new Error("Failed to add user");
+      if (!data.success) throw new Error("Failed to add user");
       setToast({ message: "User added successfully", type: "success" });
       setFirstName("");
       setLastName("");
@@ -66,15 +74,22 @@ function ManageUsers() {
   // Fetch single user
   const fetchUser = async (id: string) => {
     try {
-      const response = (await api.get(`/user/${id}`)) as {
+      const response = await fetch(`${env.API_AUTH}/user/${id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            },
+          credentials: "include",
+        });
+      const data = await response.json() as {
         success: boolean; data: User;
       };
-      setSelectedUser(response.data as User);
-      setPaidUser(response.data.userData.paidUser ? "true" : "false");
+      setSelectedUser(data.data as User);
+      setPaidUser(data.data.userData.paidUser ? "true" : "false");
       setValidityDays(
-        response.data.userData.validTill
+        data.data.userData.validTill
           ? Math.ceil(
-              (new Date(response.data.userData.validTill).getTime() -
+              (new Date(data.data.userData.validTill).getTime() -
                 Date.now()) /
                 (1000 * 60 * 60 * 24)
             )
@@ -92,11 +107,19 @@ function ManageUsers() {
   // Update subscription
   const updateSubscription = async () => {
     try {
-      const response = (await api.put(`/user/updateUser/${id}`, {
+      const response = await fetch(`${env.API_AUTH}/user/updateUser/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      credentials: "include",
+      body: JSON.stringify({
         paidUser,
         validTill: new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000),
-      })) as { success: boolean };
-      if (!response.success)
+      })
+    });
+      const data = await response.json() as { success: boolean };
+      if (!data.success)
         throw new Error("Failed to update subscription");
       setToast({
         message: "Subscription updated successfully",
