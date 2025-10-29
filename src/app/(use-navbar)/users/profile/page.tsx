@@ -54,14 +54,14 @@ const Profile = () => {
           if (res.data.success) {
             setUserData(res.data.data);
           } else {
-            router.push("/users/login");
+            router.push(`${env.AUTH_PORTAL}/login`);
           }
         } else {
-          router.push("/users/login");
+          router.push(`${env.AUTH_PORTAL}/login`);
         }
       } catch (error) {
         console.error("Error fetching user data: ", error);
-        router.push("/users/login");
+        router.push(`${env.AUTH_PORTAL}/login`);
       }
     };
     fetchUserData();

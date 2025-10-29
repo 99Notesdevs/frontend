@@ -49,6 +49,6 @@ export const api = {
     request<T>(endpoint, {
       method: "DELETE",
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body ? JSON.stringify(body) : "",
     }),
 };

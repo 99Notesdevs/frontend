@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/config/api/route";
 
@@ -14,7 +14,8 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter(); // Use Next.js router for navigation
+  const router = useRouter();
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -25,21 +26,21 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
     setIsLoading(true);
 
     try {
-      const response = await api.get<any | { [key: string]: any[] }>(
+      const response = (await api.get<any | { [key: string]: any[] }>(
         `/search/global?query=${encodeURIComponent(searchQuery)}`
-      ) as {success: boolean; data: any};
+      )) as { success: boolean; data: any };
 
       let searchResults: any[] = [];
-      
+
       // If response is an array, use it directly
       if (Array.isArray(response.data)) {
         searchResults = response.data;
-      } 
+      }
       // If response is an object with arrays as values, flatten them
-      else if (response && typeof response.data === 'object') {
+      else if (response && typeof response.data === "object") {
         searchResults = Object.values(response.data).flat();
       }
-      
+
       setResults(searchResults);
     } catch (error) {
       console.error("Error fetching search results:", error);
@@ -53,14 +54,41 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
     const value = e.target.value;
     setQuery(value);
 
-    // Trigger search
-    handleSearch(value);
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Set loading state immediately if there's a query
+    if (value.trim()) {
+      setIsLoading(true);
+    } else {
+      setResults([]);
+      setIsLoading(false);
+    }
+
+    // Set new timer for debounced search (500ms delay)
+    debounceTimerRef.current = setTimeout(() => {
+      handleSearch(value);
+    }, 1000);
   };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && query.trim()) {
       e.preventDefault();
-      // Navigate to search results page with query parameter
+      // Clear debounce timer and navigate immediately
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
       router.push(`/search-result?q=${encodeURIComponent(query)}`);
       if (onClose) onClose();
     }
@@ -72,7 +100,11 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
   };
 
   return (
-    <div className={`relative w-full ${compact ? 'max-w-full' : 'max-w-2xl mx-auto'}`}>
+    <div
+      className={`relative w-full ${
+        compact ? "max-w-full" : "max-w-2xl mx-auto"
+      }`}
+    >
       <div className="relative flex items-center">
         <input
           type="text"
@@ -82,7 +114,7 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           onKeyDown={handleKeyDown}
           className={`w-full px-4 pr-10 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
-            compact ? 'py-2 text-sm' : 'py-3 text-base'
+            compact ? "py-2 text-sm" : "py-3 text-base"
           }`}
           placeholder="Search for articles, topics, or resources..."
           autoFocus={!compact}

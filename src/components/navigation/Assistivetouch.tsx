@@ -143,6 +143,20 @@ export default function AssistiveTouch({ content }: AssistiveTouchProps) {
         onTouchStart={handleTouchStart}
         onClick={handleAssistiveClick}
       >
+        {!isOpen && (
+          <span
+            className={`absolute top-1/2 -translate-y-1/2 px-3 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-50 shadow-lg pointer-events-none
+              ${
+                position.x > window.innerWidth / 2
+                  ? "right-full mr-3 text-right"
+                  : "left-full ml-3 text-left"
+              }
+            `}
+          >
+            Table of Content / Navigation
+          </span>
+        )}
+
         {isOpen && (
           <div
             className={`flex flex-col items-end space-y-2 absolute ${

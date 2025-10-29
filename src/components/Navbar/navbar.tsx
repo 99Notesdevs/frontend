@@ -10,6 +10,9 @@ import SearchBar from "./SearchBar";
 import { NavItem } from "@/types/navigation";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { ToggleMode } from "./togglemode";
+import { useAuthModal } from "@/hooks/useAuthModal";
+import { Button } from "@/components/ui/button";
+import { env } from "@/config/env";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -188,7 +191,12 @@ function NestedNavigation({
                                                         viewBox="0 0 24 24"
                                                         xmlns="http://www.w3.org/2000/svg"
                                                       >
-                                                        <path d="M9.29289 18.7071C8.90237 18.3166 8.90237 17.6834 9.29289 17.2929L14.5858 12L9.29289 6.70711C8.90237 6.31658 8.90237 5.68342 9.29289 5.29289C9.68342 4.90237 10.3166 4.90237 10.7071 5.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L10.7071 18.7071C10.3166 19.0976 9.68342 19.0976 9.29289 18.7071Z" />
+                                                        <path
+                                                          strokeLinecap="round"
+                                                          strokeLinejoin="round"
+                                                          strokeWidth={2}
+                                                          d="M9.29289 18.7071C8.90237 18.3166 8.90237 17.6834 9.29289 17.2929L14.5858 12L9.29289 6.70711C8.90237 6.31658 8.90237 5.68342 9.29289 5.29289C9.68342 4.90237 10.3166 4.90237 10.7071 5.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L10.7071 18.7071C10.3166 19.0976 9.68342 19.0976 9.29289 18.7071Z"
+                                                        />
                                                       </svg>
                                                       {greatGrandChild.title}
                                                     </Link>
@@ -225,6 +233,7 @@ export default function Navbar({ navigation }: NavbarProps) {
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { showLogin } = useAuthModal();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -315,22 +324,22 @@ export default function Navbar({ navigation }: NavbarProps) {
               {/* Logo */}
               <div className="flex-shrink-0 min-w-[35px] mx-2 flex items-center">
                 <Link href="/" passHref>
-                    <Image
-                      src={logo}
-                      alt="99Notes"
-                      width={180}
-                      height={60}
-                      className="h-16 w-auto object-contain dark:hidden"
-                      priority
-                    />
-                    <Image
-                      src={logoDark}
-                      alt="99Notes"
-                      width={180}
-                      height={60}
-                      className="h-12 w-auto object-contain hidden dark:block"
-                      priority
-                    />
+                  <Image
+                    src={logo}
+                    alt="99Notes"
+                    width={180}
+                    height={60}
+                    className="h-16 w-auto object-contain dark:hidden"
+                    priority
+                  />
+                  <Image
+                    src={logoDark}
+                    alt="99Notes"
+                    width={180}
+                    height={60}
+                    className="h-12 w-auto object-contain hidden dark:block"
+                    priority
+                  />
                 </Link>
               </div>
               <div className="hidden lg:flex flex-1 justify-end items-center gap-1 2xl:pr-8 ">
@@ -353,36 +362,23 @@ export default function Navbar({ navigation }: NavbarProps) {
                 <div className="ml-2 flex items-center gap-4">
                   {!isLoading &&
                     (isLoggedIn ? (
-                      <Link
-                        href="/users/dashboard"
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                          <svg
-                            className="w-5 h-5 text-gray-600 dark:text-gray-300"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                          >
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                          </svg>
-                        </div>
-                      </Link>
+                      <div className="flex items-center">
+                        {/* User profile/dropdown can go here */}
+                        <Button variant="outline" size="sm" onClick={() => window.location.href = `${env.AUTH_PORTAL}/dashboard`}>
+                          My Account
+                        </Button>
+                      </div>
                     ) : (
-                      <Link
-                        href="/users/login"
-                        className="group flex items-center gap-2 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] transition-colors duration-200"
-                      >
-                        <span className="text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 group-hover:text-[var(--action-primary)] dark:group-hover:text-[var(--action-primary)] transition-colors duration-200">
-                          Login
-                        </span>
-                        <svg
-                          className="w-5 h-5 text-[var(--text-strong)] dark:text-slate-200 group-hover:text-[var(--action-primary)] dark:group-hover:text-[var(--action-primary)] transition-colors duration-200"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
+                      <div className="hidden md:flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={showLogin}
+                          className="hidden sm:inline-flex"
                         >
-                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                        </svg>
-                      </Link>
+                          Log in
+                        </Button>
+                      </div>
                     ))}
                   {/* Search icon */}
                   <button
@@ -416,44 +412,11 @@ export default function Navbar({ navigation }: NavbarProps) {
               )}
 
               {/* Mobile menu button */}
-              <div className="lg:hidden flex items-center gap-2">
-                <div className="flex lg:hidden">
-                  <ToggleMode />
-                  {!isLoading && (
-                    <Link
-                      href={isLoggedIn ? "/users/dashboard" : "/users/login"}
-                      passHref
-                    >
-                      <div className="flex items-center gap-3 cursor-pointer">
-                        {isLoggedIn ? (
-                          <div className="w-8 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                            <svg
-                              className="w-5 h-5 text-gray-600 dark:text-gray-300"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                            >
-                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                            </svg>
-                          </div>
-                        ) : (
-                          <>
-                            <svg
-                              className="w-5 h-10 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--primary)]"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                            >
-                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                            </svg>
-                          </>
-                        )}
-                      </div>
-                    </Link>
-                  )}
-                </div>
+              <div className="lg:hidden flex items-center">
                 <button
+                  type="button"
+                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
                   onClick={() => setIsOpen(!isOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-tertiary)] bg-[var(--tertiary)] dark:bg-amber-900/20
-                         hover:text-[var(--primary)] hover:bg-[var(--quaternary)] dark:hover:bg-amber-900/20 focus:outline-none transition-colors"
                 >
                   <span className="sr-only">Open main menu</span>
                   {isOpen ? (
@@ -468,7 +431,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth="2"
+                        strokeWidth={2}
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
@@ -484,7 +447,7 @@ export default function Navbar({ navigation }: NavbarProps) {
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth="2"
+                        strokeWidth={2}
                         d="M4 6h16M4 12h16M4 18h16"
                       />
                     </svg>
@@ -614,7 +577,6 @@ export default function Navbar({ navigation }: NavbarProps) {
                 )}
               </div>
             ))}
-
             {/* About and Blogs */}
             <Link href="/about" passHref>
               <span
@@ -632,6 +594,25 @@ export default function Navbar({ navigation }: NavbarProps) {
                 Blogs
               </span>
             </Link>
+            {!isLoading && (
+              <div className="px-5 pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+                {isLoggedIn ? (
+                  <Button variant="outline" className="w-full mb-2" onClick={() => window.location.href = `${env.AUTH_PORTAL}/dashboard`}>
+                    My Account
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full mb-2"
+                      onClick={showLogin}
+                    >
+                      Log in
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </nav>
