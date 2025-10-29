@@ -391,8 +391,28 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </div>
                     )}
                     {activeTab === 'community' && (
-                      <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-                        <p>Community features coming soon!</p>
+                      <div className="p-6 text-center">
+                        <p className="text-gray-500 dark:text-gray-400 mb-6">Want to connect with other aspirants?</p>
+                        <a 
+                          href="/community" 
+                          className="inline-flex items-center justify-center px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)] transition-colors shadow-md hover:shadow-lg"
+                        >
+                          <span>Go to Community</span>
+                          <svg 
+                            className="w-5 h-5 ml-2" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24" 
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth="2" 
+                              d="M17 8l4 4m0 0l-4 4m4-4H3"
+                            ></path>
+                          </svg>
+                        </a>
                       </div>
                     )}
                   </div>
