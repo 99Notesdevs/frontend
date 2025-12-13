@@ -412,8 +412,13 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </div>
                     )}
                     {activeTab === "community" && (
-                      <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-                        <p>Community features coming soon!</p>
+                      <div className="p-6 text-center">
+                        <p className="text-gray-600 dark:text-gray-300">
+                          Want to connect with more aspirants?
+                        </p>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-3">
+                          Community
+                        </button>
                       </div>
                     )}
                   </div>

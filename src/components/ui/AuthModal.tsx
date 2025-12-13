@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from 'lucide-react';
+import { X, Lock, Mail, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import { Button } from './button';
@@ -85,146 +85,245 @@ export function AuthModal() {
     }
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <Dialog open={isAuthModalOpen} onOpenChange={(open) => !open && closeAuthModal()}>
-      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900">
-        <DialogHeader className="relative">
-          <DialogTitle className="text-2xl font-bold text-center">
-            {activeTab === 'login' ? 'Welcome back!' : 'Create an account'}
-          </DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-0"
-            onClick={closeAuthModal}
-          >
-            <X className="h-5 w-5" />
-            <span className="sr-only">Close</span>
-          </Button>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-2xl border-0 p-0 overflow-hidden">
+        <div className="px-8 pt-10 pb-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              {activeTab === 'login' ? 'Welcome Back' : 'Create Account'}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {activeTab === 'login' 
+                ? 'Sign in to your account to continue'
+                : 'Join our community today'}
+            </p>
+          </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'register')} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+        <Tabs 
+          value={activeTab} 
+          onValueChange={(value) => setActiveTab(value as 'login' | 'register')} 
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg h-10">
+            <TabsTrigger 
+              value="login" 
+              className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary rounded-md transition-all duration-200"
+            >
+              Sign In
+            </TabsTrigger>
+            <TabsTrigger 
+              value="register" 
+              className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary rounded-md transition-all duration-200"
+            >
+              Sign Up
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="login">
-            <form onSubmit={(e) => handleSubmit(e, 'login')} className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
-                <Input
-                  id="login-email"
-                  name="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                />
+          <TabsContent value="login" className="mt-6">
+            <form onSubmit={(e) => handleSubmit(e, 'login')} className="space-y-5">
+              <div className="space-y-1">
+                <Label htmlFor="login-email" className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</Label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <Input
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="pl-10 h-11 focus-visible:ring-2 focus-visible:ring-primary/50 transition-all duration-200"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
+              
+              <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Password
+                  </Label>
                   <button
                     type="button"
-                    className="text-sm text-primary hover:underline"
+                    className="text-xs text-primary hover:text-primary/80 transition-colors"
                     onClick={() => {}}
                   >
                     Forgot password?
                   </button>
                 </div>
-                <Input
-                  id="login-password"
-                  name="password"
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <Input
+                    id="login-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="pl-10 pr-10 h-11 focus-visible:ring-2 focus-visible:ring-primary/50 transition-all duration-200"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign in'}
+              
+              <Button 
+                type="submit" 
+                className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200" 
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
           </TabsContent>
 
-          <TabsContent value="register">
-            <form onSubmit={(e) => handleSubmit(e, 'register')} className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="register-name">First Name</Label>
-                <Input
-                  id="register-name"
-                  name="firstName"
-                  placeholder="John Doe"
-                  required
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
+          <TabsContent value="register" className="mt-6">
+            <form onSubmit={(e) => handleSubmit(e, 'register')} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label htmlFor="register-firstName" className="text-sm font-medium text-gray-700 dark:text-gray-300">First Name</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <Input
+                      id="register-firstName"
+                      name="firstName"
+                      
+                      required
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className="pl-10 h-11 focus-visible:ring-2 focus-visible:ring-primary/50 transition-all duration-200"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="register-lastName" className="text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <Input
+                      id="register-lastName"
+                      name="lastName"
+                      
+                      required
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className="pl-10 h-11 focus-visible:ring-2 focus-visible:ring-primary/50 transition-all duration-200"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="register-name">Last Name</Label>
-                <Input
-                  id="register-name"
-                  name="lastName"
-                  placeholder="John Doe"
-                  required
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
+              
+              <div className="space-y-1">
+                <Label htmlFor="register-email" className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</Label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <Input
+                    id="register-email"
+                    name="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="pl-10 h-11 focus-visible:ring-2 focus-visible:ring-primary/50 transition-all duration-200"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="register-email">Email</Label>
-                <Input
-                  id="register-email"
-                  name="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="register-password">Password</Label>
-                <Input
-                  id="register-password"
-                  name="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-                <p className="text-xs text-muted-foreground">
+              
+              <div className="space-y-1">
+                <Label htmlFor="register-password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Password
+                </Label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <Input
+                    id="register-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={6}
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="pl-10 pr-10 h-11 focus-visible:ring-2 focus-visible:ring-primary/50 transition-all duration-200"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Password must be at least 6 characters long
                 </p>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Create account'}
+              
+              <Button 
+                type="submit" 
+                className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 mt-2"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
           </TabsContent>
         </Tabs>
 
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" type="button" disabled={isLoading}>
-            Google
-          </Button>
-          <Button variant="outline" type="button" disabled={isLoading}>
-            GitHub
-          </Button>
+        
+        
+        <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          {activeTab === 'login' ? (
+            <>
+              Don't have an account?{' '}
+              <button 
+                type="button" 
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
+                onClick={() => setActiveTab('register')}
+              >
+                Sign up
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{' '}
+              <button 
+                type="button" 
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
+                onClick={() => setActiveTab('login')}
+              >
+                Sign in
+              </button>
+            </>
+          )}
+        </p>
         </div>
       </DialogContent>
     </Dialog>
