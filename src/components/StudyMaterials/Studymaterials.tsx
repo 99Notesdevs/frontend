@@ -151,8 +151,8 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
                 >
                   <Image
                     src={
-                      JSON.parse(page?.imageUrl)[0] ||
-                      "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"
+                      JSON.parse(page?.imageUrl)[0] 
+                      // "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"
                     }
                     alt={JSON.parse(page?.imageUrl)[1]}
                     width={500}
@@ -160,8 +160,8 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
                     className="w-full h-48 object-cover"
                     onError={(e) => {
                       const img = e.target as HTMLImageElement;
-                      img.src =
-                        "https://via.placeholder.com/500x192?text=Image+Not+Available";
+                      // img.src =
+                        // "https://via.placeholder.com/500x192?text=Image+Not+Available";
                     }}
                   />
                   <div className="p-6">

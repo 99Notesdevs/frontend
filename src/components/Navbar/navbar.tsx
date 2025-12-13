@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { isAuth } from "@/lib/isAuth";
 import logo from "../../../public/Logo.svg";
@@ -13,6 +13,7 @@ import { ToggleMode } from "./togglemode";
 import { useAuthModal } from "@/hooks/useAuthModal";
 import { Button } from "@/components/ui/button";
 import { env } from "@/config/env";
+import { LogOut, User, LayoutDashboard } from "lucide-react";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -233,7 +234,23 @@ export default function Navbar({ navigation }: NavbarProps) {
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { showLogin } = useAuthModal();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -364,9 +381,47 @@ export default function Navbar({ navigation }: NavbarProps) {
                     (isLoggedIn ? (
                       <div className="flex items-center">
                         {/* User profile/dropdown can go here */}
-                        <Button variant="outline" size="sm" onClick={() => window.location.href = `${env.AUTH_PORTAL}/dashboard`}>
-                          My Account
-                        </Button>
+                        <div className="relative" ref={dropdownRef}>
+                          <button
+                            onClick={() => setOpenDropdown(!openDropdown)}
+                            className="flex items-center space-x-2 focus:outline-none"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                              <User className="w-4 h-4" />
+                            </div>
+                          </button>
+                          
+                          {openDropdown && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+                              <button
+                                onClick={() => window.location.href = `${env.TEST_PORTAL}/dashboard`}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                              >
+                                <LayoutDashboard className="w-4 h-4 mr-2" />
+                                Dashboard
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    const response = await fetch(`${env.API_AUTH}/user/logout`, {
+                                      method: 'POST',
+                                      credentials: 'include',
+                                    });
+                                    if (response.ok) {
+                                      window.location.href = '/';
+                                    }
+                                  } catch (error) {
+                                    console.error('Logout failed:', error);
+                                  }
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                              >
+                                <LogOut className="w-4 h-4 mr-2" />
+                                Logout
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <div className="hidden md:flex items-center space-x-2">
@@ -597,7 +652,7 @@ export default function Navbar({ navigation }: NavbarProps) {
             {!isLoading && (
               <div className="px-5 pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
                 {isLoggedIn ? (
-                  <Button variant="outline" className="w-full mb-2" onClick={() => window.location.href = `${env.AUTH_PORTAL}/dashboard`}>
+                  <Button variant="outline" className="w-full mb-2" onClick={() => window.location.href = `${env.TEST_PORTAL}/dashboard`}>
                     My Account
                   </Button>
                 ) : (

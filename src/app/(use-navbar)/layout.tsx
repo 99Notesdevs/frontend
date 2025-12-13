@@ -35,10 +35,10 @@ export default async function RootLayout({
           async
           defer
         ></script>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        {/* <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> */}
       </head>
       <body className={inter.className}>
-        <ThemeProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <GlobalScriptsLoader />
           <Suspense
             fallback={
