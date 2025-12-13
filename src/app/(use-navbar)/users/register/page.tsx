@@ -4,6 +4,11 @@
 // import { isAuth } from "@/lib/isAuth";
 // import { api } from "@/config/api/route";
 
+const Register = () => {
+    return(
+        <h1>Move back please!</h1>
+    );
+}
 // const Register = () => {
 //   const [email, setEmail] = useState("");
 //   const [firstName, setFirstName] = useState("");
@@ -244,4 +249,4 @@
 //   );
 // };
 
-// export default Register;
+export default Register;

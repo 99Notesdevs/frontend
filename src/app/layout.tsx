@@ -2,8 +2,6 @@
 import { AuthProvider } from '@/contexts/AuthContext';
 import { AuthModal } from '@/components/ui/AuthModal';
 import { cn } from '@/lib/utils';
-import { ThemeProvider } from 'next-themes';
-
 
 export default function RootLayout({
   children,
@@ -11,16 +9,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={cn(
-        "min-h-screen bg-background font-sans antialiased",
+        "min-h-screen bg-background font-sans antialiased"
       )}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>
-            {children}
-            <AuthModal />
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          {children}
+          <AuthModal />
+        </AuthProvider>
       </body>
     </html>
   );
