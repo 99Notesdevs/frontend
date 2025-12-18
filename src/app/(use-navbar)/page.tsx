@@ -1,5 +1,5 @@
 "use client";
-
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ContactForm from "@/components/common/ContactForm/ContactForm";
@@ -7,11 +7,16 @@ import StudyMaterials from "@/components/StudyMaterials/Studymaterials";
 import CurrentAffairs from "@/components/CurrentAffairs/CurrentAffairs";
 import CoachingInfo from "@/components/CoachingInfo/CoachingInfo";
 import FAQ from "@/components/common/FAQ/FAQ";
-import ContactMap from "@/components/common/Contact/ContactMap";
 import Reason99notes from "@/components/CoachingInfo/Reason99notes";
 import Slider from "@/components/About/Slider";
 import { api } from '@/config/api/route';
-
+const ContactMap = dynamic(
+  () => import('@/components/common/Contact/ContactMap'),
+  { 
+    ssr: false, // Disable server-side rendering if not needed
+    loading: () => <p>Loading map...</p> // Optional loading component
+  }
+);
 interface HomeProps {
   Hero:{
     title: string;

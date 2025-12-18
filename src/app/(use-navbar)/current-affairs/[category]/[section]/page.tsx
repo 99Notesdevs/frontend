@@ -7,7 +7,7 @@ import Whatsapp from "@/components/ui/whatsapp";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { Tag } from "lucide-react";
 import { api } from "@/config/api/route";
-
+import ContentWrapper from "@/components/Blogs/ContentWrapper";
 // Define types for the data
 interface Tag {
   id?: number;
@@ -179,89 +179,11 @@ const CurrentAffairArticlePage = async ({
                     </>
                   )}
                 </div>
-                <div 
-                  key={1235}
-                  className="prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg max-w-none
-                  prose-headings:font-semibold
-                  prose-headings:tracking-normal
-                  prose-headings:text-left
-                  prose-headings:relative
-                  prose-headings:mb-6
-                  
-                  prose-h1:text-3xl sm:prose-h1:text-4xl
-                  prose-h1:font-bold
-                  prose-h1:text-[var(--surface-dark)] dark:text-white
-                  prose-h1:leading-tight
-                  
-                  prose-h2:text-2xl sm:prose-h2:text-3xl
-                  prose-h2:text-[var(--text-strong)] dark:text-slate-200
-                  prose-h2:pb-2
-                  prose-h2:after:content-['']
-                  
-                  /* Dark mode styles */
-                  dark:prose-p:text-slate-300
-                  dark:prose-strong:text-white
-                  dark:prose-a:text-blue-400
-                  dark:prose-a:border-blue-700
-                  dark:prose-a:hover:text-blue-300
-                  dark:prose-blockquote:border-l-blue-500
-                  dark:prose-blockquote:bg-slate-800/50
-                  dark:prose-pre:bg-slate-800
-                  dark:prose-code:text-slate-300
-                  dark:prose-th:border-slate-700
-                  dark:prose-td:border-slate-700
-                  dark:prose-hr:border-slate-700
-                  prose-h2:after:block
-                  prose-h2:after:w-16
-                  prose-h2:after:h-[2px]
-                  prose-h2:after:mt-2
-                  prose-h2:after:bg-[var(--primary)]
-                  prose-h2:after:rounded-full
-                  
-                  prose-h3:text-xl sm:prose-h3:text-2xl
-                  prose-h3:text-[var(--text-tertiary)]
-                  prose-h3:font-medium
-                  prose-h3:pl-3
-                  
-                  prose-h4:text-lg sm:prose-h4:text-xl
-                  prose-h4:text-[var(--text-tertiary)]
-                  prose-h4:font-medium
-                  prose-h4:before:content-['§']
-                  prose-h4:before:text-[var(--primary)]
-                  prose-h4:before:mr-2
-                  prose-h4:before:opacity-70
-                  
-                  prose-p:text-[var(--text-tertiary)]
-                  prose-p:leading-relaxed
-                  prose-p:tracking-wide
-                  prose-strong:text-[var(--surface-dark)]
-                  prose-a:text-blue-600
-                  prose-a:no-underline
-                  prose-a:border-b-2
-                  prose-a:border-blue-200
-                  prose-a:transition-colors
-                  prose-a:hover:border-blue-500
-                  prose-blockquote:border-l-blue-500
-                  prose-blockquote:bg-blue-50
-                  prose-blockquote:p-3 sm:prose-blockquote:p-4
-                  prose-blockquote:rounded-r-lg
-                  prose-pre:bg-gray-50
-                  prose-pre:rounded-lg
-                  prose-pre:p-3 sm:prose-pre:p-4
-                  prose-img:rounded-lg
-                  prose-img:shadow-md
-                  prose-ul:list-disc
-                  prose-ul:pl-4 sm:prose-ul:pl-6
-                  prose-ol:list-decimal
-                  prose-ol:pl-4 sm:prose-ol:pl-6
-                  [&>*]:w-full"
-                >
-                  {article.content ? (
-                    <div dangerouslySetInnerHTML={{ __html: article.content }} />
+                {article.content ? (
+                    <ContentWrapper input={article.content}/>
                   ) : (
                     <p>No content available for this article.</p>
-                  )}
-                </div>
+                )}
 
                 {/* Blog content with tags */}
                 {article.blogs && article.blogs.length > 0 && (
