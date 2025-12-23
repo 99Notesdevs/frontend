@@ -59,10 +59,10 @@ export default function ManageEmployees() {
 
   const fetchEmployees = async () => {
     try {
-      const token = Cookies.get("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
+      // const token = Cookies.get("token");
+      // if (!token) {
+      //   throw new Error("No token found");
+      // }
 
       const [editorsResponse, authorsResponse] = (await Promise.all([
         api.get(`/editor`),
@@ -105,10 +105,10 @@ export default function ManageEmployees() {
 
   const handleAddEmployee = async () => {
     try {
-      const token = Cookies.get("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
+      // const token = Cookies.get("token");
+      // if (!token) {
+      //   throw new Error("No token found");
+      // }
 
       const response = (await api.post(
         `/${newEmployee.role === "editor" ? "editor" : "author"}`,
@@ -158,8 +158,8 @@ export default function ManageEmployees() {
     };
 
     try {
-      const token = Cookies.get("token");
-      if (!token) throw new Error("No token found");
+      // const token = Cookies.get("token");
+      // if (!token) throw new Error("No token found");
 
       const response = (await api.put(
         `/${updatedEmployee.role === "editor" ? "editor" : "author"}/${
@@ -194,10 +194,10 @@ export default function ManageEmployees() {
     role: "editor" | "author"
   ) => {
     try {
-      const token = Cookies.get("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
+        // const token = Cookies.get("token");
+        // if (!token) {
+        //   throw new Error("No token found");
+        // }
 
       const response = (await api.delete(`/${role}/${id}`)) as {
         success: boolean;
@@ -215,10 +215,10 @@ export default function ManageEmployees() {
 
   const handleEditEmployee = async (updatedEmployee: Employee) => {
     try {
-      const token = Cookies.get("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
+      // const token = Cookies.get("token");
+      // if (!token) {
+      //   throw new Error("No token found");
+      // }
 
       const response = (await api.put(
         `/${updatedEmployee.role === "editor" ? "editor" : "author"}/${
