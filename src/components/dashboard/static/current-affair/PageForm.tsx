@@ -363,7 +363,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         }),
       };
 
-      const response = (await api.get(`/currentAffair`, affairData)) as {
+      const response = (await api.post(`/currentAffair`, affairData)) as {
         success: boolean;
         data: CurrentAffairType;
       };

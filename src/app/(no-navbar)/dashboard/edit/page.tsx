@@ -47,7 +47,7 @@ function PageList() {
   const [pageIdToDelete, setPageIdToDelete] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const itemsPerPage =10;
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
