@@ -541,7 +541,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   {!isLoading && templates?.length > 0 ? (
                     templates.map((template: TemplateType) => (
                       <SelectItem key={template.id} value={template.id}>
-                        {template.name}
+                        {`${template.name} ${
+                          template.name.toLowerCase().includes('general') ? '(Tiles form)' : 
+                          template.name.toLowerCase().includes('article') ? '(Article form)' : 
+                          template.name.toLowerCase().includes('upsc') ? '(Outer level)' : ''
+                        }`}
                       </SelectItem>
                     ))
                   ) : (

@@ -395,34 +395,81 @@ export default function ArticlesPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-6">
+            <div className="flex flex-wrap justify-center gap-2 mt-4 px-2">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-[var(--admin-primary)] text-slate-900 rounded hover:bg-[var(--admin-secondary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 sm:px-4 sm:py-2 rounded-md bg-gray-200 disabled:opacity-50 hover:bg-gray-300 transition-colors"
               >
                 Previous
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`px-4 py-2 rounded ${
-                      page === currentPage
-                        ? "bg-[var(--admin-bg-light)] text-[var(--admin-primary)] "
-                        : "bg-[var(--admin-primary)] text-[var(--admin-primary)] hover:bg-[var(--admin-bg-light)]"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
+
+              {/* First page */}
+              <button
+                onClick={() => handlePageChange(1)}
+                className={`px-3 py-1 sm:px-4 sm:py-2 rounded-md ${
+                  currentPage === 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                } transition-colors`}
+              >
+                1
+              </button>
+
+              {/* Ellipsis if needed */}
+              {currentPage > 3 && (
+                <span className="px-2 py-2">...</span>
+              )}
+
+              {/* Current page and adjacent pages */}
+              {Array.from(
+                { length: Math.min(3, totalPages - 2) },
+                (_, i) => {
+                  let pageNum;
+                  if (currentPage <= 2) {
+                    pageNum = i + 2; // Show 2,3,4 if on first few pages
+                  } else if (currentPage >= totalPages - 1) {
+                    pageNum = totalPages - 3 + i; // Show last 3 pages if on last few pages
+                  } else {
+                    pageNum = currentPage - 1 + i; // Show current page with one before and after
+                  }
+
+                  if (pageNum > 1 && pageNum < totalPages) {
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-1 sm:px-4 sm:py-2 rounded-md ${
+                          currentPage === pageNum ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                        } transition-colors`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  }
+                  return null;
+                }
+              )}
+
+              {/* Ellipsis if needed */}
+              {currentPage < totalPages - 2 && totalPages > 5 && (
+                <span className="px-2 py-2">...</span>
+              )}
+
+              {/* Last page */}
+              {totalPages > 1 && (
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  className={`px-3 py-1 sm:px-4 sm:py-2 rounded-md ${
+                    currentPage === totalPages ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                  } transition-colors`}
+                >
+                  {totalPages}
+                </button>
               )}
 
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-secondary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 sm:px-4 sm:py-2 rounded-md bg-gray-200 disabled:opacity-50 hover:bg-gray-300 transition-colors"
               >
                 Next
               </button>

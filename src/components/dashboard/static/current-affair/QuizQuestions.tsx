@@ -137,7 +137,7 @@ export function QuizQuestions({
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium">Quiz Questions</h3>
-          <Button onClick={addQuestion}>Add Question</Button>
+          <Button className="bg-slate-700" onClick={addQuestion}>Add Question</Button>
         </div>
 
         {questions.map((question, questionIndex) => (

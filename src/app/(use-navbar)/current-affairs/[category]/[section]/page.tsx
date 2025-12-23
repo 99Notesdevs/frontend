@@ -8,6 +8,9 @@ import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { Tag } from "lucide-react";
 import { api } from "@/config/api/route";
 import ContentWrapper from "@/components/Blogs/ContentWrapper";
+import SocialMedia from "@/components/navigation/socialmedia";
+import Ads from "@/components/navigation/Ads";
+
 // Define types for the data
 interface Tag {
   id?: number;
@@ -27,6 +30,7 @@ interface CurrentAffairBlog {
   updatedAt?: string;
   parentSlug?: string;
 }
+
 interface CurrentAffairArticle {
   id: number;
   title: string;
@@ -127,7 +131,7 @@ const CurrentAffairArticlePage = async ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Main content column - adjusting padding top for mobile */}
-            <div className="lg:col-span-8 xl:col-span-8 pt-4 lg:pt-[50px]">
+            <div className="lg:col-span-8 pt-4 lg:pt-[50px]">
               <div className="bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg shadow-lg dark:shadow-slate-900/30 p-4 hover:shadow-xl dark:hover:shadow-slate-900/50 transition-all duration-300 mb-4">
                 {/* Article Header */}
                 <div className="text-center mb-8 sm:mb-12">
@@ -243,24 +247,48 @@ const CurrentAffairArticlePage = async ({
             
             {/* Blogs Section - Integrated with content */}
             
-            {/* Right Sidebar - increasing width */}
-            <div className="lg:col-span-4 hidden lg:block space-y-4 sm:space-y-6 mt-12">
-              {/* Sticky Container */}
-              <div className="relative">
-                {/* TOC Section */}
-                {article.blogs && article.blogs.length > 0 && (
-                  <div className="sticky top-8 space-y-4 sm:space-y-6">
-                    <div className="bg-white border border-blue-100 rounded-lg shadow-lg p-4 sm:p-6 transition-all duration-300 hover:shadow-xl">
-                      <h3 className="text-lg font-semibold mb-4 text-[var(--surface-dark)] border-b-2 border-blue-200 pb-2">
-                        Table of Contents
-                      </h3>
-                      <TableOfContents 
-                        content={article.content || ''}
-                        blogs={article.blogs?.map(blog => ({
-                          content: blog.content || ''
-                        })) || []}
-                      />
-                    </div>
+            {/* Right Sidebar */}
+            <div className="lg:col-span-4 lg:block mt-12 space-y-4">
+              {/* Table of Contents */}
+              <div className="sticky top-8 space-y-6">
+                <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-slate-700">
+                  <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white">
+                    Table of Contents
+                  </h3>
+                  <TableOfContents 
+                    content={article.content || ''}
+                    blogs={article.blogs?.map(blog => ({
+                      content: blog.content || ''
+                    })) || []}
+                  />
+                </div>
+
+                {/* Social Media Section */}
+                <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-slate-700">
+                  <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white">
+                    Connect With Us
+                  </h3>
+                  <div className="flex justify-center">
+                    <SocialMedia />
+                  </div>
+                </div>
+
+                {/* Shop Ad Section */}
+                <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+                  <h3 className="text-lg font-semibold p-4 text-slate-800 dark:text-white border-b border-gray-200 dark:border-slate-700">
+                    Our Shop
+                  </h3>
+                  <Ads 
+                    imageUrl="/shop-banner.jpg" 
+                    altText="Visit 99Notes Shop"
+                  />
+                </div>
+
+                {/* Quiz Section */}
+                {quizQuestions.length > 0 && (
+                  <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-slate-700">
+                    <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white">Quiz</h3>
+                    {/* <QuizWrapper questions={quizQuestions} /> */}
                   </div>
                 )}
               </div>
@@ -279,12 +307,6 @@ const CurrentAffairArticlePage = async ({
             >
               Go back to {category.replace(/-/g, " ")} articles
             </Link>
-          </div>
-        )}
-        {quizQuestions.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold mb-4">Quiz</h2>
-            {/* <QuizWrapper questions={quizQuestions} /> */}
           </div>
         )}
       </div>

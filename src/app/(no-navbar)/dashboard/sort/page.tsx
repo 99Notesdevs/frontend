@@ -9,6 +9,16 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { api } from "@/config/api/route";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 // Define the type for a page
 interface Page {
@@ -78,6 +88,19 @@ const buildHierarchy = (pages: Page[]): Page[] => {
 const SortableItem = ({ page }: { page: Page }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: page.id });
+  
+  // Different background colors for different levels
+  const levelColors = [
+    'bg-blue-50 border-blue-200', // Level 1
+    'bg-green-50 border-green-200', // Level 2
+    'bg-yellow-50 border-yellow-200', // Level 3
+    'bg-purple-50 border-purple-200', // Level 4
+    'bg-pink-50 border-pink-200', // Level 5
+  ];
+  
+  // Default to first color if level is out of range
+  const levelColor = levelColors[Math.min(page.level - 1, levelColors.length - 1)] || levelColors[0];
+  
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -90,22 +113,32 @@ const SortableItem = ({ page }: { page: Page }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="article-item bg-white shadow-sm rounded-lg p-4 mb-2 border border-[var(--admin-border)] cursor-move"
+      className={`article-item ${levelColor} shadow-sm rounded-lg p-4 mb-2 border cursor-move transition-colors hover:shadow-md`}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-[var(--admin-bg-secondary)]">
-          {page.title}
-        </h3>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-[var(--admin-primary)]">
-            Level: {page.level}
+        <div className="flex items-center space-x-3">
+          <div className={`w-3 h-3 rounded-full ${
+            levelColor.includes('blue') ? 'bg-blue-500' :
+            levelColor.includes('green') ? 'bg-green-500' :
+            levelColor.includes('yellow') ? 'bg-yellow-500' :
+            levelColor.includes('purple') ? 'bg-purple-500' : 'bg-pink-500'
+          }`} />
+          <h3 className="text-lg font-semibold text-gray-800">
+            {page.title}
+          </h3>
+        </div>
+        <div className="flex items-center space-x-3">
+          <span className="px-2 py-1 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
+            Level {page.level}
           </span>
-          <span className="text-sm text-[var(--admin-primary)]">
+          <span className="px-2 py-1 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
             Order: {page.order}
           </span>
-          <span className="text-sm text-[var(--admin-primary)]">
-            Parent: {page.parentId || "None"}
-          </span>
+          {page.parentId && (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
+              Parent: {page.parentId}
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -115,6 +148,14 @@ const SortableItem = ({ page }: { page: Page }) => {
 const ArticleList = () => {
   const [pages, setPages] = useState<Page[]>([]);
   const [flattenedPages, setFlattenedPages] = useState<Page[]>([]);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState<{
+    newFlattenedPages: Page[];
+    updatedSiblings: any[];
+  } | null>(null);
 
   // Flatten the hierarchy while maintaining level information
   const flattenHierarchy = (pages: Page[]): Page[] => {
@@ -150,6 +191,35 @@ const ArticleList = () => {
     setFlattenedPages(flattenHierarchy(pages));
   }, [pages]);
 
+  const showErrorAlert = (message: string) => {
+    setAlertMessage(message);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 5000);
+  };
+
+  const handleSaveChanges = async () => {
+    if (!pendingChanges) return;
+    
+    const { newFlattenedPages, updatedSiblings } = pendingChanges;
+    
+    try {
+      setFlattenedPages(newFlattenedPages);
+      setHasChanges(true);
+      // Example API call (uncomment and modify as needed):
+      // await api.post('/page/update-order', { pages: updatedSiblings });
+      setAlertMessage('Page order updated successfully!');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    } catch (error) {
+      console.error('Error updating page order:', error);
+      setAlertMessage('Failed to update page order. Please try again.');
+      setShowAlert(true);
+    } finally {
+      setShowConfirmDialog(false);
+      setPendingChanges(null);
+    }
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -166,7 +236,7 @@ const ArticleList = () => {
       activePage.level !== overPage.level ||
       activePage.parentId !== overPage.parentId
     ) {
-      console.log("Cannot reorder pages across different levels or parents");
+      showErrorAlert("Only pages at the same level and with the same parent can be reordered together.");
       return;
     }
 
@@ -197,7 +267,9 @@ const ArticleList = () => {
       return updatedSibling || page;
     });
 
-    setFlattenedPages(newFlattenedPages);
+    // Show confirmation dialog
+    setPendingChanges({ newFlattenedPages, updatedSiblings });
+    setShowConfirmDialog(true);
 
     // Rebuild the hierarchy with the updated orders
     const rebuildHierarchy = (flatPages: Page[]): Page[] => {
@@ -261,38 +333,73 @@ const ArticleList = () => {
   };
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 py-8 max-w-2xl">
-      <div className="bg-white/90 shadow-xl rounded-2xl border border-[var(--admin-border)] p-6">
-        <h1 className="text-2xl font-bold text-[var(--admin-bg-secondary)] mb-6 text-center">
-          Sort Pages
-        </h1>
-        {flattenedPages.length === 0 ? (
-          <p className="text-[var(--admin-primary)] text-center">
-            No pages found.
-          </p>
-        ) : (
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
+    <div className="p-6 relative">
+      <h1 className="text-2xl font-bold mb-6">Sort Pages</h1>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <div className="space-y-4">
+          <SortableContext
+            items={flattenedPages.map((page) => page.id)}
+            strategy={verticalListSortingStrategy}
           >
-            <SortableContext
-              items={flattenedPages.map((page) => page.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-4">
-                {flattenedPages.map((page) => (
-                  <div
-                    key={page.id}
-                    className="bg-[var(--admin-bg-lightest)] rounded-lg shadow flex items-center px-4 py-3 border border-[var(--admin-border)] hover:bg-[var(--admin-bg-light)] transition-all"
-                  >
-                    <SortableItem page={page} />
-                  </div>
-                ))}
+            {flattenedPages.map((page) => (
+              <div
+                key={page.id}
+                className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:border-blue-300 transition-colors"
+              >
+                <SortableItem page={page} />
               </div>
-            </SortableContext>
-          </DndContext>
-        )}
-      </div>
+            ))}
+          </SortableContext>
+        </div>
+      </DndContext>
+
+      {/* Alert Toast */}
+      {showAlert && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+          <div className={`flex items-center gap-3 p-4 rounded-lg shadow-lg ${
+            alertMessage.includes('success') 
+              ? 'bg-green-50 border border-green-200 text-green-800' 
+              : 'bg-red-50 border border-red-200 text-red-800'
+          }`}>
+            {alertMessage.includes('success') ? (
+              <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+            )}
+            <span className="text-sm">{alertMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent className="sm:max-w-[425px] rounded-lg">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-yellow-500" />
+              <DialogTitle className="text-lg font-semibold">Confirm Changes</DialogTitle>
+            </div>
+            <DialogDescription className="pt-2 text-gray-600">
+              Are you sure you want to save the changes to the page order?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+              className="border-gray-300 hover:bg-gray-50"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveChanges}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
