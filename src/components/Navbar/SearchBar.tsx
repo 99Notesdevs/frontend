@@ -16,37 +16,58 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // AbortController ref to cancel previous requests
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
+      // If query is empty, cancel any in-flight request and reset state
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
       setResults([]);
+      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
 
+    // Abort previous request, if any
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const response = (await api.get<any | { [key: string]: any[] }>(
         `/search/global?query=${encodeURIComponent(searchQuery)}`
+        // If your api wrapper supports a config object, you can pass
+        // { signal: controller.signal } here. If not, the controller still
+        // lets you coordinate manual cancellation if you move to fetch.
       )) as { success: boolean; data: any };
 
       let searchResults: any[] = [];
 
-      // If response is an array, use it directly
       if (Array.isArray(response.data)) {
         searchResults = response.data;
-      }
-      // If response is an object with arrays as values, flatten them
-      else if (response && typeof response.data === "object") {
+      } else if (response && typeof response.data === "object") {
         searchResults = Object.values(response.data).flat();
       }
 
       setResults(searchResults);
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.name === "AbortError") {
+        return;
+      }
       console.error("Error fetching search results:", error);
       setResults([]);
     } finally {
-      setIsLoading(false);
+      if (abortControllerRef.current === controller) {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
     }
   };
 
@@ -54,30 +75,34 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
     const value = e.target.value;
     setQuery(value);
 
-    // Clear existing timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Set loading state immediately if there's a query
     if (value.trim()) {
       setIsLoading(true);
     } else {
       setResults([]);
       setIsLoading(false);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
     }
 
-    // Set new timer for debounced search (500ms delay)
     debounceTimerRef.current = setTimeout(() => {
       handleSearch(value);
     }, 1000);
   };
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
     };
   }, []);
@@ -85,7 +110,6 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && query.trim()) {
       e.preventDefault();
-      // Clear debounce timer and navigate immediately
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
@@ -95,7 +119,6 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
   };
 
   const handleResultClick = (slug: string) => {
-    // Redirect to the specific slug
     router.push(`/${slug}`);
   };
 
@@ -154,7 +177,6 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
                   className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer text-gray-800 dark:text-slate-200 transition-colors duration-200"
                   onClick={() => handleResultClick(result.slug)}
                 >
-                  {/* Display image if available */}
                   {result.imageUrl && (
                     <img
                       src={result.imageUrl}
