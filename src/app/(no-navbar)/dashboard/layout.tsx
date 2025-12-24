@@ -41,6 +41,7 @@ const navigationItems = {
           path: "/dashboard/adminpermissions",
         },
         { icon: FaAirbnb, text: "Admin Logs", path: "/dashboard/logs" },
+        { icon: FaAirbnb, text: "Question Management", path: "/dashboard/addquestions" },
       ],
     },
     {
@@ -144,7 +145,7 @@ export default function DashboardLayout({
         // If not authenticated, clear everything and redirect
         if (!auth.isAuthenticated) {
           // Clear all auth data
-          Cookies.remove("token");
+          // Cookies.remove("token");
           sessionStorage.clear();
           router.replace("/operator");
           return;
@@ -155,7 +156,7 @@ export default function DashboardLayout({
       } catch (error) {
         console.error("Auth check failed:", error);
         // On error, clear all auth data and redirect
-        Cookies.remove("token");
+        // Cookies.remove("token");
         sessionStorage.clear();
         router.replace("/operator");
       }

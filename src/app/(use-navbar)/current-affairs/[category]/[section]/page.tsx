@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import { Metadata } from "next";
-import QuizWrapper from "@/components/quiz/QuizWrapper";
+import CurrentArticleQuiz from "@/components/quiz/CurrentArticleQuiz";
 import Whatsapp from "@/components/ui/whatsapp";
 import AssistiveTouch from "@/components/navigation/Assistivetouch";
 import { Tag } from "lucide-react";
@@ -307,6 +307,12 @@ const CurrentAffairArticlePage = async ({
             >
               Go back to {category.replace(/-/g, " ")} articles
             </Link>
+          </div>
+        )}
+        {quizQuestions.length > 0 && (
+          <div className="mt-8 bg-white rounded-lg shadow p-6">
+            <h2 className="text-2xl font-bold mb-4">Quiz</h2>
+            <CurrentArticleQuiz questions={quizQuestions} />
           </div>
         )}
       </div>

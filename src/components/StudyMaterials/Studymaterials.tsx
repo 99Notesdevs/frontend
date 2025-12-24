@@ -52,19 +52,13 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
     fetchPages();
   }, []);
 
-  const getFilteredMaterials = () => {
-    if (selectedCategory === "All") {
-      return pages.filter((page) => page.level === 3);
-    }
-    return pages.filter(
-      (page) => page.title.toLowerCase() === selectedCategory.toLowerCase()
-    );
-  };
-
   const renderCategoryItems = (category: string) => {
-    const items = pages.filter(
-      (page) => page.parentId === pages.find((p) => p.title === category)?.id
-    );
+    const items = category === "All" 
+      ? pages.filter((page) => page.level === 3)
+      : pages.filter(
+          (page) => page.parentId === pages.find((p) => p.title === category)?.id
+        );
+    
     return items.map((item) => (
       <div
         key={item.id}
@@ -143,62 +137,7 @@ const StudyMaterials = ({ title, description }: StudyMaterialsProps) => {
 
         {/* Study Materials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {selectedCategory === "All"
-            ? getFilteredMaterials().map((page) => (
-                <div
-                  key={page.id}
-                  className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 mb-4"
-                >
-                  <Image
-                    src={
-                      JSON.parse(page?.imageUrl)[0] 
-                      // "https://www.psdstack.com/wp-content/uploads/2019/08/copyright-free-images-750x420.jpg"
-                    }
-                    alt={JSON.parse(page?.imageUrl)[1]}
-                    width={500}
-                    height={192}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      // img.src =
-                        // "https://via.placeholder.com/500x192?text=Image+Not+Available";
-                    }}
-                  />
-                  <div className="p-6">
-                    <h3 className="text-xl text-black dark:text-white font-semibold mb-2">
-                      {page.title}
-                    </h3>
-                    {/* <p
-                      className="text-black dark:text-gray-300 mb-4"
-                      dangerouslySetInnerHTML={{
-                        __html: page.content
-                          ? page.content.substring(0, 100) + "..."
-                          : "No description available",
-                      }}
-                    /> */}
-                    <Link
-                      href={`${page.slug}`}
-                      className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium inline-flex items-center"
-                    >
-                      Learn More
-                      <svg
-                        className="w-4 h-4 ml-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              ))
-            : renderCategoryItems(selectedCategory)}
+          {renderCategoryItems(selectedCategory)}
         </div>
       </div>
     </section>

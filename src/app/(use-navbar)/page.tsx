@@ -140,7 +140,7 @@ export default function Home() {
         description={homeData.StudyMaterials.description} 
       />
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-        <Slider images={coreMemberImages} />
+        {/* <Slider images={coreMemberImages} /> */}
       </div>
       <CurrentAffairs title={homeData.CurrentAffairs.title} description={homeData.CurrentAffairs.description} />
       <CoachingInfo title={homeData.CoachingInfo.title} description={homeData.CoachingInfo.description} faqs={homeData.CoachingInfo.faqs} />

@@ -392,7 +392,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title *</FormLabel>
+                <FormLabel>Title(Slug) *</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter title" {...field} />
                 </FormControl>

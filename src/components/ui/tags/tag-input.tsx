@@ -1,19 +1,21 @@
 "use client";
 
-import React from "react";
-import { Input } from "@/components/ui/input";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { env } from "@/config/env";
+
+interface Tag {
+  id: number;
+  name: string;
+}
 
 interface TagInputProps {
-  value: string[] | Array<{ name: string }>;
+  value: string[] | Array<{ id: string; name: string; [key: string]: any }>;
   onChange: (value: string[]) => void;
   placeholder?: string;
   className?: string;
 }
-
-const isArray = (value: any[]): value is string[] => {
-  return Array.isArray(value) && value.every(item => typeof item === 'string');
-};
 
 export function TagInput({
   value,
@@ -21,48 +23,125 @@ export function TagInput({
   placeholder = "Add tags...",
   className,
 }: TagInputProps) {
-  const [inputValue, setInputValue] = React.useState("");
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && inputValue.trim()) {
-      e.preventDefault();
-      const currentValues = isArray(value) ? value : value.map(v => v.name);
-      onChange([...currentValues, inputValue.trim()]);
-      setInputValue("");
+  const selected = Array.isArray(value) ? value.map(tag => typeof tag === 'string' ? tag : tag.name) : [];
+
+  // Close on outside click
+  useEffect(() => {
+    const close = (e: MouseEvent) =>
+      ref.current && !ref.current.contains(e.target as Node) && setOpen(false);
+
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  // Fetch tags (only when needed)
+  const fetchTags = async (reset = false) => {
+    if (!hasMore && !reset) return;
+
+    const skip = reset ? 0 : page * 10;
+    const res = await fetch(`${env.API}/tag?skip=${skip}&take=10`);
+    const json = await res.json();
+    const incoming = json.data ?? [];
+
+    setTags(prev => (reset ? incoming : [...prev, ...incoming]));
+    setHasMore(incoming.length === 10);
+    setPage(p => (reset ? 1 : p + 1));
+  };
+
+  const addTag = (tag: string) => {
+    if (tag && !selected.includes(tag)) {
+      onChange([...selected, tag]);
     }
+    setInput("");
   };
 
-  const handleDelete = (index: number) => {
-    const currentValues = isArray(value) ? value : value.map(v => v.name);
-    onChange(currentValues.filter((_, i) => i !== index));
-  };
+  const removeTag = (i: number) =>
+    onChange(selected.filter((_, idx) => idx !== i));
+
+  const available = tags.filter(t => !selected.includes(t.name));
 
   return (
-    <div className={cn("relative flex flex-col gap-2", className)}>
-      <div className="flex flex-wrap gap-2 ">
-        {(isArray(value) ? value : value.map(v => v.name)).map((tag, index) => (
-          <div
-            key={index}
-            className="flex items-center gap-2 rounded-full bg-[var(--admin-border)] border rounded px-3 py-1.5 text-sm font-medium transition-all duration-200 hover:bg-primary/10"
+    <div ref={ref} className={cn("relative", className)}>
+      <div
+        className="flex flex-wrap gap-2 min-h-10 border rounded-md px-3 py-2 cursor-text"
+        onClick={() => {
+          if (!open) {
+            setOpen(true);
+            if (!tags.length) fetchTags(true);
+          }
+        }}
+      >
+        {selected.map((tag, i) => (
+          <span
+            key={i}
+            className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full text-sm"
           >
-            <span className="text-primary">{tag}</span>
+            {tag}
+            <button type="button" onClick={(e) => {
+              e.preventDefault();
+              removeTag(i);
+            }}>
+              <X className="h-3 w-3" />
+            </button>
+          </span>
+        ))}
+
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && addTag(input.trim())}
+          placeholder={!selected.length ? placeholder : "Add more..."}
+          className="flex-1 outline-none bg-transparent text-sm min-w-[80px]"
+        />
+
+        <ChevronDown
+          className={cn("h-4 w-4 transition", open && "rotate-180")}
+        />
+      </div>
+
+      {open && (
+        <div className="absolute z-50 mt-1 w-full border rounded-md bg-popover shadow">
+          {available.map(t => (
             <button
               type="button"
-              onClick={() => handleDelete(index)}
-              className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              key={t.id}
+              onClick={(e) => {
+                e.preventDefault();
+                addTag(t.name);
+              }}
+              className="block w-full text-left px-3 py-2 text-sm hover:bg-accent"
             >
-              ×
+              {t.name}
             </button>
-          </div>
-        ))}
-      </div>
-      <Input
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        className="w-full"
-      />
+          ))}
+
+          {hasMore && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                fetchTags();
+              }}
+              className="w-full px-3 py-2 text-sm text-muted-foreground hover:bg-accent"
+            >
+              Load more
+            </button>
+          )}
+
+          {!available.length && (
+            <div className="px-3 py-2 text-sm text-muted-foreground">
+              No tags available
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

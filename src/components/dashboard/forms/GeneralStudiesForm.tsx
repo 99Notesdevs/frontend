@@ -453,7 +453,7 @@ const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Title <span className="text-red-500">*</span>
+                  Title(Slug) <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
