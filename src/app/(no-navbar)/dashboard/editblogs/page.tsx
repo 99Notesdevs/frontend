@@ -35,7 +35,8 @@ export default function ArticlesPage() {
     selectedPage?.imageUrl || null
   );
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
-  const itemsPerPage = 2;
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const itemsPerPage = 10;
   const token = Cookie.get("token");
 
   const fetchPages = async (searchTerm = "") => {
@@ -260,20 +261,30 @@ export default function ArticlesPage() {
     }
 
     try {
-      const response = (await api.delete(`/blog/${id}`)) as {
-        data: { success: boolean };
-      };
+      const response = (await api.delete(`/blog/${id}`)) as any;
 
-      if (!response.data.success) {
+      console.log("Delete response:", response);
+
+      // Check different possible response structures
+      const isSuccess = response?.success || response?.data?.success;
+      
+      if (!isSuccess) {
         throw new Error("Failed to delete blog");
       }
 
-      // Refresh the page after successful update
-      window.location.href = window.location.pathname;
-
+      // Show success message and refresh the blogs list
+      setShowDeleteSuccess(true);
       setSelectedPage(null);
       setDeleteConfirm(null);
       setError(null);
+      
+      // Refresh the blogs list
+      await fetchPages(searchQuery);
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setShowDeleteSuccess(false);
+      }, 3000);
     } catch (err) {
       console.error("Error deleting blog:", err);
       setError(
@@ -341,8 +352,14 @@ export default function ArticlesPage() {
           </div>
 
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               <p className="text-[var(--admin-primary)]">{error}</p>
+            </div>
+          )}
+          
+          {showDeleteSuccess && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+              Blog deleted successfully!
             </div>
           )}
 
@@ -352,7 +369,20 @@ export default function ArticlesPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredPages.map((page) => (
+              {filteredPages.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="mx-auto w-16 h-16 mb-4 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">No blogs found</h3>
+                  <p className="text-gray-500">
+                    {searchQuery ? 'Try a different search term' : 'Create a new blog to get started'}
+                  </p>
+                </div>
+              ) : (
+                filteredPages.map((page) => (
                 <div
                   key={page.id}
                   className="bg-[var(--admin-bg-lightest)] p-4 rounded-lg hover:bg-[var(--admin-bg-light)] transition-colors cursor-pointer"
@@ -389,7 +419,7 @@ export default function ArticlesPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )))}
             </div>
           )}
 

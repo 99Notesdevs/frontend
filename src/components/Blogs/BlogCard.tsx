@@ -18,6 +18,13 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
+  // Track if the image failed to load
+  const [imageError, setImageError] = React.useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   // Format date if available
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
@@ -47,26 +54,25 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
     <article className="group block bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col">
       <Link href={`/blog/${blog.slug}`} className="block h-full">
         <div className="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-slate-700">
-          {blog.imageUrl ? (
+          {blog.imageUrl && !imageError ? (
             <Image
               src={blog.imageUrl}
               alt={blog.alt || blog.title || "Blog post image"}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = "/images/placeholder-blog.png";
-              }}
+              onError={handleImageError}
               priority={false}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-slate-700">
-              <span className="text-gray-400 dark:text-gray-500 text-sm">
-                No image available
-              </span>
-            </div>
+            <Image
+              src="/images/placeholder-blog.png"
+              alt={blog.alt || blog.title || "Blog post placeholder image"}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={false}
+            />
           )}
         </div>
 
