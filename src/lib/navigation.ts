@@ -13,32 +13,60 @@ interface CurrentAffairSection {
   link: string | null;
 }
 
+interface Page {
+  slug: string;
+  title: string;
+  link: string | null;
+  showInNav: boolean;
+}
+
+let pagesPromise: Promise<Page[]> | null = null;
+
+async function fetchOrderedPages(): Promise<Page[]> {
+  if (!pagesPromise) {
+    pagesPromise = (async () => {
+      const response = (await api.get(`/page/order`)) as {
+        success: boolean;
+        data: any[];
+      };
+
+      if (!response.success) {
+        throw new Error(`Failed to fetch navigation data`);
+      }
+
+      return response.data as Page[];
+    })();
+  }
+
+  return pagesPromise;
+}
+
+let currentAffairsPromise: Promise<CurrentAffairSection[]> | null = null;
+
+async function fetchCurrentAffairs(): Promise<CurrentAffairSection[]> {
+  if (!currentAffairsPromise) {
+    currentAffairsPromise = (async () => {
+      const response = (await api.get(`/currentAffair`)) as {
+        success: boolean;
+        data: any[];
+      };
+
+      if (!response.success) {
+        throw new Error("Failed to fetch current affairs data");
+      }
+
+      return response.data as CurrentAffairSection[];
+    })();
+  }
+
+  return currentAffairsPromise;
+}
+
 export async function getNavigationTree(): Promise<NavItem[]> {
   try {
-    const response = (await api.get(`/page/order`)) as {
-      success: boolean;
-      data: any[];
-    };
-
-    if (!response.success) {
-      throw new Error(`Failed to fetch navigation data`);
-    }
-
-    const pages = response.data;
+    const pages = await fetchOrderedPages();
 
     const tree: NavItem[] = [];
-
-    // Build the navigation tree
-    interface Page {
-      slug: string;
-      title: string;
-      link: string | null;
-      showInNav: boolean;
-    }
-
-    interface PageResponse {
-      data: Page[];
-    }
 
     pages?.forEach((page: Page) => {
       const parts: string[] = page.slug.split("/");
@@ -73,17 +101,8 @@ export async function getNavigationTree(): Promise<NavItem[]> {
       });
     });
 
-    // Fetch current affairs from the database
     const currentAffairsNavItem = await buildCurrentAffairsNavigation();
 
-    // Merge static navigation items with the dynamic ones
-    // First, filter out any potential conflicts (items with the same slug)
-    const dynamicTopLevelSlugs = tree.map((item) => item.slug);
-    // const filteredStaticItems = staticNavigationItems.filter(
-    //   item => !dynamicTopLevelSlugs.includes(item.slug) && item.slug !== 'current-affairs' // Exclude static current-affairs
-    // );
-
-    // Combine the trees with our dynamic current affairs
     return [...tree, currentAffairsNavItem];
   } catch (error) {
     console.error("Error fetching navigation data:", error);
@@ -91,9 +110,7 @@ export async function getNavigationTree(): Promise<NavItem[]> {
   }
 }
 
-// Function to build the current affairs navigation structure from the database
 async function buildCurrentAffairsNavigation(): Promise<NavItem> {
-  // Create the base current affairs navigation item
   const currentAffairsNav: NavItem = {
     slug: "current-affairs",
     title: "Current Affairs",
@@ -125,105 +142,65 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
   };
 
   try {
-    // Fetch daily sections
-    const dailyResponse = (await api.get(`/currentAffair/type/daily`)) as {
-      success: boolean;
-      data: any[];
-    };
+    const sections = await fetchCurrentAffairs();
 
-    // Fetch monthly sections
-    const monthlyResponse = (await api.get(`/currentAffair/type/monthly`)) as {
-      success: boolean;
-      data: any[];
-    };
+    const dailySections = sections.filter((s) => s.type === "daily");
+    const monthlySections = sections.filter((s) => s.type === "monthly");
+    const yearlySections = sections.filter((s) => s.type === "yearly");
 
-    // Fetch yearly sections
-    const yearlyResponse = (await api.get(`/currentAffair/type/yearly`)) as {
-      success: boolean;
-      data: any[];
-    };
+    const dailyNavItems = currentAffairsNav.children.find(
+      (item) => item.slug === "current-affairs/daily"
+    );
+    const monthlyNavItems = currentAffairsNav.children.find(
+      (item) => item.slug === "current-affairs/monthly"
+    );
+    const yearlyNavItems = currentAffairsNav.children.find(
+      (item) => item.slug === "current-affairs/yearly"
+    );
 
-    // Process daily sections
-    if (dailyResponse.success) {
-      const dailyData = dailyResponse.data;
-      if (dailyResponse.success && dailyData) {
-        const dailySections = dailyData;
-        const dailyNavItems = currentAffairsNav.children.find(
-          (item) => item.slug === "current-affairs/daily"
-        );
-
-        if (dailyNavItems) {
-          dailyNavItems.children = dailySections
-            .filter((section: CurrentAffairSection) => section.showInNav)
-            .map((section: CurrentAffairSection) => {
-              // Extract the last part of the slug for the path
-              const pathSlug = section.slug.split("/").pop() || section.slug;
-              const isCustomLink = section.link && section.link !== "";
-
-              return {
-                slug: `current-affairs/${pathSlug}`,
-                title: section.title,
-                link: section.link,
-                children: [],
-                showInNav: true,
-              };
-            });
-        }
-      }
+    if (dailyNavItems) {
+      dailyNavItems.children = dailySections
+        .filter((section: CurrentAffairSection) => section.showInNav)
+        .map((section: CurrentAffairSection) => {
+          const pathSlug = section.slug.split("/").pop() || section.slug;
+          return {
+            slug: `current-affairs/${pathSlug}`,
+            title: section.title,
+            link: section.link,
+            children: [],
+            showInNav: true,
+          };
+        });
     }
 
-    // Process monthly sections
-    if (monthlyResponse.success) {
-      const monthlyData = monthlyResponse.data;
-      if (monthlyData) {
-        const monthlySections = monthlyData;
-        const monthlyNavItems = currentAffairsNav.children.find(
-          (item) => item.slug === "current-affairs/monthly"
-        );
-
-        if (monthlyNavItems) {
-          monthlyNavItems.children = monthlySections
-            .filter((section: CurrentAffairSection) => section.showInNav)
-            .map((section: CurrentAffairSection) => {
-              // Extract the last part of the slug for the path
-              const pathSlug = section.slug.split("/").pop() || section.slug;
-              return {
-                slug: `current-affairs/${pathSlug}`,
-                title: section.title,
-                link: section.link,
-                children: [],
-                showInNav: true,
-              };
-            });
-        }
-      }
+    if (monthlyNavItems) {
+      monthlyNavItems.children = monthlySections
+        .filter((section: CurrentAffairSection) => section.showInNav)
+        .map((section: CurrentAffairSection) => {
+          const pathSlug = section.slug.split("/").pop() || section.slug;
+          return {
+            slug: `current-affairs/${pathSlug}`,
+            title: section.title,
+            link: section.link,
+            children: [],
+            showInNav: true,
+          };
+        });
     }
 
-    // Process yearly sections
-    if (yearlyResponse.success) {
-      const yearlyData = yearlyResponse.data;
-      if (yearlyData) {
-        const yearlySections = yearlyData;
-        const yearlyNavItems = currentAffairsNav.children.find(
-          (item) => item.slug === "current-affairs/yearly"
-        );
-
-        if (yearlyNavItems) {
-          yearlyNavItems.children = yearlySections
-            .filter((section: CurrentAffairSection) => section.showInNav)
-            .map((section: CurrentAffairSection) => {
-              // Extract the last part of the slug for the path
-              const pathSlug = section.slug.split("/").pop() || section.slug;
-              return {
-                slug: `current-affairs/${pathSlug}`,
-                title: section.title,
-                link: section.link,
-                children: [],
-                showInNav: true,
-              };
-            });
-        }
-      }
+    if (yearlyNavItems) {
+      yearlyNavItems.children = yearlySections
+        .filter((section: CurrentAffairSection) => section.showInNav)
+        .map((section: CurrentAffairSection) => {
+          const pathSlug = section.slug.split("/").pop() || section.slug;
+          return {
+            slug: `current-affairs/${pathSlug}`,
+            title: section.title,
+            link: section.link,
+            children: [],
+            showInNav: true,
+          };
+        });
     }
   } catch (error) {
     console.error("Error fetching current affairs sections:", error);
@@ -234,29 +211,13 @@ async function buildCurrentAffairsNavigation(): Promise<NavItem> {
 
 export async function getFooterLinks(): Promise<NavItem[]> {
   try {
-    const response = (await api.get(`/page/order`)) as {
-      success: boolean;
-      data: any[];
-    };
-
-    if (!response.success) {
-      throw new Error(`Failed to fetch footer links data`);
-    }
-
-    const pages = response.data;
+    const pages = await fetchOrderedPages();
 
     const tree: NavItem[] = [];
 
-    // Build the footer links tree (up to 2 levels)
-    interface Page {
-      slug: string;
-      title: string;
-      link: string | null;
-    }
-
     pages?.forEach((page: Page) => {
       const parts: string[] = page.slug.split("/");
-      if (parts.length > 2) return; // Skip deeper levels
+      if (parts.length > 2) return;
 
       let currentLevel: NavItem[] = tree;
 

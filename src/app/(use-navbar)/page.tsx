@@ -8,7 +8,6 @@ import CurrentAffairs from "@/components/CurrentAffairs/CurrentAffairs";
 import CoachingInfo from "@/components/CoachingInfo/CoachingInfo";
 import FAQ from "@/components/common/FAQ/FAQ";
 import Reason99notes from "@/components/CoachingInfo/Reason99notes";
-import Slider from "@/components/About/Slider";
 import { api } from '@/config/api/route';
 const ContactMap = dynamic(
   () => import('@/components/common/Contact/ContactMap'),

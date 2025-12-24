@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Search as SearchIcon } from "lucide-react";
 import { api } from '@/config/api/route';
-import { env } from '@/config/env';
 
 interface SearchResultItem {
   id: string;
