@@ -11,7 +11,7 @@ interface Tag {
 }
 
 interface TagInputProps {
-  value: string[];
+  value: string[] | Array<{ id: string; name: string; [key: string]: any }>;
   onChange: (value: string[]) => void;
   placeholder?: string;
   className?: string;
@@ -30,7 +30,7 @@ export function TagInput({
   const [hasMore, setHasMore] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
 
-  const selected = value;
+  const selected = Array.isArray(value) ? value.map(tag => typeof tag === 'string' ? tag : tag.name) : [];
 
   // Close on outside click
   useEffect(() => {

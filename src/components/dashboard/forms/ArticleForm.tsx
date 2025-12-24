@@ -509,7 +509,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Title <span className="text-red-500">*</span>
+                  Title(Slug) <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input {...field} className="border-[var(--admin-border)]" />
