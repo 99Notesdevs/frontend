@@ -28,7 +28,7 @@ export default async function RootLayout({
   const footerSections = await getFooterLinks();
 
   return (
-    <html suppressHydrationWarning>
+    <>
       <head>
         <script
           src="https://accounts.google.com/gsi/client"
@@ -37,7 +37,7 @@ export default async function RootLayout({
         ></script>
         {/* <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> */}
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <GlobalScriptsLoader />
           <Suspense
@@ -60,6 +60,6 @@ export default async function RootLayout({
           </Suspense>
         </ThemeProvider>
       </body>
-    </html>
+    </>
   );
 }

@@ -28,27 +28,27 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(endpoint: string, headers?: HeadersInit) =>
-    request<T>(endpoint, { method: "GET", headers }),
+  get: <T>(endpoint: string, options: RequestInit = {}) =>
+    request<T>(endpoint, { method: "GET", ...options }),
 
-  post: <T>(endpoint: string, body?: unknown, headers?: HeadersInit) =>
+  post: <T>(endpoint: string, body?: unknown, options: RequestInit = {}) =>
     request<T>(endpoint, {
       method: "POST",
       body: JSON.stringify(body),
-      headers,
+      ...options,
     }),
 
-  put: <T>(endpoint: string, body?: unknown, headers?: HeadersInit) =>
+  put: <T>(endpoint: string, body?: unknown, options: RequestInit = {}) =>
     request<T>(endpoint, {
       method: "PUT",
       body: JSON.stringify(body),
-      headers,
+      ...options,
     }),
 
-  delete: <T>(endpoint: string, body?: unknown, headers?: HeadersInit) =>
+  delete: <T>(endpoint: string, body?: unknown, options: RequestInit = {}) =>
     request<T>(endpoint, {
       method: "DELETE",
-      headers,
       body: body ? JSON.stringify(body) : "",
+      ...options,
     }),
 };

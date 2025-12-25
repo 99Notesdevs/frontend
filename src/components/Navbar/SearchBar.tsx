@@ -41,32 +41,25 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
     abortControllerRef.current = controller;
 
     try {
-      const response = (await api.get<any | { [key: string]: any[] }>(
-        `/search/global?query=${encodeURIComponent(searchQuery)}`
-        // If your api wrapper supports a config object, you can pass
-        // { signal: controller.signal } here. If not, the controller still
-        // lets you coordinate manual cancellation if you move to fetch.
-      )) as { success: boolean; data: any };
+      const res = (await api.get<{ success: boolean; data: any[] }>(
+        `/search/global?query=${encodeURIComponent(searchQuery)}`,
+        { signal: controller.signal }
+      )) as { success: boolean; data: any[] };
 
-      let searchResults: any[] = [];
-
-      if (Array.isArray(response.data)) {
-        searchResults = response.data;
-      } else if (response && typeof response.data === "object") {
-        searchResults = Object.values(response.data).flat();
+      if (!res.success) {
+        throw new Error("Search failed");
       }
 
-      setResults(searchResults);
-    } catch (error: any) {
-      if (error?.name === "AbortError") {
-        return;
-      }
-      console.error("Error fetching search results:", error);
+      setResults(res.data || []);
+    } catch (err: any) {
+      // Ignore abort errors
+      if (err?.name === "AbortError") return;
+      console.error("Search error:", err);
       setResults([]);
     } finally {
+      // Only clear loading if this is still the active controller
       if (abortControllerRef.current === controller) {
         setIsLoading(false);
-        abortControllerRef.current = null;
       }
     }
   };
@@ -94,6 +87,22 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
       handleSearch(value);
     }, 1000);
   };
+
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      handleSearch(query);
+    }, 1000); // 400ms debounce
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [query]);
 
   useEffect(() => {
     return () => {
