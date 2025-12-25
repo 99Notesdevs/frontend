@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { api } from "@/config/api/route";
 import Cookie from "js-cookie";
+import SearchBarBlogs from "@/components/Navbar/SearchBarBlogs";
 
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { BlogForm } from "@/components/dashboard/forms";
@@ -30,6 +31,7 @@ export default function ArticlesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [filteredPages, setFilteredPages] = useState<BlogType[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(
     selectedPage?.imageUrl || null
@@ -45,11 +47,7 @@ export default function ArticlesPage() {
       setLoading(true);
 
       const skip = (currentPage - 1) * itemsPerPage;
-      const url = searchTerm
-        ? `/blog/search?skip=${skip}&take=${itemsPerPage}&query=${encodeURIComponent(
-            searchTerm
-          )}`
-        : `/blog?skip=${skip}&take=${itemsPerPage}`;
+      const url =`/blog?skip=${skip}&take=${itemsPerPage}`;
 
       const response = (await api.get(url)) as {
         success: boolean; data: BlogType[];
@@ -87,7 +85,6 @@ export default function ArticlesPage() {
 
   useEffect(() => {
     if (selectedPage) {
-      // Load the form data when a page is selected
       setImagePreview(selectedPage.imageUrl || null);
     }
   }, [selectedPage]);
@@ -97,14 +94,35 @@ export default function ArticlesPage() {
       setCurrentPage(page);
     }
   };
-
-  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    setCurrentPage(1); // Reset to first page when searching
-    fetchPages(query);
-  };
-
+const handleSearchResultClick = async (blog: any) => {
+  try {
+    setLoading(true);
+    const response = await api.get(`/blog/slug/${blog.slug}`) as {
+        success: boolean; data: BlogType;
+      };
+    
+    if (response.success) {
+      setSelectedPage(response.data);
+      setError(null);
+      setSearchQuery("");
+      
+      // Scroll to the form container after a small delay to ensure the form is mounted
+      setTimeout(() => {
+        const formContainer = document.querySelector(
+          ".bg-white.p-6.rounded-xl.shadow-md"
+        );
+        if (formContainer) {
+          formContainer.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  } catch (error) {
+    console.error("Error fetching blog by slug:", error);
+    setError("Failed to load the selected blog. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
   const handleEdit = async (page: BlogType) => {
     setSelectedPage(page);
     setError(null);
@@ -329,13 +347,12 @@ export default function ArticlesPage() {
         <div className="bg-white p-6 rounded-xl shadow-md">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center space-x-4">
-              <input
-                type="text"
-                placeholder="Search blogs..."
-                value={searchQuery}
-                onChange={handleSearch}
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--admin-bg-primary)]"
-              />
+              <div className="w-full max-w-md">
+                <SearchBarBlogs
+                  onResultClick={handleSearchResultClick}
+                  compact={false}
+                />
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <button

@@ -1,14 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import {
-  ArticleForm,
-  GeneralStudiesForm,
-  UpscNotesForm,
-  CurrentAffairForm,
-  BlogForm,
-  CustomLinkForm,
-} from "../forms";
+import React, { useState, useEffect,lazy , Suspense } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -21,7 +14,12 @@ import Cookie from "js-cookie";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 import Drafts from "@/components/ui/drafts";
 import { api } from "@/config/api/route";
-
+const ArticleForm = lazy(() => import("../forms/ArticleForm").then(module => ({ default: module.ArticleForm })));
+const GeneralStudiesForm = lazy(() => import("../forms/GeneralStudiesForm").then(module => ({ default: module.GeneralStudiesForm })));
+const UpscNotesForm = lazy(() => import("../forms/UPSCNotesForm").then(module => ({ default: module.UpscNotesForm })));
+const CurrentAffairForm = lazy(() => import("../forms/CurrentAffairForm").then(module => ({ default: module.CurrentAffairForm })));
+const BlogForm = lazy(() => import("../forms/BlogForm").then(module => ({ default: module.BlogForm })));
+const CustomLinkForm = lazy(() => import("../forms/CustomLinkForm").then(module => ({ default: module.CustomLinkForm })));
 interface TemplateType {
   id: string;
   name: string;
@@ -454,7 +452,11 @@ export function PageForm({ editPage = null }: PageFormProps) {
       return null;
     }
 
-    return <FormComponent {...formProps} />;
+    return (
+      <Suspense fallback={<h2>Loading...</h2>}>
+        <FormComponent {...formProps} />
+      </Suspense>
+    );
   };
 
   const renderStepContent = () => {
