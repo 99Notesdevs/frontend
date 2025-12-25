@@ -200,7 +200,6 @@ const CurrentAffairsSectionPage = async ({
       dangerouslySetInnerHTML={{ __html: jsonLD }} />
     </section>
     <main>
-    <CurrentAffairsLayout>
       {/* Hero Section */}
       <div className="px-4 py-6">
         <div className="container mx-auto">
@@ -266,9 +265,9 @@ const CurrentAffairsSectionPage = async ({
 
       {/* Articles Section */}
       <div className="container mx-auto px-4 sm:px-6 py-8">
-        {currentAffair?.type === 'daily' && (
+        {/* {currentAffair?.type === 'daily' && (
           <SearchBar />
-        )}
+        )} */}
         <div className="grid grid-cols-1 gap-6 mt-5 mb-4">
           {sortedArticles.length > 0 ? (
             sortedArticles.map((article) => (
@@ -359,7 +358,6 @@ const CurrentAffairsSectionPage = async ({
                     <p>No content available for this article.</p>
                 )}
       </div>
-    </CurrentAffairsLayout>
     </main>
     </>
   );

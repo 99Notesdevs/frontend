@@ -1,14 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy } from "react";
 import { usePathname } from "next/navigation";
 
-// Dynamic imports
-import { PageForm as DefaultPageForm } from "./dynamic/PageForm";
-
-// Static imports
-import { PageForm as CurrentAffairPageForm } from "./static/current-affair/PageForm";
-import BlogsPageForm from "./static/blogs/PageForm";
+const CurrentAffairPageForm = lazy(() => import("./static/current-affair/PageForm").then(module => ({ default: module.PageForm })));
+const BlogsPageForm = lazy(() => import("./static/blogs/PageForm"));
+const DefaultPageForm = lazy(() => import("./dynamic/PageForm").then(module => ({ default : module.PageForm})));
 
 // Define a more generic type for the PageForm component
 type AnyPageForm = React.ComponentType<any>;
