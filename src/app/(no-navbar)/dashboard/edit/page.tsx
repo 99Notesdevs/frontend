@@ -437,7 +437,7 @@ function PageList() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <div className="container mx-auto px-8 py-6 max-w-full">
       <div className="mb-6 mt-7 ml-2">
         <h1 className="text-3xl font-bold text-[var(--admin-bg-dark)] mb-1">
           Page Management

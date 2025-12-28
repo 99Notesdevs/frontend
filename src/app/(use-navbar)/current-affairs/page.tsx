@@ -47,10 +47,8 @@ const CurrentAffairsIndex = async () => {
             content="Current Affairs for UPSC Civil Services Examination"
             />
         </Head>
-      <div className="min-h-screen bg-[var(--bg-elevated)] dark:bg-slate-900">
-        
-
-        <div className="container mx-auto px-4 pt-2 pb-12 max-w-7xl">
+      <div className="min-h-screen">
+        <div className="container mx-auto px-4 pt-2 pb-12 max-w-9xl">
           {/* Daily Current Affairs */}
           <div className="mb-16 mt-12">
             <div className="flex flex-col items-center mb-8 pt-2 sm:mb-10">
