@@ -24,7 +24,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "99notes-media-files.s3.ap-south-1.amazonaws.com",
+        hostname: "notesstorage99.blob.core.windows.net",
         pathname: "/**", // Allow all paths under this hostname
       },
     ],
