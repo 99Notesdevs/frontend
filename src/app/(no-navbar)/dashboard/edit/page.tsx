@@ -685,6 +685,10 @@ function PageList() {
                     selectedPage,
                     selectedPage.templateId
                   )}
+                  onSuccess={() => {
+                    setShowForm(false);
+                    setSelectedPage(null);
+                  }}
                 />
               )}
               {selectedPage.templateId === "upsc-notes" && (
