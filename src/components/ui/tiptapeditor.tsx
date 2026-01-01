@@ -1285,7 +1285,6 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         orderedList: false,
       }),
       CustomOrderedList,
-      Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       CustomLink.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -1334,6 +1333,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       CleanPaste,
     ],
     content: content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const handleUpdate = debounce(() => {
         if (editor) {

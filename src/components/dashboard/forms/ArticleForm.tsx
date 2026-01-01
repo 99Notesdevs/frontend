@@ -52,6 +52,9 @@ const TiptapEditor = dynamic(
   }
 );
 
+// Configure Tiptap to avoid SSR hydration issues
+TiptapEditor.displayName = "TiptapEditor";
+
 const articleSchema = z.object({
   title: z.string(),
   content: z.string(),
