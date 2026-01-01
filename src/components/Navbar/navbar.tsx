@@ -467,7 +467,8 @@ export default function Navbar({ navigation }: NavbarProps) {
               )}
 
               {/* Mobile menu button */}
-              <div className="lg:hidden flex items-center">
+              <div className="lg:hidden flex items-center space-x-4">
+                <ToggleMode />
                 <button
                   type="button"
                   className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"

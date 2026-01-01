@@ -18,7 +18,7 @@ import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/tags/tag-input";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useLayoutEffect } from "react";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 import { Alert } from "@/components/ui/alert";
@@ -104,6 +104,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     defaultValues?.ogImage ? getImageUrl(defaultValues.ogImage) : null
   );
   const [isUploading, setIsUploading] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [alert, setAlert] = useState<{
     message: string;
     type: "error" | "success" | "warning";
@@ -276,11 +277,50 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     setShowDraftDialog(false);
   }, [form, setCurrentDraftId]);
 
+  // Handle beforeunload event
+  useLayoutEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isUploading) {
+        // Standard way to show the confirmation dialog
+        e.preventDefault();
+        // Chrome requires returnValue to be set
+        e.returnValue = 'You have an upload in progress. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isUploading]);
+
+  // Handle route changes (for Next.js)
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (isUploading && !window.confirm('You have an upload in progress. Are you sure you want to leave?')) {
+        throw 'Route change aborted. Please wait for the upload to complete.';
+      }
+    };
+
+    // For Next.js router
+    if (typeof window !== 'undefined' && (window as any).next) {
+      const router = (window as any).next.router;
+      if (router) {
+        router.events?.on('routeChangeStart', handleRouteChange);
+        return () => {
+          router.events?.off('routeChangeStart', handleRouteChange);
+        };
+      }
+    }
+  }, [isUploading]);
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
+      setHasUnsavedChanges(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -308,6 +348,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           console.error("Error uploading image:", error);
         } finally {
           setIsUploading(false);
+          setHasUnsavedChanges(false);
         }
       };
       reader.readAsDataURL(file);
@@ -319,6 +360,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
+      setHasUnsavedChanges(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -351,6 +393,7 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
           console.error("Error uploading image:", error);
         } finally {
           setIsUploading(false);
+          setHasUnsavedChanges(false);
         }
       };
       reader.readAsDataURL(file);
