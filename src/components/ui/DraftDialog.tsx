@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
 interface Draft {
@@ -36,14 +36,12 @@ const DraftDialog: React.FC<DraftDialogProps> = ({ open, onClose, onLoadDraft, o
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Load Draft</DialogTitle>
+          <DialogDescription>
+            You have {drafts.length} saved draft{drafts.length !== 1 ? "s" : ""}. Would you like to continue with one of them or start fresh?
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            You have {drafts.length} saved draft{drafts.length !== 1 ? "s" : ""}. Would you like to continue with one of
-            them or start fresh?
-          </p>
-
           {drafts.length > 0 && (
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {drafts.map((draft) => (
