@@ -1944,7 +1944,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         <div className="w-full overflow-x-auto">
           <EditorContent
             editor={editor}
-            className="prose prose-slate max-w-full p-4 w-full"
+            className="prose prose-slate max-w-full p-4 w-full max-h-[500px] overflow-y-auto"
             style={
               {
                 "--tw-prose-pre-bg": "transparent",

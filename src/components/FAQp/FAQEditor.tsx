@@ -9,7 +9,21 @@ import {
 } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
-import TiptapEditor from "../ui/tiptapeditor";
+// import TiptapEditor from "../ui/tiptapeditor";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+const TiptapEditor = dynamic(
+  () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    ),
+  }
+);
 
 interface SubQuestion {
   id: string;
@@ -169,18 +183,20 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                     <span className="font-medium text-gray-700">
                       {index + 1}.
                     </span>
-                    <TiptapEditor
-                      content={item.question}
-                      onChange={(value) => {
-                        setFaqs((prev) =>
-                          prev.map((faq) =>
-                            faq.id === item.id
-                              ? { ...faq, question: value }
-                              : faq
-                          )
-                        );
-                      }}
-                    />{" "}
+                    <div className="h-[200px] overflow-hidden">
+                      <TiptapEditor
+                        content={item.question}
+                        onChange={(value) => {
+                          setFaqs((prev) =>
+                            prev.map((faq) =>
+                              faq.id === item.id
+                                ? { ...faq, question: value }
+                                : faq
+                            )
+                          );
+                        }}
+                      />
+                    </div>{" "}
                     <Button
                       type="button"
                       variant="ghost"
@@ -192,16 +208,18 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                     </Button>
                   </div>
 
-                  <TiptapEditor
-                    content={item.answer}
-                    onChange={(value) => {
-                      setFaqs((prev) =>
-                        prev.map((faq) =>
-                          faq.id === item.id ? { ...faq, answer: value } : faq
-                        )
-                      );
-                    }}
-                  />
+                  <div className="h-[200px] overflow-hidden">
+                    <TiptapEditor
+                      content={item.answer}
+                      onChange={(value) => {
+                        setFaqs((prev) =>
+                          prev.map((faq) =>
+                            faq.id === item.id ? { ...faq, answer: value } : faq
+                          )
+                        );
+                      }}
+                    />
+                  </div>
                   <div className="flex justify-between items-center">
                     <Button
                       type="button"
@@ -227,26 +245,28 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                             <span className="text-sm text-gray-600">
                               {subIndex + 1}.
                             </span>
-                            <TiptapEditor
-                              content={subItem.question}
-                              onChange={(value) => {
-                                setFaqs((prev) =>
-                                  prev.map((faq) =>
-                                    faq.id === item.id
-                                      ? {
-                                          ...faq,
-                                          subQuestions: faq.subQuestions.map(
-                                            (sub) =>
-                                              sub.id === subItem.id
-                                                ? { ...sub, question: value }
-                                                : sub
-                                          ),
-                                        }
-                                      : faq
-                                  )
-                                );
-                              }}
-                            />{" "}
+                            <div className="h-[60px] overflow-hidden">
+                              <TiptapEditor
+                                content={subItem.question}
+                                onChange={(value) => {
+                                  setFaqs((prev) =>
+                                    prev.map((faq) =>
+                                      faq.id === item.id
+                                        ? {
+                                            ...faq,
+                                            subQuestions: faq.subQuestions.map(
+                                              (sub) =>
+                                                sub.id === subItem.id
+                                                  ? { ...sub, question: value }
+                                                  : sub
+                                            ),
+                                          }
+                                        : faq
+                                    )
+                                  );
+                                }}
+                              />
+                            </div>{" "}
                             <Button
                               type="button"
                               variant="ghost"
@@ -259,26 +279,28 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                               <Trash2 size={14} />
                             </Button>
                           </div>
-                          <TiptapEditor
-                            content={subItem.answer}
-                            onChange={(value) => {
-                              setFaqs((prev) =>
-                                prev.map((faq) =>
-                                  faq.id === item.id
-                                    ? {
-                                        ...faq,
-                                        subQuestions: faq.subQuestions.map(
-                                          (sub) =>
-                                            sub.id === subItem.id
-                                              ? { ...sub, answer: value }
-                                              : sub
-                                        ),
-                                      }
-                                    : faq
-                                )
-                              );
-                            }}
-                          />
+                          <div className="h-[60px] overflow-hidden">
+                            <TiptapEditor
+                              content={subItem.answer}
+                              onChange={(value) => {
+                                setFaqs((prev) =>
+                                  prev.map((faq) =>
+                                    faq.id === item.id
+                                      ? {
+                                          ...faq,
+                                          subQuestions: faq.subQuestions.map(
+                                            (sub) =>
+                                              sub.id === subItem.id
+                                                ? { ...sub, answer: value }
+                                                : sub
+                                          ),
+                                        }
+                                      : faq
+                                  )
+                                );
+                              }}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>
