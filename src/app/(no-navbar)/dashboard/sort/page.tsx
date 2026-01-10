@@ -37,6 +37,7 @@ interface Page {
   order: number;
   createdAt: string;
   updatedAt: string;
+  isExpanded?: boolean;
 }
 
 // Fetch pages from the API with parent-child relationships
@@ -85,7 +86,7 @@ const buildHierarchy = (pages: Page[]): Page[] => {
 };
 
 // Sortable Item Component
-const SortableItem = ({ page }: { page: Page }) => {
+const SortableItem = ({ page, onToggleExpand }: { page: Page, onToggleExpand: (id: number) => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: page.id });
   
@@ -100,47 +101,83 @@ const SortableItem = ({ page }: { page: Page }) => {
   
   // Default to first color if level is out of range
   const levelColor = levelColors[Math.min(page.level - 1, levelColors.length - 1)] || levelColors[0];
+  const hasChildren = page.children && page.children.length > 0;
   
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    marginLeft: `${(page.level - 1) * 2}rem`, // Indent each level by 2rem
+    marginLeft: `${(page.level - 1) * 1.5}rem`, // Slightly reduce indentation
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`article-item ${levelColor} shadow-sm rounded-lg p-4 mb-2 border cursor-move transition-colors hover:shadow-md`}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className={`w-3 h-3 rounded-full ${
-            levelColor.includes('blue') ? 'bg-blue-500' :
-            levelColor.includes('green') ? 'bg-green-500' :
-            levelColor.includes('yellow') ? 'bg-yellow-500' :
-            levelColor.includes('purple') ? 'bg-purple-500' : 'bg-pink-500'
-          }`} />
-          <h3 className="text-lg font-semibold text-gray-800">
-            {page.title}
-          </h3>
-        </div>
-        <div className="flex items-center space-x-3">
-          <span className="px-2 py-1 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
-            Level {page.level}
-          </span>
-          <span className="px-2 py-1 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
-            Order: {page.order}
-          </span>
-          {page.parentId && (
-            <span className="px-2 py-1 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
-              Parent: {page.parentId}
+    <div className="mb-1">
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        className={`article-item ${levelColor} shadow-sm rounded-lg p-3 border cursor-move transition-colors hover:shadow-md`}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2 flex-1">
+            {hasChildren && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleExpand(page.id);
+                }}
+                className="p-1 rounded hover:bg-gray-100"
+                aria-label={page.isExpanded ? 'Collapse' : 'Expand'}
+              >
+                <svg 
+                  className={`w-4 h-4 transition-transform ${page.isExpanded ? 'rotate-90' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+            {!hasChildren && <div className="w-6"></div>} {/* Spacer for alignment */}
+            <div 
+              {...listeners}
+              className="flex items-center space-x-2 flex-1 cursor-grab active:cursor-grabbing"
+            >
+              <div className={`w-3 h-3 rounded-full ${
+                levelColor.includes('blue') ? 'bg-blue-500' :
+                levelColor.includes('green') ? 'bg-green-500' :
+                levelColor.includes('yellow') ? 'bg-yellow-500' :
+                levelColor.includes('purple') ? 'bg-purple-500' : 'bg-pink-500'
+              }`} />
+              <h3 className="text-base font-medium text-gray-800">
+                {page.title}
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
+              L{page.level}
             </span>
-          )}
+            <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600">
+              #{page.order}
+            </span>
+          </div>
         </div>
       </div>
+      {hasChildren && page.isExpanded && (
+        <div className="mt-1 ml-6 border-l-2 border-gray-200 pl-2">
+          <SortableContext items={page.children.map(child => child.id)} strategy={verticalListSortingStrategy}>
+            {page.children.map(child => (
+              <SortableItem 
+                key={child.id} 
+                page={child} 
+                onToggleExpand={onToggleExpand}
+              />
+            ))}
+          </SortableContext>
+        </div>
+      )}
     </div>
   );
 };
@@ -155,7 +192,34 @@ const ArticleList = () => {
   const [pendingChanges, setPendingChanges] = useState<{
     newFlattenedPages: Page[];
     updatedSiblings: any[];
+    newHierarchy: Page[];
   } | null>(null);
+  
+  // Toggle expanded state of a page
+  const toggleExpand = (id: number) => {
+    const updateExpanded = (items: Page[]): Page[] => {
+      return items.map(item => {
+        if (item.id === id) {
+          return { ...item, isExpanded: !item.isExpanded };
+        }
+        if (item.children && item.children.length > 0) {
+          return { ...item, children: updateExpanded(item.children) };
+        }
+        return item;
+      });
+    };
+    
+    setPages(prevPages => updateExpanded(prevPages));
+  };
+  
+  // Set initial expanded state (expand first level by default)
+  const setInitialExpandedState = (items: Page[]): Page[] => {
+    return items.map(item => ({
+      ...item,
+      isExpanded: item.level <= 2, // Expand first two levels by default
+      children: item.children ? setInitialExpandedState(item.children) : []
+    }));
+  };
 
   // Flatten the hierarchy while maintaining level information
   const flattenHierarchy = (pages: Page[]): Page[] => {
@@ -178,8 +242,9 @@ const ArticleList = () => {
     const getPages = async () => {
       try {
         const pagesData = await fetchPages();
-        setPages(pagesData);
-        setFlattenedPages(flattenHierarchy(pagesData));
+        const pagesWithExpandedState = setInitialExpandedState(pagesData);
+        setPages(pagesWithExpandedState);
+        setFlattenedPages(flattenHierarchy(pagesWithExpandedState));
       } catch (error) {
         console.error("Error fetching pages:", error);
       }
@@ -200,13 +265,24 @@ const ArticleList = () => {
   const handleSaveChanges = async () => {
     if (!pendingChanges) return;
     
-    const { newFlattenedPages, updatedSiblings } = pendingChanges;
+    const { newFlattenedPages, updatedSiblings, newHierarchy } = pendingChanges;
     
     try {
+      // Update the database with the new order
+      const updatePromises = updatedSiblings.map((page) => {
+        return api.put(`/page/order`, {
+          pageId: page.id,
+          newOrder: page.order,
+        });
+      });
+      
+      await Promise.all(updatePromises);
+      
+      // Only update the UI state after successful API call
+      setPages(newHierarchy);
       setFlattenedPages(newFlattenedPages);
       setHasChanges(true);
-      // Example API call (uncomment and modify as needed):
-      // await api.post('/page/update-order', { pages: updatedSiblings });
+      
       setAlertMessage('Page order updated successfully!');
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
@@ -220,7 +296,7 @@ const ArticleList = () => {
     }
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over || active.id === over.id) return;
@@ -267,10 +343,6 @@ const ArticleList = () => {
       return updatedSibling || page;
     });
 
-    // Show confirmation dialog
-    setPendingChanges({ newFlattenedPages, updatedSiblings });
-    setShowConfirmDialog(true);
-
     // Rebuild the hierarchy with the updated orders
     const rebuildHierarchy = (flatPages: Page[]): Page[] => {
       // Create a deep copy to avoid mutation issues
@@ -315,43 +387,37 @@ const ArticleList = () => {
     };
 
     const newHierarchy = rebuildHierarchy(newFlattenedPages);
-    setPages(newHierarchy);
-
-    // Update the order of the pages in the database
-    try {
-      // Only update the pages that were reordered (the siblings)
-      const updatePromises = updatedSiblings.map((page) => {
-        return api.put(`/page/order`, {
-          pageId: page.id,
-          newOrder: page.order,
-        });
-      });
-      await Promise.all(updatePromises);
-    } catch (error) {
-      console.error("Error updating page order:", error);
-    }
+    
+    // Store the pending changes and show confirmation dialog
+    setPendingChanges({
+      newFlattenedPages,
+      updatedSiblings,
+      newHierarchy
+    });
+    setShowConfirmDialog(true);
   };
 
   return (
-    <div className="p-6 relative">
-      <h1 className="text-2xl font-bold mb-6">Sort Pages</h1>
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="space-y-4">
-          <SortableContext
-            items={flattenedPages.map((page) => page.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            {flattenedPages.map((page) => (
-              <div
-                key={page.id}
-                className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:border-blue-300 transition-colors"
-              >
-                <SortableItem page={page} />
-              </div>
-            ))}
-          </SortableContext>
-        </div>
-      </DndContext>
+    <div className="container mx-auto p-4 max-w-4xl">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Page Sorter</h1>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <div className="space-y-1">
+            <SortableContext items={pages.map(page => page.id)} strategy={verticalListSortingStrategy}>
+              {pages.map(page => (
+                <SortableItem 
+                  key={page.id} 
+                  page={page} 
+                  onToggleExpand={toggleExpand}
+                />
+              ))}
+            </SortableContext>
+          </div>
+        </DndContext>
+      </div>
 
       {/* Alert Toast */}
       {showAlert && (
@@ -386,7 +452,15 @@ const ArticleList = () => {
           <DialogFooter className="mt-4">
             <Button
               variant="outline"
-              onClick={() => setShowConfirmDialog(false)}
+              onClick={() => {
+                setShowConfirmDialog(false);
+                // Reset to previous state when canceling
+                if (pendingChanges) {
+                  setPendingChanges(null);
+                  // Optional: Revert the UI to the previous state
+                  // This would require keeping track of the previous state
+                }
+              }}
               className="border-gray-300 hover:bg-gray-50"
             >
               Cancel
