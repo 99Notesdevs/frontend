@@ -1285,7 +1285,6 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         orderedList: false,
       }),
       CustomOrderedList,
-      Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       CustomLink.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -1334,6 +1333,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       CleanPaste,
     ],
     content: content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const handleUpdate = debounce(() => {
         if (editor) {
@@ -1944,7 +1944,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         <div className="w-full overflow-x-auto">
           <EditorContent
             editor={editor}
-            className="prose prose-slate max-w-full p-4 w-full"
+            className="prose prose-slate max-w-full p-4 w-full max-h-[500px] overflow-y-auto"
             style={
               {
                 "--tw-prose-pre-bg": "transparent",

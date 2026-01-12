@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import dynamic from "next/dynamic";
@@ -21,6 +21,13 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Alert } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -44,6 +51,9 @@ const TiptapEditor = dynamic(
     ),
   }
 );
+
+// Configure Tiptap to avoid SSR hydration issues
+TiptapEditor.displayName = "TiptapEditor";
 
 const articleSchema = z.object({
   title: z.string(),
@@ -77,12 +87,14 @@ type ArticleFormData = z.infer<typeof articleSchema>;
 
 interface ArticleFormProps {
   initialData?: ArticleFormData;
-  onSubmit: (data: ArticleFormData) => void;
+  onSubmit: (data: ArticleFormData) => Promise<void>;
+  onSuccess?: () => void;
 }
 
 export const ArticleForm: React.FC<ArticleFormProps> = ({
   initialData,
   onSubmit,
+  onSuccess,
 }) => {
   const faqEditorRef = useRef<FAQEditorRef>(null);
 
@@ -111,6 +123,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     initialData?.ogImage ? getImageUrl(initialData.ogImage) : null
   );
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [alert, setAlert] = useState<{
     message: string;
     type: "error" | "success" | "warning";
@@ -368,24 +382,84 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     form.setValue("category", [e.target.value]);
   };
 
-  const handleSubmitForm = (data: ArticleFormData) => {
-    const transformedData = {
-      ...data,
-      category: [mainCategory, ...subcategories].filter(Boolean) as string[],
-    };
+  const handleSubmitForm = async (data: ArticleFormData) => {
+    setIsUploading(true);
+    setUploadSuccess(false);
+    
+    try {
+      const transformedData = {
+        ...data,
+        category: [mainCategory, ...subcategories].filter(Boolean) as string[],
+      };
 
-    onSubmit(transformedData);
+      await onSubmit(transformedData);
+      setUploadSuccess(true);
+      
+      // Call onSuccess callback after a short delay to show the success message
+      setTimeout(() => {
+        if (onSuccess) {
+          onSuccess();
+        }
+      }, 1500);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setAlert({
+        message: "Failed to submit the form. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleEditorChange = (content: string) => {
     form.setValue("content", content, { shouldValidate: true });
   };
 
+  // Handle beforeunload event
+  useLayoutEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isUploading) {
+        // Standard way to show the confirmation dialog
+        e.preventDefault();
+        // Chrome requires returnValue to be set
+        e.returnValue = 'You have an upload in progress. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isUploading]);
+
+  // Handle route changes (for Next.js)
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (isUploading && !window.confirm('You have an upload in progress. Are you sure you want to leave?')) {
+        throw 'Route change aborted. Please wait for the upload to complete.';
+      }
+    };
+
+    // For Next.js router
+    if (typeof window !== 'undefined' && (window as any).next) {
+      const router = (window as any).next.router;
+      if (router) {
+        router.events?.on('routeChangeStart', handleRouteChange);
+        return () => {
+          router.events?.off('routeChangeStart', handleRouteChange);
+        };
+      }
+    }
+  }, [isUploading]);
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
+      setHasUnsavedChanges(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -418,6 +492,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           console.error("Error uploading image:", error);
         } finally {
           setIsUploading(false);
+          setHasUnsavedChanges(false);
         }
       };
       reader.readAsDataURL(file);
@@ -429,6 +504,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
+      setHasUnsavedChanges(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -461,6 +537,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           console.error("Error uploading image:", error);
         } finally {
           setIsUploading(false);
+          setHasUnsavedChanges(false);
         }
       };
       reader.readAsDataURL(file);
@@ -505,10 +582,53 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           onClose={() => setAlert(null)}
         />
       )}
+      {/* Uploading Modal */}
+      <Dialog open={isUploading}>
+        <DialogContent className="sm:max-w-[425px]">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <p className="text-lg font-medium">Uploading your article...</p>
+            <p className="text-sm text-muted-foreground">Please wait while we save your changes.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Modal */}
+      <Dialog open={uploadSuccess} onOpenChange={setUploadSuccess}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+              <svg
+                className="h-6 w-6 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <DialogTitle className="text-center text-xl font-semibold mt-4">
+              Article Saved Successfully!
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Your article has been saved and published successfully.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex justify-center">
+            <Button onClick={() => setUploadSuccess(false)}>Done</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmitForm)}
-          className="space-y-8"
+          className="space-y-6"
         >
           {/* Title */}
           <FormField
