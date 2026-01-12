@@ -164,41 +164,26 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   const form = useForm<ArticleFormData>({
     resolver: (values) => {
       let errors = {};
-      const messages = [];
 
       if (!values.title || values.title.length < 2) {
-        messages.push("Title must be at least 2 characters");
         errors = {
           ...errors,
-          title: { message: "" },
+          title: { message: "Title must be at least 2 characters" },
         };
       }
 
       if (!values.content || values.content.length < 10) {
-        messages.push("Content must be at least 10 characters");
         errors = {
           ...errors,
-          content: { message: "" },
+          content: { message: "Content must be at least 10 characters" },
         };
       }
 
-      // if (!values.imageUrl || !getImageUrl(values.imageUrl)) {
-      //   messages.push("Image is required");
-      //   errors = {
-      //     ...errors,
-      //     imageUrl: "Image URL is required",
-      //   };
-      // }
-
-      if (messages.length > 0) {
-        setAlert({
-          message: `Please fix the following:\n• ${messages.join("\n• ")}`,
-          type: "error",
-        });
+      // NOTE: Resolver must be pure (no setState). Alerts should be handled outside.
+      if (Object.keys(errors).length > 0) {
         return { values: {}, errors };
       }
 
-      setAlert(null);
       return { values, errors: {} };
     },
     defaultValues: {
@@ -206,6 +191,29 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       ...initialData,
     },
   });
+
+  // Show validation messages to the user (keep resolver pure)
+  useEffect(() => {
+    const { errors } = form.formState;
+
+    const messages = [
+      errors.title?.message ? String(errors.title.message) : null,
+      errors.content?.message ? String(errors.content.message) : null,
+    ].filter(Boolean) as string[];
+
+    if (messages.length > 0) {
+      setAlert((prev) => {
+        // Avoid unnecessary state updates to prevent re-render churn
+        const next = { message: `Please fix the following:\n• ${messages.join("\n• ")}`, type: "error" as const };
+        if (prev?.type === next.type && prev.message === next.message) return prev;
+        return next;
+      });
+      return;
+    }
+
+    // Only clear if it's a validation error alert (don't wipe success alerts)
+    setAlert((prev) => (prev?.type === "error" ? null : prev));
+  }, [form.formState.errors]);
 
   const [currentSubcategory, setCurrentSubcategory] = useState("");
   // @ts-ignore
@@ -717,7 +725,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                   <FormLabel>Robots</FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value || "index,follow"}
+                      value={field.value ?? "index,follow"}
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger>
