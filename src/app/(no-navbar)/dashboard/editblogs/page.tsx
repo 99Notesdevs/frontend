@@ -50,30 +50,59 @@ export default function ArticlesPage() {
       const url =`/blog?skip=${skip}&take=${itemsPerPage}`;
 
       const response = (await api.get(url)) as {
-        success: boolean; data: BlogType[];
+        success: boolean; 
+        data: BlogType[];
+        message?: string;
       };
 
+      // Handle case when no blogs are found
+      if (response.success && (!response.data || response.data.length === 0)) {
+        setPages([]);
+        setFilteredPages([]);
+        setTotalPages(0);
+        return;
+      }
+
       if (!response.success) {
-        throw new Error("Failed to fetch pages");
+        // If the error is specifically about blogs not found, handle it gracefully
+        if (response.message === "Blogs not found") {
+          setPages([]);
+          setFilteredPages([]);
+          setTotalPages(0);
+          return;
+        }
+        throw new Error(response.message || "Failed to fetch pages");
       }
 
       const pagesData = response.data || [];
 
       // Get total count for pagination
       const countResponse = (await api.get(`/blog/count`)) as {
-        success: boolean; data: number;
+        success: boolean; 
+        data: number;
+        message?: string;
       };
+      
       if (!countResponse.success) {
-        throw new Error("Failed to fetch pages count");
+        console.warn("Failed to fetch pages count:", countResponse.message);
+        // Don't throw error here, we can still continue with the data we have
       }
-      const totalItems = countResponse.data || 0;
+      
+      const totalItems = countResponse.data || pagesData.length;
 
       setPages(pagesData);
       setFilteredPages(pagesData);
-      setTotalPages(Math.ceil(totalItems / itemsPerPage));
+      setTotalPages(Math.max(1, Math.ceil(totalItems / itemsPerPage)));
     } catch (err) {
       console.error("Error fetching pages:", err);
-      setError(err instanceof Error ? err.message : "An error occurred");
+      // Don't show error for 'Blogs not found' case, just set empty state
+      if (err instanceof Error && err.message.includes("Blogs not found")) {
+        setPages([]);
+        setFilteredPages([]);
+        setTotalPages(0);
+      } else {
+        setError(err instanceof Error ? err.message : "An error occurred while fetching blogs");
+      }
     } finally {
       setLoading(false);
     }
@@ -321,7 +350,8 @@ const handleSearchResultClick = async (blog: any) => {
     );
   }
 
-  if (error) {
+  // Don't show error page for empty state, handle it in the main UI
+  if (error && pages.length > 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
         <p className="text-[var(--admin-primary)]">{error}</p>
@@ -339,9 +369,6 @@ const handleSearchResultClick = async (blog: any) => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 mt-4 text-[var(--admin-bg-secondary)] text-center">
-        Manage Blogs
-      </h1>
       <div className="flex flex-col gap-6">
         {/* Blog List */}
         <div className="bg-white p-6 rounded-xl shadow-md">
@@ -387,16 +414,24 @@ const handleSearchResultClick = async (blog: any) => {
           ) : (
             <div className="space-y-4">
               {filteredPages.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="mx-auto w-16 h-16 mb-4 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+                  <div className="mx-auto w-24 h-24 text-gray-300 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-full w-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-1">No blogs found</h3>
-                  <p className="text-gray-500">
-                    {searchQuery ? 'Try a different search term' : 'Create a new blog to get started'}
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">No Blogs Yet</h3>
+                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                    {searchQuery 
+                      ? 'No blogs match your search. Try different keywords.' 
+                      : 'You haven\'t created any blogs yet. Click the button below to create your first blog post.'}
                   </p>
+                  <button
+                    onClick={() => setSelectedPage(null)}
+                    className="bg-[var(--admin-bg-primary)] hover:bg-[var(--admin-bg-secondary)] text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+                  >
+                    Create Your First Blog
+                  </button>
                 </div>
               ) : (
                 filteredPages.map((page) => (

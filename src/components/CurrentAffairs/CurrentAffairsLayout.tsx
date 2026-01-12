@@ -142,9 +142,13 @@ const handleItemClick = useCallback((itemId: string, sectionTitle: string) => {
     fetchAllCurrentAffairs();
   }, [processCurrentAffairs]);
 
+  const pathname = usePathname();
+  // Only show sidebar on /current-affairs/[category] page
+  const isCategoryPage = /^\/current-affairs\/[^/]+$/.test(pathname);
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 pt-8 transition-colors duration-200">
-      <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-6">
+      <section className="max-w-7xl mx-auto px-2 flex flex-col md:flex-row gap-6">
         {/* On mobile */}
         <div className="flex flex-col md:hidden">
           <main className="flex-1">
@@ -154,15 +158,16 @@ const handleItemClick = useCallback((itemId: string, sectionTitle: string) => {
           </main>
         </div>
 
-        {/* Sidebar */}
-        <aside className="w-full md:w-[340px] lg:w-[400px] flex-shrink-0">
+        {/* Sidebar - Only shown on /current-affairs/[category] */}
+        {isCategoryPage && (
+          <aside className="hidden md:block w-[340px] lg:w-[450px] flex-shrink-0 -ml-8">
           <nav className="bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30 md:sticky md:top-24">
             {loading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500" />
               </div>
             ) : (
-              <div className="p-5 space-y-5">
+              <div className="p-5 space-y-5 bg-[var(--bg-main)] dark:bg-slate-800">
                 {navSections.map((section) => (
                   <article
                     key={section.type}
@@ -252,11 +257,12 @@ const handleItemClick = useCallback((itemId: string, sectionTitle: string) => {
             </div>
           </nav>
         </aside>
+        )}
 
-        {/* On tablet/desktop: Display main content second */}
-        <div className="hidden md:flex flex-1">
+        {/* Main content - full width on all pages except [category] */}
+        <div className={`${isCategoryPage ? 'hidden md:flex flex-1' : 'w-full'}`}>
           <main className="w-full">
-            <article className="bg-[var(--bg-main)] dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30">
+            <article className="">
               {memoizedChildren}
             </article>
           </main>
