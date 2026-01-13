@@ -845,7 +845,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                   <FormLabel>Robots</FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value ?? "index,follow"}
+                      value={field.value}
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger>
