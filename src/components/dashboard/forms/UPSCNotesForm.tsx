@@ -145,7 +145,7 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
-
+  
   const loadDraft = async () => {
     await loadDrafts();
     if (drafts.length > 0) {
@@ -268,7 +268,13 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
   const [subcategories, setSubcategories] = useState<string[]>(
     initialData?.category?.slice(1) || []
   );
-
+      const title = form.watch("title");
+      useEffect(() => {
+        if (title && title !== mainCategory) {
+          setMainCategory(title);
+          form.setValue("category", [title]);
+        }
+      }, [title, mainCategory, form]);
   const addSubcategory = () => {
     if (currentSubcategory.trim()) {
       setSubcategories([...subcategories, currentSubcategory.trim()]);

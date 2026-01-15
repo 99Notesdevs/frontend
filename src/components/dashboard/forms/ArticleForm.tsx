@@ -242,6 +242,15 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
 
+  // Update main category to match title
+  const title = form.watch("title");
+  useEffect(() => {
+    if (title && title !== mainCategory) {
+      setMainCategory(title);
+      form.setValue("category", [title, ...subcategories]);
+    }
+  }, [title, mainCategory, subcategories, form]);
+
   const loadDraft = async () => {
     await loadDrafts();
     if (drafts.length > 0) {
