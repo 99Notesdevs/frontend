@@ -19,8 +19,18 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "99notes-media-files.s3.ap-south-1.amazonaws.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "www.psdstack.com",
         pathname: "/**", // Allow all paths for placeholder images
+      },
+      {
+        protocol: "https",
+        hostname: "notesstorage99.blob.core.windows.net",
+        pathname: "/**", // Allow all paths under this hostname
       },
       {
         protocol: "https",

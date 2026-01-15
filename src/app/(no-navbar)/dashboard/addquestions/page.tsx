@@ -353,7 +353,7 @@ const formRef = useRef<HTMLDivElement>(null);
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 py-12 px-4 md:px-8 flex flex-col items-center relative">
+    <div className="min-h-screen w-full bg-gray-50 py-8 px-4 md:px-6 flex flex-col items-center relative">
       {/* Toast Notification */}
       {toast && (
         <div 
@@ -364,29 +364,83 @@ const formRef = useRef<HTMLDivElement>(null);
           {toast.message}
         </div>
       )}
-      <style>{`
+      <style jsx global>{`
+        /* Remove inner scrollbar from Tiptap editor */
         .tiptap-editor-container {
-          max-height: 250px;
-          min-height: 100px;
-          overflow-y: auto;
+          min-height: 80px;
           border: 1px solid #e2e8f0;
-          border-radius: 0.375rem;
-          padding: 0.5rem;
+          border-radius: 0.5rem;
           background: white;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+          transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+          overflow: hidden; /* Prevent double scrollbar */
         }
+        
+        .tiptap-editor-container:focus-within {
+          border-color: #818cf8;
+          box-shadow: 0 0 0 1px #818cf8;
+        }
+        
         .tiptap-editor-container .ProseMirror {
           outline: none;
-          min-height: 100%;
+          min-height: 80px;
+          max-height: 200px;
+          overflow-y: auto;
+          padding: 0.75rem;
+          font-size: 0.9375rem;
+          line-height: 1.5;
+          color: #1f2937;
         }
+        
+        /* Custom scrollbar for the editor */
+        .tiptap-editor-container .ProseMirror::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        
+        .tiptap-editor-container .ProseMirror::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+        
+        .tiptap-editor-container .ProseMirror::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 3px;
+        }
+        
+        .tiptap-editor-container .ProseMirror::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+        }
+        
         .tiptap-editor-container .ProseMirror > * + * {
-          margin-top: 0.75em;
+          margin-top: 0.5em;
+        }
+        
+        .tiptap-editor-container .ProseMirror h1,
+        .tiptap-editor-container .ProseMirror h2,
+        .tiptap-editor-container .ProseMirror h3 {
+          margin: 1em 0 0.5em 0;
+          line-height: 1.2;
+        }
+        
+        .tiptap-editor-container .ProseMirror p {
+          margin: 0.5em 0;
+        }
+        
+        .tiptap-editor-container .ProseMirror ul,
+        .tiptap-editor-container .ProseMirror ol {
+          padding: 0 1.5em;
+          margin: 0.5em 0;
         }
       `}</style>
       <div className="w-full max-w-4xl">
-        <h1 className="text-4xl font-bold text-center text-gray-900 drop-shadow-sm tracking-tight mb-4">
-          Add & Manage Questions
-        </h1>
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 md:p-12 space-y-8 scale-105 mx-auto mt-16">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Add & Manage Questions
+          </h1>
+          <div className="h-1 w-16 bg-indigo-500 mx-auto rounded-full"></div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-8 mx-auto">
           {/* Category Selection */}
           <CategorySelect
             selectedCategoryId={selectedCategory}
@@ -403,12 +457,12 @@ const formRef = useRef<HTMLDivElement>(null);
                 editingQuestion ? handleUpdateQuestion : handleCreateQuestion
               }
             >
-              <div className="space-y-8">
+              <div className="space-y-6">
                 <div>
-                  <label className="block mb-1 [color:var(--admin-bg-dark)] font-semibold">
-                    Question
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Question <span className="text-red-500">*</span>
                   </label>
-                  <div className="tiptap-editor-container custom-tiptap-editor">
+                  <div className="tiptap-editor-container">
                     <TiptapEditor
                       content={newQuestion.question}
                       onChange={(content) =>
@@ -417,14 +471,14 @@ const formRef = useRef<HTMLDivElement>(null);
                     />
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <label className="block [color:var(--admin-bg-dark)] font-semibold">
-                    Options
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Options <span className="text-red-500">*</span>
                   </label>
                   {newQuestion.options.map((option, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                      <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 font-bold text-sm border border-gray-300">
-                        {index + 1}
+                    <div key={index} className="flex gap-3 items-start">
+                      <span className="w-6 h-6 mt-2.5 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 font-medium text-xs">
+                        {String.fromCharCode(65 + index)}
                       </span>
                       <div className="tiptap-editor-container flex-1">
                         <TiptapEditor
@@ -455,7 +509,7 @@ const formRef = useRef<HTMLDivElement>(null);
                   <Button
                     type="button"
                     variant="outline"
-                    className="mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg px-4 py-2"
+                    className="mt-2 border-dashed border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-gray-800 rounded-lg px-4 py-2 text-sm font-medium"
                     onClick={() =>
                       setNewQuestion({
                         ...newQuestion,
@@ -463,55 +517,67 @@ const formRef = useRef<HTMLDivElement>(null);
                       })
                     }
                   >
-                    <span className="text-sm">Add Option</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+                    Add Option
                   </Button>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={newQuestion.multipleCorrectType}
-                      onChange={(e) => {
-                        setNewQuestion({
-                          ...newQuestion,
-                          multipleCorrectType: e.target.checked
-                        });
-                      }}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label className="text-sm font-medium text-gray-700">
-                      Allow multiple correct answers
-                    </label>
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                  <div className="flex items-start gap-3">
+                    <div className="flex items-center h-5 mt-0.5">
+                      <input
+                        type="checkbox"
+                        id="multipleCorrect"
+                        checked={newQuestion.multipleCorrectType}
+                        onChange={(e) => {
+                          setNewQuestion({
+                            ...newQuestion,
+                            multipleCorrectType: e.target.checked,
+                            answer: '' // Reset answer when changing type
+                          });
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="multipleCorrect" className="text-sm font-medium text-gray-700 cursor-pointer">
+                        Allow multiple correct answers
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {newQuestion.multipleCorrectType 
+                          ? 'Enter comma-separated option letters (e.g., A,C,D)'
+                          : 'Select a single correct option'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block mb-1 font-semibold">Answer</label>
+                  <div className="mt-2">
+                    <label htmlFor="answer" className="block text-sm font-medium text-gray-700 mb-1">
+                      Correct Answer <span className="text-red-500">*</span>
+                    </label>
                     <Input
-                      className="bg-white text-[#1e293b] border border-gray-200 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
+                      id="answer"
+                      className="bg-white border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
                       type="text"
                       placeholder={newQuestion.multipleCorrectType 
-                        ? "Enter comma-separated answer numbers (e.g., 1,3,4)"
-                        : "Enter answer number"}
+                        ? 'e.g., A,C,D' 
+                        : 'e.g., A'}
                       value={newQuestion.answer}
                       onChange={(e) => {
-                        const value = e.target.value;
+                        const value = e.target.value.toUpperCase();
                         setNewQuestion({
                           ...newQuestion,
                           answer: value
                         });
                       }}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      {newQuestion.multipleCorrectType
-                        ? "Enter comma-separated numbers for multiple correct answers (e.g., 1,3,4)"
-                        : "Enter the number that corresponds to the correct answer"}
-                    </p>
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className=" border border-slate-300 rounded-xl p-4 mb-2 shadow-sm">
+                  <div className="border border-gray-200 rounded-lg p-4 bg-white">
                     <label
                       htmlFor="explanation"
-                      className="flex items-center gap-2 text-base font-semibold text-slate-700 mb-1"
+                      className="block text-sm font-medium text-gray-700 mb-2"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -645,8 +711,11 @@ const formRef = useRef<HTMLDivElement>(null);
           </div>
 
           {/* Questions List */}
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Questions</h2>
+          <div className="mt-12 border-t border-gray-100 pt-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">Questions</h2>
+              <span className="text-sm text-gray-500">{questions.length} questions</span>
+            </div>
             <div className="space-y-4">
               {questions.length === 0 ? (
                 <p className="text-center text-gray-500 ">
@@ -656,12 +725,12 @@ const formRef = useRef<HTMLDivElement>(null);
                 questions.map((question) => (
                   <div
                     key={question.id}
-                    className="flex flex-col sm:flex-row justify-between gap-3 p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors duration-200 shadow-xs"
+                    className="flex flex-col sm:flex-row justify-between gap-4 p-4 border border-gray-100 rounded-lg bg-white hover:shadow transition-all duration-200"
                   >
-                    <div className="flex-1 min-w-0 space-y-3">
-                      <div className="line-clamp-3">
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="line-clamp-2">
                         <div 
-                          className="text-[#0f172a] text-sm leading-snug [&_table]:border [&_table]:border-gray-200 [&_table]:rounded [&_table]:overflow-hidden [&_table]:w-full [&_td]:p-2 [&_th]:p-2 [&_th]:bg-gray-50 [&_tr:not(:last-child)]:border-b [&_tr:not(:last-child)]:border-gray-100"
+                          className="text-gray-800 text-sm leading-relaxed [&_table]:border [&_table]:border-gray-200 [&_table]:rounded [&_table]:overflow-hidden [&_table]:w-full [&_td]:p-2 [&_th]:p-2 [&_th]:bg-gray-50 [&_tr:not(:last-child)]:border-b [&_tr:not(:last-child)]:border-gray-100"
                           dangerouslySetInnerHTML={{ __html: question.question }}
                         />
                       </div>
@@ -689,25 +758,31 @@ const formRef = useRef<HTMLDivElement>(null);
                         )}
                       </div>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0 sm:ml-4">
+                    <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0 sm:ml-4">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs h-12"
+                        className="rounded-md border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-1.5 text-xs h-8"
                         onClick={() => handleEditQuestion(question)}
                       >
-                        <span className="text-sm font-medium">Edit</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                        Edit
                       </Button>
                       <Button
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
-                        className="rounded-lg bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-xs h-12"
+                        className="rounded-md border-red-200 text-red-600 hover:bg-red-50 px-3 py-1.5 text-xs h-8"
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeleteConfirmation({ isOpen: true, questionId: question.id });
                         }}
                       >
-                        <span className="text-sm font-medium">Delete</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        Delete
                       </Button>
                     </div>
                   </div>
