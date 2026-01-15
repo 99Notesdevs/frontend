@@ -79,6 +79,7 @@ const faqEditorStyles = `
     background: #a8a8a8;
   }
 `;
+
 const TiptapEditor = dynamic(
   () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
   {
@@ -127,117 +128,93 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
       },
     }));
 
-    // Parse the initial value
+    // Initialize from value prop
     useEffect(() => {
-      if (value) {
-        try {
-          const parsed = JSON.parse(value);
-          if (parsed && parsed.general && Array.isArray(parsed.general)) {
-            // Add IDs to items if they don't exist
-            const faqData = parsed.general.map((item: any) => ({
-              ...item,
-              id:
-                item.id ||
-                `faq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-              subQuestions: (item.subQuestions || []).map((sub: any) => ({
-                ...sub,
-                id:
-                  sub.id ||
-                  `sub_${Date.now()}_${Math.random()
-                    .toString(36)
-                    .substr(2, 9)}`,
-              })),
-            }));
-            setFaqs(faqData);
-          } else {
-            setFaqs([]);
-          }
-        } catch (error) {
-          console.error("Failed to parse FAQ data", error);
+      if (!value) {
+        setFaqs([]);
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed?.general && Array.isArray(parsed.general)) {
+          setFaqs(parsed.general);
+        } else {
           setFaqs([]);
         }
-      } else {
+      } catch (error) {
+        console.error("Failed to parse FAQ data:", error);
         setFaqs([]);
       }
     }, [value]);
 
-    // Update the parent form when FAQs change
+    // Notify parent of changes with debounce
     useEffect(() => {
-      const faqData = { general: faqs };
-      const jsonString = JSON.stringify(faqData);
-      onChange(jsonString);
+      const timeoutId = setTimeout(() => {
+        const jsonString = JSON.stringify({ general: faqs });
+        onChange(jsonString);
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
     }, [faqs, onChange]);
 
     const addFAQ = useCallback(() => {
-      const newFAQ = {
+      const newFAQ: FAQItem = {
         id: `faq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         question: "",
         answer: "",
         subQuestions: [],
       };
-      setFaqs((prev) => [...prev, newFAQ]);
+      setFaqs(prev => [...prev, newFAQ]);
     }, []);
 
-    const addSubQuestion = useCallback(
-      (parentId: string) => {
-        if (isAdding[parentId]) return;
+    const updateFAQ = useCallback((id: string, field: 'question' | 'answer', value: string, isSubQuestion = false, parentId?: string) => {
+      setFaqs(prev => prev.map(item => {
+        if (isSubQuestion && parentId && item.id === parentId) {
+          return {
+            ...item,
+            subQuestions: item.subQuestions.map(sub =>
+              sub.id === id ? { ...sub, [field]: value } : sub
+            )
+          };
+        }
+        return item.id === id ? { ...item, [field]: value } : item;
+      }));
+    }, []);
 
-        setIsAdding((prev) => ({ ...prev, [parentId]: true }));
+    const addSubQuestion = useCallback((parentId: string) => {
+      if (isAdding[parentId]) return;
 
-        setFaqs((prev) =>
-          prev.map((item) =>
-            item.id === parentId
-              ? {
-                  ...item,
-                  subQuestions: [
-                    ...item.subQuestions,
-                    {
-                      id: `sub_${Date.now()}_${Math.random()
-                        .toString(36)
-                        .substr(2, 9)}`,
-                      question: "",
-                      answer: "",
-                    },
-                  ],
-                }
-              : item
-          )
-        );
+      setIsAdding(prev => ({ ...prev, [parentId]: true }));
 
-        setTimeout(() => {
-          setIsAdding((prev) => ({ ...prev, [parentId]: false }));
-        }, 300);
-      },
-      [isAdding]
-    );
+      const newSubQuestion: SubQuestion = {
+        id: `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        question: "",
+        answer: "",
+      };
 
-    // const updateFAQ = useCallback(
-    //   (id: string, field: "question" | "answer", value: string, isSubQuestion = false, subId?: string) => {
-    //     setFaqs((prev) =>
-    //       isSubQuestion && subId
-    //         ? prev.map((item) => ({
-    //             ...item,
-    //             subQuestions: item.subQuestions.map((sub) => (sub.id === subId ? { ...sub, [field]: value } : sub)),
-    //           }))
-    //         : prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    //     )
-    //   },
-    //   [],
-    // )
+      setFaqs(prev => prev.map(item =>
+        item.id === parentId
+          ? { ...item, subQuestions: [...item.subQuestions, newSubQuestion] }
+          : item
+      ));
 
-    const deleteFAQ = useCallback(
-      (id: string, isSubQuestion = false, parentId?: string) => {
-        setFaqs((prev) =>
-          isSubQuestion && parentId
-            ? prev.map((item) => ({
-                ...item,
-                subQuestions: item.subQuestions.filter((sub) => sub.id !== id),
-              }))
-            : prev.filter((item) => item.id !== id)
-        );
-      },
-      []
-    );
+      setTimeout(() => {
+        setIsAdding(prev => ({ ...prev, [parentId]: false }));
+      }, 300);
+    }, [isAdding]);
+
+    const deleteFAQ = useCallback((id: string, isSubQuestion = false, parentId?: string) => {
+      setFaqs(prev => prev.map(item => {
+        if (isSubQuestion && parentId && item.id === parentId) {
+          return {
+            ...item,
+            subQuestions: item.subQuestions.filter(sub => sub.id !== id)
+          };
+        }
+        return item.id === id ? { ...item, subQuestions: item.subQuestions.filter(sub => sub.id !== id) } : item;
+      }).filter(item => !isSubQuestion || item.id !== parentId));
+    }, []);
 
     return (
       <div className="space-y-4">
@@ -255,18 +232,10 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                       <div className="h-[200px] overflow-hidden">
                         <TiptapEditor
                           content={item.question}
-                          onChange={(value) => {
-                            setFaqs((prev) =>
-                              prev.map((faq) =>
-                                faq.id === item.id
-                                  ? { ...faq, question: value }
-                                  : faq
-                              )
-                            );
-                          }}
+                          onChange={(value) => updateFAQ(item.id, 'question', value)}
                         />
                       </div>
-                    </div>{" "}
+                    </div>
                     <Button
                       type="button"
                       variant="ghost"
@@ -284,16 +253,11 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                       <style jsx global>{faqEditorStyles}</style>
                       <TiptapEditor
                         content={item.answer}
-                        onChange={(value) => {
-                          setFaqs((prev) =>
-                            prev.map((faq) =>
-                              faq.id === item.id ? { ...faq, answer: value } : faq
-                            )
-                          );
-                        }}
+                        onChange={(value) => updateFAQ(item.id, 'answer', value)}
                       />
                     </div>
                   </div>
+
                   <div className="flex justify-between items-center">
                     <Button
                       type="button"
@@ -324,33 +288,15 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                               <div className="faq-tiptap-container">
                                 <TiptapEditor
                                   content={subItem.question}
-                                  onChange={(value) => {
-                                    setFaqs((prev) =>
-                                      prev.map((faq) =>
-                                        faq.id === item.id
-                                          ? {
-                                              ...faq,
-                                              subQuestions: faq.subQuestions.map(
-                                                (sub) =>
-                                                  sub.id === subItem.id
-                                                    ? { ...sub, question: value }
-                                                    : sub
-                                              ),
-                                            }
-                                          : faq
-                                      )
-                                    );
-                                  }}
+                                  onChange={(value) => updateFAQ(subItem.id, 'question', value, true, item.id)}
                                 />
                               </div>
-                            </div>{" "}
+                            </div>
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
-                              onClick={() =>
-                                deleteFAQ(subItem.id, true, item.id)
-                              }
+                              onClick={() => deleteFAQ(subItem.id, true, item.id)}
                               className="text-red-500 hover:text-red-700"
                             >
                               <Trash2 size={14} />
@@ -361,23 +307,7 @@ export const FAQEditor = forwardRef<FAQEditorRef, FAQEditorProps>(
                             <div className="faq-tiptap-container">
                               <TiptapEditor
                                 content={subItem.answer}
-                                onChange={(value) => {
-                                  setFaqs((prev) =>
-                                    prev.map((faq) =>
-                                      faq.id === item.id
-                                        ? {
-                                            ...faq,
-                                            subQuestions: faq.subQuestions.map(
-                                              (sub) =>
-                                                sub.id === subItem.id
-                                                  ? { ...sub, answer: value }
-                                                  : sub
-                                            ),
-                                          }
-                                        : faq
-                                    )
-                                  );
-                                }}
+                                onChange={(value) => updateFAQ(subItem.id, 'answer', value, true, item.id)}
                               />
                             </div>
                           </div>
