@@ -214,7 +214,13 @@ export function GeneralStudiesForm({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
-
+  const title = form.watch("title");
+  useEffect(() => {
+    if (title && title !== mainCategory) {
+      setMainCategory(title);
+      form.setValue("category", [title]);
+    }
+  }, [title, mainCategory, form]);
   const loadDraft = async () => {
     await loadDrafts();
     if (drafts.length > 0) {
@@ -318,7 +324,7 @@ export function GeneralStudiesForm({
     onSubmit(transformedData);
   };
 
-const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {

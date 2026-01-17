@@ -123,6 +123,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     initialData?.ogImage ? getImageUrl(initialData.ogImage) : null
   );
   const [isUploading, setIsUploading] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [alert, setAlert] = useState<{
@@ -240,6 +241,15 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
+
+  // Update main category to match title
+  const title = form.watch("title");
+  useEffect(() => {
+    if (title && title !== mainCategory) {
+      setMainCategory(title);
+      form.setValue("category", [title, ...subcategories]);
+    }
+  }, [title, mainCategory, subcategories, form]);
 
   const loadDraft = async () => {
     await loadDrafts();
@@ -458,7 +468,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true);
+      setIsImageUploading(true);
       setHasUnsavedChanges(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
@@ -491,7 +501,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         } catch (error) {
           console.error("Error uploading image:", error);
         } finally {
-          setIsUploading(false);
+          setIsImageUploading(false);
           setHasUnsavedChanges(false);
         }
       };
@@ -503,7 +513,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
-      setIsUploading(true);
+      setIsImageUploading(true);
       setHasUnsavedChanges(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
@@ -536,7 +546,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         } catch (error) {
           console.error("Error uploading image:", error);
         } finally {
-          setIsUploading(false);
+          setIsImageUploading(false);
           setHasUnsavedChanges(false);
         }
       };
@@ -583,44 +593,12 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         />
       )}
       {/* Uploading Modal */}
-      <Dialog open={isUploading}>
+      <Dialog open={isUploading && !isImageUploading}>
         <DialogContent className="sm:max-w-[425px]">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             <p className="text-lg font-medium">Uploading your article...</p>
             <p className="text-sm text-muted-foreground">Please wait while we save your changes.</p>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Success Modal */}
-      <Dialog open={uploadSuccess} onOpenChange={setUploadSuccess}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <svg
-                className="h-6 w-6 text-green-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <DialogTitle className="text-center text-xl font-semibold mt-4">
-              Article Saved Successfully!
-            </DialogTitle>
-            <DialogDescription className="text-center">
-              Your article has been saved and published successfully.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4 flex justify-center">
-            <Button onClick={() => setUploadSuccess(false)}>Done</Button>
           </div>
         </DialogContent>
       </Dialog>
