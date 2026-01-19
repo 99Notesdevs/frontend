@@ -198,7 +198,7 @@ const CustomImage = Image.extend({
       // Set up the image
       img.src = src;
       img.alt = alt || "";
-      img.style.width = width || "50%";
+      img.style.width = width || "100%";
       img.style.height = height || "auto";
       img.style.maxWidth = "100%";
       img.style.display = "block";
@@ -217,8 +217,33 @@ const CustomImage = Image.extend({
       container.className = "resizable-image-container";
       container.setAttribute("data-type", "image-container");
       container.setAttribute("data-float", float);
+      
+      // Check if image is inside a table cell
+      let isInTableCell = false;
+      let closestCell = null;
+      
+      // Use requestAnimationFrame to check after DOM is updated
+      requestAnimationFrame(() => {
+        closestCell = container.closest('td, th');
+        if (closestCell) {
+          isInTableCell = true;
+          // For table cells, make image full width with no margins
+          container.style.maxWidth = "100%";
+          container.style.width = "100%";
+          container.style.margin = "0";
+          container.style.float = "none";
+          container.style.display = "block";
+        } else {
+          // For regular content, use original styling
+          container.style.maxWidth = "100%";
+          container.style.margin = margin;
+          container.style.float = float;
+          container.style.display = "inline-block";
+        }
+      });
+      
       container.style.float = float;
-      container.style.maxWidth = "50%";
+      container.style.maxWidth = "100%";
       container.style.display = "inline-block";
       container.style.verticalAlign = "top";
       container.style.margin = margin;
@@ -708,78 +733,105 @@ const TableMenu = ({ editor }: TableMenuProps) => {
 
   const increaseColumnWidth = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const { from, to } = editor.state.selection;
-    const transactions: any[] = [];
-
-    editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
-      if (node.type.name === "tableCell" || node.type.name === "tableHeader") {
-        const currentStyle = node.attrs.style || "";
-        const currentWidth =
-          currentStyle.match(/width:\s*(\d+px)/)?.[1] || "100px";
-        const newWidth = `${Math.min(parseInt(currentWidth) + 20, 500)}px`;
-        const newStyle = currentStyle
-          ? currentStyle.replace(/width:\s*\d+px/, `width: ${newWidth}`)
-          : `width: ${newWidth};`;
-
-        if (!currentStyle.includes("width:")) {
-          // If width style doesn't exist, add it
-          transactions.push(
-            editor.state.tr.setNodeMarkup(pos, null, {
-              ...node.attrs,
-              style: `${node.attrs.style || ""} width: ${newWidth};`.trim(),
-            })
-          );
-        } else {
-          // If width style exists, replace it
-          transactions.push(
-            editor.state.tr.setNodeMarkup(pos, null, {
-              ...node.attrs,
-              style: newStyle,
-            })
-          );
-        }
+    
+    const { state, view } = editor;
+    const { $anchor } = state.selection;
+    
+    // Find the table cell that contains the cursor
+    let cellPos: number | null = null;
+    let cellNode: any = null;
+    
+    // Walk up from current position to find table cell
+    for (let depth = $anchor.depth; depth > 0; depth--) {
+      const node = $anchor.node(depth);
+      if (node.type.name === "table_cell" || node.type.name === "table_header" || node.type.spec.tableRole === "cell" || node.type.spec.tableRole === "header_cell") {
+        cellPos = $anchor.before(depth);
+        cellNode = node;
+        break;
       }
-    });
-
-    transactions.forEach((tr: any) => editor.view.dispatch(tr));
+    }
+    
+    // Fallback: search all nodes
+    if (!cellNode) {
+      state.doc.nodesBetween(0, state.doc.content.size, (node: any, pos: number) => {
+        if (($anchor.pos >= pos && $anchor.pos < pos + node.nodeSize) && 
+            (node.type.spec.tableRole === "cell" || node.type.spec.tableRole === "header_cell")) {
+          cellPos = pos;
+          cellNode = node;
+          return false;
+        }
+      });
+    }
+    
+    if (cellNode && cellPos !== null) {
+      const currentStyle = cellNode.attrs.style || "";
+      const colwidth = cellNode.attrs.colwidth || [100];
+      let currentWidth = Array.isArray(colwidth) ? colwidth[0] : colwidth;
+      
+      if (currentWidth === undefined || currentWidth === null) {
+        currentWidth = 100;
+      }
+      
+      const newWidth = Math.min(currentWidth + 30, 600);
+      
+      view.dispatch(
+        state.tr.setNodeMarkup(cellPos, undefined, {
+          ...cellNode.attrs,
+          colwidth: [newWidth],
+        })
+      );
+    }
   };
 
   const decreaseColumnWidth = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const { from, to } = editor.state.selection;
-    const transactions: any[] = [];
-
-    editor.state.doc.nodesBetween(from, to, (node: any, pos: number) => {
-      if (node.type.name === "tableCell" || node.type.name === "tableHeader") {
-        const currentStyle = node.attrs.style || "";
-        const currentWidth =
-          currentStyle.match(/width:\s*(\d+px)/)?.[1] || "100px";
-        const newWidth = `${Math.max(parseInt(currentWidth) - 20, 50)}px`;
-        const newStyle = currentStyle
-          ? currentStyle.replace(/width:\s*\d+px/, `width: ${newWidth}`)
-          : `width: ${newWidth};`;
-
-        if (!currentStyle.includes("width:")) {
-          // If width style doesn't exist, add it
-          transactions.push(
-            editor.state.tr.setNodeMarkup(pos, null, {
-              ...node.attrs,
-              style: `${node.attrs.style || ""} width: ${newWidth};`.trim(),
-            })
-          );
-        } else {
-          // If width style exists, replace it
-          transactions.push(
-            editor.state.tr.setNodeMarkup(pos, null, {
-              ...node.attrs,
-              style: newStyle,
-            })
-          );
-        }
+    
+    const { state, view } = editor;
+    const { $anchor } = state.selection;
+    
+    // Find the table cell that contains the cursor
+    let cellPos: number | null = null;
+    let cellNode: any = null;
+    
+    // Walk up from current position to find table cell
+    for (let depth = $anchor.depth; depth > 0; depth--) {
+      const node = $anchor.node(depth);
+      if (node.type.name === "table_cell" || node.type.name === "table_header" || node.type.spec.tableRole === "cell" || node.type.spec.tableRole === "header_cell") {
+        cellPos = $anchor.before(depth);
+        cellNode = node;
+        break;
       }
-    });
-
-    transactions.forEach((tr: any) => editor.view.dispatch(tr));
+    }
+    
+    // Fallback: search all nodes
+    if (!cellNode) {
+      state.doc.nodesBetween(0, state.doc.content.size, (node: any, pos: number) => {
+        if (($anchor.pos >= pos && $anchor.pos < pos + node.nodeSize) && 
+            (node.type.spec.tableRole === "cell" || node.type.spec.tableRole === "header_cell")) {
+          cellPos = pos;
+          cellNode = node;
+          return false;
+        }
+      });
+    }
+    
+    if (cellNode && cellPos !== null) {
+      const colwidth = cellNode.attrs.colwidth || [100];
+      let currentWidth = Array.isArray(colwidth) ? colwidth[0] : colwidth;
+      
+      if (currentWidth === undefined || currentWidth === null) {
+        currentWidth = 100;
+      }
+      
+      const newWidth = Math.max(currentWidth - 30, 50);
+      
+      view.dispatch(
+        state.tr.setNodeMarkup(cellPos, undefined, {
+          ...cellNode.attrs,
+          colwidth: [newWidth],
+        })
+      );
+    }
   };
 
   const insertTableTemplate = (html: string) => {
@@ -1112,10 +1164,43 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         shape-margin: 0.75rem;
       }
       
+      /* Images in table cells should take full width */
+      td .resizable-image-container,
+      th .resizable-image-container {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        vertical-align: top;
+      }
+      
+      td .resizable-image-container img,
+      th .resizable-image-container img {
+        width: 100% !important;
+        max-width: 100%;
+        height: auto !important;
+        padding-right: 0.5rem;
+        box-sizing: border-box;
+      }
+      
       /* Improve text wrapping around images */
       .ProseMirror p {
         margin: 0 0 1em 0;
         line-height: 1.6;
+      }
+      
+      /* Ensure table cells handle content properly */
+      .ProseMirror table td,
+      .ProseMirror table th {
+        box-sizing: border-box;
+        word-wrap: break-word;
+        word-break: break-word;
+      }
+      
+      /* Ensure paragraphs in table cells don't create extra space */
+      .ProseMirror td p,
+      .ProseMirror th p {
+        margin: 0;
       }
       
       /* Fix for list items wrapping around floated images */
@@ -1143,6 +1228,12 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       
       .ProseMirror img.floating-image {
         margin: 0.5rem 1rem 1rem 1rem;
+      }
+      
+      /* Remove margins for images inside table cells */
+      .ProseMirror td .floating-image,
+      .ProseMirror th .floating-image {
+        margin: 0 !important;
       }
       
       .ProseMirror img[data-float="left"] {
@@ -1326,7 +1417,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
       TableCell.configure({
         HTMLAttributes: {
           style:
-            "border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top;",
+            "border: 1px solid #e5e7eb; padding: 0.5rem; vertical-align: top; overflow: visible;",
         },
       }),
       Iframe,

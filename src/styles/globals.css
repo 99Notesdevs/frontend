@@ -1394,3 +1394,64 @@ a[data-description]:hover::after {
 .prose > *:not(p, .resizable-image-container) {
   clear: both;
 }
+
+/* Images in table cells - full width with proper padding */
+td .resizable-image-container,
+th .resizable-image-container {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+td .resizable-image-container img,
+th .resizable-image-container img {
+  width: 100% !important;
+  max-width: 100%;
+  height: auto !important;
+  padding-right: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Remove margins from floating images inside table cells */
+td .floating-image,
+th .floating-image {
+  margin: 0 !important;
+}
+
+/* Add minimal padding to table cells */
+table td,
+table th {
+  padding-left: 0.35rem !important;
+  padding-right: 0.35rem !important;
+}
+
+/* Fix shifted tables from copied content - reset margin while keeping horizontal scroll */
+.prose table,
+table {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  display: block !important;
+  overflow-x: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Remove empty colgroup columns */
+table colgroup col {
+  display: none !important;
+}
+
+/* Ensure table content fills full width */
+table tbody,
+table thead {
+  display: table !important;
+  width: 100% !important;
+  table-layout: auto !important;
+}
+
+/* Ensure table rows stretch */
+table tr {
+  width: 100% !important;
+  display: table-row !important;
+}
