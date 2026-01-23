@@ -31,27 +31,40 @@ interface Page {
   imageUrl: string | null;
   templateId: string;
   parentId: number | null;
-  children: Page[];
+  children: Page[] | null;
   level: number;
   showInNav: boolean;
   order: number;
   createdAt: string;
   updatedAt: string;
   isExpanded?: boolean;
+  isLoading?: boolean;
 }
 
-// Fetch pages from the API with parent-child relationships
-const fetchPages = async (): Promise<Page[]> => {
-  const res = (await api.get(`/page/order`)) as {
+// Fetch pages from the API by parentId
+const fetchPages = async (parentId: number | null = null): Promise<Page[]> => {
+  const url = parentId === null ? `/page/order/null` : `/page/order/${parentId}`;
+  const res = (await api.get(url)) as {
     success: boolean; data: Page[];
   };
   if (!res.success) {
     throw new Error("Failed to fetch pages");
   }
-  return buildHierarchy(res.data);
+  return res.data.map(page => ({ ...page, children: [], level: parentId === null ? 1 : 2 }));
 };
 
-// Helper function to build hierarchical structure from flat array
+// Fetch children for a specific page
+const fetchChildren = async (parentId: number, parentLevel: number): Promise<Page[]> => {
+  const res = (await api.get(`/page/order/${parentId}`)) as {
+    success: boolean; data: Page[];
+  };
+  if (!res.success) {
+    throw new Error("Failed to fetch children");
+  }
+  return res.data.map(page => ({ ...page, children: [], level: parentLevel + 1 }));
+};
+
+// Helper function to build hierarchical structure from flat array (for backward compatibility)
 const buildHierarchy = (pages: Page[]): Page[] => {
   const map = new Map<number, Page>();
   const result: Page[] = [];
@@ -66,10 +79,16 @@ const buildHierarchy = (pages: Page[]): Page[] => {
     if (page.parentId !== null) {
       const parent = map.get(page.parentId);
       if (parent) {
-        parent.children.push(map.get(page.id)!);
+        const child = map.get(page.id);
+        if (child && parent.children) {
+          parent.children.push(child);
+        }
       }
     } else {
-      result.push(map.get(page.id)!);
+      const rootPage = map.get(page.id);
+      if (rootPage) {
+        result.push(rootPage);
+      }
     }
   });
 
@@ -77,7 +96,9 @@ const buildHierarchy = (pages: Page[]): Page[] => {
   const calculateLevels = (pages: Page[], currentLevel = 1) => {
     pages.forEach((page) => {
       page.level = currentLevel;
-      calculateLevels(page.children, currentLevel + 1);
+      if (page.children && page.children.length > 0) {
+        calculateLevels(page.children, currentLevel + 1);
+      }
     });
   };
 
@@ -86,7 +107,11 @@ const buildHierarchy = (pages: Page[]): Page[] => {
 };
 
 // Sortable Item Component
-const SortableItem = ({ page, onToggleExpand }: { page: Page, onToggleExpand: (id: number) => void }) => {
+const SortableItem = ({ page, onToggleExpand, onLoadChildren }: { 
+  page: Page, 
+  onToggleExpand: (id: number) => void,
+  onLoadChildren: (id: number, level: number) => void 
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: page.id });
   
@@ -102,6 +127,7 @@ const SortableItem = ({ page, onToggleExpand }: { page: Page, onToggleExpand: (i
   // Default to first color if level is out of range
   const levelColor = levelColors[Math.min(page.level - 1, levelColors.length - 1)] || levelColors[0];
   const hasChildren = page.children && page.children.length > 0;
+  const isLoading = page.isLoading; // New property for loading state
   
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -119,27 +145,35 @@ const SortableItem = ({ page, onToggleExpand }: { page: Page, onToggleExpand: (i
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 flex-1">
-            {hasChildren && (
+            {(hasChildren || page.children === null) && (
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleExpand(page.id);
+                  if (!page.isExpanded && (!page.children || page.children.length === 0)) {
+                    onLoadChildren(page.id, page.level);
+                  }
                 }}
                 className="p-1 rounded hover:bg-gray-100"
                 aria-label={page.isExpanded ? 'Collapse' : 'Expand'}
+                disabled={isLoading}
               >
-                <svg 
-                  className={`w-4 h-4 transition-transform ${page.isExpanded ? 'rotate-90' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24" 
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-gray-500"></div>
+                ) : (
+                  <svg 
+                    className={`w-4 h-4 transition-transform ${page.isExpanded ? 'rotate-90' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
               </button>
             )}
-            {!hasChildren && <div className="w-6"></div>} {/* Spacer for alignment */}
+            {(!hasChildren && page.children !== null) && <div className="w-6"></div>} {/* Spacer for alignment */}
             <div 
               {...listeners}
               className="flex items-center space-x-2 flex-1 cursor-grab active:cursor-grabbing"
@@ -165,7 +199,7 @@ const SortableItem = ({ page, onToggleExpand }: { page: Page, onToggleExpand: (i
           </div>
         </div>
       </div>
-      {hasChildren && page.isExpanded && (
+      {page.children && page.children.length > 0 && page.isExpanded && (
         <div className="mt-1 ml-6 border-l-2 border-gray-200 pl-2">
           <SortableContext items={page.children.map(child => child.id)} strategy={verticalListSortingStrategy}>
             {page.children.map(child => (
@@ -173,6 +207,7 @@ const SortableItem = ({ page, onToggleExpand }: { page: Page, onToggleExpand: (i
                 key={child.id} 
                 page={child} 
                 onToggleExpand={onToggleExpand}
+                onLoadChildren={onLoadChildren}
               />
             ))}
           </SortableContext>
@@ -194,6 +229,67 @@ const ArticleList = () => {
     updatedSiblings: any[];
     newHierarchy: Page[];
   } | null>(null);
+  
+  // Load children for a specific page
+  const loadChildren = async (parentId: number, parentLevel: number) => {
+    try {
+      // Set loading state
+      const updateLoadingState = (items: Page[]): Page[] => {
+        return items.map(item => {
+          if (item.id === parentId) {
+            return { ...item, isLoading: true };
+          }
+          if (item.children && item.children.length > 0) {
+            return { ...item, children: updateLoadingState(item.children) };
+          }
+          return item;
+        });
+      };
+      
+      setPages(prevPages => updateLoadingState(prevPages));
+      
+      // Fetch children
+      const children = await fetchChildren(parentId, parentLevel);
+      
+      // Update page with children
+      const updatePageWithChildren = (items: Page[]): Page[] => {
+        return items.map(item => {
+          if (item.id === parentId) {
+            return { 
+              ...item, 
+              children: children.map(child => ({ ...child, isExpanded: false, isLoading: false })),
+              isLoading: false 
+            };
+          }
+          if (item.children && item.children.length > 0) {
+            return { ...item, children: updatePageWithChildren(item.children) };
+          }
+          return item;
+        });
+      };
+      
+      setPages(prevPages => updatePageWithChildren(prevPages));
+    } catch (error) {
+      console.error('Error loading children:', error);
+      // Remove loading state on error
+      const removeLoadingState = (items: Page[]): Page[] => {
+        return items.map(item => {
+          if (item.id === parentId) {
+            return { ...item, isLoading: false };
+          }
+          if (item.children && item.children.length > 0) {
+            return { ...item, children: removeLoadingState(item.children) };
+          }
+          return item;
+        });
+      };
+      
+      setPages(prevPages => removeLoadingState(prevPages));
+      setAlertMessage('Failed to load children. Please try again.');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
   
   // Toggle expanded state of a page
   const toggleExpand = (id: number) => {
@@ -241,8 +337,13 @@ const ArticleList = () => {
   useEffect(() => {
     const getPages = async () => {
       try {
-        const pagesData = await fetchPages();
-        const pagesWithExpandedState = setInitialExpandedState(pagesData);
+        // Fetch root level pages (parentId = 0)
+        const pagesData = await fetchPages(null); // null means parentId = 0
+        const pagesWithExpandedState = pagesData.map(page => ({
+          ...page,
+          isExpanded: false, // All dropdowns closed by default
+          children: null, // Initially no children, will be loaded on demand
+        }));
         setPages(pagesWithExpandedState);
         setFlattenedPages(flattenHierarchy(pagesWithExpandedState));
       } catch (error) {
@@ -253,7 +354,9 @@ const ArticleList = () => {
   }, []);
 
   useEffect(() => {
-    setFlattenedPages(flattenHierarchy(pages));
+    if (pages.length > 0) {
+      setFlattenedPages(flattenHierarchy(pages));
+    }
   }, [pages]);
 
   const showErrorAlert = (message: string) => {
@@ -366,7 +469,7 @@ const ArticleList = () => {
           result.push(page);
         } else {
           const parent = pageMap.get(page.parentId);
-          if (parent) {
+          if (parent && parent.children) {
             parent.children.push(page);
           }
         }
@@ -375,8 +478,10 @@ const ArticleList = () => {
       // Sort children by order
       const sortChildren = (pages: Page[]) => {
         pages.forEach((page) => {
-          page.children.sort((a, b) => a.order - b.order);
-          sortChildren(page.children);
+          if (page.children && page.children.length > 0) {
+            page.children.sort((a, b) => a.order - b.order);
+            sortChildren(page.children);
+          }
         });
       };
 
@@ -412,6 +517,7 @@ const ArticleList = () => {
                   key={page.id} 
                   page={page} 
                   onToggleExpand={toggleExpand}
+                  onLoadChildren={loadChildren}
                 />
               ))}
             </SortableContext>
