@@ -38,6 +38,7 @@ import {
 import { TagInput } from "@/components/ui/tags/tag-input";
 import { FAQEditor, type FAQEditorRef } from "../../FAQp/FAQEditor";
 import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts";
+import { isAuth, type AuthResponse } from "@/lib/isAuth";
 
 const TiptapEditor = dynamic(
   () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
@@ -131,6 +132,8 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "editor" | "author" | "user" | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const {
     drafts,
@@ -241,6 +244,23 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
+
+  // Check user authentication and role
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authResponse: AuthResponse = await isAuth();
+        setUserRole(authResponse.role);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setUserRole(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   // Update main category to match title
   const title = form.watch("title");
@@ -618,8 +638,18 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                   Title(Slug) <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} className="border-[var(--admin-border)]" />
+                  <Input 
+                    {...field} 
+                    className="border-[var(--admin-border)]" 
+                    disabled={userRole !== "admin" && !isLoadingAuth}
+                  />
                 </FormControl>
+                {userRole !== "admin" && !isLoadingAuth && (
+                  <FormDescription className="text-amber-600">
+                    Only administrators can edit the title field.
+                  </FormDescription>
+                )}
+                <FormMessage />
               </FormItem>
             )}
           />

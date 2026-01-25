@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import DraftDialog from "@/components/ui/DraftDialog";
 import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts";
+import { isAuth, type AuthResponse } from "@/lib/isAuth";
 
 const TiptapEditor = dynamic(
   () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
@@ -110,7 +111,9 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
-
+  const [userRole, setUserRole] = useState<"admin" | "editor" | "author" | "user" | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  
   const {
     drafts,
     currentDraftId,
@@ -417,6 +420,22 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
       });
     }
   };
+  // Check user authentication and role
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authResponse: AuthResponse = await isAuth();
+        setUserRole(authResponse.role);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setUserRole(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -476,8 +495,17 @@ export function BlogForm({ onSubmit, defaultValues }: BlogFormProps) {
                   Title <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter blog title" {...field} />
+                  <Input 
+                    placeholder="Enter blog title" 
+                    {...field} 
+                    disabled={userRole !== "admin" && !isLoadingAuth}
+                  />
                 </FormControl>
+                {userRole !== "admin" && !isLoadingAuth && (
+                  <FormDescription className="text-amber-600">
+                    Only administrators can edit the title field.
+                  </FormDescription>
+                )}
                 {fieldState.error?.message && (
                   <div className="text-red-600 font-semibold text-sm mt-1">
                     {fieldState.error.message}

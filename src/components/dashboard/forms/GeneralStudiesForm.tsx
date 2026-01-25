@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import DraftDialog from "@/components/ui/DraftDialog";
 import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts";
+import { isAuth, type AuthResponse } from "@/lib/isAuth";
 
 const TiptapEditor = dynamic(
   () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
@@ -114,6 +115,8 @@ export function GeneralStudiesForm({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "editor" | "author" | "user" | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const {
     drafts,
@@ -214,6 +217,23 @@ export function GeneralStudiesForm({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
+
+  // Check user authentication and role
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authResponse: AuthResponse = await isAuth();
+        setUserRole(authResponse.role);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setUserRole(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
   const title = form.watch("title");
   useEffect(() => {
     if (title && title !== mainCategory) {
@@ -466,8 +486,14 @@ export function GeneralStudiesForm({
                     placeholder="Enter title"
                     {...field}
                     className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                    disabled={userRole !== "admin" && !isLoadingAuth}
                   />
                 </FormControl>
+                {userRole !== "admin" && !isLoadingAuth && (
+                  <FormDescription className="text-amber-600">
+                    Only administrators can edit the title field.
+                  </FormDescription>
+                )}
               </FormItem>
             )}
           />

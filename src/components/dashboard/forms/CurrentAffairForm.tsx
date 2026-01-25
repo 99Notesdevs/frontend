@@ -21,6 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Label } from "@radix-ui/react-label";
 import Image from "next/image";
@@ -28,6 +29,7 @@ import { Alert } from "@/components/ui/alert";
 import DraftDialog from "@/components/ui/DraftDialog";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts";
+import { isAuth, type AuthResponse } from "@/lib/isAuth";
 
 const TiptapEditor = dynamic(
   () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
@@ -93,6 +95,8 @@ export function CurrentAffairForm({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "editor" | "author" | "user" | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [ogimagePreview, setOgImagePreview] = useState<string | null>(
     defaultValues?.ogImage ? getImageUrl(defaultValues.ogImage) : null
   );
@@ -178,6 +182,23 @@ export function CurrentAffairForm({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
+
+  // Check user authentication and role
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authResponse: AuthResponse = await isAuth();
+        setUserRole(authResponse.role);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setUserRole(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const loadDraft = async () => {
     await loadDrafts();
@@ -336,8 +357,17 @@ export function CurrentAffairForm({
                   Title <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Enter title" />
+                  <Input 
+                    {...field} 
+                    placeholder="Enter title" 
+                    disabled={userRole !== "admin" && !isLoadingAuth}
+                  />
                 </FormControl>
+                {userRole !== "admin" && !isLoadingAuth && (
+                  <FormDescription className="text-amber-600">
+                    Only administrators can edit the title field.
+                  </FormDescription>
+                )}
               </FormItem>
             )}
           />

@@ -25,7 +25,7 @@ let pagesPromise: Promise<Page[]> | null = null;
 async function fetchOrderedPages(): Promise<Page[]> {
   if (!pagesPromise) {
     pagesPromise = (async () => {
-      const response = (await api.get(`/page/order`)) as {
+      const response = (await api.get(`/page/order/-1`)) as {
         success: boolean;
         data: any[];
       };

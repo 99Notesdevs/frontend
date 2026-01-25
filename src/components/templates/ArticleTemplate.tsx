@@ -276,9 +276,9 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
   // Use either the content image or the metadata coverImage
   // @ts-ignore
-  const displayImagearray = JSON.parse(page.imageUrl) || (coverImage as string);
-  const displayImage = displayImagearray[0];
-  const displayImageAlt = displayImagearray[1];
+  const displayImagearray = page.imageUrl ? JSON.parse(page.imageUrl) : (coverImage as string || []);
+  const displayImage = displayImagearray[0]||'';
+  const displayImageAlt = displayImagearray[1]||'';
   const formattedDate = page.createdAt
     ? new Date(page.createdAt).toLocaleDateString("en-US", {
       year: "numeric",

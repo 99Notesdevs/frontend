@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,8 +18,10 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
+import { isAuth, type AuthResponse } from "@/lib/isAuth";
 
 const customLinkSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -38,6 +40,25 @@ export const CustomLinkForm: React.FC<CustomLinkFormProps> = ({
   initialData,
   onSubmit,
 }) => {
+  const [userRole, setUserRole] = useState<"admin" | "editor" | "author" | "user" | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authResponse: AuthResponse = await isAuth();
+        setUserRole(authResponse.role);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setUserRole(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   const form = useForm<CustomLinkFormData>({
     resolver: zodResolver(customLinkSchema),
     defaultValues: initialData || {
@@ -61,8 +82,17 @@ export const CustomLinkForm: React.FC<CustomLinkFormProps> = ({
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Enter page title" {...field} />
+                <Input 
+                  placeholder="Enter page title" 
+                  {...field} 
+                  disabled={userRole !== "admin" && !isLoadingAuth}
+                />
               </FormControl>
+              {userRole !== "admin" && !isLoadingAuth && (
+                <FormDescription className="text-amber-600">
+                  Only administrators can edit the title field.
+                </FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}

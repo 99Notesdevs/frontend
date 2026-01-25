@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { TagInput } from "@/components/ui/tags/tag-input";
 import DraftDialog from "@/components/ui/DraftDialog";
+import { isAuth, type AuthResponse } from "@/lib/isAuth";
 import {
   BlogsManager,
   type Blog,
@@ -119,6 +120,8 @@ export function CurrentArticleForm({
     type: "success" | "error";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "editor" | "author" | "user" | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const {
     drafts,
@@ -202,6 +205,23 @@ export function CurrentArticleForm({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
+
+  // Check user authentication and role
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authResponse: AuthResponse = await isAuth();
+        setUserRole(authResponse.role);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setUserRole(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const slug =
     defaultValues?.slug ||
@@ -444,8 +464,14 @@ export function CurrentArticleForm({
                     placeholder="Enter title"
                     {...field}
                     className="border-blue-100 focus:border-blue-300 focus:ring-blue-300 rounded-lg"
+                    disabled={userRole !== "admin" && !isLoadingAuth}
                   />
                 </FormControl>
+                {userRole !== "admin" && !isLoadingAuth && (
+                  <FormDescription className="text-amber-600">
+                    Only administrators can edit the title field.
+                  </FormDescription>
+                )}
                 <FormMessage />
               </FormItem>
             )}

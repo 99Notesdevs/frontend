@@ -14,6 +14,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormDescription,
 } from "@/components/ui/form";
 import { Label } from "@radix-ui/react-label";
 import Image from "next/image";
@@ -28,6 +29,7 @@ import {
 import DraftDialog from "@/components/ui/DraftDialog";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 import { useIndexedDBDrafts } from "@/hooks/useIndexedDBDrafts";
+import { isAuth, type AuthResponse } from "@/lib/isAuth";
 
 const TiptapEditor = dynamic(
   () => import("@/components/ui/tiptapeditor").then((mod) => mod.default),
@@ -82,6 +84,8 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
     type: "error" | "success" | "warning";
   } | null>(null);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "editor" | "author" | "user" | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const parseImageUrl = (url: string | undefined): [string, string] => {
     try {
@@ -145,6 +149,23 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
       setShowDraftDialog(true);
     }
   }, [drafts, isLoadingDrafts, currentDraftId]);
+
+  // Check user authentication and role
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authResponse: AuthResponse = await isAuth();
+        setUserRole(authResponse.role);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setUserRole(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
   
   const loadDraft = async () => {
     await loadDrafts();
@@ -400,8 +421,17 @@ export const UpscNotesForm: React.FC<UpscNotesFormProps> = ({
               <FormItem>
                 <FormLabel>Title(Slug) *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter title" {...field} />
+                  <Input 
+                    placeholder="Enter title" 
+                    {...field} 
+                    disabled={userRole !== "admin" && !isLoadingAuth}
+                  />
                 </FormControl>
+                {userRole !== "admin" && !isLoadingAuth && (
+                  <FormDescription className="text-amber-600">
+                    Only administrators can edit the title field.
+                  </FormDescription>
+                )}
               </FormItem>
             )}
           />
