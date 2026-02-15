@@ -63,7 +63,7 @@ const MediaLibrary = () => {
   const bulkDeleteMediaFiles = async () => {
     try {
       const response = (await api.delete(`/aws/delete-image`, {
-        data: { selectedFiles },
+        selectedFiles,
       })) as { success: boolean; message: string };
       if (response.success) {
         setMediaFiles((prev) =>
