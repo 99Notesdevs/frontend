@@ -152,6 +152,15 @@ const formRef = useRef<HTMLDivElement>(null);
     e.preventDefault();
     if (isSubmitting) return;
     
+    // Validate answer against available options
+    if (!validateAnswer(newQuestion.answer, newQuestion.options, newQuestion.multipleCorrectType)) {
+      setToast({
+        message: `Invalid answer. Please select from available options only: ${getValidOptionsDisplay()}`,
+        type: "error"
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -287,6 +296,15 @@ const formRef = useRef<HTMLDivElement>(null);
     e.preventDefault();
     if (!editingQuestion) return;
 
+    // Validate answer against available options
+    if (!validateAnswer(newQuestion.answer, newQuestion.options, newQuestion.multipleCorrectType)) {
+      setToast({
+        message: `Invalid answer. Please select from available options only: ${getValidOptionsDisplay()}`,
+        type: "error"
+      });
+      return;
+    }
+
     try {
       const answer = newQuestion.multipleCorrectType 
         ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
@@ -350,6 +368,32 @@ const formRef = useRef<HTMLDivElement>(null);
       year: null,
       rating: null
     });
+  };
+
+  // Validate answer against available options
+  const validateAnswer = (answer: string, options: string[], isMultiple: boolean): boolean => {
+    if (!answer.trim()) return false;
+    
+    const validOptions = options
+      .map((_, index) => String.fromCharCode(65 + index)) // A, B, C, D...
+      .filter((_, index) => options[index] && options[index].trim()); // Only non-empty options
+    
+    if (isMultiple) {
+      const answerLetters = answer.split(',').map(a => a.trim().toUpperCase()).filter(a => a);
+      return answerLetters.length > 0 && answerLetters.every(letter => validOptions.includes(letter));
+    } else {
+      const answerLetter = answer.trim().toUpperCase();
+      return validOptions.includes(answerLetter);
+    }
+  };
+
+  // Get valid options for display
+  const getValidOptionsDisplay = (): string => {
+    const validOptions = newQuestion.options
+      .map((_, index) => String.fromCharCode(65 + index))
+      .filter((_, index) => newQuestion.options[index] && newQuestion.options[index].trim());
+    
+    return validOptions.length > 0 ? validOptions.join(', ') : 'No options available';
   };
 
   return (
@@ -555,9 +599,16 @@ const formRef = useRef<HTMLDivElement>(null);
                     <label htmlFor="answer" className="block text-sm font-medium text-gray-700 mb-1">
                       Correct Answer <span className="text-red-500">*</span>
                     </label>
+                    <div className="text-xs text-gray-500 mb-2">
+                      Available options: <span className="font-medium text-indigo-600">{getValidOptionsDisplay()}</span>
+                    </div>
                     <Input
                       id="answer"
-                      className="bg-white border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                      className={`bg-white border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 ${
+                        !validateAnswer(newQuestion.answer, newQuestion.options, newQuestion.multipleCorrectType) && newQuestion.answer
+                          ? 'border-red-300 focus:border-red-500' 
+                          : ''
+                      }`}
                       type="text"
                       placeholder={newQuestion.multipleCorrectType 
                         ? 'e.g., A,C,D' 
@@ -571,6 +622,11 @@ const formRef = useRef<HTMLDivElement>(null);
                         });
                       }}
                     />
+                    {!validateAnswer(newQuestion.answer, newQuestion.options, newQuestion.multipleCorrectType) && newQuestion.answer && (
+                      <p className="mt-1 text-xs text-red-600">
+                        Answer must be from available options only ({getValidOptionsDisplay()})
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-4">
