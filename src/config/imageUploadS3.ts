@@ -5,14 +5,15 @@ export const uploadImageToS3 = async (
   folder: string,
   name?: string
 ): Promise<string | null> => {
-  const res = await fetch(
-    `${env.API}/aws/upload-image?folder=${folder}&name=${name}`,
-    {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    }
-  );
+  const params = new URLSearchParams();
+  params.set("folder", folder);
+  if (name) params.set("name", name);
+
+  const res = await fetch(`${env.API}/aws/upload-image?${params.toString()}`, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
   const result = await res.json();
   if (!res.ok) return null;
 
