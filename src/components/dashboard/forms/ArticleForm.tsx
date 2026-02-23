@@ -171,7 +171,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
     schemaData: "",
     header: "",
     body: "",
-    showInNav: false,
+    showInNav: true,
     questionNumber: undefined,
     FAQ: JSON.stringify({ general: [] }),
   };

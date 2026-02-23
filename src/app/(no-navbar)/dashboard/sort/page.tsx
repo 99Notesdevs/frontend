@@ -42,7 +42,7 @@ interface Page {
 }
 
 // Fetch pages from the API by parentId
-const fetchPages = async (parentId: number | null = null): Promise<Page[]> => {
+const fetchPages = async (parentId: number | -1): Promise<Page[]> => {
   const url = parentId === null ? `/page/order/null` : `/page/order/${parentId}`;
   const res = (await api.get(url)) as {
     success: boolean; data: Page[];
@@ -61,7 +61,12 @@ const fetchChildren = async (parentId: number, parentLevel: number): Promise<Pag
   if (!res.success) {
     throw new Error("Failed to fetch children");
   }
-  return res.data.map(page => ({ ...page, children: [], level: parentLevel + 1 }));
+  return res.data.map(page => ({ 
+    ...page, 
+    children: null, // Set to null to indicate children can be loaded
+    level: parentLevel + 1,
+    isExpanded: false
+  }));
 };
 
 // Helper function to build hierarchical structure from flat array (for backward compatibility)
@@ -145,7 +150,7 @@ const SortableItem = ({ page, onToggleExpand, onLoadChildren }: {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 flex-1">
-            {(hasChildren || page.children === null) && (
+            {(page.children === null || page.children.length > 0) && (
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
@@ -173,7 +178,7 @@ const SortableItem = ({ page, onToggleExpand, onLoadChildren }: {
                 )}
               </button>
             )}
-            {(!hasChildren && page.children !== null) && <div className="w-6"></div>} {/* Spacer for alignment */}
+            {page.children !== null && page.children.length === 0 && <div className="w-6"></div>} {/* Spacer for alignment */}
             <div 
               {...listeners}
               className="flex items-center space-x-2 flex-1 cursor-grab active:cursor-grabbing"
@@ -261,7 +266,7 @@ const ArticleList = () => {
               isLoading: false 
             };
           }
-          if (item.children && item.children.length > 0) {
+          if (item.children) {
             return { ...item, children: updatePageWithChildren(item.children) };
           }
           return item;
@@ -277,7 +282,7 @@ const ArticleList = () => {
           if (item.id === parentId) {
             return { ...item, isLoading: false };
           }
-          if (item.children && item.children.length > 0) {
+          if (item.children) {
             return { ...item, children: removeLoadingState(item.children) };
           }
           return item;
@@ -298,7 +303,7 @@ const ArticleList = () => {
         if (item.id === id) {
           return { ...item, isExpanded: !item.isExpanded };
         }
-        if (item.children && item.children.length > 0) {
+        if (item.children) {
           return { ...item, children: updateExpanded(item.children) };
         }
         return item;
@@ -337,15 +342,15 @@ const ArticleList = () => {
   useEffect(() => {
     const getPages = async () => {
       try {
-        // Fetch root level pages (parentId = 0)
-        const pagesData = await fetchPages(null); // null means parentId = 0
+        // Fetch root level pages (parentId = null)
+        const pagesData = await fetchPages(-1); // -1 means parentId = null
         const pagesWithExpandedState = pagesData.map(page => ({
           ...page,
           isExpanded: false, // All dropdowns closed by default
           children: null, // Initially no children, will be loaded on demand
         }));
         setPages(pagesWithExpandedState);
-        setFlattenedPages(flattenHierarchy(pagesWithExpandedState));
+        // Don't set flattenedPages initially - we'll only show the hierarchy structure
       } catch (error) {
         console.error("Error fetching pages:", error);
       }
@@ -354,9 +359,8 @@ const ArticleList = () => {
   }, []);
 
   useEffect(() => {
-    if (pages.length > 0) {
-      setFlattenedPages(flattenHierarchy(pages));
-    }
+    // Only update flattenedPages when needed for drag operations
+    // Don't auto-flatten as it shows all levels at once
   }, [pages]);
 
   const showErrorAlert = (message: string) => {
@@ -404,9 +408,20 @@ const ArticleList = () => {
 
     if (!over || active.id === over.id) return;
 
-    // Find the pages being dragged and dropped
-    const activePage = flattenedPages.find((page) => page.id === active.id);
-    const overPage = flattenedPages.find((page) => page.id === over.id);
+    // Find the pages being dragged and dropped in the hierarchy
+    const findPageInHierarchy = (pages: Page[], id: number): Page | null => {
+      for (const page of pages) {
+        if (page.id === id) return page;
+        if (page.children && page.children.length > 0) {
+          const found = findPageInHierarchy(page.children, id);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const activePage = findPageInHierarchy(pages, Number(active.id));
+    const overPage = findPageInHierarchy(pages, Number(over.id));
 
     if (!activePage || !overPage) return;
 
@@ -419,15 +434,27 @@ const ArticleList = () => {
       return;
     }
 
-    // Get all siblings (pages at the same level with the same parent)
-    const siblings = flattenedPages.filter(
-      (page) =>
-        page.level === activePage.level && page.parentId === activePage.parentId
-    );
+    // Find the parent that contains both pages
+    const findParentAndSiblings = (pages: Page[], parentId: number | null): Page[] => {
+      if (parentId === null) return pages;
+      
+      for (const page of pages) {
+        if (page.id === parentId) {
+          return page.children || [];
+        }
+        if (page.children && page.children.length > 0) {
+          const found = findParentAndSiblings(page.children, parentId);
+          if (found.length > 0) return found;
+        }
+      }
+      return [];
+    };
+
+    const siblings = findParentAndSiblings(pages, activePage.parentId);
 
     // Find indices within the siblings array
-    const oldIndex = siblings.findIndex((page) => page.id === activePage.id);
-    const newIndex = siblings.findIndex((page) => page.id === overPage.id);
+    const oldIndex = siblings.findIndex((page) => page.id === Number(active.id));
+    const newIndex = siblings.findIndex((page) => page.id === Number(over.id));
 
     if (oldIndex === -1 || newIndex === -1) return;
 
@@ -440,62 +467,24 @@ const ArticleList = () => {
       order: index,
     }));
 
-    // Create a new flattened pages array with the updated siblings
-    const newFlattenedPages = flattenedPages.map((page) => {
-      const updatedSibling = updatedSiblings.find((s) => s.id === page.id);
-      return updatedSibling || page;
-    });
-
-    // Rebuild the hierarchy with the updated orders
-    const rebuildHierarchy = (flatPages: Page[]): Page[] => {
-      // Create a deep copy to avoid mutation issues
-      const pagesCopy = JSON.parse(JSON.stringify(flatPages)) as Page[];
-
-      // Reset children arrays
-      pagesCopy.forEach((page) => {
-        page.children = [];
-      });
-
-      // Create a map for quick lookups
-      const pageMap = new Map<number, Page>();
-      pagesCopy.forEach((page) => {
-        pageMap.set(page.id, page);
-      });
-
-      // Build the hierarchy
-      const result: Page[] = [];
-      pagesCopy.forEach((page) => {
-        if (page.parentId === null) {
-          result.push(page);
-        } else {
-          const parent = pageMap.get(page.parentId);
-          if (parent && parent.children) {
-            parent.children.push(page);
-          }
+    // Update the hierarchy with the new order
+    const updateHierarchy = (pages: Page[]): Page[] => {
+      return pages.map(page => {
+        if (page.id === activePage.parentId) {
+          return { ...page, children: updatedSiblings };
         }
+        if (page.children && page.children.length > 0) {
+          return { ...page, children: updateHierarchy(page.children) };
+        }
+        return page;
       });
-
-      // Sort children by order
-      const sortChildren = (pages: Page[]) => {
-        pages.forEach((page) => {
-          if (page.children && page.children.length > 0) {
-            page.children.sort((a, b) => a.order - b.order);
-            sortChildren(page.children);
-          }
-        });
-      };
-
-      sortChildren(result);
-      result.sort((a, b) => a.order - b.order);
-
-      return result;
     };
 
-    const newHierarchy = rebuildHierarchy(newFlattenedPages);
+    const newHierarchy = activePage.parentId === null ? updatedSiblings : updateHierarchy(pages);
     
     // Store the pending changes and show confirmation dialog
     setPendingChanges({
-      newFlattenedPages,
+      newFlattenedPages: flattenHierarchy(newHierarchy),
       updatedSiblings,
       newHierarchy
     });
