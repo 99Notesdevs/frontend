@@ -89,64 +89,19 @@ interface ArticleFormProps {
   initialData?: ArticleFormData;
   onSubmit: (data: ArticleFormData) => Promise<void>;
   onSuccess?: () => void;
+  currentPath?: string;
 }
 
 export const ArticleForm: React.FC<ArticleFormProps> = ({
   initialData,
   onSubmit,
   onSuccess,
+  currentPath = "",
 }) => {
+  // Slug state
+  const [slug, setSlug] = useState("");
+
   const faqEditorRef = useRef<FAQEditorRef>(null);
-
-  const parseImageUrl = (url: string | undefined): [string, string] => {
-    try {
-      return JSON.parse(url || "[]") as [string, string];
-    } catch (error) {
-      return ["", ""];
-    }
-  };
-
-  const getImageUrl = (url: string | undefined): string => {
-    const [imageUrl] = parseImageUrl(url);
-    return imageUrl;
-  };
-
-  const getImageAlt = (url: string | undefined): string => {
-    const [, altText] = parseImageUrl(url);
-    return altText;
-  };
-
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    initialData?.imageUrl ? getImageUrl(initialData.imageUrl) : null
-  );
-  const [ogimagePreview, setOgImagePreview] = useState<string | null>(
-    initialData?.ogImage ? getImageUrl(initialData.ogImage) : null
-  );
-  const [isUploading, setIsUploading] = useState(false);
-  const [isImageUploading, setIsImageUploading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [alert, setAlert] = useState<{
-    message: string;
-    type: "error" | "success" | "warning";
-  } | null>(null);
-  const [showDraftDialog, setShowDraftDialog] = useState(false);
-
-  const {
-    drafts,
-    currentDraftId,
-    isLoading: isLoadingDrafts,
-    error: draftError,
-    saveDraft: saveDraftToDB,
-    deleteDraft,
-    getDraft,
-    loadDrafts,
-    setCurrentDraftId,
-  } = useIndexedDBDrafts<ArticleFormData>({
-    draftType: "article",
-    defaultTitle: "Untitled Article",
-    autoSaveInterval: 30000,
-  });
 
   // Default form values
   const defaultFormValues: ArticleFormData = {
@@ -206,6 +161,81 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
       ...initialData,
     },
   });
+
+  // Update slug live as title changes
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      const title = value.title || "";
+      const slugifiedTitle = title
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+      setSlug(currentPath ? (currentPath + (slugifiedTitle ? "/" + slugifiedTitle : "")) : slugifiedTitle);
+    });
+    // Set initial slug
+    const initialTitle = form.getValues("title") || "";
+    const slugifiedTitle = initialTitle
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    setSlug(currentPath ? (currentPath + (slugifiedTitle ? "/" + slugifiedTitle : "")) : slugifiedTitle);
+    return () => subscription.unsubscribe();
+  }, [form, currentPath]);
+
+  const parseImageUrl = (url: string | undefined): [string, string] => {
+    try {
+      return JSON.parse(url || "[]") as [string, string];
+    } catch (error) {
+      return ["", ""];
+    }
+  };
+
+  // Remove the duplicate defaultFormValues and form definition that appears later
+
+  const getImageUrl = (url: string | undefined): string => {
+    const [imageUrl] = parseImageUrl(url);
+    return imageUrl;
+  };
+
+  const getImageAlt = (url: string | undefined): string => {
+    const [, altText] = parseImageUrl(url);
+    return altText;
+  };
+
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    initialData?.imageUrl ? getImageUrl(initialData.imageUrl) : null
+  );
+  const [ogimagePreview, setOgImagePreview] = useState<string | null>(
+    initialData?.ogImage ? getImageUrl(initialData.ogImage) : null
+  );
+  const [isUploading, setIsUploading] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [alert, setAlert] = useState<{
+    message: string;
+    type: "error" | "success" | "warning";
+  } | null>(null);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+
+  const {
+    drafts,
+    currentDraftId,
+    isLoading: isLoadingDrafts,
+    error: draftError,
+    saveDraft: saveDraftToDB,
+    deleteDraft,
+    getDraft,
+    loadDrafts,
+    setCurrentDraftId,
+  } = useIndexedDBDrafts<ArticleFormData>({
+    draftType: "article",
+    defaultTitle: "Untitled Article",
+    autoSaveInterval: 30000,
+  });
+
 
   // Show validation messages to the user (keep resolver pure)
   useEffect(() => {
@@ -608,6 +638,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
           onSubmit={form.handleSubmit(handleSubmitForm)}
           className="space-y-6"
         >
+
           {/* Title */}
           <FormField
             control={form.control}
@@ -623,6 +654,12 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
               </FormItem>
             )}
           />
+          {/* Slug (read-only, inline below title) */}
+          <div className="mb-2">
+            <span className="text-xs text-muted-foreground block mt-1 ml-1 select-all">
+              <b>Slug:</b> {slug || <span className="italic text-gray-400">(auto-generated from title)</span>}
+            </span>
+          </div>
 
           {/* Image Upload */}
           <FormField
