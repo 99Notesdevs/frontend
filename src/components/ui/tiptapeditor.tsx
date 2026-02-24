@@ -1313,7 +1313,10 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         if (event.target?.result) {
           setImageSrc(event.target.result as string);
           setImageDialogOpen(true);
-          setAltText("");
+          // Set default name and alt text to file name (without extension for alt)
+          const fileName = file.name;
+          setName(fileName);
+          setAltText(fileName);
         }
       };
 
