@@ -375,15 +375,10 @@ const ArticleList = () => {
     const { newFlattenedPages, updatedSiblings, newHierarchy } = pendingChanges;
     
     try {
-      // Update the database with the new order
-      const updatePromises = updatedSiblings.map((page) => {
-        return api.put(`/page/order`, {
-          pageId: page.id,
-          newOrder: page.order,
-        });
+      // Update the database with the new order using a single bulk request
+      await api.put(`/page/order`, {
+        updates: updatedSiblings.map((p) => ({ id: p.id, order: p.order })),
       });
-      
-      await Promise.all(updatePromises);
       
       // Only update the UI state after successful API call
       setPages(newHierarchy);
