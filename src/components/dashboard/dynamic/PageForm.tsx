@@ -427,10 +427,30 @@ export function PageForm({ editPage = null }: PageFormProps) {
       return null;
     }
 
+
+    // Compute the current path (fullPath) as in handleSubmit, including the slugified title
+    const title = editPage?.data?.title || "";
+    const slugifiedTitle = title
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    const parentPath = selectedLevels
+      .filter((level) => level)
+      .map((level) => {
+        const page = pages.find((p) => p.id === level);
+        if (!page) return "";
+        const slugParts = page.slug.split("/");
+        return slugParts[slugParts.length - 1];
+      })
+      .join("/");
+    const fullPath = parentPath + (parentPath && slugifiedTitle ? "/" : "") + slugifiedTitle;
+
     const formProps = {
       onSubmit: handleSubmit,
       defaultValues: editPage?.data || undefined,
       folder: "GeneralStudies",
+      currentPath: fullPath,
     };
 
     // Map template IDs to form components
