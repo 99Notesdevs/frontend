@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { env } from "@/config/env";
-import CategorySelect from "@/components/testUtils/CategorySelect";
+import MultiCategorySelect from "@/components/testUtils/MultiCategorySelect";
 import TiptapEditor from "@/components/ui/tiptapeditor";
 import { uploadImageToS3 } from "@/config/imageUploadS3";
 
@@ -12,7 +12,8 @@ interface Question {
   question: string;
   answer: string;
   options: string[];
-  categoryId: number;
+  categoryIds: number[];
+  categories?: Array<{id: number; name: string}>;
   explaination: string;
   creatorName: string;
   multipleCorrectType: boolean;
@@ -25,7 +26,7 @@ import { useRef } from "react";
 
 
 export default function AddQuestionsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pageSize] = useState(10);
   const [creatorName, setCreatorName] = useState<string>("");
@@ -37,7 +38,7 @@ const formRef = useRef<HTMLDivElement>(null);
     question: "",
     answer: "",
     options: [] as string[],
-    categoryId: 0,
+    categoryIds: [],
     explaination: "",
     creatorName: "",
     multipleCorrectType: false,
@@ -68,11 +69,12 @@ const formRef = useRef<HTMLDivElement>(null);
   }, [toast]);
 
   useEffect(() => {
-    if (!selectedCategory) return;
+    if (selectedCategories.length === 0) return;
 
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`${env.API_TEST}/questions/?categoryId=${selectedCategory}&limit=${pageSize}`,{
+        // Fetch questions for the first selected category
+        const response = await fetch(`${env.API_TEST}/questions/?categoryId=${selectedCategories[0]}&limit=${pageSize}`,{
             method: "GET",
             credentials: "include",
             headers: {
@@ -90,7 +92,15 @@ const formRef = useRef<HTMLDivElement>(null);
       }
     };
     fetchQuestions();
-  }, [selectedCategory]);
+  }, [selectedCategories]);
+
+  // Sync selected categories with newQuestion state
+  useEffect(() => {
+    setNewQuestion(prev => ({
+      ...prev,
+      categoryIds: selectedCategories
+    }));
+  }, [selectedCategories]);
 
   // Fetch user name
   useEffect(() => {
@@ -152,6 +162,15 @@ const formRef = useRef<HTMLDivElement>(null);
     e.preventDefault();
     if (isSubmitting) return;
     
+    // Validate at least one category is selected
+    if (selectedCategories.length === 0) {
+      setToast({
+        message: "Please select at least one category",
+        type: "error"
+      });
+      return;
+    }
+    
     // Validate answer against available options
     if (!validateAnswer(newQuestion.answer, newQuestion.options, newQuestion.multipleCorrectType)) {
       setToast({
@@ -180,7 +199,7 @@ const formRef = useRef<HTMLDivElement>(null);
         options: processedOptions,
         explaination: processedExplanation,
         answer,
-        categoryId: selectedCategory,
+        categoryIds: selectedCategories,
         multipleCorrectType: newQuestion.multipleCorrectType}
       const response = await fetch(`${env.API_TEST}/questions`,
         {
@@ -209,7 +228,7 @@ const formRef = useRef<HTMLDivElement>(null);
         question: "",
         answer: "",
         options: [],
-        categoryId: selectedCategory || 0,
+        categoryIds: selectedCategories,
         explaination: "",
         creatorName: creatorName || "",
         multipleCorrectType: false,
@@ -244,12 +263,13 @@ const formRef = useRef<HTMLDivElement>(null);
       const processedExplanation = await handleImageUpload(question.explaination);
   
       setEditingQuestion(question);
+      setSelectedCategories(question.categoryIds);
       setNewQuestion({
         ...question,
         question: processedQuestion,
         options: processedOptions,
         explaination: processedExplanation,
-        categoryId: question.categoryId,
+        categoryIds: question.categoryIds,
         multipleCorrectType: question.multipleCorrectType
       });
       
@@ -296,6 +316,15 @@ const formRef = useRef<HTMLDivElement>(null);
     e.preventDefault();
     if (!editingQuestion) return;
 
+    // Validate at least one category is selected
+    if (selectedCategories.length === 0) {
+      setToast({
+        message: "Please select at least one category",
+        type: "error"
+      });
+      return;
+    }
+
     // Validate answer against available options
     if (!validateAnswer(newQuestion.answer, newQuestion.options, newQuestion.multipleCorrectType)) {
       setToast({
@@ -340,7 +369,7 @@ const formRef = useRef<HTMLDivElement>(null);
         question: "",
         answer: "",
         options: [],
-        categoryId: selectedCategory || 0,
+        categoryIds: selectedCategories,
         explaination: "",
         creatorName: creatorName || "",
         multipleCorrectType: false,
@@ -360,7 +389,7 @@ const formRef = useRef<HTMLDivElement>(null);
       question: "",
       answer: "",
       options: [],
-      categoryId: selectedCategory || 0,
+      categoryIds: selectedCategories,
       explaination: "",
       creatorName: "",
       multipleCorrectType: false,
@@ -486,9 +515,9 @@ const formRef = useRef<HTMLDivElement>(null);
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-8 mx-auto">
           {/* Category Selection */}
-          <CategorySelect
-            selectedCategoryId={selectedCategory}
-            onCategoryChange={setSelectedCategory}
+          <MultiCategorySelect
+            selectedCategoryIds={selectedCategories}
+            onCategoryChange={setSelectedCategories}
           />
 
           {/* Question Form */}
@@ -811,6 +840,16 @@ const formRef = useRef<HTMLDivElement>(null);
                           <div className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded border border-blue-100">
                             PYQ: {question.year}
                           </div>
+                        )}
+                        {question.categories && question.categories.length > 0 && (
+                          <>
+                            <div className="text-xs font-medium text-gray-500">Categories:</div>
+                            {question.categories.map((cat) => (
+                              <div key={cat.id} className="px-2.5 py-1 bg-purple-50 text-purple-700 text-xs font-medium rounded border border-purple-100">
+                                {cat.name}
+                              </div>
+                            ))}
+                          </>
                         )}
                       </div>
                     </div>
