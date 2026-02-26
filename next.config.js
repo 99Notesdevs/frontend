@@ -34,9 +34,14 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "99notes-media-files.s3.ap-south-1.amazonaws.com",
+        hostname: "99notes.org",
         pathname: "/**", // Allow all paths under this hostname
       },
+      {
+	protocol: "http",
+	hostname: "99notes.org",
+	pathname: "/**",
+      }
     ],
   },
 };
