@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { env } from "@/config/env";
 import { Button } from "@/components/ui/button";
 
 interface Category {
   id: number;
   name: string;
+  parentTagId?: number | null;
 }
 
 interface MultiCategorySelectProps {
@@ -22,6 +23,14 @@ export default function MultiCategorySelect({
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
+  const categoryById = useMemo(() => {
+    const map = new Map<number, Category>();
+    for (const category of categories) {
+      map.set(category.id, category);
+    }
+    return map;
+  }, [categories]);
+
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -31,7 +40,7 @@ export default function MultiCategorySelect({
         });
         if (!response.ok) throw new Error("Failed to fetch categories");
         const { data } = await response.json();
-        setCategories(data);
+        setCategories(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -56,6 +65,19 @@ export default function MultiCategorySelect({
       .filter(cat => selectedCategoryIds.includes(cat.id))
       .map(cat => cat.name)
       .join(", ");
+  };
+
+  const getHierarchyText = (categoryId: number) => {
+    const selected = categoryById.get(categoryId);
+    const selectedName = selected?.name ?? `Category ${categoryId}`;
+
+    const parent = selected?.parentTagId != null ? categoryById.get(selected.parentTagId) : undefined;
+    const parentName = parent?.name ?? "—";
+
+    const grandparent = parent?.parentTagId != null ? categoryById.get(parent.parentTagId) : undefined;
+    const grandparentName = grandparent?.name ?? "—";
+
+    return `${grandparentName} › ${parentName} › ${selectedName}`;
   };
 
   return (
@@ -146,6 +168,22 @@ export default function MultiCategorySelect({
           </div>
         )}
       </div>
+      {selectedCategoryIds.length > 0 && (
+        <div className="mt-2 text-xs text-gray-500">
+          {categories.length === 0 ? (
+            <p>Loading category hierarchy…</p>
+          ) : (
+            <div className="space-y-1">
+              {selectedCategoryIds.map((categoryId) => (
+                <div key={categoryId} className="flex items-start gap-2">
+                  <span className="mt-[2px] text-gray-400">•</span>
+                  <span className="leading-relaxed">{getHierarchyText(categoryId)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       {selectedCategoryIds.length === 0 && (
         <p className="mt-1 text-xs text-red-600">At least one category is required</p>
       )}

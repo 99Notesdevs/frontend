@@ -1,0 +1,58 @@
+# main-frontend architecture
+
+This document describes the architecture of the **main-frontend** web app (Next.js + React + TypeScript) as implemented in this repository.
+
+## What this app does
+
+`main-frontend` is the primary 99Notes portal UI.
+
+- It uses Next.js App Router under `src/app/`.
+- It renders a public site with a navigation/footer layout and also contains dashboard/operator flows under a no-navbar layout group.
+- It uses cookies for authentication in coordination with the backend(s).
+
+## Tech stack
+
+- Framework: Next.js (App Router)
+- UI: React + TypeScript
+- Styling: Tailwind CSS
+- Data: `fetch` wrapper in `src/config/api/route.ts`
+
+## Runtime entrypoints
+
+- `src/app/layout.tsx`
+  - Root HTML layout and global providers.
+  - Wraps the app in an `AuthProvider` and includes `AuthModal`.
+
+- `src/app/(use-navbar)/layout.tsx`
+  - Layout group that renders Navbar + Footer and loads navigation/footer sections.
+
+- `src/app/(no-navbar)/layout.tsx`
+  - Layout group for dashboard/operator flows without the main navbar/footer.
+
+## Routing (App Router)
+
+- Public site pages live under `src/app/(use-navbar)/...`.
+- Dashboard/operator pages live under `src/app/(no-navbar)/...`.
+
+## API boundary
+
+- API client: `src/config/api/route.ts`
+  - Uses `fetch` with `credentials: "include"`.
+  - Base URL is centralized in a single config module (avoid scattering base URLs across components).
+  - Central place to control headers and request options.
+
+## High-level architecture
+
+- `src/components/` contains reusable UI components.
+- `src/lib/` contains utilities and data helpers (e.g., navigation fetching).
+- `src/contexts/` contains auth-related providers.
+
+## Local development
+
+- `npm run dev`
+- `npm run build`
+- `npm start`
+
+## Known inconsistencies
+
+See [main-frontend/INCONSISTENCIES.md](main-frontend/INCONSISTENCIES.md).
