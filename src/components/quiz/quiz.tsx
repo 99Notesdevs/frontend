@@ -164,7 +164,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
             </div>
             
             {/* Show only the current question */}
-            <div className="max-h-[500px]">
+            <div className="max-h-[500px] overflow-auto">
               {(() => {
                 const question = questions[currentQuestion];
 
@@ -179,7 +179,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                 return (
                   <div key={question.id} className="mb-6">
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
-                      <h2 className="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100 leading-relaxed">
+                      <h2 className="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
                         <span className="text-blue-600 dark:text-blue-400 font-medium mr-2">Q{currentQuestion + 1}.</span>
                         {stripHtml(question.question)}
                       </h2>
@@ -218,7 +218,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                 className="mr-3 w-4 h-4 rounded border-gray-300 dark:border-gray-500 text-blue-600 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700"
                                 disabled={isShown}
                               />
-                              <span className="flex-1 text-gray-700 dark:text-gray-300">
+                              <span className="flex-1 text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
                                 {stripHtml(option)}
                               </span>
                               {isShown && isCorrect && (
@@ -242,7 +242,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                 <p className="font-medium text-blue-900 dark:text-blue-300 mb-2 text-sm">
                                   Explanation:
                                 </p>
-                                <p className="text-blue-800 dark:text-blue-200 text-sm leading-relaxed">
+                                <p className="text-blue-800 dark:text-blue-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
                                   {stripHtml(question.explaination)}
                                 </p>
                               </div>
