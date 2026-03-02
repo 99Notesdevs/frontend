@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { env } from "@/config/env";
@@ -13,7 +13,7 @@ interface Question {
   answer: string;
   options: string[];
   categoryIds: number[];
-  categories?: Array<{id: number; name: string}>;
+  categories?: Array<{ id: number; name: string }>;
   explaination: string;
   creatorName: string;
   multipleCorrectType: boolean;
@@ -22,18 +22,14 @@ interface Question {
   rating: number | null;
 }
 
-import { useRef } from "react";
-
-
 export default function AddQuestionsPage() {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pageSize] = useState(10);
   const [creatorName, setCreatorName] = useState<string>("");
   // At the top of your component with other hooks
-const formRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [newQuestion, setNewQuestion] = useState<Question>({
-    
     id: "",
     question: "",
     answer: "",
@@ -69,7 +65,7 @@ const formRef = useRef<HTMLDivElement>(null);
   }, [toast]);
 
   useEffect(() => {
-    if (selectedCategories.length === 0) return;
+    if (selectedCategories && selectedCategories.length === 0) return;
 
     const fetchQuestions = async () => {
       try {
@@ -190,15 +186,21 @@ const formRef = useRef<HTMLDivElement>(null);
       );
       const processedExplanation = await handleImageUpload(newQuestion.explaination);
   
-      const answer = newQuestion.multipleCorrectType 
-        ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
-        : (parseInt(newQuestion.answer) - 1).toString();
-      
-        const body = {...newQuestion,
+      const converted = convertAnswerToIndex(newQuestion.answer, newQuestion.multipleCorrectType);
+      if (converted === null) {
+        setToast({
+          message: `Invalid answer. Please select from available options only: ${getValidOptionsDisplay()}`,
+          type: "error"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const body = {...newQuestion,
         question: processedQuestion,
         options: processedOptions,
         explaination: processedExplanation,
-        answer,
+        answer: converted,
         categoryIds: selectedCategories,
         multipleCorrectType: newQuestion.multipleCorrectType}
       const response = await fetch(`${env.API_TEST}/questions`,
@@ -414,6 +416,28 @@ const formRef = useRef<HTMLDivElement>(null);
       const answerLetter = answer.trim().toUpperCase();
       return validOptions.includes(answerLetter);
     }
+  };
+
+  // Convert UI answer (letters like A,B or numbers like 1,2) to zero-based index string(s)
+  const convertAnswerToIndex = (answer: string, isMultiple: boolean): string | null => {
+    if (!answer || !answer.toString().trim()) return null;
+    const tokens = isMultiple ? answer.split(',') : [answer];
+    const indices: number[] = [];
+    for (const token of tokens) {
+      const s = token.trim().toUpperCase();
+      if (!s) continue;
+      if (/^[A-Z]$/.test(s)) {
+        indices.push(s.charCodeAt(0) - 65);
+      } else if (/^\d+$/.test(s)) {
+        const n = Number(s);
+        if (Number.isNaN(n)) return null;
+        indices.push(n - 1);
+      } else {
+        return null;
+      }
+    }
+    if (indices.length === 0) return null;
+    return isMultiple ? indices.join(',') : indices[0].toString();
   };
 
   // Get valid options for display
