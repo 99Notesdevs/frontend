@@ -160,7 +160,7 @@ const handleItemClick = useCallback((itemId: string, sectionTitle: string) => {
 
         {/* Sidebar - Only shown on /current-affairs/[category] */}
         {isCategoryPage && (
-          <aside className="hidden md:block w-[340px] lg:w-[450px] flex-shrink-0 -ml-8">
+          <aside className="hidden md:block w-[320px] lg:w-[450px] flex-shrink-0">
           <nav className="bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30 md:sticky md:top-24">
             {loading ? (
               <div className="flex justify-center py-8">
@@ -260,9 +260,9 @@ const handleItemClick = useCallback((itemId: string, sectionTitle: string) => {
         )}
 
         {/* Main content - full width on all pages except [category] */}
-        <div className={`${isCategoryPage ? 'hidden md:flex flex-1' : 'w-full'}`}>
-          <main className="w-full">
-            <article className="">
+        <div className={`${isCategoryPage ? 'hidden md:flex flex-1 min-w-0' : 'w-full'}`}>
+          <main className="w-full overflow-hidden">
+            <article className="bg-[var(--bg-main)] dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/30 p-2">
               {memoizedChildren}
             </article>
           </main>

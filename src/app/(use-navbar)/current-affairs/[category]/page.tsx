@@ -257,14 +257,13 @@ const CurrentAffairsSectionPage = async ({
                   })()
                   : 'Description Of page'}
               </p>
-
             </div>
           </div>
         </div>
       </div>
 
       {/* Articles Section */}
-      <div className="container mx-auto px-4 sm:px-6 py-8">
+      <div className="w-full py-8">
         {/* {currentAffair?.type === 'daily' && (
           <SearchBar />
         )} */}
