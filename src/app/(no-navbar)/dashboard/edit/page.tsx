@@ -685,6 +685,7 @@ function PageList() {
                     selectedPage,
                     selectedPage.templateId
                   )}
+                  isEditMode={true}
                   onSuccess={() => {
                     setShowForm(false);
                     setSelectedPage(null);
