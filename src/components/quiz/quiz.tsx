@@ -1,3 +1,4 @@
+import { env } from "@/config/env";
 import React, { useState, useEffect } from "react";
 
 interface Question {
@@ -77,7 +78,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
   };
 
   const handlePracticeMore = () => {
-    window.location.href = "http://localhost:5173/tests";
+    window.location.href = env.TEST_PORTAL;
   };
 
   const checkResults = () => {
@@ -162,7 +163,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                         {question.options.map((option, index) => {
                           const isSelected =
                             selectedOptions[question.id] === index;
-                          const isCorrect = index === Number(question.answer);
+                          const isCorrect = (index + 'A') == question.answer;
                           const isShown = showExplanations[question.id];
                           let className =
                             "flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors text-lg font-medium";
