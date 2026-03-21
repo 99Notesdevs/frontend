@@ -90,6 +90,7 @@ interface ArticleFormProps {
   onSubmit: (data: ArticleFormData) => Promise<void>;
   onSuccess?: () => void;
   currentPath?: string;
+  isEditMode?: boolean;
 }
 
 export const ArticleForm: React.FC<ArticleFormProps> = ({
@@ -97,6 +98,7 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
   onSubmit,
   onSuccess,
   currentPath = "",
+  isEditMode = false,
 }) => {
   // Slug state
   const [slug, setSlug] = useState("");
@@ -649,8 +651,18 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
                   Title(Slug) <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} className="border-[var(--admin-border)]" />
+                  <Input 
+                    {...field} 
+                    className="border-[var(--admin-border]" 
+                    disabled={isEditMode}
+                    readOnly={isEditMode}
+                  />
                 </FormControl>
+                {isEditMode && (
+                  <FormDescription>
+                    Article title cannot be changed in edit mode.
+                  </FormDescription>
+                )}
               </FormItem>
             )}
           />
