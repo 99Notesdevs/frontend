@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import GlobalScriptsLoader from "@/components/GlobalScriptsLoader";
 import { ThemeProvider } from "@/components/ui/themeprovider";
 import GoogleOneTap from "@/components/GoogleOneTap";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"]
@@ -29,15 +30,11 @@ export default async function RootLayout({
 
   return (
     <>
-      <head>
-        <script
+      <div className={inter.className} suppressHydrationWarning>
+        <Script
           src="https://accounts.google.com/gsi/client"
-          async
-          defer
-        ></script>
-        {/* <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> */}
-      </head>
-      <body className={inter.className} suppressHydrationWarning>
+          strategy="afterInteractive"
+        />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <GlobalScriptsLoader />
           <Suspense
@@ -59,7 +56,7 @@ export default async function RootLayout({
             <Footer footerSections={footerSections} />
           </Suspense>
         </ThemeProvider>
-      </body>
+      </div>
     </>
   );
 }
