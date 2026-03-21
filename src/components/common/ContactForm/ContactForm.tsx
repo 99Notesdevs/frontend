@@ -188,7 +188,7 @@ const ContactForm: React.FC = () => {
         <div className="flex justify-center mt-6">
           <button
             type="submit"
-            className="px-8 py-3 bg-[#ffc107] hover:bg-[#ffb300] dark:bg-yellow-400 dark:hover:bg-yellow-300 text-black font-medium rounded-none transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-[15px] shadow-md hover:shadow-lg flex items-center"
+            className="px-8 py-3 bg-[var(--primary)] hover:bg-[var(--secondary)]   text-black font-medium rounded-none transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-[15px] shadow-md hover:shadow-lg flex items-center"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
