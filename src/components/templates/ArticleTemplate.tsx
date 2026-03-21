@@ -491,11 +491,23 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
 
                   {/* Practice Questions Section - Sticky Footer */}
                   <div className="hidden lg:block sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl dark:hover:shadow-slate-900/50">
-                    <div className="bg-gradient-to-br from-white to-[#f8f9fa] dark:from-slate-800 dark:to-slate-900 border-2 border-[var(--info-surface)] dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl dark:shadow-slate-900/50">
-                      <div className="p-3">
-                        <h2 className="text-xl font-semibold mb-4 text-[var(--surface-dark)] dark:text-slate-200 border-b-2 border-[var(--info-surface)] dark:border-slate-600 pb-2">
-                          Practice Questions
-                        </h2>
+                    <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl dark:hover:shadow-slate-900/50">
+                      <div className="p-4">
+                        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200 dark:border-slate-600">
+                          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                            <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-200">
+                              Practice Questions
+                            </h2>
+                            <p className="text-sm text-gray-600 dark:text-slate-400">
+                              Test your understanding
+                            </p>
+                          </div>
+                        </div>
                         <QuizWrapper
                           questions={currentQuestions}
                           onQuizComplete={handleQuizComplete}
@@ -506,18 +518,15 @@ export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
                       </div>
 
                       {!isLoading && !error && (
-                        <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
-                          <div className="flex items-center text-sm text-gray-500 dark:text-slate-400">
+                        <div className="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 border-t border-gray-200 dark:border-slate-700 flex justify-between items-center">
+                          <div className="flex items-center text-sm text-gray-600 dark:text-slate-400">
                             <svg
-                              className="h-4 w-4 mr-1.5 text-yellow-500"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
+                              className="h-4 w-4 mr-2 text-blue-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                             >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                clipRule="evenodd"
-                              />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             {currentQuestions.length} Questions
                           </div>

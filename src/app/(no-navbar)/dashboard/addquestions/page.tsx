@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { env } from "@/config/env";
@@ -13,27 +13,23 @@ interface Question {
   answer: string;
   options: string[];
   categoryIds: number[];
-  categories?: Array<{id: number; name: string}>;
+  categories?: Array<{ id: number; name: string }>;
   explaination: string;
   creatorName: string;
   multipleCorrectType: boolean;
+  completed: boolean;
   pyq: boolean;
   year: number | null;
   rating: number | null;
 }
-
-import { useRef } from "react";
-
 
 export default function AddQuestionsPage() {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pageSize] = useState(10);
   const [creatorName, setCreatorName] = useState<string>("");
-  // At the top of your component with other hooks
-const formRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [newQuestion, setNewQuestion] = useState<Question>({
-    
     id: "",
     question: "",
     answer: "",
@@ -42,6 +38,7 @@ const formRef = useRef<HTMLDivElement>(null);
     explaination: "",
     creatorName: "",
     multipleCorrectType: false,
+    completed: true,
     pyq: false,
     year: null,
     rating: null
@@ -51,14 +48,12 @@ const formRef = useRef<HTMLDivElement>(null);
     type: "success" | "error";
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     isOpen: boolean;
     questionId: string | null;
   }>({ isOpen: false, questionId: null });
 
-  // Fetch questions for selected category
-  // Auto-hide toast after 3 seconds
+  // Auto-hide toast after 3 seconds.
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => {
@@ -69,12 +64,15 @@ const formRef = useRef<HTMLDivElement>(null);
   }, [toast]);
 
   useEffect(() => {
-    if (selectedCategories.length === 0) return;
+    if (selectedCategories.length === 0) {
+      setQuestions([]);
+      return;
+    }
 
     const fetchQuestions = async () => {
       try {
-        // Fetch questions for the first selected category
-        const response = await fetch(`${env.API_TEST}/questions/?categoryId=${selectedCategories[0]}&limit=${pageSize}`,{
+        const categoryIdsQuery = selectedCategories.join(",");
+        const response = await fetch(`${env.API_TEST}/questions/?categoryIds=${categoryIdsQuery}&limit=${pageSize}`,{
             method: "GET",
             credentials: "include",
             headers: {
@@ -86,13 +84,18 @@ const formRef = useRef<HTMLDivElement>(null);
         
         if (!typedResponse.success) throw new Error("Failed to fetch questions");
         const { data } = typedResponse;
-        setQuestions(data);
+        setQuestions(
+          (data || []).map((question: Question) => ({
+            ...question,
+            completed: question.completed ?? true,
+          }))
+        );
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
     };
     fetchQuestions();
-  }, [selectedCategories]);
+  }, [selectedCategories, pageSize]);
 
   // Sync selected categories with newQuestion state
   useEffect(() => {
@@ -190,16 +193,23 @@ const formRef = useRef<HTMLDivElement>(null);
       );
       const processedExplanation = await handleImageUpload(newQuestion.explaination);
   
-      const answer = newQuestion.multipleCorrectType 
-        ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
-        : (parseInt(newQuestion.answer) - 1).toString();
-      
-        const body = {...newQuestion,
+      const converted = convertAnswerToIndex(newQuestion.answer, newQuestion.multipleCorrectType);
+      if (converted === null) {
+        setToast({
+          message: `Invalid answer. Please select from available options only: ${getValidOptionsDisplay()}`,
+          type: "error"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const body = {...newQuestion,
         question: processedQuestion,
         options: processedOptions,
         explaination: processedExplanation,
-        answer,
+        answer: converted,
         categoryIds: selectedCategories,
+        completed: true,
         multipleCorrectType: newQuestion.multipleCorrectType}
       const response = await fetch(`${env.API_TEST}/questions`,
         {
@@ -214,7 +224,10 @@ const formRef = useRef<HTMLDivElement>(null);
       const typedResponse = await response.json()
       if (!typedResponse.success) throw new Error("Failed to create question")
       
-      const createdQuestion = typedResponse.data
+      const createdQuestion = {
+        ...typedResponse.data,
+        completed: true,
+      }
       
       // Update the questions list with the new question
       setQuestions(prevQuestions => [createdQuestion, ...prevQuestions]);
@@ -232,6 +245,7 @@ const formRef = useRef<HTMLDivElement>(null);
         explaination: "",
         creatorName: creatorName || "",
         multipleCorrectType: false,
+        completed: true,
         pyq: false,
         year: null,
         rating: null
@@ -253,34 +267,6 @@ const formRef = useRef<HTMLDivElement>(null);
     }
   };
   
-  const handleEditQuestion = async (question: Question) => {
-    try {
-      // Process all rich text fields for images
-      const processedQuestion = await handleImageUpload(question.question);
-      const processedOptions = await Promise.all(
-        question.options.map(option => handleImageUpload(option))
-      );
-      const processedExplanation = await handleImageUpload(question.explaination);
-  
-      setEditingQuestion(question);
-      setSelectedCategories(question.categoryIds);
-      setNewQuestion({
-        ...question,
-        question: processedQuestion,
-        options: processedOptions,
-        explaination: processedExplanation,
-        categoryIds: question.categoryIds,
-        multipleCorrectType: question.multipleCorrectType
-      });
-      
-      if (formRef.current) {
-        formRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    } catch (error) {
-      console.error("Error processing question data:", error);
-    }
-  };
-
   const handleDeleteQuestion = async () => {
     if (!deleteConfirmation.questionId) return;
     
@@ -303,100 +289,12 @@ const formRef = useRef<HTMLDivElement>(null);
       // Close the confirmation dialog
       setDeleteConfirmation({ isOpen: false, questionId: null });
       
-      // Show success message
-      alert('Question deleted successfully');
+      setToast({ message: "Question deleted successfully", type: "success" });
     } catch (error) {
       console.error('Error deleting question:', error);
-      alert('Failed to delete question');
+      setToast({ message: "Failed to delete question", type: "error" });
       setDeleteConfirmation({ isOpen: false, questionId: null });
     }
-  };
-
-  const handleUpdateQuestion = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!editingQuestion) return;
-
-    // Validate at least one category is selected
-    if (selectedCategories.length === 0) {
-      setToast({
-        message: "Please select at least one category",
-        type: "error"
-      });
-      return;
-    }
-
-    // Validate answer against available options
-    if (!validateAnswer(newQuestion.answer, newQuestion.options, newQuestion.multipleCorrectType)) {
-      setToast({
-        message: `Invalid answer. Please select from available options only: ${getValidOptionsDisplay()}`,
-        type: "error"
-      });
-      return;
-    }
-
-    try {
-      const answer = newQuestion.multipleCorrectType 
-        ? newQuestion.answer.split(',').map(num => parseInt(num) - 1).join(',')
-        : (parseInt(newQuestion.answer) - 1).toString();
-      
-        const body = {...newQuestion,
-        answer,
-        creatorName: creatorName || "",
-        multipleCorrectType: newQuestion.multipleCorrectType}
-      const response = await fetch(`${env.API_TEST}/questions/${editingQuestion.id}`, {
-            method: "PUT",
-            body: JSON.stringify(body),
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Auth-Type": "Admin"
-            }
-          })
-      const typedResponse = await response.json()
-      if (!typedResponse.success) throw new Error("Failed to update question");
-
-      // Update the question in the list
-      setQuestions((prevQuestions) =>
-        prevQuestions.map((q) =>
-          q.id === editingQuestion.id ? newQuestion : q
-        )
-      );
-
-      // Reset editing state
-      setEditingQuestion(null);
-      setNewQuestion({
-        id: "",
-        question: "",
-        answer: "",
-        options: [],
-        categoryIds: selectedCategories,
-        explaination: "",
-        creatorName: creatorName || "",
-        multipleCorrectType: false,
-        pyq: false,
-        year: null,
-        rating: null
-      });
-    } catch (error) {
-      console.error("Error updating question:", error);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingQuestion(null);
-    setNewQuestion({
-      id: "",
-      question: "",
-      answer: "",
-      options: [],
-      categoryIds: selectedCategories,
-      explaination: "",
-      creatorName: "",
-      multipleCorrectType: false,
-      pyq: false,
-      year: null,
-      rating: null
-    });
   };
 
   // Validate answer against available options
@@ -414,6 +312,28 @@ const formRef = useRef<HTMLDivElement>(null);
       const answerLetter = answer.trim().toUpperCase();
       return validOptions.includes(answerLetter);
     }
+  };
+
+  // Convert UI answer (letters like A,B or numbers like 1,2) to zero-based index string(s)
+  const convertAnswerToIndex = (answer: string, isMultiple: boolean): string | null => {
+    if (!answer || !answer.toString().trim()) return null;
+    const tokens = isMultiple ? answer.split(',') : [answer];
+    const indices: number[] = [];
+    for (const token of tokens) {
+      const s = token.trim().toUpperCase();
+      if (!s) continue;
+      if (/^[A-Z]$/.test(s)) {
+        indices.push(s.charCodeAt(0) - 65);
+      } else if (/^\d+$/.test(s)) {
+        const n = Number(s);
+        if (Number.isNaN(n)) return null;
+        indices.push(n - 1);
+      } else {
+        return null;
+      }
+    }
+    if (indices.length === 0) return null;
+    return isMultiple ? indices.join(',') : indices[0].toString();
   };
 
   // Get valid options for display
@@ -523,13 +443,9 @@ const formRef = useRef<HTMLDivElement>(null);
           {/* Question Form */}
           <div ref={formRef}>
             <h2 className="text-xl font-bold [color:var(--admin-bg-dark)] mb-4">
-              {editingQuestion ? "Edit Question" : "Add New Question"}
+              Add New Question
             </h2>
-            <form
-              onSubmit={
-                editingQuestion ? handleUpdateQuestion : handleCreateQuestion
-              }
-            >
+            <form onSubmit={handleCreateQuestion}>
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -776,20 +692,11 @@ const formRef = useRef<HTMLDivElement>(null);
                 <div className="flex gap-4 mt-6">
                   <Button
                     type="submit"
+                    disabled={isSubmitting}
                     className="px-6 py-2 text-base font-semibold rounded bg-slate-600 hover:bg-slate-700 text-white transition"
                   >
-                    {editingQuestion ? "Update Question" : "Add Question"}
+                    {isSubmitting ? "Adding..." : "Add Question"}
                   </Button>
-                  {editingQuestion && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="rounded"
-                      onClick={handleCancelEdit}
-                    >
-                      Cancel
-                    </Button>
-                  )}
                 </div>
               </div>
             </form>
@@ -804,7 +711,7 @@ const formRef = useRef<HTMLDivElement>(null);
             <div className="space-y-4">
               {questions.length === 0 ? (
                 <p className="text-center text-gray-500 ">
-                  No questions found for this category.
+                  No questions found for selected categories.
                 </p>
               ) : (
                 questions.map((question) => (
@@ -819,6 +726,11 @@ const formRef = useRef<HTMLDivElement>(null);
                           dangerouslySetInnerHTML={{ __html: question.question }}
                         />
                       </div>
+                      {question.completed === false && (
+                        <div className="inline-flex items-center px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded border border-amber-100">
+                          Incomplete
+                        </div>
+                      )}
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="text-xs font-medium text-gray-500">Options:</div>
                         <div className="flex flex-wrap gap-1.5">
@@ -854,17 +766,6 @@ const formRef = useRef<HTMLDivElement>(null);
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0 sm:ml-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="rounded-md border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-1.5 text-xs h-8"
-                        onClick={() => handleEditQuestion(question)}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                        Edit
-                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

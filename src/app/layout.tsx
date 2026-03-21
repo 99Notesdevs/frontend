@@ -2,6 +2,7 @@
 import { AuthProvider } from '@/contexts/AuthContext';
 import { AuthModal } from '@/components/ui/AuthModal';
 import { cn } from '@/lib/utils';
+import '@/styles/globals.css';
 
 export default function RootLayout({
   children,
