@@ -188,7 +188,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                         {question.options.map((option, index) => {
                           const isSelected =
                             selectedOptions[question.id] === index;
-                          const isCorrect = (index + 'A') == question.answer;
+                          const isCorrect = (index === Number(question.answer)) || (String.fromCharCode(index + 65) == question.answer);
                           const isShown = showExplanations[question.id];
                           let className =
                             "flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 text-base";
