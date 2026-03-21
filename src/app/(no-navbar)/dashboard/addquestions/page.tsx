@@ -17,6 +17,7 @@ interface Question {
   explaination: string;
   creatorName: string;
   multipleCorrectType: boolean;
+  completed: boolean;
   pyq: boolean;
   year: number | null;
   rating: number | null;
@@ -37,6 +38,7 @@ export default function AddQuestionsPage() {
     explaination: "",
     creatorName: "",
     multipleCorrectType: false,
+    completed: true,
     pyq: false,
     year: null,
     rating: null
@@ -82,7 +84,12 @@ export default function AddQuestionsPage() {
         
         if (!typedResponse.success) throw new Error("Failed to fetch questions");
         const { data } = typedResponse;
-        setQuestions(data);
+        setQuestions(
+          (data || []).map((question: Question) => ({
+            ...question,
+            completed: question.completed ?? true,
+          }))
+        );
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
@@ -202,6 +209,7 @@ export default function AddQuestionsPage() {
         explaination: processedExplanation,
         answer: converted,
         categoryIds: selectedCategories,
+        completed: true,
         multipleCorrectType: newQuestion.multipleCorrectType}
       const response = await fetch(`${env.API_TEST}/questions`,
         {
@@ -216,7 +224,10 @@ export default function AddQuestionsPage() {
       const typedResponse = await response.json()
       if (!typedResponse.success) throw new Error("Failed to create question")
       
-      const createdQuestion = typedResponse.data
+      const createdQuestion = {
+        ...typedResponse.data,
+        completed: true,
+      }
       
       // Update the questions list with the new question
       setQuestions(prevQuestions => [createdQuestion, ...prevQuestions]);
@@ -234,6 +245,7 @@ export default function AddQuestionsPage() {
         explaination: "",
         creatorName: creatorName || "",
         multipleCorrectType: false,
+        completed: true,
         pyq: false,
         year: null,
         rating: null
@@ -714,6 +726,11 @@ export default function AddQuestionsPage() {
                           dangerouslySetInnerHTML={{ __html: question.question }}
                         />
                       </div>
+                      {question.completed === false && (
+                        <div className="inline-flex items-center px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded border border-amber-100">
+                          Incomplete
+                        </div>
+                      )}
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="text-xs font-medium text-gray-500">Options:</div>
                         <div className="flex flex-wrap gap-1.5">
