@@ -1,6 +1,5 @@
 import { env } from "@/config/env";
 import React, { useState, useEffect } from "react";
-
 interface Question {
   id: number;
   question: string;
@@ -15,11 +14,6 @@ interface QuizProps {
   onQuizComplete: () => void;
 }
 
-// Helper function to strip HTML tags from text
-const stripHtml = (html: string): string => {
-  if (!html) return "";
-  return html.replace(/<[^>]*>?/gm, "");
-};
 
 const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
   const [selectedOptions, setSelectedOptions] = useState<
@@ -157,13 +151,13 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                 </span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div 
+                <div
                   className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
                 />
               </div>
             </div>
-            
+
             {/* Show only the current question */}
             <div className="max-h-[500px] overflow-auto">
               {(() => {
@@ -182,7 +176,10 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
                       <h2 className="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
                         <span className="text-blue-600 dark:text-blue-400 font-medium mr-2">Q{currentQuestion + 1}.</span>
-                        {stripHtml(question.question)}
+                        <div
+                          className="prose prose-lg max-w-none"
+                          dangerouslySetInnerHTML={{ __html: question.question }}
+                        />
                       </h2>
                       <div className="space-y-3">
                         {question.options.map((option, index) => {
@@ -220,7 +217,10 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                 disabled={isShown}
                               />
                               <span className="flex-1 text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
-                                {stripHtml(option)}
+                                <div
+                                  className="prose prose-lg max-w-none"
+                                  dangerouslySetInnerHTML={{ __html: option }}
+                                />
                               </span>
                               {isShown && isCorrect && (
                                 <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
@@ -244,7 +244,10 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                   Explanation:
                                 </p>
                                 <p className="text-blue-800 dark:text-blue-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                  {stripHtml(question.explaination)}
+                                  <div
+                                    className="prose prose-lg max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: question.explaination }}
+                                  />
                                 </p>
                               </div>
                             )}
@@ -269,13 +272,12 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                 disabled={
                   selectedOptions[questions[currentQuestion].id] === undefined
                 }
-                className={`px-6 py-2.5 rounded-lg transition-all duration-200 font-medium shadow-sm ${
-                  selectedOptions[questions[currentQuestion].id] === undefined
+                className={`px-6 py-2.5 rounded-lg transition-all duration-200 font-medium shadow-sm ${selectedOptions[questions[currentQuestion].id] === undefined
                     ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     : currentQuestion === questions.length - 1
-                    ? "bg-green-600 text-white hover:bg-green-700 shadow-md"
-                    : "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
-                }`}
+                      ? "bg-green-600 text-white hover:bg-green-700 shadow-md"
+                      : "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
+                  }`}
               >
                 {currentQuestion === questions.length - 1
                   ? "Check Results"
