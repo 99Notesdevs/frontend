@@ -1,6 +1,5 @@
 import { env } from "@/config/env";
 import React, { useState, useEffect } from "react";
-
 interface Question {
   id: number;
   question: string;
@@ -8,6 +7,11 @@ interface Question {
   answer: string;
   explaination: string;
   creatorName: string;
+  categories?: { id: number; name: string }[];
+  rating?: number;
+  pyq?: boolean;
+  year?: number;
+  totalAttempts?: number;
 }
 
 interface QuizProps {
@@ -15,10 +19,28 @@ interface QuizProps {
   onQuizComplete: () => void;
 }
 
-// Helper function to strip HTML tags from text
-const stripHtml = (html: string): string => {
-  if (!html) return "";
-  return html.replace(/<[^>]*>?/gm, "");
+// Helper function to calculate difficulty based on rating and attempts
+const getDifficulty = (rating?: number, totalAttempts?: number): string => {
+  if (!totalAttempts || totalAttempts === 0) return "Easy";
+  if (!rating) return "Medium";
+  const percentage = rating;
+  if (percentage < 25) return "Hard";
+  if (percentage < 50) return "Medium";
+  return "Easy";
+};
+
+// Helper function to get difficulty color
+const getDifficultyColor = (difficulty: string): string => {
+  switch (difficulty) {
+    case "Easy":
+      return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+    case "Medium":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+    case "Hard":
+      return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+    default:
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
+  }
 };
 
 const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
@@ -104,40 +126,40 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <div className="space-y-6" data-theme="light">
         {showResults ? (
-          <div className="border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg bg-white dark:bg-gray-800 p-8">
-            <div className="flex flex-col items-center justify-center min-h-[280px] space-y-6">
+          <div className="border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl bg-white dark:bg-gray-800 p-8">
+            <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6">
               <div className="text-center">
-                <div className="mb-4">
-                  <svg className="h-16 w-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mb-6">
+                  <svg className="h-20 w-20 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                   Quiz Completed!
                 </h2>
-                <div className="text-4xl font-bold text-green-600 dark:text-green-400 mb-3">
+                <div className="text-5xl font-bold text-green-600 dark:text-green-400 mb-4">
                   {calculateScore()} / {questions.length}
                 </div>
-                <p className="text-base text-gray-600 dark:text-gray-400 max-w-sm">
+                <p className="text-lg text-gray-600 dark:text-gray-400 max-w-md leading-relaxed">
                   {calculateScore() >= questions.length / 2
                     ? "Great job! "
                     : "Keep practicing! "}
                   You answered {calculateScore()} out of {questions.length} questions correctly.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+              <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
                 <button
                   onClick={resetQuiz}
-                  className="flex-1 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                  className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 >
                   Try Again
                 </button>
                 <button
                   onClick={handlePracticeMore}
-                  className="flex-1 px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm"
+                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 >
                   Practice More
                 </button>
@@ -145,27 +167,9 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Progress indicator */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Question {currentQuestion + 1} of {questions.length}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-500">
-                  {Object.keys(selectedOptions).length} answered
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-                />
-              </div>
-            </div>
-            
+          <div className="space-y-8">
             {/* Show only the current question */}
-            <div className="max-h-[500px] overflow-auto">
+            <div className="max-h-[500px] overflow-auto pr-2">
               {(() => {
                 const question = questions[currentQuestion];
 
@@ -177,12 +181,39 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                   );
                 }
                 const isAnswered = selectedOptions[question.id] !== undefined;
+
                 return (
                   <div key={question.id} className="mb-6">
-                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
-                      <h2 className="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
-                        <span className="text-blue-600 dark:text-blue-400 font-medium mr-2">Q{currentQuestion + 1}.</span>
-                        {stripHtml(question.question)}
+                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
+                      {/* Categories, Difficulty, and PYQ Year */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {question.categories && question.categories.length > 0 && (
+                          question.categories.slice(0, 3).map((category, index) => (
+                            <span
+                              key={category.id || index}
+                              className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-full"
+                            >
+                              {category.name}
+                            </span>
+                          ))
+                        )}
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${getDifficultyColor(getDifficulty(question.rating, question.totalAttempts))}`}
+                        >
+                          {getDifficulty(question.rating, question.totalAttempts)}
+                        </span>
+                        {question.pyq && question.year && (
+                          <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 rounded-full">
+                            {question.year}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
+                        <span className="text-blue-600 dark:text-blue-400 font-bold mr-2">Q{currentQuestion + 1}.</span>
+                        <div
+                          className="prose prose-lg max-w-none"
+                          dangerouslySetInnerHTML={{ __html: question.question }}
+                        />
                       </h2>
                       <div className="space-y-3">
                         {question.options.map((option, index) => {
@@ -191,7 +222,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                           const isCorrect = (index === Number(question.answer)) || (String.fromCharCode(index + 65) == question.answer);
                           const isShown = showExplanations[question.id];
                           let className =
-                            "flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 text-base";
+                            "flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-300 text-base hover:shadow-md";
                           if (isShown) {
                             if (isCorrect) {
                               className +=
@@ -216,19 +247,22 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                 onChange={() =>
                                   handleOptionSelect(question.id, index)
                                 }
-                                className="mr-3 w-4 h-4 rounded border-gray-300 dark:border-gray-500 text-blue-600 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700"
+                                className="mr-4 w-5 h-5 rounded border-gray-300 dark:border-gray-500 text-blue-600 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700"
                                 disabled={isShown}
                               />
-                              <span className="flex-1 text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
-                                {stripHtml(option)}
+                              <span className="flex-1 text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words leading-relaxed">
+                                <div
+                                  className="prose prose-lg max-w-none"
+                                  dangerouslySetInnerHTML={{ __html: option }}
+                                />
                               </span>
                               {isShown && isCorrect && (
-                                <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="h-6 w-6 text-green-500 ml-3" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                               )}
                               {isShown && isSelected && !isCorrect && (
-                                <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="h-6 w-6 text-red-500 ml-3" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                                 </svg>
                               )}
@@ -237,14 +271,17 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                         })}
 
                         {showExplanations[question.id] && (
-                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
                             {question.explaination && (
                               <div>
-                                <p className="font-medium text-blue-900 dark:text-blue-300 mb-2 text-sm">
+                                <p className="font-semibold text-blue-900 dark:text-blue-300 mb-3 text-base">
                                   Explanation:
                                 </p>
-                                <p className="text-blue-800 dark:text-blue-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                  {stripHtml(question.explaination)}
+                                <p className="text-blue-800 dark:text-blue-200 text-base leading-relaxed whitespace-pre-wrap break-words">
+                                  <div
+                                    className="prose prose-lg max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: question.explaination }}
+                                  />
                                 </p>
                               </div>
                             )}
@@ -256,8 +293,8 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                 );
               })()}
             </div>
-            <div className="flex justify-between items-center mt-6">
-              <div className="text-sm text-gray-500 dark:text-gray-500">
+            <div className="flex justify-between items-center mt-6 px-2">
+              <div className="text-base font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
                 {currentQuestion + 1} / {questions.length}
               </div>
               <button
@@ -269,13 +306,12 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                 disabled={
                   selectedOptions[questions[currentQuestion].id] === undefined
                 }
-                className={`px-6 py-2.5 rounded-lg transition-all duration-200 font-medium shadow-sm ${
-                  selectedOptions[questions[currentQuestion].id] === undefined
-                    ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                className={`px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:-translate-y-0.5 ${selectedOptions[questions[currentQuestion].id] === undefined
+                    ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     : currentQuestion === questions.length - 1
-                    ? "bg-green-600 text-white hover:bg-green-700 shadow-md"
-                    : "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
-                }`}
+                      ? "bg-green-600 text-white hover:bg-green-700 hover:shadow-xl"
+                      : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl"
+                  }`}
               >
                 {currentQuestion === questions.length - 1
                   ? "Check Results"

@@ -9,6 +9,11 @@ interface Question {
   answer: string;
   explaination: string;
   creatorName: string;
+  categories?: {id: number; name: string}[];
+  rating?: number;
+  pyq?: boolean;
+  year?: number;
+  totalAttempts?: number;
 }
 
 interface QuizWrapperProps {

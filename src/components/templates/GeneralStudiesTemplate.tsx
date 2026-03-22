@@ -405,33 +405,6 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                       (currentQuestions && currentQuestions.length > 0)) && (
                       <div className="sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl">
                         <div className="bg-gradient-to-br from-white to-[#f8f9fa] dark:from-slate-800 dark:to-slate-900 border-2 border-[var(--info-surface)] dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                          <div className="bg-gradient-to-r from-yellow-500 to-amber-300 px-6 py-4">
-                            <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                              <span className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                  />
-                                </svg>
-                              </span>
-                              <span className="drop-shadow-sm">
-                                Practice PYQs
-                              </span>
-                            </h3>
-                            <p className="text-white/90 text-sm mt-1">
-                              Test your knowledge with these practice questions
-                            </p>
-                          </div>
-
                           <div className="p-6">
                             {isLoading ? (
                               <div className="flex flex-col items-center justify-center py-8">
