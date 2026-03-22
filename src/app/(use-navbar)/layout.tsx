@@ -29,26 +29,34 @@ export default async function RootLayout({
   const footerSections = await getFooterLinks();
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <GlobalScriptsLoader />
-      <Suspense
-        fallback={
-          <div className="text-foreground">Loading Navbar...</div>
-        }
-      >
-        <Navbar navigation={navigation} />
-      </Suspense>
-      <main className="min-h-[calc(100vh-64px)] bg-background dark:bg-slate-900 text-foreground">
-        <GoogleOneTap />
-        {children}
-      </main>
-      <Suspense
-        fallback={
-          <div className="text-foreground">Loading Footer...</div>
-        }
-      >
-        <Footer footerSections={footerSections} />
-      </Suspense>
-    </ThemeProvider>
+     <>
+      <div className={inter.className} suppressHydrationWarning>
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <GlobalScriptsLoader />
+          <Suspense
+            fallback={
+              <div className="text-foreground">Loading Navbar...</div>
+            }
+          >
+            <Navbar navigation={navigation} />
+          </Suspense>
+          <main className="min-h-[calc(100vh-64px)] bg-background dark:bg-slate-900 text-foreground">
+            <GoogleOneTap />
+            {children}
+          </main>
+          <Suspense
+            fallback={
+              <div className="text-foreground">Loading Footer...</div>
+            }
+          >
+            <Footer footerSections={footerSections} />
+          </Suspense>
+        </ThemeProvider>
+      </div>
+    </>
   );
 }
