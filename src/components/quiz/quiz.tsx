@@ -19,7 +19,6 @@ interface QuizProps {
   onQuizComplete: () => void;
 }
 
-
 // Helper function to calculate difficulty based on rating and attempts
 const getDifficulty = (rating?: number, totalAttempts?: number): string => {
   if (!totalAttempts || totalAttempts === 0) return "Easy";
