@@ -29,7 +29,7 @@ export default async function RootLayout({
   const footerSections = await getFooterLinks();
 
   return (
-     <>
+    <>
       <div className={inter.className} suppressHydrationWarning>
         <Script
           src="https://accounts.google.com/gsi/client"
