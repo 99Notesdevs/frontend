@@ -39,7 +39,8 @@ export default function MultiCategorySelect({
           credentials: "include",
         });
         if (!response.ok) throw new Error("Failed to fetch categories");
-        const { data } = await response.json();
+        const result = await response.json();
+        const { data } = result;
         setCategories(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -61,10 +62,11 @@ export default function MultiCategorySelect({
   };
 
   const getSelectedCategoryNames = () => {
-    return categories
+    if (categories.length === 0) return "Loading...";
+    const selectedNames = categories
       .filter(cat => selectedCategoryIds.includes(cat.id))
-      .map(cat => cat.name)
-      .join(", ");
+      .map(cat => cat.name);
+    return selectedNames.length > 0 ? selectedNames.join(", ") : "No matching categories found";
   };
 
   const getHierarchyText = (categoryId: number) => {
@@ -91,10 +93,12 @@ export default function MultiCategorySelect({
           onClick={() => setIsOpen(!isOpen)}
           className="w-full bg-white text-left text-[var(--admin-bg-dark)] border border-gray-300 font-medium shadow focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition px-3 py-2 rounded-md flex items-center justify-between"
         >
-          <span className={selectedCategoryIds ? selectedCategoryIds.length === 0 ? "text-gray-400" : "" : ""}>
-            {selectedCategoryIds ? selectedCategoryIds.length === 0 
+          <span className={selectedCategoryIds.length === 0 ? "text-gray-400" : ""}>
+            {selectedCategoryIds.length === 0 
               ? "Select categories..." 
-              : `${selectedCategoryIds.length} selected: ${getSelectedCategoryNames()}` : "Select..."}
+              : categories.length === 0 
+                ? "Loading categories..." 
+                : `${selectedCategoryIds.length} selected: ${getSelectedCategoryNames()}`}
           </span>
           <svg 
             className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
@@ -168,7 +172,7 @@ export default function MultiCategorySelect({
           </div>
         )}
       </div>
-      { selectedCategoryIds && selectedCategoryIds.length > 0 && (
+      {selectedCategoryIds.length > 0 && (
         <div className="mt-2 text-xs text-gray-500">
           {categories.length === 0 ? (
             <p>Loading category hierarchy…</p>
@@ -184,7 +188,7 @@ export default function MultiCategorySelect({
           )}
         </div>
       )}
-      {selectedCategoryIds && selectedCategoryIds.length === 0 && (
+      {selectedCategoryIds.length === 0 && (
         <p className="mt-1 text-xs text-red-600">At least one category is required</p>
       )}
     </div>
