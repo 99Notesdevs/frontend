@@ -1,6 +1,5 @@
 import { env } from "@/config/env";
 import React, { useState, useEffect } from "react";
-
 interface Question {
   id: number;
   question: string;
@@ -8,7 +7,7 @@ interface Question {
   answer: string;
   explaination: string;
   creatorName: string;
-  categories?: {id: number; name: string}[];
+  categories?: { id: number; name: string }[];
   rating?: number;
   pyq?: boolean;
   year?: number;
@@ -20,11 +19,6 @@ interface QuizProps {
   onQuizComplete: () => void;
 }
 
-// Helper function to strip HTML tags from text
-const stripHtml = (html: string): string => {
-  if (!html) return "";
-  return html.replace(/<[^>]*>?/gm, "");
-};
 
 // Helper function to calculate difficulty based on rating and attempts
 const getDifficulty = (rating?: number, totalAttempts?: number): string => {
@@ -188,7 +182,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                   );
                 }
                 const isAnswered = selectedOptions[question.id] !== undefined;
-                
+
                 return (
                   <div key={question.id} className="mb-6">
                     <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
@@ -217,7 +211,10 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                       </div>
                       <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
                         <span className="text-blue-600 dark:text-blue-400 font-bold mr-2">Q{currentQuestion + 1}.</span>
-                        {stripHtml(question.question)}
+                        <div
+                          className="prose prose-lg max-w-none"
+                          dangerouslySetInnerHTML={{ __html: question.question }}
+                        />
                       </h2>
                       <div className="space-y-3">
                         {question.options.map((option, index) => {
@@ -255,7 +252,10 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                 disabled={isShown}
                               />
                               <span className="flex-1 text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words leading-relaxed">
-                                {stripHtml(option)}
+                                <div
+                                  className="prose prose-lg max-w-none"
+                                  dangerouslySetInnerHTML={{ __html: option }}
+                                />
                               </span>
                               {isShown && isCorrect && (
                                 <svg className="h-6 w-6 text-green-500 ml-3" fill="currentColor" viewBox="0 0 20 20">
@@ -279,7 +279,10 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                                   Explanation:
                                 </p>
                                 <p className="text-blue-800 dark:text-blue-200 text-base leading-relaxed whitespace-pre-wrap break-words">
-                                  {stripHtml(question.explaination)}
+                                  <div
+                                    className="prose prose-lg max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: question.explaination }}
+                                  />
                                 </p>
                               </div>
                             )}
@@ -304,13 +307,12 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                 disabled={
                   selectedOptions[questions[currentQuestion].id] === undefined
                 }
-                className={`px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:-translate-y-0.5 ${
-                  selectedOptions[questions[currentQuestion].id] === undefined
+                className={`px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:-translate-y-0.5 ${selectedOptions[questions[currentQuestion].id] === undefined
                     ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     : currentQuestion === questions.length - 1
-                    ? "bg-green-600 text-white hover:bg-green-700 hover:shadow-xl"
-                    : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl"
-                }`}
+                      ? "bg-green-600 text-white hover:bg-green-700 hover:shadow-xl"
+                      : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl"
+                  }`}
               >
                 {currentQuestion === questions.length - 1
                   ? "Check Results"
