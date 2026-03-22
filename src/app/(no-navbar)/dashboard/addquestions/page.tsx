@@ -442,9 +442,6 @@ export default function AddQuestionsPage() {
 
           {/* Question Form */}
           <div ref={formRef}>
-            <h2 className="text-xl font-bold [color:var(--admin-bg-dark)] mb-4">
-              Add New Question
-            </h2>
             <form onSubmit={handleCreateQuestion}>
               <div className="space-y-6">
                 <div>
