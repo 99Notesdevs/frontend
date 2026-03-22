@@ -1,5 +1,6 @@
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700;800;900&display=swap');
 
 /* Import Tailwind CSS */
 @import 'tailwindcss/base';
@@ -54,7 +55,7 @@
   }
 
   html {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Lato', sans-serif;
   }
   
   body {
@@ -62,8 +63,12 @@
     color: hsl(var(--foreground));
   }
   
-  h1, h2, h3, h4, h5, h6, p, span, div, a {
-    font-family: 'Poppins', sans-serif;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'League Spartan', sans-serif;
+  }
+  
+  p, span, div, a {
+    font-family: 'Lato', sans-serif;
   }
 }
 
@@ -556,14 +561,6 @@
 .locked-content .login-link:hover {
     background-color: var(--locked-bg-hover);
     /* Darker background on hover */
-}
-
-.font-playfair {
-    font-family: "Playfair Display", serif;
-}
-
-.font-poppins {
-    font-family: "Poppins", sans-serif;
 }
 
 @keyframes float {
