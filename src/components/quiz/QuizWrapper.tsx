@@ -22,6 +22,13 @@ interface QuizWrapperProps {
   onRetry: () => void;
   isLoading: boolean;
   error: string | null;
+  onProgressChange?: (progress: {
+    score: number;
+    total: number;
+    answered: number;
+    currentQuestion: number;
+    isCompleted: boolean;
+  }) => void;
 }
 
 export default function QuizWrapper({
@@ -30,6 +37,7 @@ export default function QuizWrapper({
   onRetry,
   isLoading,
   error,
+  onProgressChange,
 }: QuizWrapperProps) {
   const [currentQuestions, setCurrentQuestions] = useState<Question[]>(questions);
 
@@ -97,6 +105,7 @@ export default function QuizWrapper({
       <Quiz
         questions={currentQuestions}
         onQuizComplete={onQuizComplete}
+        onProgressChange={onProgressChange}
       />
     </div>
   );

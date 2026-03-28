@@ -1,8 +1,8 @@
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import Navbar from "@/components/Navbar/navbar";
-import Footer from "@/components/Footer/Footer";
-import { getNavigationTree, getFooterLinks } from "@/lib/navigation";
+import FooterCompressed from "@/components/Footer/FooterCompressed";
+import { getNavigationTree } from "@/lib/navigation";
 import { Suspense } from "react";
 import GlobalScriptsLoader from "@/components/GlobalScriptsLoader";
 import { ThemeProvider } from "@/components/ui/themeprovider";
@@ -26,7 +26,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const navigation = await getNavigationTree();
-  const footerSections = await getFooterLinks();
 
   return (
     <>
@@ -48,13 +47,7 @@ export default async function RootLayout({
             <GoogleOneTap />
             {children}
           </main>
-          <Suspense
-            fallback={
-              <div className="text-foreground">Loading Footer...</div>
-            }
-          >
-            <Footer footerSections={footerSections} />
-          </Suspense>
+          <FooterCompressed />
         </ThemeProvider>
       </div>
     </>

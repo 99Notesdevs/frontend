@@ -4,10 +4,6 @@ import { BaseTemplateProps } from "./types";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { TableOfContents } from "@/components/navigation/TableOfContents";
-import SearchBar from "@/components/Navbar/SearchBar";
-import SocialMedia from "@/components/navigation/socialmedia";
-import Ads from "../navigation/Ads";
 import QuizWrapper from "@/components/quiz/QuizWrapper";
 import { env } from "@/config/env";
 import Breadcrumb from "@/components/ui/breadcrumb";
@@ -27,10 +23,18 @@ interface GeneralStudiesContent {
   imageUrl?: string;
 }
 
+interface QuizProgress {
+  score: number;
+  total: number;
+  answered: number;
+  currentQuestion: number;
+  isCompleted: boolean;
+}
+
 export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   page,
 }) => {
-  const { title, content, metadata, children, imageUrl } = page;
+  const { title, content, metadata, imageUrl } = page;
   const mainContent = content || "";
   // @ts-ignore
   const jsonLD = JSON.parse(metadata).schemaData;
@@ -47,23 +51,51 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   const bodyScripts =
     parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
     [];
-  const [showQuiz, setShowQuiz] = useState(true);
+  const quizChildren = page.children.filter(
+    (child: any) =>
+      child.templateId !== "custom-link" &&
+      Array.isArray(child.categories) &&
+      child.categories[0]?.id
+  );
+
+  const [selectedQuizChildId, setSelectedQuizChildId] = useState<
+    string | number | null
+  >(null);
   const [currentQuestions, setCurrentQuestions] = useState<Question[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [quizProgress, setQuizProgress] = useState<QuizProgress>({
+    score: 0,
+    total: 0,
+    answered: 0,
+    currentQuestion: 0,
+    isCompleted: false,
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasFetched, setHasFetched] = useState(false);
+
+  const selectedQuizChild: any = quizChildren.find(
+    (child: any) => String(child.id) === String(selectedQuizChildId)
+  );
+  const selectedQuizCategoryId = selectedQuizChild?.categories?.[0]?.id;
+
   const fetchQuestions = useCallback(async () => {
-    if (!page?.id) return;
+    const categoryId = selectedQuizCategoryId;
+    if (!categoryId) return;
 
     setIsLoading(true);
     setError(null);
+    setQuizProgress({
+      score: 0,
+      total: 0,
+      answered: 0,
+      currentQuestion: 0,
+      isCompleted: false,
+    });
 
     try {
       const limit =
         page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
-      console.log(page);
       const response = await fetch(
-        `${env.API_TEST}/questions/practice?categoryId=${page.categories?.[0].id}&limit=${limit}`,
+        `${env.API_TEST}/questions/practice?categoryId=${categoryId}&limit=${limit}`,
         {
           credentials: "include",
         }
@@ -75,33 +107,51 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
 
       const { data } = await response.json();
       setCurrentQuestions(data);
+      setQuizProgress({
+        score: 0,
+        total: Array.isArray(data) ? data.length : 0,
+        answered: 0,
+        currentQuestion: 0,
+        isCompleted: false,
+      });
     } catch (err) {
       console.error("Error fetching questions:", err);
       setError("Failed to load questions. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [page?.id, page?.questionNumber]);
-  const handleStartQuiz = async () => {
-    if (!showQuiz) {
-      await fetchQuestions();
-    }
-    setShowQuiz(!showQuiz);
-  };
+  }, [page?.questionNumber, selectedQuizCategoryId]);
 
-  const handleQuizComplete = () => {
-    setShowQuiz(false);
-  };
-  // Fetch questions when component mounts
+  const handleQuizComplete = () => {};
+
   useEffect(() => {
-    const loadQuestions = async () => {
-      if (!hasFetched) {
-        await fetchQuestions();
-        setHasFetched(true);
+    if (!quizChildren.length) {
+      setSelectedQuizChildId(null);
+      return;
+    }
+
+    setSelectedQuizChildId((prevSelected) => {
+      if (
+        prevSelected !== null &&
+        quizChildren.some(
+          (child: any) => String(child.id) === String(prevSelected)
+        )
+      ) {
+        return prevSelected;
       }
-    };
-    loadQuestions();
-  }, [fetchQuestions, hasFetched]);
+
+      return quizChildren[0].id;
+    });
+  }, [quizChildren]);
+
+  useEffect(() => {
+    if (!selectedQuizCategoryId) {
+      setCurrentQuestions([]);
+      return;
+    }
+
+    fetchQuestions();
+  }, [fetchQuestions, selectedQuizCategoryId]);
 
   useEffect(() => {
     // Inject head scripts
@@ -161,6 +211,25 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const scrollToQuizSection = () => {
+    const element = document.getElementById("gs-spark-section");
+    if (!element) return;
+
+    const offset = 80;
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    });
+  };
+
+  const handlePracticeClick = (childId: string | number) => {
+    setSelectedQuizChildId(childId);
+    scrollToQuizSection();
+  };
+
   // Function to scroll to specific child card
   const scrollToChildCard = (childId: string) => {
     const element = document.getElementById(`child-card-${childId}`);
@@ -184,9 +253,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   };
 
   // Filter out custom-link templates and paginate
-  const filteredChildren = page.children.filter(
-    (child: any) => child.templateId !== "custom-link"
-  );
+  const filteredChildren = quizChildren;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredChildren.slice(
@@ -326,8 +393,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                       const childImageAlt = childImagearray[1];
 
                       return (
-                        <Link
-                          href={`/${child.slug}`}
+                        <div
                           key={child.id}
                           className="group transform transition-all hover:-translate-y-1"
                         >
@@ -376,10 +442,16 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                               </p>
                               
                               <div className="flex gap-2">
-                                <button className="flex-1 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors">
+                                <Link
+                                  href={`/${child.slug}`}
+                                  className="flex-1 inline-flex items-center justify-center bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors"
+                                >
                                   Read Notes →
-                                </button>
-                                <button className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                </Link>
+                                <button
+                                  onClick={() => handlePracticeClick(child.id)}
+                                  className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                >
                                   Practice ↗
                                 </button>
                               </div>
@@ -390,7 +462,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                               <div className="h-full bg-blue-500 w-0 transition-all duration-600"></div>
                             </div>
                           </Card>
-                        </Link>
+                        </div>
                       );
                     })}
                   </div>
@@ -489,7 +561,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
               </Card>
 
               {/* GS Spark - Quick Challenge */}
-              <div className="mt-12 mb-8">
+              <div id="gs-spark-section" className="mt-12 mb-8">
                   <div className="bg-gray-50 dark:bg-slate-800 border-t border-b border-gray-200 dark:border-slate-700 py-16 px-6">
                     <div className="max-w-4xl mx-auto text-center mb-8">
                       <span className="text-xs font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2 block">
@@ -505,14 +577,37 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                     </div>
                     
                     <div className="max-w-2xl mx-auto">
+                      {quizChildren.length > 0 && (
+                        <div className="flex gap-2 justify-center flex-wrap mb-6">
+                          {quizChildren.map((child: any) => {
+                            const isActive =
+                              String(selectedQuizChildId) === String(child.id);
+
+                            return (
+                              <button
+                                key={child.id}
+                                onClick={() => setSelectedQuizChildId(child.id)}
+                                className={`px-3 py-1 rounded-full border text-xs font-bold transition-all duration-200 ${
+                                  isActive
+                                    ? "bg-blue-600 text-white border-blue-600"
+                                    : "bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-slate-600 hover:border-blue-500 hover:text-blue-600"
+                                }`}
+                              >
+                                {child.title}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
                       <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden">
                         <div className="border-b border-gray-200 dark:border-slate-700 px-6 py-4">
                           <div className="flex justify-between items-center">
                             <span className="text-xs font-black uppercase tracking-wider px-3 py-1 bg-blue-600 text-white rounded-full">
-                              {(page.categories as any)?.[0]?.name || 'General Studies'}
+                              {selectedQuizChild?.title || "General Studies"}
                             </span>
                             <span className="text-sm font-bold text-gray-600 dark:text-gray-400">
-                              Score: <span className="text-gray-900 dark:text-white">0</span> / <span className="text-gray-900 dark:text-white">5</span>
+                              Score: <span className="text-gray-900 dark:text-white">{quizProgress.score}</span> / <span className="text-gray-900 dark:text-white">{quizProgress.total || currentQuestions.length || 0}</span>
                             </span>
                           </div>
                         </div>
@@ -565,6 +660,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                                 onRetry={fetchQuestions}
                                 isLoading={isLoading}
                                 error={error}
+                                onProgressChange={setQuizProgress}
                               />
                             </div>
                           )}

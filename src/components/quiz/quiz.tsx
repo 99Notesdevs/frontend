@@ -17,6 +17,13 @@ interface Question {
 interface QuizProps {
   questions: Question[];
   onQuizComplete: () => void;
+  onProgressChange?: (progress: {
+    score: number;
+    total: number;
+    answered: number;
+    currentQuestion: number;
+    isCompleted: boolean;
+  }) => void;
 }
 
 // Normalize answer to 0-based option index.
@@ -60,7 +67,11 @@ const getDifficultyColor = (difficulty: string): string => {
   }
 };
 
-const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
+const Quiz: React.FC<QuizProps> = ({
+  questions = [],
+  onQuizComplete,
+  onProgressChange,
+}) => {
   const [selectedOptions, setSelectedOptions] = useState<
     Record<number, number>
   >({});
@@ -71,15 +82,46 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSavePrompt, setShowSavePrompt] = useState(true);
+
+  const calculateScore = () => {
+    return questions.reduce((score, question) => {
+      const correctOptionIndex = getCorrectOptionIndex(question.answer);
+      return score +
+        (selectedOptions[question.id] === correctOptionIndex ? 1 : 0);
+    }, 0);
+  };
 
   useEffect(() => {
     if (questions && questions.length > 0) {
+      setSelectedOptions({});
+      setShowExplanations({});
+      setShowResults(false);
+      setCurrentQuestion(0);
+      setShowSavePrompt(true);
+      setError(null);
       setIsLoading(false);
     } else {
       setError("No questions available");
       setIsLoading(false);
     }
   }, [questions]);
+
+  useEffect(() => {
+    onProgressChange?.({
+      score: calculateScore(),
+      total: questions.length,
+      answered: Object.keys(selectedOptions).length,
+      currentQuestion,
+      isCompleted: showResults,
+    });
+  }, [
+    selectedOptions,
+    showResults,
+    currentQuestion,
+    questions,
+    onProgressChange,
+  ]);
 
   if (isLoading) {
     return (
@@ -122,6 +164,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
 
   const checkResults = () => {
     setShowResults(true);
+    onQuizComplete();
   };
 
   const resetQuiz = () => {
@@ -129,56 +172,118 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
     setShowExplanations({});
     setShowResults(false);
     setCurrentQuestion(0);
+    setShowSavePrompt(true);
     onQuizComplete();
-    setCurrentQuestion(0);
   };
 
-  const calculateScore = () => {
-    return questions.reduce((score, question) => {
-      const correctOptionIndex = getCorrectOptionIndex(question.answer);
-      return score + (selectedOptions[question.id] === correctOptionIndex ? 1 : 0);
-    }, 0);
-  };
+  const score = calculateScore();
+  const totalQuestions = questions.length;
+  const scoreRatio = totalQuestions > 0 ? score / totalQuestions : 0;
+
+  const scoreTrophy =
+    scoreRatio === 1 ? "🏆" : scoreRatio >= 0.6 ? "⭐" : "💪";
+  const scoreHeadline =
+    scoreRatio === 1
+      ? "Perfect score!"
+      : scoreRatio >= 0.6
+        ? "Solid attempt."
+        : "Keep pushing.";
+  const scoreBody =
+    scoreRatio === 1
+      ? "Flawless. The examiner would approve."
+      : scoreRatio >= 0.6
+        ? "Good foundation. Now read the notes to fill the gaps."
+        : "Start with the notes and come back. You'll surprise yourself.";
+
+  const saveEyebrow =
+    scoreRatio === 1
+      ? "🔥 Perfect — but will you remember this tomorrow?"
+      : scoreRatio >= 0.6
+        ? "⚠ Good score. Going to waste without a log."
+        : "📉 These are exactly the questions that appear in Prelims.";
+  const saveHeadline =
+    scoreRatio === 1
+      ? "You just proved you can do it."
+      : scoreRatio >= 0.6
+        ? `You got ${score}/${totalQuestions}.`
+        : `${score}/${totalQuestions} today.`;
+  const saveHeadlineAccent =
+    scoreRatio === 1
+      ? "Prove it stays."
+      : scoreRatio >= 0.6
+        ? "Someone else got 5/5 and saved their progress."
+        : "The topper next to you scored 5/5 last week.";
+  const saveSubtext =
+    scoreRatio === 1
+      ? "Log in free. We'll save your streak, track your revision cycle, and remind you before this subject fades. Perfect scores mean nothing if you forget by exam day."
+      : scoreRatio >= 0.6
+        ? "Log in free. We'll track what you've read, flag the gaps, and build a personal revision plan. Your score is a starting point — only if you track where you go next."
+        : "Log in free. We'll identify your weak subjects, queue them for revision, and track your improvement over time. The gap closes faster when you can see it clearly.";
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="space-y-6" data-theme="light">
         {showResults ? (
-          <div className="border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl bg-white dark:bg-gray-800 p-8">
-            <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6">
-              <div className="text-center">
-                <div className="mb-6">
-                  <svg className="h-20 w-20 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                  Quiz Completed!
-                </h2>
-                <div className="text-5xl font-bold text-green-600 dark:text-green-400 mb-4">
-                  {calculateScore()} / {questions.length}
-                </div>
-                <p className="text-lg text-gray-600 dark:text-gray-400 max-w-md leading-relaxed">
-                  {calculateScore() >= questions.length / 2
-                    ? "Great job! "
-                    : "Keep practicing! "}
-                  You answered {calculateScore()} out of {questions.length} questions correctly.
-                </p>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl bg-white dark:bg-gray-800 p-6 md:p-8">
+            <div className="flex flex-col items-center justify-center text-center">
+              <div className="text-5xl mb-4">{scoreTrophy}</div>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {scoreHeadline}
+              </h2>
+              <div className="text-5xl font-bold text-green-600 dark:text-green-400 mb-3">
+                {score} / {totalQuestions}
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+              <p className="text-base text-gray-600 dark:text-gray-400 max-w-lg leading-relaxed mb-6">
+                You scored {score}/{totalQuestions}. {scoreBody}
+              </p>
+
+              <div className="w-full max-w-md mb-4">
                 <button
                   onClick={resetQuiz}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   Try Again
                 </button>
-                <button
-                  onClick={handlePracticeMore}
-                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                >
-                  Practice More
-                </button>
               </div>
+
+              {showSavePrompt && (
+                <div className="w-full max-w-2xl bg-gray-900 rounded-xl p-5 md:p-6 text-left relative overflow-hidden">
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse 80% 60% at 110% -20%, rgba(24,101,242,.35) 0%, transparent 60%)",
+                    }}
+                  />
+                  <div className="relative z-10">
+                    <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.18em] text-yellow-400 mb-2 block">
+                      {saveEyebrow}
+                    </span>
+                    <h3 className="text-lg md:text-xl font-semibold text-slate-100 leading-snug mb-2">
+                      {saveHeadline}
+                      <br />
+                      <span className="italic text-yellow-300">{saveHeadlineAccent}</span>
+                    </h3>
+                    <p className="text-sm text-slate-300/80 leading-relaxed mb-4">
+                      {saveSubtext}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        onClick={handlePracticeMore}
+                        className="bg-blue-600 text-white border-none px-5 py-2.5 rounded-lg text-sm font-black hover:bg-blue-700 transition-colors"
+                      >
+                        Save My Progress →
+                      </button>
+                      <button
+                        onClick={() => setShowSavePrompt(false)}
+                        className="text-xs text-slate-300/60 hover:text-slate-300 transition-colors"
+                      >
+                        Not now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ) : (
