@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import QuizWrapper from '../quiz/QuizWrapper';
+import QuizWrapper from '../quiz/QuizWrapperN';
 import { env } from '@/config/env';
 
 interface Question {
