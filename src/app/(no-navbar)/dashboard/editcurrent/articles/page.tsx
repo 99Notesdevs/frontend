@@ -177,7 +177,7 @@ export default function ArticlesPage() {
 
   useEffect(() => {
     if (selectedPage) {
-      console.log("Selected page content:", selectedPage);
+      // console.log("Selected page content:", selectedPage);
 
       // Parse metadata string into object if it exists
       const parsedMetadata = selectedPage.metadata

@@ -25,7 +25,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
           const response = (await api.get(`/admin/check`)) as {
             success: boolean;
           };
-          console.log(response);
+          // console.log(response);
           if (!response.success) {
             // If token is invalid, redirect to login page
             router.push("/operator");

@@ -40,10 +40,10 @@ export default function SearchResult() {
       try {
         setIsLoading(true);
         const searchUrl = `/search/global?query=${encodeURIComponent(query)}`;
-        console.log('Fetching search results from:', searchUrl);
+        // console.log('Fetching search results from:', searchUrl);
         
         const response = await api.get<SearchResultItem[] | { [key: string]: SearchResultItem[] }>(searchUrl);
-        console.log('Search API Response:', response);
+        // console.log('Search API Response:', response);
         
         let searchResults: SearchResultItem[] = [];
         
@@ -56,7 +56,7 @@ export default function SearchResult() {
           searchResults = Object.values(response).flat();
         }
         
-        console.log('Processed search results:', searchResults);
+        // console.log('Processed search results:', searchResults);
         setResults(searchResults);
         setTotalItems(searchResults.length);
         setTotalPages(1); // No pagination for now, show all results on one page

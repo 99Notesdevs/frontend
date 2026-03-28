@@ -22,14 +22,14 @@ export function QuizQuestions({
   defaultValue = "",
   onChange,
 }: QuizQuestionsProps) {
-  console.log("QuizQuestions component initialized with defaultValue:", defaultValue);
+  // console.log("QuizQuestions component initialized with defaultValue:", defaultValue);
 
   try {
     // Parse the defaultValue safely
     let parsedValue: QuizQuestion[];
     try {
       parsedValue = defaultValue ? JSON.parse(defaultValue) : [];
-      console.log("Parsed defaultValue:", parsedValue);
+      // console.log("Parsed defaultValue:", parsedValue);
     } catch (parseError) {
       console.error("Error parsing quiz questions JSON:", parseError);
       parsedValue = [];
@@ -157,9 +157,9 @@ export function QuizQuestions({
     };
 
     useEffect(() => {
-      console.log("Questions changed:", questions);
+      // console.log("Questions changed:", questions);
       const stringified = JSON.stringify(questions);
-      console.log("Stringified questions:", stringified);
+      // console.log("Stringified questions:", stringified);
       onChange(stringified);
     }, [questions, onChange]);
 

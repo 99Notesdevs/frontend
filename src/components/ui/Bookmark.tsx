@@ -14,12 +14,12 @@ const Bookmark: React.FC<BookmarkProps> = ({
 }) => {
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const [loading, setLoading] = useState(false);
-  console.log(
-    "Bookmark component mounted with articleId:",
-    articleId,
-    "bookmarked:",
-    initialBookmarked
-  );
+  // console.log(
+  //   "Bookmark component mounted with articleId:",
+  //   articleId,
+  //   "bookmarked:",
+  //   initialBookmarked
+  // );
 
   const handleBookmark = async () => {
     setLoading(true);

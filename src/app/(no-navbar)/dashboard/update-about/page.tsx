@@ -91,7 +91,7 @@ export default function UpdateAboutPage() {
     field: string,
     index?: number
   ) => {
-    console.log("Change......");
+    // console.log("Change......");
     setTempContent((prev) => {
       // Handle top-level fields like heroImage and heroText
       if (section === "heroImage" || section === "heroText") {
@@ -104,7 +104,7 @@ export default function UpdateAboutPage() {
       // Handle nested fields
       const sectionData = (prev[section as keyof Content] || {}) as any;
       if (Array.isArray(sectionData[field])) {
-        console.log("Array field detected");
+        // console.log("Array field detected");
         // Handle array fields (e.g., images)
         return {
           ...prev,
@@ -116,7 +116,7 @@ export default function UpdateAboutPage() {
           },
         };
       } else {
-        console.log("Non-array field detected");
+        // console.log("Non-array field detected");
         // Handle non-array fields
         return {
           ...prev,

@@ -66,17 +66,17 @@ const fetchCurrentAffairsByType = async (
 
 // Fetch articles by parent slug from the API
 const fetchArticlesByParentSlug = async (parentSlug: string): Promise<CurrentArticle[]> => {
-  console.log('Fetching articles for slug:', parentSlug); // Debug log
+  // console.log('Fetching articles for slug:', parentSlug); // Debug log
   // URL encode the slug to handle forward slashes properly
   const encodedSlug = encodeURIComponent(parentSlug);
-  console.log('Encoded slug:', encodedSlug); // Debug log
+  // console.log('Encoded slug:', encodedSlug); // Debug log
   const res = (await api.get(`/currentArticle/parent/${encodedSlug}`)) as {
     success: boolean; data: CurrentArticle[];
   };
   if (!res.success) {
     throw new Error(`Failed to fetch articles for ${parentSlug}`);
   }
-  console.log('Articles response:', res.data); // Debug log
+  // console.log('Articles response:', res.data); // Debug log
   return res.data.map(article => ({
     ...article,
     level: 2,
@@ -234,7 +234,7 @@ const CurrentAffairsList = () => {
 
   // Load children (articles) for a specific current affair
   const loadChildren = async (parentSlug: string, parentId: number) => {
-    console.log('loadChildren called with:', { parentSlug, parentId }); // Debug log
+    // console.log('loadChildren called with:', { parentSlug, parentId }); // Debug log
     try {
       // Set loading state for the specific affair
       const updateLoadingState = (affairs: CurrentAffair[]): CurrentAffair[] => {

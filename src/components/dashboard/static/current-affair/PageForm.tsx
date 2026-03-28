@@ -273,7 +273,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     for (const img of imgTags) {
       const src = img.getAttribute("src");
       if (!src) continue;
-      console.log("I was here");
+      // console.log("I was here");
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
       const fileName =

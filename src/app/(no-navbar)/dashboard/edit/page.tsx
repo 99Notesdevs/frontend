@@ -167,7 +167,7 @@ function PageList() {
 
   const saveEdit = async (formData: any) => {
     if (!selectedPage) return;
-    console.log("Form data:", formData);
+    // console.log("Form data:", formData);
 
     try {
       // Generate new slug from title if it has changed

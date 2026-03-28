@@ -42,7 +42,7 @@ export function AuthModal() {
     
     try {
       // TODO: Implement actual auth logic
-      console.log(`${type} with:`, formData);
+      // console.log(`${type} with:`, formData);
       // Simulate API call
       
     //   await new Promise(resolve => setTimeout(resolve, 1000));
@@ -56,7 +56,7 @@ export function AuthModal() {
           body: JSON.stringify(formData),
         })
         const responseData = await response.json() as { success: boolean };
-        console.log(responseData);
+        // console.log(responseData);
         if (!responseData.success) throw new Error('Failed to login');
 
       }
@@ -70,7 +70,7 @@ export function AuthModal() {
           body: JSON.stringify(formData),
         })
         const responseData = await response.json() as { success: boolean };
-        console.log(responseData);
+        // console.log(responseData);
         if (!responseData.success) throw new Error('Failed to register');
       }
       

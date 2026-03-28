@@ -105,7 +105,7 @@ export default function PageListCurrent() {
     for (const img of imgTags) {
       const src = img.getAttribute("src");
       if (!src) continue;
-      console.log("I was here");
+      // console.log("I was here");
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
       const fileNmae =
@@ -249,7 +249,7 @@ export default function PageListCurrent() {
 
   useEffect(() => {
     if (selectedPage) {
-      console.log("Selected page content:", selectedPage);
+      // console.log("Selected page content:", selectedPage);
 
       // Parse metadata string into object if it exists
       const parsedMetadata = JSON.parse(selectedPage.metadata || "{}");

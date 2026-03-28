@@ -294,7 +294,7 @@ export default function AdminPermissions() {
             id="header-scripts"
             value={headerScript}
             onChange={(e) => setHeaderScript(e.target.value)}
-            placeholder="<script>console.log('Header script')</script>"
+            placeholder="<script>// console.log('Header script')</script>"
             rows={5}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-mono text-sm"
           />
@@ -367,7 +367,7 @@ export default function AdminPermissions() {
             id="footer-scripts"
             value={footerScript}
             onChange={(e) => setFooterScript(e.target.value)}
-            placeholder="<script>console.log('Footer script')</script>"
+            placeholder="<script>// console.log('Footer script')</script>"
             rows={5}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-mono text-sm"
           />
