@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { isAuth } from "@/lib/isAuth";
 import logo from "../../../public/Logo.svg";
@@ -238,6 +238,18 @@ export default function Navbar({ navigation }: NavbarProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { showLogin } = useAuthModal();
 
+  const refreshAuthStatus = useCallback(async () => {
+    try {
+      const authStatus = await isAuth();
+      setIsLoggedIn(authStatus.isAuthenticated);
+    } catch (error) {
+      console.error("Error checking auth status:", error);
+      setIsLoggedIn(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -253,20 +265,27 @@ export default function Navbar({ navigation }: NavbarProps) {
   }, []);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const authStatus = await isAuth();
-        setIsLoggedIn(authStatus.isAuthenticated);
-      } catch (error) {
-        console.error("Error checking auth status:", error);
-        setIsLoggedIn(false);
-      } finally {
-        setIsLoading(false);
+    const handleAuthChange = () => {
+      refreshAuthStatus();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refreshAuthStatus();
       }
     };
 
-    checkAuth();
-  }, []);
+    refreshAuthStatus();
+    window.addEventListener("auth-state-changed", handleAuthChange);
+    window.addEventListener("focus", handleAuthChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("auth-state-changed", handleAuthChange);
+      window.removeEventListener("focus", handleAuthChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [refreshAuthStatus]);
 
   useEffect(() => {
     const handleScroll = () => {

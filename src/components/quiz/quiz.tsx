@@ -19,6 +19,23 @@ interface QuizProps {
   onQuizComplete: () => void;
 }
 
+// Normalize answer to 0-based option index.
+const getCorrectOptionIndex = (answer: string): number => {
+  const numericAnswer = Number(answer);
+  if (!Number.isNaN(numericAnswer)) {
+    // Support both 0-based and 1-based numeric answers from APIs.
+    return numericAnswer > 0 ? numericAnswer - 1 : numericAnswer;
+  }
+
+  // Support alphabet answers like A/B/C/D.
+  const upper = answer.trim().toUpperCase();
+  if (upper.length === 1 && upper >= "A" && upper <= "Z") {
+    return upper.charCodeAt(0) - 65;
+  }
+
+  return -1;
+};
+
 // Helper function to calculate difficulty based on rating and attempts
 const getDifficulty = (rating?: number, totalAttempts?: number): string => {
   if (!totalAttempts || totalAttempts === 0) return "Easy";
@@ -118,10 +135,8 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
 
   const calculateScore = () => {
     return questions.reduce((score, question) => {
-      return (
-        score +
-        (selectedOptions[question.id] === Number(question.answer) ? 1 : 0)
-      );
+      const correctOptionIndex = getCorrectOptionIndex(question.answer);
+      return score + (selectedOptions[question.id] === correctOptionIndex ? 1 : 0);
     }, 0);
   };
 
@@ -219,7 +234,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
                         {question.options.map((option, index) => {
                           const isSelected =
                             selectedOptions[question.id] === index;
-                          const isCorrect = (index === Number(question.answer)) || (String.fromCharCode(index + 65) == question.answer);
+                          const isCorrect = index === getCorrectOptionIndex(question.answer);
                           const isShown = showExplanations[question.id];
                           let className =
                             "flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-300 text-base hover:shadow-md";
