@@ -47,7 +47,13 @@ export default async function RootLayout({
             <GoogleOneTap />
             {children}
           </main>
-          <FooterCompressed />
+          <Suspense
+            fallback={
+              <div className="text-foreground">Loading Footer...</div>
+            }
+          >
+            <FooterCompressed />
+          </Suspense>
         </ThemeProvider>
       </div>
     </>

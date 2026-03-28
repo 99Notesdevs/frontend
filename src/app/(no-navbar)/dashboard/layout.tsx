@@ -12,6 +12,7 @@ import {
 import { isAuth, AuthResponse } from "@/lib/isAuth";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { api } from "@/config/api/route";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -243,12 +244,19 @@ export default function DashboardLayout({
           </button>
           {/* Logout button */}
           <button
-            onClick={() => {
-              // Clear all auth data
-              Cookies.remove("token", { path: "/" });
-              sessionStorage.clear();
-              // Force a full page reload to clear any cached state
-              window.location.href = "/operator";
+            onClick={async () => {
+              try {
+                // Send POST request to logout endpoint using api helper
+                await api.post(`/admin/logout`);
+              } catch (error) {
+                console.error('Logout request failed:', error);
+              } finally {
+                // Clear all auth data regardless of request success/failure
+                Cookies.remove("token", { path: "/" });
+                sessionStorage.clear();
+                // Force a full page reload to clear any cached state
+                window.location.href = "/operator";
+              }
             }}
             className="text-gray-300 hover:text-white transition-colors focus:outline-none"
             aria-label="Logout"
