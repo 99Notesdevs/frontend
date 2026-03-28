@@ -41,16 +41,28 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
     abortControllerRef.current = controller;
 
     try {
-      const res = (await api.get<{ success: boolean; data: any[] }>(
+      const res = (await api.get<{ success?: boolean; data?: { pages?: any[] } }>(
         `/search/global?query=${encodeURIComponent(searchQuery)}`,
         { signal: controller.signal }
-      )) as { success: boolean; data: any[] };
+      ));
 
-      if (!res.success) {
+      const normalizedResponse = res as any;
+      const success =
+        normalizedResponse?.success ??
+        normalizedResponse?.response?.data?.success ??
+        true;
+
+      if (!success) {
         throw new Error("Search failed");
       }
 
-      setResults(res.data || []);
+      const pages =
+        normalizedResponse?.data?.pages ??
+        normalizedResponse?.response?.data?.pages ??
+        normalizedResponse?.response?.data?.data?.pages ??
+        [];
+
+      setResults(Array.isArray(pages) ? pages : []);
     } catch (err: any) {
       // Ignore abort errors
       if (err?.name === "AbortError") return;
@@ -60,6 +72,7 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
       // Only clear loading if this is still the active controller
       if (abortControllerRef.current === controller) {
         setIsLoading(false);
+        abortControllerRef.current = null;
       }
     }
   };
@@ -87,22 +100,6 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
       handleSearch(value);
     }, 1000);
   };
-
-  useEffect(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = setTimeout(() => {
-      handleSearch(query);
-    }, 1000); // 400ms debounce
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, [query]);
 
   useEffect(() => {
     return () => {
@@ -179,11 +176,11 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
               Loading...
             </div>
           ) : results.length > 0 ? (
-            <ul className="py-1">
+            <ul className="py-1 max-h-72 overflow-y-auto overscroll-contain">
               {results.map((result: any, index: number) => (
                 <li
                   key={index}
-                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer text-gray-800 dark:text-slate-200 transition-colors duration-200"
+                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer text-gray-800 dark:text-slate-200 transition-colors duration-200 flex items-start gap-2"
                   onClick={() => handleResultClick(result.slug)}
                 >
                   {result.imageUrl && (
@@ -193,7 +190,7 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
                       className="w-10 h-10 object-cover rounded"
                     />
                   )}
-                  <div className="ml-2">
+                  <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-800 dark:text-white">
                       {result.title || "Untitled"}
                     </h3>
