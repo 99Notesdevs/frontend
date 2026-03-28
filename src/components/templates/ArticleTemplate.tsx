@@ -48,7 +48,7 @@ const processContent = async (content: string, isAuthorized: boolean) => {
 
 export const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ page }) => {
   const [activeTab, setActiveTab] = useState<'article' | 'practice' | 'community'>('article');
-  console.log("page", page);
+  // console.log("page", page);
   const { title, content, metadata } = page;
   const parsedMetadata =
     typeof metadata === "string" ? JSON.parse(metadata) : metadata || {};

@@ -53,7 +53,7 @@ export default function UpdateCssPage() {
         if (response.success) {
           const data = response.data;
           // Accepts either a CSS string or an object of variables
-          console.log("Fetched CSS:", data);
+          // console.log("Fetched CSS:", data);
           const currentCss = JSON.parse(data.globalCss) || "";
           setCss(currentCss);
           setOriginalCss(currentCss);

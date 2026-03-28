@@ -80,7 +80,7 @@ class DraftStorage {
             createdAt: now,
             updatedAt: now,
           };
-          console.log("New draft data:", draftData);
+          // console.log("New draft data:", draftData);
           const request = store.add(draftData);
           request.onerror = () => reject(request.error);
           request.onsuccess = () => resolve(newId);
@@ -163,7 +163,7 @@ class DraftStorage {
         );
         resolve(drafts);
       };
-      console.log("Drafts result:", request.result);
+      // console.log("Drafts result:", request.result);
       transaction.onerror = () => reject(transaction.error);
     });
   }

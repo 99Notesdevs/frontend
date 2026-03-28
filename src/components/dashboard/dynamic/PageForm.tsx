@@ -139,7 +139,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         success: boolean;
         data: TemplateType[];
       };
-      console.log("response", response);
+      // console.log("response", response);
       if (!response.success) throw new Error("Failed to fetch templates");
       const { data } = response;
 
@@ -204,7 +204,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
   };
 
   const getSelectedCategoryId = (): string | null => {
-    console.log(selectedCategories);
+    // console.log(selectedCategories);
     return selectedCategories.filter(Boolean).pop() || null;
   };
 
@@ -261,7 +261,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     try {
       const parentId = getSelectedParentId();
       const categoryId = getSelectedCategoryId();
-      console.log(parentId, categoryId);
+      // console.log(parentId, categoryId);
       const currentTemplate = templates.find((t) => t.id === selectedTemplate);
 
       if (!currentTemplate) {

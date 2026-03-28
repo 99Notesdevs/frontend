@@ -189,7 +189,7 @@ const handleSearchResultClick = async (blog: any) => {
     for (const img of imgTags) {
       const src = img.getAttribute("src");
       if (!src) continue;
-      console.log("I was here");
+      // console.log("I was here");
       const isBlob = src.startsWith("blob:");
       const isBase64 = src.startsWith("data:image");
       const fileNmae =
@@ -226,7 +226,7 @@ const handleSearchResultClick = async (blog: any) => {
       }
 
       // Log the raw form data
-      console.log("Raw form data:", formData);
+      // console.log("Raw form data:", formData);
 
       // Generate slug from title
       // const baseSlug = formData.title
@@ -256,7 +256,7 @@ const handleSearchResultClick = async (blog: any) => {
       };
 
       // Log the metadata object
-      console.log("Metadata object:", metadata);
+      // console.log("Metadata object:", metadata);
 
       formData.content = await handleImageUpload(formData.content);
       const updateData = {
@@ -270,7 +270,7 @@ const handleSearchResultClick = async (blog: any) => {
       };
 
       // Log the final update data that will be sent
-      console.log("Final update data to be sent:", updateData);
+      // console.log("Final update data to be sent:", updateData);
 
       if (!selectedPage) {
         setError("No page selected");
@@ -310,7 +310,7 @@ const handleSearchResultClick = async (blog: any) => {
     try {
       const response = (await api.delete(`/blog/${id}`)) as any;
 
-      console.log("Delete response:", response);
+      // console.log("Delete response:", response);
 
       // Check different possible response structures
       const isSuccess = response?.success || response?.data?.success;

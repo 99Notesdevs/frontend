@@ -290,7 +290,7 @@ export default function Navbar({ navigation }: NavbarProps) {
     e.preventDefault();
     if (searchQuery.trim()) {
       // Implement search functionality
-      console.log('Searching for:', searchQuery);
+      // console.log('Searching for:', searchQuery);
       // You can redirect to search results page or handle search as needed
       window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
     }

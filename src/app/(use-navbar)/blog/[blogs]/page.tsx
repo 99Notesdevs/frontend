@@ -12,10 +12,10 @@ async function getPage(
 ): Promise<BaseTemplateProps["page"] | null> {
   try {
     const normalizedSlug = slug.replace(/\s+/g, "-"); // Normalize slug by replacing spaces with hyphens
-    console.log("NORMALIZED SLUG", normalizedSlug);
+    // console.log("NORMALIZED SLUG", normalizedSlug);
     const response = await api.get(`/blog/slug/${normalizedSlug}`) as { success: boolean, data: BaseTemplateProps["page"] | null };
     const page = response.data;
-    console.log("PAGE", page);
+    // console.log("PAGE", page);
     if (!page) {
       return null;
     }

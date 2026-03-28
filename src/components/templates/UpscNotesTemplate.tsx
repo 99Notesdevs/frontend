@@ -25,7 +25,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
     // Inject head scripts
     if (headScripts) {
       headScripts.forEach((script: string) => {
-        console.log(script);
+        // console.log(script);
         try {
           if (script.startsWith("<script")) {
             // Parse the full <script> tag and extract attributes
@@ -50,7 +50,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
     // Inject body scripts
     if (bodyScripts) {
       bodyScripts.forEach((script: string) => {
-        console.log(script);
+        // console.log(script);
         try {
           if (script.startsWith("<script")) {
             // Parse the full <script> tag and extract attributes

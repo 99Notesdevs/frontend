@@ -52,7 +52,7 @@ export function useIndexedDBDrafts<T = any>({
     async (title: string, data: T) => {
       try {
         setError(null);
-        console.log("Current draft ID:", currentDraftId);
+        // console.log("Current draft ID:", currentDraftId);
 
         // Convert ID to string if it exists, otherwise pass null
         const idToSave = currentDraftId ? String(currentDraftId) : null;
@@ -68,9 +68,9 @@ export function useIndexedDBDrafts<T = any>({
         if (currentDraftId !== stringId) {
           setCurrentDraftId(stringId);
         }
-        console.log("here saving");
+        // console.log("here saving");
         await loadDrafts(); // Refresh the drafts list
-        console.log("here saved");
+        // console.log("here saved");
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to save draft");
         console.error("Error saving draft:", err);

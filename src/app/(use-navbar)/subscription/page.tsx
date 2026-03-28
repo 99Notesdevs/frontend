@@ -44,7 +44,7 @@ export default function SubscriptionPage() {
       return;
     }
     const responseData = response.data;
-    console.log("First ", responseData);
+    // console.log("First ", responseData);
     const orderId = responseData.id;
     const orderData = {
       orderId: orderId,
@@ -56,7 +56,7 @@ export default function SubscriptionPage() {
     }
     const response2 = await api.post(`/payment/create-order`, orderData) as { success: boolean, data: { redirectUrl: string } };
     const responseData2 = response2.data;
-    console.log(responseData2);
+    // console.log(responseData2);
     const redirectUrl = responseData2.redirectUrl;
     window.location.href = redirectUrl;
   };

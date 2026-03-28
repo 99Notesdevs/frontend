@@ -111,7 +111,7 @@ const CurrentAffairArticlePage = async ({
   
   // Fetch the article
   const article = await fetchArticle(category, articleSlug);
-  console.log(article);
+  // console.log(article);
   const quizQuestions =  JSON.parse(article?.quizQuestions || "[]");
   // @ts-ignore
   const jsonLD = JSON.parse(article?.metadata).schemaData || "{}";
@@ -339,7 +339,7 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
       if (response.success && data) {
         return data;
       } else {
-        console.log(`API returned success but no article data was found`);
+        // console.log(`API returned success but no article data was found`);
       }
     } else {      
       // Try a different approach - fetch all articles and find a match
