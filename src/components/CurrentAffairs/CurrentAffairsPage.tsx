@@ -47,11 +47,13 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
   initialArticles,
   initialError,
 }) => {
+  const TOPIC_PARENT_ID = 718;
   const [activeTab, setActiveTab] = useState<'daily' | 'monthly' | 'yearly'>('daily');
   const [currentAffair, setCurrentAffair] = useState<CurrentAffair | null>(initialCurrentAffair);
   const [articles, setArticles] = useState<Article[]>(initialArticles);
   const [error, setError] = useState<string | null>(initialError);
   const [allSections, setAllSections] = useState<CurrentAffair[]>([]);
+  const [topicPages, setTopicPages] = useState<Article[]>([]);
 
   // Fetch all sections for tab navigation
   useEffect(() => {
@@ -72,6 +74,26 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
 
     fetchAllSections();
   }, []);
+
+  // Fetch sidebar pages under a fixed parent category.
+  useEffect(() => {
+    const fetchTopicPages = async () => {
+      try {
+        const response = await api.get(`/page/parent/${TOPIC_PARENT_ID}`) as {
+          success: boolean;
+          data: Article[] | null;
+        };
+
+        if (response.success && response.data) {
+          setTopicPages(response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching topic pages:', err);
+      }
+    };
+
+    fetchTopicPages();
+  }, [TOPIC_PARENT_ID]);
 
   // Handle tab switching
   const handleTabSwitch = async (tabType: 'daily' | 'monthly' | 'yearly') => {
@@ -352,28 +374,27 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
                   </span>
                 </div>
                 <div className="p-4 space-y-1">
-                  {[
-                    { icon: '⚖️', name: 'Indian Polity', count: 12 },
-                    { icon: '🌍', name: 'International Relations', count: 9 },
-                    { icon: '📈', name: 'Economy & Finance', count: 15 },
-                    { icon: '🌿', name: 'Environment & Ecology', count: 8 },
-                    { icon: '🔬', name: 'Science & Technology', count: 11 },
-                    { icon: '🛡️', name: 'Internal Security', count: 5 },
-                    { icon: '🏛️', name: 'History & Culture', count: 6 },
-                  ].map((topic, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-slate-700 rounded cursor-pointer transition-colors"
-                    >
-                      <span className="text-lg">{topic.icon}</span>
-                      <span className="flex-1 text-sm font-medium text-gray-900 dark:text-white">
-                        {topic.name}
-                      </span>
-                      <span className="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
-                        {topic.count}
-                      </span>
+                  {topicPages.length > 0 ? (
+                    topicPages.map((page, index) => (
+                      <Link
+                        key={page.id}
+                        href={`/${page.slug}`}
+                        className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-slate-700 rounded transition-colors"
+                      >
+                        <span className="text-lg">📄</span>
+                        <span className="flex-1 text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
+                          {page.title}
+                        </span>
+                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
+                          {index + 1}
+                        </span>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500 dark:text-gray-400 p-2">
+                      No topic pages found.
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 

@@ -76,6 +76,7 @@ export function AuthModal() {
       
       
       // On success
+      window.dispatchEvent(new Event('auth-state-changed'));
       closeAuthModal();
     } catch (error) {
       console.error(`${type} error:`, error);
