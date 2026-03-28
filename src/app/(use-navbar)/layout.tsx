@@ -53,7 +53,6 @@ export default async function RootLayout({
               <div className="text-foreground">Loading Footer...</div>
             }
           >
-            <Footer footerSections={footerSections} />
           </Suspense>
         </ThemeProvider>
       </div>

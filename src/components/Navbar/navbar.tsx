@@ -2,18 +2,12 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
 import { isAuth } from "@/lib/isAuth";
-import logo from "../../../public/Logo.svg";
-import logoDark from "../../../public/Logo-Dark.png";
-import SearchBar from "./SearchBar";
+import { useAuthModal } from "@/hooks/useAuthModal";
+import { env } from "@/config/env";
+import { LogOut, User, LayoutDashboard, Search, Menu, X } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { ToggleMode } from "./togglemode";
-import { useAuthModal } from "@/hooks/useAuthModal";
-import { Button } from "@/components/ui/button";
-import { env } from "@/config/env";
-import { LogOut, User, LayoutDashboard } from "lucide-react";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -58,7 +52,7 @@ function NestedNavigation({
           >
             <Link
               href={item.link ? item.link : `/${item.slug}`}
-              className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
+              className="text-[0.76rem] font-bold tracking-[0.07em] uppercase text-[#7A8873] dark:text-gray-300 no-underline py-[0.2rem] border-b-2 border-transparent transition-all duration-[0.18s] hover:text-[#1865F2] hover:border-[#4A90D9] flex items-center"
             >
               {item.title}
               {item.children.length > 0 && (
@@ -73,7 +67,7 @@ function NestedNavigation({
             </Link>
             {item.children.length > 0 && (
               <div
-                className={`absolute mt-0 w-[max(700px,100%)] min-h-[350px] invisible group-hover:visible bg-white dark:bg-slate-800 rounded-md shadow-lg border border-[var(--border-light)] dark:border-slate-700 z-50 ${
+                className={`absolute mt-0 w-[max(700px,100%)] min-h-[350px] invisible group-hover:visible bg-white dark:bg-gray-800 rounded-md shadow-lg border border-[#E8EDE2] dark:border-gray-700 z-50 ${
                   item.slug === "current-affairs" ? "p-4" : ""
                 } ${
                   items.indexOf(item) >= items.length - 2 ? "right-0" : "left-0"
@@ -91,7 +85,7 @@ function NestedNavigation({
                     item.children.map((child) => (
                       <div key={child.slug} className="space-y-2">
                         <div className="space-y-1">
-                          <h3 className="text-[14px] font-normal text-[var(--surface-darker)] dark:text-slate-300 pb-2 border-b border-[var(--bg-elevated)] dark:border-slate-700 font-opensans w-full">
+                          <h3 className="text-[14px] font-normal text-[#1A1F16] dark:text-gray-300 pb-2 border-b border-[#E8EDE2] dark:border-gray-700 w-full">
                             {child.title}
                           </h3>
                           {child.children.length > 0 && (
@@ -104,7 +98,7 @@ function NestedNavigation({
                                       ? grandChild.link
                                       : `/${grandChild.slug}`
                                   }
-                                  className={`${plusJakarta.className} flex px-3 py-1 text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[13px] font-normal tracking-[-0.01em] items-center`}
+                                  className="flex px-3 py-1 text-[#1A1F16] dark:text-gray-200 hover:bg-[#F5F7F4] dark:hover:bg-gray-700 hover:text-[#1865F2] dark:hover:text-blue-400 rounded-md transition-colors duration-200 text-[13px] font-normal tracking-[-0.01em] items-center"
                                 >
                                   <svg
                                     className="w-3 h-3 mr-2 fill-current opacity-80"
@@ -125,12 +119,12 @@ function NestedNavigation({
                     // Original layout for other dropdowns
                     <>
                       {/* Level 2 - Left column */}
-                      <div className="w-[200px] border-r border-[var(--bg-elevated)] dark:border-slate-700 p-4 h-[350px] overflow-y-auto">
+                      <div className="w-[200px] border-r border-[#E8EDE2] dark:border-gray-700 p-4 h-[350px] overflow-y-auto">
                         {item.children.map((child) => (
                           <div key={child.slug} className="mb-2">
                             <Link
                               href={child.link ? child.link : `/${child.slug}`}
-                              className="flex px-1 py-1 text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-medium items-center justify-between font-urbanist tracking-wide"
+                              className="flex px-1 py-1 text-[#1A1F16] dark:text-gray-200 hover:bg-[#F5F7F4] dark:hover:bg-gray-700 hover:text-[#1865F2] dark:hover:text-blue-400 rounded-md transition-colors duration-200 text-[14px] font-medium items-center justify-between tracking-wide"
                               onMouseEnter={() => setOpenDropdown(child.slug)}
                             >
                               <span>{child.title}</span>
@@ -149,7 +143,7 @@ function NestedNavigation({
                       </div>
 
                       {/* Level 3 and 4 - Right column */}
-                      <div className="flex-1 p-3 h-[350px] overflow-y-auto dark:bg-slate-800">
+                      <div className="flex-1 p-3 h-[350px] overflow-y-auto dark:bg-gray-800">
                         {openDropdown &&
                           items.map(
                             (parentItem) =>
@@ -170,12 +164,12 @@ function NestedNavigation({
                                                   ? grandChild.link
                                                   : `/${grandChild.slug}`
                                               }
-                                              className="flex px-3 py-1 text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 text-[14px] font-normal items-center font-opensans"
+                                              className="flex px-3 py-1 text-[#1A1F16] dark:text-gray-200 hover:bg-[#F5F7F4] dark:hover:bg-gray-700 hover:text-[#1865F2] dark:hover:text-blue-400 rounded-md transition-colors duration-200 text-[14px] font-normal items-center"
                                             >
                                               {grandChild.title}
                                             </Link>
                                             {grandChild.children.length > 0 && (
-                                              <div className="pl-2 mt-1 space-y-1 border-l-2 border-[var(--bg-elevated)]">
+                                              <div className="pl-2 mt-1 space-y-1 border-l-2 border-[#E8EDE2]">
                                                 {grandChild.children.map(
                                                   (greatGrandChild) => (
                                                     <Link
@@ -185,7 +179,7 @@ function NestedNavigation({
                                                           ? greatGrandChild.link
                                                           : `/${greatGrandChild.slug}`
                                                       }
-                                                      className="flex px-1 py-1 text-[12.5px] font-inter font-normal tracking-normal text-[var(--text-tertiary)] dark:text-slate-400 hover:bg-[var(--bg-main)] dark:hover:bg-slate-700 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md transition-colors duration-200 items-center"
+                                                      className="flex px-1 py-1 text-[12.5px] font-normal tracking-normal text-[#7A8873] dark:text-gray-400 hover:bg-[#F5F7F4] dark:hover:bg-gray-700 hover:text-[#1865F2] dark:hover:text-blue-400 rounded-md transition-colors duration-200 items-center"
                                                     >
                                                       <svg
                                                         className="w-3 h-3 mr-2 fill-current"
@@ -228,14 +222,16 @@ function NestedNavigation({
 }
 
 export default function Navbar({ navigation }: NavbarProps) {
-  const [showSearch, setShowSearch] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
   const { showLogin } = useAuthModal();
 
   const refreshAuthStatus = useCallback(async () => {
@@ -250,11 +246,14 @@ export default function Navbar({ navigation }: NavbarProps) {
     }
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdown(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearch(false);
       }
     }
 
@@ -263,6 +262,46 @@ export default function Navbar({ navigation }: NavbarProps) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Initialize dark mode from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    setIsDarkMode(shouldBeDark);
+    if (shouldBeDark) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Implement search functionality
+      console.log('Searching for:', searchQuery);
+      // You can redirect to search results page or handle search as needed
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+    }
+  };
+
+  const toggleMobileSubmenu = (slug: string) => {
+    setOpenMenus((prev) => ({
+      ...prev,
+      [slug]: !prev[slug],
+    }));
+  };
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -278,419 +317,369 @@ export default function Navbar({ navigation }: NavbarProps) {
     refreshAuthStatus();
     window.addEventListener("auth-state-changed", handleAuthChange);
     window.addEventListener("focus", handleAuthChange);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleAuthChange);
 
     return () => {
       window.removeEventListener("auth-state-changed", handleAuthChange);
       window.removeEventListener("focus", handleAuthChange);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleAuthChange);
     };
   }, [refreshAuthStatus]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 0);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const toggleMobileSubmenu = (slug: string) => {
-    setOpenMenus((prev) => ({
-      ...prev,
-      [slug]: !prev[slug],
-    }));
-  };
 
   return (
     <>
       {/* Spacer div to prevent content overlap */}
-      <div className="h-[70px] w-full" />
+      <div className="h-14 w-full" />
 
-      <nav
-        className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-          isScrolled ? "border-b-0" : ""
-        }`}
-      >
-        {/* Top Bar - Hidden when scrolled */}
-        {/* <div
-          className={`hidden md:block bg-[var(--primary)] w-full transition-all duration-300 h-0 overflow-hidden opacity-0`}
+      <nav className="fixed top-0 left-0 right-0 z-[200] flex items-center justify-between px-[1.2rem] h-14 bg-white/97 dark:bg-gray-900/97 border-b border-[#E8EDE2] dark:border-gray-700 backdrop-blur-[14px] gap-4">
+        
+        {/* Logo */}
+        <Link 
+          href="/" 
+          className="font-serif text-[1.18rem] font-bold tracking-[-0.02em] text-[#1A1F16] dark:text-white no-underline flex-shrink-0"
         >
-          <div className="container mx-auto px-6 flex justify-between items-center h-12">
-            <div className="mt-1.75">
-              <Link href="/shop" passHref>
-                <span className="text-[12px] text-white font-bold tracking-wide 
-                               bg-[var(--primary)] border border-white px-4 py-1.5 shadow-sm hover:shadow-md transition-all">
-                  Shop Now
-                </span>
-              </Link>
-            </div>
+          99<em className="italic text-[#1865F2]">Notes</em>
+        </Link>
 
-            <div className="ml-30">
-              <Link href={isLoggedIn ? "/users/dashboard" : "/users/login"} passHref>
-                <div className="flex items-center gap-2 hover:text-white/90 transition-colors">
-                    <span className="text-[13px] font-bold tracking-wide text-white ">
-                      Login
-                    </span>
-                  <svg
-                    className="w-6 h-6 text-white"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
-                </div>
-              </Link>
-            </div>
-          </div>
-        </div> */}
-
-        {/* Main Navbar */}
-        <div
-          className={` w-full max-w-[2000px] transition-all duration-300 -mt-[1px]  ${
-            isScrolled
-              ? "bg-white h-[70px] dark:bg-slate-900 shadow-md "
-              : "bg-white h-[70px] dark:bg-slate-700"
-          }`}
-        >
-          <div className="container w-full max-w-[2000px] px-2 lg:px-12">
-            <div className="flex justify-between items-center h-[72px] lg:px-3">
-              {/* Logo */}
-              <div className="flex-shrink-0 min-w-[35px] mx-2 flex items-center">
-                <Link href="/" passHref>
-                  <Image
-                    src={logo}
-                    alt="99Notes"
-                    width={180}
-                    height={60}
-                    className="h-16 w-auto object-contain dark:hidden"
-                    priority
-                  />
-                  <Image
-                    src={logoDark}
-                    alt="99Notes"
-                    width={180}
-                    height={60}
-                    className="h-12 w-auto object-contain hidden dark:block"
-                    priority
-                  />
-                </Link>
-              </div>
-              <div className="hidden lg:flex flex-1 justify-end items-center gap-1 2xl:pr-8 ">
-                {/* <div className="flex font-bold items-center space-x-1 xl:space-x-2 "></div> */}
-                <NestedNavigation items={navigation} />
-                <Link href="/about" passHref>
-                  <span
-                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
-                  >
-                    About 99Notes
-                  </span>
-                </Link>
-                <Link href="/blog" passHref>
-                  <span
-                    className={`${plusJakarta.className} px-3 py-2 text-[var(--text-strong)] dark:text-slate-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] rounded-md text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 flex items-center`}
-                  >
-                    Blogs
-                  </span>
-                </Link>
-                <div className="ml-2 flex items-center gap-4">
-                  {!isLoading &&
-                    (isLoggedIn ? (
-                      <div className="flex items-center">
-                        {/* User profile/dropdown can go here */}
-                        <div className="relative" ref={dropdownRef}>
-                          <button
-                            onClick={() => setOpenDropdown(!openDropdown)}
-                            className="flex items-center space-x-2 focus:outline-none"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                              <User className="w-4 h-4" />
-                            </div>
-                          </button>
-                          
-                          {openDropdown && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
-                              <button
-                                onClick={() => window.location.href = `${env.TEST_PORTAL}/dashboard`}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-                              >
-                                <LayoutDashboard className="w-4 h-4 mr-2" />
-                                Dashboard
-                              </button>
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    const response = await fetch(`${env.API_AUTH}/user/logout`, {
-                                      method: 'POST',
-                                      credentials: 'include',
-                                    });
-                                    if (response.ok) {
-                                      window.location.href = '/';
-                                    }
-                                  } catch (error) {
-                                    console.error('Logout failed:', error);
-                                  }
-                                }}
-                                className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-                              >
-                                <LogOut className="w-4 h-4 mr-2" />
-                                Logout
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="hidden md:flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={showLogin}
-                          className="hidden sm:inline-flex"
-                        >
-                          Log in
-                        </Button>
-                      </div>
-                    ))}
-                  {/* Search icon */}
-                  <button
-                    onClick={() => setShowSearch(!showSearch)}
-                    className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </button>
-                  <ToggleMode />
-                </div>
-              </div>
-
-              {/* Search bar that appears below navbar */}
-              {showSearch && (
-                <div className="absolute right-0 w-80 top-full bg-white dark:bg-gray-800 shadow-md z-50 p-4 mr-2">
-                  <SearchBar onClose={() => setShowSearch(false)} />
-                </div>
-              )}
-
-              {/* Mobile menu button */}
-              <div className="lg:hidden flex items-center space-x-4">
-                <ToggleMode />
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
-                  onClick={() => setIsOpen(!isOpen)}
-                >
-                  <span className="sr-only">Open main menu</span>
-                  {isOpen ? (
-                    <svg
-                      className="block h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="block h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 6h16M4 12h16M4 18h16"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* Desktop Navigation Links */}
+        <div className="hidden lg:flex items-center gap-[1.8rem]">
+          <NestedNavigation items={navigation} />
+          <Link 
+            href="/about" 
+            className="text-[0.76rem] font-bold tracking-[0.07em] uppercase text-[#7A8873] dark:text-gray-300 no-underline py-[0.2rem] border-b-2 border-transparent transition-all duration-[0.18s] hover:text-[#1865F2] hover:border-[#4A90D9]"
+          >
+            About 99Notes
+          </Link>
+          <Link 
+            href="/blog" 
+            className="text-[0.76rem] font-bold tracking-[0.07em] uppercase text-[#7A8873] dark:text-gray-300 no-underline py-[0.2rem] border-b-2 border-transparent transition-all duration-[0.18s] hover:text-[#1865F2] hover:border-[#4A90D9]"
+          >
+            Blogs
+          </Link>
         </div>
 
-        {/* Mobile menu */}
-        <div
-          className={`lg:hidden transform transition-all duration-300 ease-in-out ${
-            isOpen
-              ? "translate-y-0 opacity-100 max-h-[80vh] overflow-y-auto"
-              : "-translate-y-2 opacity-0 pointer-events-none max-h-0"
-          } bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg shadow-lg`}
-        >
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {/* Search Bar in mobile menu */}
-            <div className="px-3 py-2 mb-2 border-b border-gray-200 dark:border-slate-700">
-              <SearchBar onClose={() => setIsOpen(false)} compact={true} />
-            </div>
-            {navigation.map((item) => (
-              <div key={item.slug} className="py-1">
-                <div className="flex items-center justify-between">
-                  <Link
-                    href={item.link ? item.link : `/${item.slug}`}
-                    className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
-                    onClick={() => setIsOpen(false)}
+        {/* Right side buttons */}
+        <div className="flex items-center gap-3">
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex items-center relative" ref={searchRef}>
+            <button
+              onClick={() => setShowSearch(!showSearch)}
+              className="p-2 text-[#7A8873] dark:text-gray-300 hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            
+            {showSearch && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-[#E8EDE2] dark:border-gray-700 p-3">
+                <form onSubmit={handleSearch} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search notes, topics, questions..."
+                    className="flex-1 px-3 py-2 text-sm border border-[#E8EDE2] dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-[#1A1F16] dark:text-white placeholder-[#7A8873] dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-[#1865F2] text-white text-sm font-medium rounded-md hover:bg-[#1149C0] transition-colors"
                   >
-                    {item.title}
-                  </Link>
-                  {item.children.length > 0 && (
-                    <button
-                      onClick={() => toggleMobileSubmenu(item.slug)}
-                      className="px-2 py-1 text-[var(--text-tertiary)]"
-                    >
-                      <svg
-                        className={`h-5 w-5 transform transition-transform duration-200 ${
-                          openMenus[item.slug] ? "rotate-180" : ""
-                        }`}
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                      >
-                        <path d="M12.7071 15.2929L19.7071 8.29289C20.0976 7.90237 20.0976 7.2692 19.7071 6.87868C19.3166 6.48815 18.6834 6.48815 18.2929 6.87868L12 13.1716L5.70711 6.87868C5.31658 6.48815 4.68342 6.48815 4.29289 6.87868C3.90237 7.2692 3.90237 7.90237 4.29289 8.29289L11.2929 15.2929C11.6834 15.6834 12.3166 15.6834 12.7071 15.2929Z" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-                {openMenus[item.slug] && item.children.length > 0 && (
-                  <div className="pl-4 space-y-1 mt-1">
-                    {item.children.map((child) => (
-                      <div key={child.slug} className="py-1">
-                        <div className="flex items-center justify-between">
-                          <Link
-                            href={child.link ? child.link : `/${child.slug}`}
-                            className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {child.title}
-                          </Link>
-                          {child.children.length > 0 && (
-                            <button
-                              onClick={() => toggleMobileSubmenu(child.slug)}
-                              className="px-2 py-1 text-[var(--text-tertiary)]"
-                            >
-                              <svg
-                                className={`h-4 w-4 transform transition-transform duration-200 ${
-                                  openMenus[child.slug] ? "rotate-180" : ""
-                                }`}
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="currentColor"
-                              >
-                                <path d="M12.7071 15.2929L19.7071 8.29289C20.0976 7.90237 20.0976 7.2692 19.7071 6.87868C19.3166 6.48815 18.6834 6.48815 18.2929 6.87868L12 13.1716L5.70711 6.87868C5.31658 6.48815 4.68342 6.48815 4.29289 6.87868C3.90237 7.2692 3.90237 7.90237 4.29289 8.29289L11.2929 15.2929C11.6834 15.6834 12.3166 15.6834 12.7071 15.2929Z" />
-                              </svg>
-                            </button>
-                          )}
-                        </div>
-                        {openMenus[child.slug] && child.children.length > 0 && (
-                          <div className="pl-4 space-y-1 mt-1">
-                            {child.children.map((grandChild) => (
-                              <div key={grandChild.slug} className="py-1">
-                                <div className="flex items-center justify-between">
-                                  <Link
-                                    href={
-                                      grandChild.link
-                                        ? grandChild.link
-                                        : `/${grandChild.slug}`
-                                    }
-                                    className="block px-4 py-2 text-sm font-normal text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] font-inter tracking-normal"
-                                    onClick={() => setIsOpen(false)}
-                                  >
-                                    {grandChild.title}
-                                  </Link>
-                                </div>
-                                {openMenus[grandChild.slug] &&
-                                  grandChild.children.length > 0 && (
-                                    <div className="pl-4 space-y-1 mt-1">
-                                      {grandChild.children.map(
-                                        (greatGrandChild) => (
-                                          <Link
-                                            key={greatGrandChild.slug}
-                                            href={
-                                              greatGrandChild.link
-                                                ? greatGrandChild.link
-                                                : `/${greatGrandChild.slug}`
-                                            }
-                                            className="block px-4 py-2 text-sm text-[var(--text-tertiary)] dark:text-slate-400 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)] font-inter font-normal tracking-normal"
-                                            onClick={() => setIsOpen(false)}
-                                          >
-                                            {greatGrandChild.title}
-                                          </Link>
-                                        )
-                                      )}
-                                    </div>
-                                  )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            {/* About and Blogs */}
-            <Link href="/about" passHref>
-              <span
-                className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
-                onClick={() => setIsOpen(false)}
-              >
-                About 99Notes
-              </span>
-            </Link>
-            <Link href="/blog" passHref>
-              <span
-                className={`${plusJakarta.className} block px-3 py-2.5 text-[14px] font-semibold text-[var(--text-strong)] dark:text-slate-200 hover:bg-[var(--bg-main)] dark:hover:bg-slate-800 rounded-md transition-colors duration-200 hover:text-[var(--action-primary)] dark:hover:text-[var(--action-primary)]`}
-                onClick={() => setIsOpen(false)}
-              >
-                Blogs
-              </span>
-            </Link>
-            {!isLoading && (
-              <div className="px-5 pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-                {isLoggedIn ? (
-                  <Button variant="outline" className="w-full mb-2" onClick={() => window.location.href = `${env.TEST_PORTAL}/dashboard`}>
-                    My Account
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      variant="outline"
-                      className="w-full mb-2"
-                      onClick={showLogin}
-                    >
-                      Log in
-                    </Button>
-                  </>
-                )}
+                    Search
+                  </button>
+                </form>
               </div>
             )}
           </div>
+
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 text-[#7A8873] dark:text-gray-300 hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {isDarkMode ? (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            )}
+          </button>
+
+          {/* Quiz Button - Mobile only */}
+          <button 
+            className="lg:hidden bg-[#1865F2] text-white border-none px-[1.05rem] py-[0.42rem] rounded-[7px] text-[0.76rem] font-black tracking-[0.02em] transition-all duration-[0.15s] flex-shrink-0 whitespace-nowrap hover:bg-[#1149C0]"
+            onClick={() => window.location.href = '/test'}
+          >
+            Take the Quiz →
+          </button>
+
+          {/* User Account */}
+          {!isLoading && (
+            isLoggedIn ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setOpenDropdown(!openDropdown)}
+                  className="flex items-center space-x-2 focus:outline-none"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#1865F2]/10 dark:bg-blue-900/30 flex items-center justify-center text-[#1865F2] dark:text-blue-400">
+                    <User className="w-4 h-4" />
+                  </div>
+                </button>
+                
+                {openDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-[#E8EDE2] dark:border-gray-700">
+                    <button
+                      onClick={() => window.location.href = `${env.TEST_PORTAL}/dashboard`}
+                      className="w-full text-left px-4 py-2 text-sm text-[#1A1F16] dark:text-white hover:bg-[#F5F7F4] dark:hover:bg-gray-700 flex items-center"
+                    >
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(`${env.API_AUTH}/user/logout`, {
+                            method: 'POST',
+                            credentials: 'include',
+                          });
+                          if (response.ok) {
+                            window.location.href = '/';
+                          }
+                        } catch (error) {
+                          console.error('Logout failed:', error);
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-[#C0392B] dark:text-red-400 hover:bg-[#F5F7F4] dark:hover:bg-gray-700 flex items-center"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={showLogin}
+                className="bg-[#1865F2] text-white border-none px-[1.05rem] py-[0.42rem] rounded-[7px] text-[0.76rem] font-black tracking-[0.02em] transition-all duration-[0.15s] flex-shrink-0 whitespace-nowrap hover:bg-[#1149C0]"
+              >
+                Login
+              </button>
+            )
+          )}
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 text-[#7A8873] dark:text-gray-300 hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 top-14 z-[190] bg-white/97 dark:bg-gray-900/97 backdrop-blur-[14px] lg:hidden">
+          <div className="h-full overflow-y-auto">
+            {/* Mobile Search */}
+            <div className="p-4 border-b border-[#E8EDE2] dark:border-gray-700">
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search notes, topics, questions..."
+                  className="flex-1 px-3 py-2 text-sm border border-[#E8EDE2] dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-[#1A1F16] dark:text-white placeholder-[#7A8873] dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#1865F2] text-white text-sm font-medium rounded-md hover:bg-[#1149C0] transition-colors"
+                >
+                  Search
+                </button>
+              </form>
+            </div>
+
+            {/* Mobile Navigation Links */}
+            <div className="p-4 space-y-4">
+              {navigation.map((item) => (
+                <div key={item.slug} className="py-1">
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={item.link ? item.link : `/${item.slug}`}
+                      className={`${plusJakarta.className} block text-[0.9rem] font-bold tracking-[0.07em] uppercase text-[#1A1F16] dark:text-white hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
+                    {item.children.length > 0 && (
+                      <button
+                        onClick={() => toggleMobileSubmenu(item.slug)}
+                        className="px-2 py-1 text-[#7A8873] dark:text-gray-300"
+                      >
+                        <svg
+                          className={`h-5 w-5 transform transition-transform duration-200 ${
+                            openMenus[item.slug] ? "rotate-180" : ""
+                          }`}
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="currentColor"
+                        >
+                          <path d="M12.7071 15.2929L19.7071 8.29289C20.0976 7.90237 20.0976 7.2692 19.7071 6.87868C19.3166 6.48815 18.6834 6.48815 18.2929 6.87868L12 13.1716L5.70711 6.87868C5.31658 6.48815 4.68342 6.48815 4.29289 6.87868C3.90237 7.2692 3.90237 7.90237 4.29289 8.29289L11.2929 15.2929C11.6834 15.6834 12.3166 15.6834 12.7071 15.2929Z" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  {openMenus[item.slug] && item.children.length > 0 && (
+                    <div className="pl-4 space-y-1 mt-1">
+                      {item.children.map((child) => (
+                        <div key={child.slug} className="py-1">
+                          <div className="flex items-center justify-between">
+                            <Link
+                              href={child.link ? child.link : `/${child.slug}`}
+                              className={`${plusJakarta.className} block text-[0.8rem] font-semibold text-[#1A1F16] dark:text-white hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              {child.title}
+                            </Link>
+                            {child.children.length > 0 && (
+                              <button
+                                onClick={() => toggleMobileSubmenu(child.slug)}
+                                className="px-2 py-1 text-[#7A8873] dark:text-gray-300"
+                              >
+                                <svg
+                                  className={`h-4 w-4 transform transition-transform duration-200 ${
+                                    openMenus[child.slug] ? "rotate-180" : ""
+                                  }`}
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="currentColor"
+                                >
+                                  <path d="M12.7071 15.2929L19.7071 8.29289C20.0976 7.90237 20.0976 7.2692 19.7071 6.87868C19.3166 6.48815 18.6834 6.48815 18.2929 6.87868L12 13.1716L5.70711 6.87868C5.31658 6.48815 4.68342 6.48815 4.29289 6.87868C3.90237 7.2692 3.90237 7.90237 4.29289 8.29289L11.2929 15.2929C11.6834 15.6834 12.3166 15.6834 12.7071 15.2929Z" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                          {openMenus[child.slug] && child.children.length > 0 && (
+                            <div className="pl-4 space-y-1 mt-1">
+                              {child.children.map((grandChild) => (
+                                <div key={grandChild.slug} className="py-1">
+                                  <div className="flex items-center justify-between">
+                                    <Link
+                                      href={
+                                        grandChild.link
+                                          ? grandChild.link
+                                          : `/${grandChild.slug}`
+                                      }
+                                      className="block text-[0.7rem] font-normal text-[#1A1F16] dark:text-white hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
+                                      onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                      {grandChild.title}
+                                    </Link>
+                                  </div>
+                                  {openMenus[grandChild.slug] &&
+                                    grandChild.children.length > 0 && (
+                                      <div className="pl-4 space-y-1 mt-1">
+                                        {grandChild.children.map(
+                                          (greatGrandChild) => (
+                                            <Link
+                                              key={greatGrandChild.slug}
+                                              href={
+                                                greatGrandChild.link
+                                                  ? greatGrandChild.link
+                                                  : `/${greatGrandChild.slug}`
+                                              }
+                                              className="block text-[0.65rem] text-[#7A8873] dark:text-gray-400 hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
+                                              onClick={() => setIsMobileMenuOpen(false)}
+                                            >
+                                              {greatGrandChild.title}
+                                            </Link>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+              
+              {/* About and Blogs */}
+              <Link 
+                href="/about" 
+                className="block text-[0.9rem] font-bold tracking-[0.07em] uppercase text-[#1A1F16] dark:text-white hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About 99Notes
+              </Link>
+              <Link 
+                href="/blog" 
+                className="block text-[0.9rem] font-bold tracking-[0.07em] uppercase text-[#1A1F16] dark:text-white hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Blogs
+              </Link>
+
+              {/* Mobile User Actions */}
+              <div className="pt-4 border-t border-[#E8EDE2] dark:border-gray-700">
+                {!isLoading && (
+                  isLoggedIn ? (
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => {
+                          window.location.href = `${env.TEST_PORTAL}/dashboard`;
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-3 text-sm text-[#1A1F16] dark:text-white bg-[#F5F7F4] dark:bg-gray-700 rounded-md flex items-center"
+                      >
+                        <LayoutDashboard className="w-4 h-4 mr-3" />
+                        Dashboard
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`${env.API_AUTH}/user/logout`, {
+                              method: 'POST',
+                              credentials: 'include',
+                            });
+                            if (response.ok) {
+                              window.location.href = '/';
+                            }
+                          } catch (error) {
+                            console.error('Logout failed:', error);
+                          }
+                        }}
+                        className="w-full text-left px-4 py-3 text-sm text-[#C0392B] dark:text-red-400 bg-[#F5F7F4] dark:bg-gray-700 rounded-md flex items-center"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        showLogin();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full bg-[#1865F2] text-white border-none px-[1.05rem] py-[0.42rem] rounded-[7px] text-[0.76rem] font-black tracking-[0.02em] transition-all duration-[0.15s] hover:bg-[#1149C0]"
+                    >
+                      Login
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
