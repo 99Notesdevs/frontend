@@ -8,7 +8,7 @@ import { TableOfContents } from "@/components/navigation/TableOfContents";
 import SearchBar from "@/components/Navbar/SearchBar";
 import SocialMedia from "@/components/navigation/socialmedia";
 import Ads from "../navigation/Ads";
-import Quiz from "@/components/quiz/quiz";
+import QuizWrapper from "@/components/quiz/QuizWrapper";
 import { env } from "@/config/env";
 import Breadcrumb from "@/components/ui/breadcrumb";
 import { BackToTop } from "@/components/ui/reachtotop";
@@ -161,6 +161,28 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Function to scroll to specific child card
+  const scrollToChildCard = (childId: string) => {
+    const element = document.getElementById(`child-card-${childId}`);
+    if (element) {
+      const offset = 80; // Account for sticky header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+      
+      // Add highlight effect
+      element.style.outline = "2px solid #3B82F6";
+      element.style.outlineOffset = "4px";
+      setTimeout(() => {
+        element.style.outline = "none";
+      }, 2000);
+    }
+  };
+
   // Filter out custom-link templates and paginate
   const filteredChildren = page.children.filter(
     (child: any) => child.templateId !== "custom-link"
@@ -183,176 +205,269 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
       </section>
       <main>
         <div className="min-h-screen bg-gradient-to-b from-[var(--bg-main)] to-white dark:from-slate-900 dark:to-slate-800">
-          <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-0 md:px-6 lg:px-8 py-4 sm:py-8">
+          <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-0 md:px-6 lg:px-8 py-4 sm:py-8">
             <Breadcrumb
               containerClasses="bg-muted/40 px-1 py-2 rounded-md"
               activeClasses="font-semibold"
             />
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-              {/* Left Column - Main Image and Content */}
-              <div className="lg:col-span-8 space-y-4 sm:space-y-6">
-                {/* Main Topic Image */}
-                <div className="bg-white dark:bg-slate-800 border border-[var(--info-surface)] dark:border-slate-700 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
-                  <div className="relative w-full h-[300px] md:h-[400px]">
-                    <Image
-                      src={`${pageImage || "/"}`}
-                      alt={pageImageAlt}
-                      fill
-                      className="object-cover w-full h-full"
-                      priority
-                    />
+            
+            {/* Hero Section */}
+            <div className="py-8 md:py-12">
+              <div className="flex flex-col lg:flex-row gap-8 items-center">
+                <div className="flex-1">
+                  <h1 className="text-3xl lg:text-4xl font-bold leading-tight mb-4 text-gray-900 dark:text-white">
+                    The notes your topper<br />never shared with you.<br />
+                    <span className="italic text-blue-600 dark:text-blue-400">Until now.</span>
+                  </h1>
+                  <p className="text-gray-600 dark:text-gray-300 text-16px leading-relaxed max-w-lg">
+                    12 GS subjects. Curated for UPSC Prelims & Mains.<br />
+                    Read the concept, solve questions on it — <strong>right there, side by side.</strong><br />
+                    No paywalls. No detours. Just the road to selection.
+                  </p>
+                </div>
+                <div className="lg:max-w-[270px] w-full">
+                  <div className="bg-gray-900 text-white rounded-xl p-6 shadow-xl">
+                    <span className="text-yellow-400 text-xs font-black uppercase tracking-wider mb-2 block">
+                      ★ Only on 99Notes
+                    </span>
+                    <p className="font-serif text-lg italic leading-relaxed mb-3">
+                      <strong>Read a concept. Solve it immediately.</strong> Side by side, on the same screen.
+                    </p>
+                    <p className="text-gray-400 text-sm font-sans">
+                      Every other platform makes you switch tabs to practice. We don't.
+                    </p>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Related Topics Section */}
-                {page.children && page.children.length > 0 && (
-                  <div className="mb-8 sm:mb-10">
-                    <div className="flex flex-col items-center mb-6 sm:mb-8">
-                      <h2 className="text-2xl font-medium text-[var(--primary)] mb-1 text-center">
-                        {JSON.parse(metadata).metaTitle ||
-                          title ||
-                          "Related Topics"}
-                      </h2>
-                      <p className="text-[var(--text-tertiary)] dark:text-slate-300 text-sm mb-1 text-center">
-                        {JSON.parse(metadata).metaDescription ||
-                          "Explore related topics to gain a deeper understanding of the subject."}
-                      </p>
-                      <div className="w-full h-1 bg-[var(--highlight-bg)] dark:bg-blue-500/30 rounded-full"></div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                      {currentItems.map((child: any) => {
-                        // Skip children with custom-link template
-                        if (child.templateId === "custom-link") {
-                          return null;
+            {/* Sticky Subject Strip */}
+            {page.children && page.children.length > 0 && (
+              <div className="sticky top-16 z-30 bg-white/97 dark:bg-slate-900/97 border-b border-gray-200 dark:border-slate-700 backdrop-blur-sm">
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-0 md:px-6 lg:px-8">
+                  <div className="flex gap-1 py-2 overflow-x-auto scrollbar-hide">
+                    {page.children.map((child: any, index: number) => {
+                      if (child.templateId === "custom-link") {
+                        return null;
+                      }
+                      
+                      return (
+                        <button
+                          key={child.id}
+                          onClick={() => scrollToChildCard(child.id)}
+                          className="inline-flex items-center gap-1 px-2 py-1 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-full text-xs font-bold text-gray-700 dark:text-gray-300 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 dark:hover:text-blue-400 transition-all duration-200 whitespace-nowrap flex-shrink-0"
+                        >
+                          <span className="text-xs">
+                            {index === 0 && '⚖️'}
+                            {index === 1 && '🏛️'}
+                            {index === 2 && '📈'}
+                            {index === 3 && '🌍'}
+                            {index === 4 && '👥'}
+                            {index === 5 && '🏛'}
+                            {index === 6 && '🌐'}
+                            {index === 7 && '🌾'}
+                            {index === 8 && '🔬'}
+                            {index === 9 && '🌿'}
+                            {index === 10 && '🛡️'}
+                            {index === 11 && '✨'}
+                            {index === 12 && '📚'}
+                          </span>
+                          {child.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Main Content - Full Width */}
+            <div className="space-y-6 sm:space-y-8">
+              {/* Related Topics Section - Card Grid Layout */}
+              {page.children && page.children.length > 0 && (
+                <div className="mb-8 sm:mb-10">
+                  <div className="flex flex-col items-center mb-6 sm:mb-8">
+                    <h2 className="text-2xl font-medium text-[var(--primary)] mb-1 text-center">
+                      {JSON.parse(metadata).metaTitle ||
+                        title ||
+                        "Related Topics"}
+                    </h2>
+                    <p className="text-[var(--text-tertiary)] dark:text-slate-300 text-sm mb-1 text-center">
+                      {JSON.parse(metadata).metaDescription ||
+                        "Explore related topics to gain a deeper understanding of subject."}
+                    </p>
+                    <div className="w-full h-1 bg-[var(--highlight-bg)] dark:bg-blue-500/30 rounded-full"></div>
+                  </div>
+                  
+                  {/* Card Grid - 3 columns on desktop */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {currentItems.map((child: any) => {
+                      // Skip children with custom-link template
+                      if (child.templateId === "custom-link") {
+                        return null;
+                      }
+
+                      let childContent;
+                      try {
+                        if (typeof child.content === "string") {
+                          childContent = child.content;
+                        } else {
+                          childContent = child.content || {};
                         }
+                      } catch (error) {
+                        console.error("Error parsing child content:", error);
+                        childContent = {};
+                      }
 
-                        let childContent;
-                        try {
-                          if (typeof child.content === "string") {
-                            childContent = child.content;
-                          } else {
-                            childContent = child.content || {};
-                          }
-                        } catch (error) {
-                          console.error("Error parsing child content:", error);
-                          childContent = {};
-                        }
+                      const childImagearray = JSON.parse(
+                        child.imageUrl || ""
+                      );
+                      const childImage = childImagearray[0];
+                      const childImageAlt = childImagearray[1];
 
-                        const childImagearray = JSON.parse(
-                          child.imageUrl || ""
-                        );
-                        const childImage = childImagearray[0];
-                        const childImageAlt = childImagearray[1];
-
-                        return (
-                          <Link
-                            href={`/${child.slug}`}
-                            key={child.id}
-                            className="group transform transition-all hover:-translate-y-1"
+                      return (
+                        <Link
+                          href={`/${child.slug}`}
+                          key={child.id}
+                          className="group transform transition-all hover:-translate-y-1"
+                        >
+                          <Card 
+                            id={`child-card-${child.id}`}
+                            className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/90 dark:bg-slate-800/90 dark:border dark:border-slate-700 overflow-hidden"
                           >
-                            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/90 dark:bg-slate-800/90 dark:border dark:border-slate-700">
-                              <div className="relative w-full h-48 ">
+                            {/* Card Stripe */}
+                            <div className="h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                            
+                            {/* Card Body */}
+                            <div className="p-4 sm:p-6">
+                              <div className="flex items-start gap-3 mb-3">
+                                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                  <span className="text-lg">📚</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-lg font-semibold mb-2 text-[var(--primary)] line-clamp-2">
+                                    {child.title}
+                                  </h3>
+                                  <span className="inline-block text-xs font-bold uppercase tracking-wider px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                                    Topic
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <div className="relative w-full h-32 mb-4">
                                 <Image
                                   src={`${childImage}`}
                                   alt={childImageAlt}
                                   fill
-                                  className="object-cover"
+                                  className="object-cover rounded-lg"
                                   sizes="(max-width: 768px) 100vw, 33vw"
                                 />
                               </div>
-                              <div className="p-6">
-                                <h3 className="text-lg font-semibold mb-2 text-[var(--primary)] ">
-                                  {child.title}
-                                </h3>
-                                <p className="text-[var(--text-tertiary)] dark:text-slate-300 text-sm line-clamp-2">
-                                  {child.content
-                                    ? child.content
-                                        .replace(/<[^>]*>/g, "") // Remove HTML tags
-                                        .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
-                                        .slice(0, 100) // Get first 100 characters
-                                        .trim() +
-                                      (child.content.length > 100 ? "..." : "")
-                                    : "No content available"}
-                                </p>
-                              </div>
-                            </Card>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                    {totalPages > 1 && (
-                      <div className="flex justify-center mt-8">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handlePageChange(1)}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
-                          >
-                            «
-                          </button>
-                          <button
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
-                          >
-                            ‹
-                          </button>
-
-                          {Array.from(
-                            { length: Math.min(5, totalPages) },
-                            (_, i) => {
-                              let pageNum;
-                              if (totalPages <= 5) {
-                                pageNum = i + 1;
-                              } else if (currentPage <= 3) {
-                                pageNum = i + 1;
-                              } else if (currentPage >= totalPages - 2) {
-                                pageNum = totalPages - 4 + i;
-                              } else {
-                                pageNum = currentPage - 2 + i;
-                              }
-
-                              return (
-                                <button
-                                  key={pageNum}
-                                  onClick={() => handlePageChange(pageNum)}
-                                  className={`w-10 h-10 flex items-center justify-center rounded-full ${
-                                    currentPage === pageNum
-                                      ? "bg-blue-500 text-white"
-                                      : "border hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white dark:hover:text-white"
-                                  }`}
-                                >
-                                  {pageNum}
+                              
+                              <p className="text-[var(--text-tertiary)] dark:text-slate-300 text-sm line-clamp-3 mb-4">
+                                {child.content
+                                  ? child.content
+                                      .replace(/<[^>]*>/g, "") // Remove HTML tags
+                                      .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
+                                      .slice(0, 150) // Get first 150 characters
+                                      .trim() +
+                                    (child.content.length > 150 ? "..." : "")
+                                  : "No content available"}
+                              </p>
+                              
+                              <div className="flex gap-2">
+                                <button className="flex-1 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors">
+                                  Read Notes →
                                 </button>
-                              );
-                            }
-                          )}
-
-                          <button
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
-                          >
-                            ›
-                          </button>
-                          <button
-                            onClick={() => handlePageChange(totalPages)}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
-                          >
-                            »
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                                <button className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                  Practice ↗
+                                </button>
+                              </div>
+                            </div>
+                            
+                            {/* Progress Bar */}
+                            <div className="h-0.5 bg-gray-200 dark:bg-gray-700">
+                              <div className="h-full bg-blue-500 w-0 transition-all duration-600"></div>
+                            </div>
+                          </Card>
+                        </Link>
+                      );
+                    })}
                   </div>
-                )}
+                  
+                  {totalPages > 1 && (
+                    <div className="flex justify-center mt-8">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handlePageChange(1)}
+                          disabled={currentPage === 1}
+                          className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
+                        >
+                          «
+                        </button>
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
+                        >
+                          ‹
+                        </button>
 
-                {/* Main Content Section */}
-                <Card className="border-0 shadow-xl bg-white/90 dark:bg-slate-800/90 dark:border dark:border-slate-700">
-                  <CardContent className="p-y-5 p-x-2 lg:p-10">
-                    <div
-                      className="prose prose-lg max-w-none
+                        {Array.from(
+                          { length: Math.min(5, totalPages) },
+                          (_, i) => {
+                            let pageNum;
+                            if (totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`w-10 h-10 flex items-center justify-center rounded-full ${
+                                  currentPage === pageNum
+                                    ? "bg-blue-500 text-white"
+                                    : "border hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white dark:hover:text-white"
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          }
+                        )}
+
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
+                        >
+                          ›
+                        </button>
+                        <button
+                          onClick={() => handlePageChange(totalPages)}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-white"
+                        >
+                          »
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Main Content Section */}
+              <Card className="border-0 shadow-xl bg-white/90 dark:bg-slate-800/90 dark:border dark:border-slate-700">
+                <CardContent className="p-y-5 p-x-2 lg:p-10">
+                  <div
+                    className="prose prose-lg max-w-none
                     prose-h1:text-gray-900 dark:text-white prose-h1:text-center prose-h1:font-bold prose-h1:border-b-2 prose-h1:border-yellow-400 dark:border-yellow-500 prose-h1:pb-2 prose-h1:mb-6
                     prose-h2:text-gray-900 dark:text-white prose-h2:text-center prose-h2:font-bold prose-h2:border-b-2 prose-h2:border-yellow-400 dark:border-yellow-500 prose-h2:pb-2 prose-h2:mb-6
                     prose-h3:text-gray-900 dark:text-white prose-h3:text-center prose-h3:font-bold prose-h3:pb-2 prose-h3:mb-6
@@ -368,158 +483,139 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                     prose-p:dark:text-gray-200
                     prose-li:dark:text-gray-200
                     prose-strong:dark:text-white"
-                      dangerouslySetInnerHTML={{ __html: mainContent }}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
+                    dangerouslySetInnerHTML={{ __html: mainContent }}
+                  />
+                </CardContent>
+              </Card>
 
-              {/* Right Sidebar */}
-              <aside className="lg:col-span-4 space-y-4 sm:space-y-6">
-                {/* Search Bar */}
-                <div
-                  className="bg-white dark:bg-slate-800 border border-[var(--border-light)] dark:border-slate-700 rounded-xl shadow-lg p-4 sm:p-6 
-                    transition-all duration-300 hover:shadow-xl mb-4 sm:mb-6"
-                >
-                  <SearchBar />
-                </div>
-
-                {/* Sticky Container */}
-                <div className="relative">
-                  <div className="sticky top-8 space-y-4 sm:space-y-6">
-                    {/* Table of Contents Section */}
-                    <div className="bg-white dark:bg-slate-800 border border-[var(--border-light)] dark:border-slate-700 rounded-xl shadow-lg p-6">
-                      <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] dark:text-white border-b-2 border-[var(--border-light)] dark:border-slate-600 pb-2 flex items-center gap-2">
-                        <span className="text-[var(--primary)] dark:text-blue-400">
-                          📑
-                        </span>
-                        <span>Table of Contents</span>
-                      </h3>
-                      <div className="pr-2">
-                        <TableOfContents content={mainContent} />
-                      </div>
+              {/* GS Spark - Quick Challenge */}
+              <div className="mt-12 mb-8">
+                  <div className="bg-gray-50 dark:bg-slate-800 border-t border-b border-gray-200 dark:border-slate-700 py-16 px-6">
+                    <div className="max-w-4xl mx-auto text-center mb-8">
+                      <span className="text-xs font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2 block">
+                        GS Spark — Quick Challenge
+                      </span>
+                      <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                        How sharp are you <span className="italic text-yellow-500 dark:text-yellow-400">right now?</span>
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
+                        Pick a subject. Answer 5 questions. See your score.<br />
+                        Most toppers got question #3 wrong. Will you?
+                      </p>
                     </div>
-
-                    {/* Practice Questions Section - Only show when there are questions or still loading */}
-                    {(isLoading ||
-                      (currentQuestions && currentQuestions.length > 0)) && (
-                      <div className="sticky bottom-6 mt-6 transition-all duration-300 hover:shadow-xl">
-                        <div className="bg-gradient-to-br from-white to-[#f8f9fa] dark:from-slate-800 dark:to-slate-900 border-2 border-[var(--info-surface)] dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                          <div className="p-6">
-                            {isLoading ? (
-                              <div className="flex flex-col items-center justify-center py-8">
-                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-                                <p className="text-gray-600 font-medium">
-                                  Loading Questions...
-                                </p>
-                                <p className="text-sm text-gray-500 mt-1">
-                                  Preparing your practice session
-                                </p>
-                              </div>
-                            ) : error ? (
-                              <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-md">
-                                <div className="flex">
-                                  <div className="flex-shrink-0">
-                                    <svg
-                                      className="h-5 w-5 text-red-500 dark:text-red-400"
-                                      fill="currentColor"
-                                      viewBox="0 0 20 20"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                  </div>
-                                  <div className="ml-3">
-                                    <p className="text-sm text-red-700 dark:text-red-200">
-                                      {error}
-                                    </p>
-                                    <button
-                                      onClick={fetchQuestions}
-                                      className="mt-2 text-sm font-medium text-red-700 dark:text-red-300 hover:text-red-600 dark:hover:text-red-400 underline"
-                                    >
-                                      Try Again
-                                    </button>
-                                  </div>
+                    
+                    <div className="max-w-2xl mx-auto">
+                      <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden">
+                        <div className="border-b border-gray-200 dark:border-slate-700 px-6 py-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-black uppercase tracking-wider px-3 py-1 bg-blue-600 text-white rounded-full">
+                              {(page.categories as any)?.[0]?.name || 'General Studies'}
+                            </span>
+                            <span className="text-sm font-bold text-gray-600 dark:text-gray-400">
+                              Score: <span className="text-gray-900 dark:text-white">0</span> / <span className="text-gray-900 dark:text-white">5</span>
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="p-6">
+                          {isLoading ? (
+                            <div className="flex flex-col items-center justify-center py-8">
+                              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+                              <p className="text-gray-600 font-medium">
+                                Loading Questions...
+                              </p>
+                              <p className="text-sm text-gray-500 mt-1">
+                                Preparing your practice session
+                              </p>
+                            </div>
+                          ) : error ? (
+                            <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-md">
+                              <div className="flex">
+                                <div className="flex-shrink-0">
+                                  <svg
+                                    className="h-5 w-5 text-red-500 dark:text-red-400"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </div>
+                                <div className="ml-3">
+                                  <p className="text-sm text-red-700 dark:text-red-200">
+                                    {error}
+                                  </p>
+                                  <button
+                                    onClick={fetchQuestions}
+                                    className="mt-2 text-sm font-medium text-red-700 dark:text-red-300 hover:text-red-600 dark:hover:text-red-400 underline"
+                                  >
+                                    Try Again
+                                  </button>
                                 </div>
                               </div>
-                            ) : (
-                              <div className="animate-fade-in">
-                                <Quiz
-                                  questions={currentQuestions}
-                                  onQuizComplete={handleQuizComplete}
-                                />
-                              </div>
-                            )}
-                          </div>
-
-                          {!isLoading && !error && (
-                            <div className="bg-gray-50 dark:bg-slate-800/50 px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
-                              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                <svg
-                                  className="h-4 w-4 mr-1.5 text-yellow-500"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                                {currentQuestions.length} Questions
-                              </div>
-                              <button
-                                onClick={() =>
-                                  window.scrollTo({
-                                    top: 0,
-                                    behavior: "smooth",
-                                  })
-                                }
-                                className="text-sm font-medium text-yellow-600 hover:text-yellow-700 flex items-center"
-                              >
-                                <span>Back to Top</span>
-                                <svg
-                                  className="h-4 w-4 ml-1"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M5 10l7-7m0 0l7 7m-7-7v18"
-                                  />
-                                </svg>
-                              </button>
+                            </div>
+                          ) : (
+                            <div className="animate-fade-in">
+                              <QuizWrapper
+                                questions={currentQuestions}
+                                onQuizComplete={handleQuizComplete}
+                                onRetry={fetchQuestions}
+                                isLoading={isLoading}
+                                error={error}
+                              />
                             </div>
                           )}
                         </div>
-                      </div>
-                    )}
 
-                    {/* Social Media Section */}
-                    <div className="bg-white dark:bg-slate-800 border border-[var(--border-light)] dark:border-slate-700 rounded-xl shadow-lg p-6">
-                      <h3 className="text-lg font-semibold mb-4 text-[var(--primary)] dark:text-white border-b-2 border-[var(--border-light)] dark:border-slate-600 pb-2 flex items-center gap-2">
-                        <span className="text-[var(--primary)] dark:text-blue-400">
-                          🌐
-                        </span>
-                        <span>Connect With Us</span>
-                      </h3>
-                      <div className="py-2">
-                        <SocialMedia />
+                        {!isLoading && !error && currentQuestions.length > 0 && (
+                          <div className="bg-gray-50 dark:bg-slate-800 px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex justify-between items-center">
+                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                              <svg
+                                className="h-4 w-4 mr-1.5 text-yellow-500"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              {currentQuestions.length} Questions
+                            </div>
+                            <button
+                              onClick={() =>
+                                window.scrollTo({
+                                  top: 0,
+                                  behavior: "smooth",
+                                })
+                              }
+                              className="text-sm font-medium text-yellow-600 hover:text-yellow-700 flex items-center"
+                            >
+                              <span>Back to Top</span>
+                              <svg
+                                className="h-4 w-4 ml-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 10l7-7m0 0l7 7m-7-7v18"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    </div>
-
-                    <div className="bg-white dark:bg-slate-800 border border-[var(--border-light)] dark:border-slate-700 rounded-xl shadow-lg">
-                      <Ads imageUrl="/" altText="ads" />
                     </div>
                   </div>
                 </div>
-              </aside>
             </div>
           </div>
           <BackToTop />
