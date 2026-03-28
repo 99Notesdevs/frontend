@@ -124,7 +124,7 @@ const CurrentAffairsSectionPage = async ({
 
   try {
     // Convert forward slashes to spaces to match backend format
-    const modifiedSlug = fullSlug.replace(/\s+/g, ' ');
+    const modifiedSlug = fullSlug.replace(/\//g, ' ');
     
     try {
       // For server components, use the backend API directly
