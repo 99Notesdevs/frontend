@@ -17,6 +17,9 @@ interface Question {
 interface QuizProps {
   questions: Question[];
   onQuizComplete: () => void;
+  currentQuestionIndex?: number;
+  onQuestionAnswered?: (questionIndex: number) => void;
+  showNudge?: boolean;
 }
 
 // Normalize answer to 0-based option index.
@@ -60,7 +63,13 @@ const getDifficultyColor = (difficulty: string): string => {
   }
 };
 
-const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
+const Quiz: React.FC<QuizProps> = ({ 
+  questions = [], 
+  onQuizComplete, 
+  currentQuestionIndex = 0,
+  onQuestionAnswered,
+  showNudge = false
+}) => {
   const [selectedOptions, setSelectedOptions] = useState<
     Record<number, number>
   >({});
@@ -68,18 +77,19 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
     Record<number, boolean>
   >({});
   const [showResults, setShowResults] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(currentQuestionIndex);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (questions && questions.length > 0) {
       setIsLoading(false);
+      setCurrentQuestion(currentQuestionIndex);
     } else {
       setError("No questions available");
       setIsLoading(false);
     }
-  }, [questions]);
+  }, [questions, currentQuestionIndex]);
 
   if (isLoading) {
     return (
@@ -110,7 +120,12 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+      const nextQuestionIndex = currentQuestion + 1;
+      if (onQuestionAnswered) {
+        onQuestionAnswered(currentQuestion);
+      } else {
+        setCurrentQuestion(nextQuestionIndex);
+      }
     } else {
       setShowResults(true);
     }
@@ -130,7 +145,6 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
     setShowResults(false);
     setCurrentQuestion(0);
     onQuizComplete();
-    setCurrentQuestion(0);
   };
 
   const calculateScore = () => {
@@ -184,7 +198,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete }) => {
         ) : (
           <div className="space-y-8">
             {/* Show only the current question */}
-            <div className="max-h-[500px] overflow-auto pr-2">
+            <div className="pr-2">
               {(() => {
                 const question = questions[currentQuestion];
 

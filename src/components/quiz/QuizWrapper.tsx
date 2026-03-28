@@ -22,6 +22,9 @@ interface QuizWrapperProps {
   onRetry: () => void;
   isLoading: boolean;
   error: string | null;
+  currentQuestionIndex?: number;
+  onQuestionAnswered?: (questionIndex: number) => void;
+  showNudge?: boolean;
 }
 
 export default function QuizWrapper({
@@ -30,6 +33,9 @@ export default function QuizWrapper({
   onRetry,
   isLoading,
   error,
+  currentQuestionIndex = 0,
+  onQuestionAnswered,
+  showNudge = false,
 }: QuizWrapperProps) {
   const [currentQuestions, setCurrentQuestions] = useState<Question[]>(questions);
 
@@ -97,6 +103,9 @@ export default function QuizWrapper({
       <Quiz
         questions={currentQuestions}
         onQuizComplete={onQuizComplete}
+        currentQuestionIndex={currentQuestionIndex}
+        onQuestionAnswered={onQuestionAnswered}
+        showNudge={showNudge}
       />
     </div>
   );
