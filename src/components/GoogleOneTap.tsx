@@ -1,7 +1,6 @@
 "use client";
 import { useEffect } from "react";
 import { env } from "@/config/env";
-import { api } from "@/config/api/route";
 
 declare global {
   interface Window {
@@ -12,9 +11,12 @@ declare global {
 export default function GoogleOneTap() {
   // Handler for Google credential response
   const handleCredentialResponse = async (response: any) => {
-    const res = (await api.post(`/user/google`, {
+    const fetchRes = await fetch(`${env.API_AUTH}/user/google`, {
+      method: "POST",
+      credentials: "include",
       body: JSON.stringify({ credential: response.credential }),
-    })) as { success: boolean };
+    });
+    const res = (await fetchRes.json()) as { success: boolean };
     if (res.success) {
       window.location.href = window.location.href;
     } else {
