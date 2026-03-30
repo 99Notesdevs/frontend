@@ -34,6 +34,7 @@ interface QuizProgress {
 export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   page,
 }) => {
+    console.log(page);
   const { title, content, metadata, imageUrl } = page;
   const mainContent = content || "";
   // @ts-ignore
@@ -368,7 +369,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                   
                   {/* Card Grid - 3 columns on desktop */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {currentItems.map((child: any) => {
+                    {page.children.map((child: any) => {
                       // Skip children with custom-link template
                       if (child.templateId === "custom-link") {
                         return null;

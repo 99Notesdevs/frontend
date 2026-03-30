@@ -14,6 +14,7 @@ export default function GoogleOneTap() {
     const fetchRes = await fetch(`${env.API_AUTH}/user/google`, {
       method: "POST",
       credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: response.credential }),
     });
     const res = (await fetchRes.json()) as { success: boolean };

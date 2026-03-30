@@ -20,6 +20,7 @@ async function getPage(slug: string, section: string[]): Promise<BaseTemplatePro
   try {
     const fullPath = `${slug} ${section.join(' ')}`; // slugs seperated by space will be rejoined with / in the backend 
     const res = await api.get(`/page/slug/${fullPath}`) as { data: BaseTemplateProps['page'] | null };
+    console.log(res);
     const page = res.data;
 
     if (!page) {
