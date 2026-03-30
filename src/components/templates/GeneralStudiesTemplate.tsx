@@ -76,11 +76,14 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   const selectedQuizChild: any = quizChildren.find(
     (child: any) => String(child.id) === String(selectedQuizChildId)
   );
-  const selectedQuizCategoryId = selectedQuizChild?.categories?.[0]?.id;
+  const selectedQuizCategoryIds = Array.isArray(selectedQuizChild?.categories)
+    ? selectedQuizChild.categories
+        .map((category: any) => Number(category?.id))
+        .filter((id: number) => !Number.isNaN(id))
+    : [];
 
   const fetchQuestions = useCallback(async () => {
-    const categoryId = selectedQuizCategoryId;
-    if (!categoryId) return;
+    if (selectedQuizCategoryIds.length === 0) return;
 
     setIsLoading(true);
     setError(null);
@@ -96,7 +99,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
       const limit =
         page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
       const response = await fetch(
-        `${env.API_TEST}/questions/practice?categoryId=${categoryId}&limit=${limit}`,
+        `${env.API_TEST}/questions/?categoryIds=${selectedQuizCategoryIds.join(",")}&limit=${limit}`,
         {
           credentials: "include",
         }
@@ -121,7 +124,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [page?.questionNumber, selectedQuizCategoryId]);
+  }, [page?.questionNumber, selectedQuizCategoryIds]);
 
   const handleQuizComplete = () => {};
 
@@ -146,13 +149,13 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   }, [quizChildren]);
 
   useEffect(() => {
-    if (!selectedQuizCategoryId) {
+    if (selectedQuizCategoryIds.length === 0) {
       setCurrentQuestions([]);
       return;
     }
 
     fetchQuestions();
-  }, [fetchQuestions, selectedQuizCategoryId]);
+  }, [fetchQuestions, selectedQuizCategoryIds]);
 
   useEffect(() => {
     // Inject head scripts
