@@ -34,7 +34,7 @@ const QuizOverlay: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
     setError(null);
     
     try {
-      const response = await fetch(`${env.API_TEST}/questions/practice?categoryId=2604&limit=15`, {
+      const response = await fetch(`${env.API_TEST}/questions?categoryIds=2603&limit=15`, {
         credentials: 'include'
       });
       
