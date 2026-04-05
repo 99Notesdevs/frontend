@@ -38,7 +38,7 @@ export const metadata = {
 
 const fetchByType = async (type: "daily" | "monthly" | "yearly") => {
   try {
-    const response = (await api.get(`/currentAffiar/type/${type}`)) as {
+    const response = (await api.get(`/currentAffair/type/${type}`)) as {
       success: boolean;
       data: CurrentAffair[] | null;
     };
