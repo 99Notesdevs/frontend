@@ -43,7 +43,7 @@ async function getPage(
 ): Promise<CurrentAffair | null> {
   try {
     const fullSlug = `current-affairs/${slug}`;
-    const modifiedSlug = fullSlug.replace(/\s+/g, ' ');
+    const modifiedSlug = fullSlug.replace(/\//g, ' ');
     const response = await api.get(`/currentAffair/slug/${encodeURIComponent(modifiedSlug)}`) as { success: boolean, data: CurrentAffair | null };
     const page = response.data;
 
@@ -125,7 +125,7 @@ const CurrentAffairsSectionPage = async ({
 
   try {
     // Convert forward slashes to spaces to match backend format
-    const modifiedSlug = fullSlug.replace(/\s+/g, ' ');
+    const modifiedSlug = fullSlug.replace(/\//g, ' ');
     
     try {
       // For server components, use the backend API directly
