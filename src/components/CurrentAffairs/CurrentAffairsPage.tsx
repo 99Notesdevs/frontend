@@ -101,7 +101,8 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
   };
 
   const fetchArticlesByParentSlug = async (parentSlug: string, skip = 0, take = 5) => {
-    const encodedSlug = encodeURIComponent(parentSlug);
+    const modifiedSlug = parentSlug.replace(/\//g, ' ');
+    const encodedSlug = encodeURIComponent(modifiedSlug);
     try {
       const response = (await api.get(
         `/currentArticle/parent/${encodedSlug}?skip=${skip}&take=${take}`
