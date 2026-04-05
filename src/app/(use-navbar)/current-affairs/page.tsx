@@ -58,7 +58,8 @@ const fetchByType = async (type: "daily" | "monthly" | "yearly") => {
 };
 
 const fetchArticlesByParentSlug = async (parentSlug: string): Promise<Article[]> => {
-  const encodedSlug = encodeURIComponent(parentSlug);
+  const modifiedSlug = parentSlug.replace(/\//g, ' ');
+  const encodedSlug = encodeURIComponent(modifiedSlug);
   const response = (await api.get(`/currentArticle/parent/${encodedSlug}`)) as {
     success: boolean;
     data: Article[] | null;

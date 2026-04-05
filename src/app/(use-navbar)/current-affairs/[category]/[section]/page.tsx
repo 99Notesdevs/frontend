@@ -329,9 +329,10 @@ async function fetchArticle(category: string, articleSlug: string): Promise<Curr
     // Construct the full slug exactly as it would be in the database
     // Based on the seed data, the format is: current-affairs/category/sample-article
     const fullSlug = `current-affairs/${category}/${articleSlug}`;
+    const fullModifSlug = fullSlug.replace(/\//g, ' ');
     
     // Make a direct API call to get the article by its full slug
-    const response = await api.get(`/currentArticle/slug/${encodeURIComponent(fullSlug)}`) as { success: boolean, data: CurrentAffairArticle | null };
+    const response = await api.get(`/currentArticle/slug/${encodeURIComponent(fullModifSlug)}`) as { success: boolean, data: CurrentAffairArticle | null };
 
     if (response.success) {
       const data = response.data;
