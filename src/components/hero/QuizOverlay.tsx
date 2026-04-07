@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import QuizWrapper from '../quiz/QuizWrapper';
+import QuizWrapper from '../quiz/QuizWrapperN';
 import { env } from '@/config/env';
 
 interface Question {
@@ -65,7 +65,7 @@ const QuizOverlay: React.FC<QuizOverlayProps> = ({ isOpen, onClose }) => {
     setError(null);
     
     try {
-      const response = await fetch(`${env.API_TEST}/questions/practice?categoryId=1&limit=15`, {
+      const response = await fetch(`${env.API_TEST}/questions/random?limit=15`, {
         credentials: 'include'
       });
       
@@ -113,29 +113,17 @@ const QuizOverlay: React.FC<QuizOverlayProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-[9999] flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-2xl w-[90vw] sm:w-full max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden relative">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-        >
-          <svg className="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {/* Quiz Content */}
-        <div className="p-3 sm:p-6 overflow-y-auto max-h-[90vh] sm:max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[rgba(10,14,8,0.6)] backdrop-blur-md md:items-center md:p-4">
+      <div className="relative w-full max-h-[94svh] overflow-hidden rounded-t-[18px] bg-white shadow-[0_-8px_60px_rgba(0,0,0,0.22)] md:max-h-[90vh] md:max-w-[660px] md:rounded-2xl md:shadow-2xl">
+        <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-[#E8EDE2] md:hidden" />
+        <div className="max-h-[94svh] overflow-y-auto md:max-h-[90vh]">
           <QuizWrapper
             questions={questions}
             onQuizComplete={handleQuizComplete}
             onRetry={handleRetry}
             isLoading={isLoading}
             error={error}
-            currentQuestionIndex={currentQuestionIndex}
-            onQuestionAnswered={handleQuestionAnswered}
-            showNudge={showNudge}
+            onClose={onClose}
           />
         </div>
 

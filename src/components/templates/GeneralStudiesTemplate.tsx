@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BaseTemplateProps } from "./types";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
@@ -43,19 +43,30 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   const pageImage = pageImagearray[0];
   const pageImageAlt = pageImagearray[1];
 
-  const parsedMetadata = JSON.parse(metadata);
-  const headScripts =
-    parsedMetadata?.header
-      ?.split("||")
-      ?.map((script: string) => script.trim()) || [];
-  const bodyScripts =
-    parsedMetadata?.body?.split("||")?.map((script: string) => script.trim()) ||
-    [];
-  const quizChildren = page.children.filter(
-    (child: any) =>
-      child.templateId !== "custom-link" &&
-      Array.isArray(child.categories) &&
-      child.categories[0]?.id
+  const parsedMetadata = useMemo(() => JSON.parse(metadata), [metadata]);
+  const headScripts = useMemo(
+    () =>
+      parsedMetadata?.header
+        ?.split("||")
+        ?.map((script: string) => script.trim()) || [],
+    [parsedMetadata]
+  );
+  const bodyScripts = useMemo(
+    () =>
+      parsedMetadata?.body
+        ?.split("||")
+        ?.map((script: string) => script.trim()) || [],
+    [parsedMetadata]
+  );
+  const quizChildren = useMemo(
+    () =>
+      page.children.filter(
+        (child: any) =>
+          child.templateId !== "custom-link" &&
+          Array.isArray(child.categories) &&
+          child.categories[0]?.id
+      ),
+    [page.children]
   );
 
   const [selectedQuizChildId, setSelectedQuizChildId] = useState<
@@ -72,14 +83,44 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedQuizChild: any = quizChildren.find(
-    (child: any) => String(child.id) === String(selectedQuizChildId)
+  const selectedQuizChild: any = useMemo(
+    () =>
+      quizChildren.find(
+        (child: any) => String(child.id) === String(selectedQuizChildId)
+      ),
+    [quizChildren, selectedQuizChildId]
   );
-  const selectedQuizCategoryId = selectedQuizChild?.categories?.[0]?.id;
+  const selectedQuizCategoryIds = useMemo(
+    () =>
+      Array.isArray(selectedQuizChild?.categories)
+        ? selectedQuizChild.categories
+            .map((category: any) => Number(category?.id))
+            .filter((id: number) => !Number.isNaN(id))
+        : [],
+    [selectedQuizChild?.categories]
+  );
+  const selectedQuizCategoryKey = useMemo(
+    () => selectedQuizCategoryIds.join(","),
+    [selectedQuizCategoryIds]
+  );
+  const lastFetchKeyRef = useRef<string>("");
+  const inFlightControllerRef = useRef<AbortController | null>(null);
 
-  const fetchQuestions = useCallback(async () => {
-    const categoryId = selectedQuizCategoryId;
-    if (!categoryId) return;
+  const fetchQuestions = useCallback(async (force = false) => {
+    if (selectedQuizCategoryIds.length === 0) return;
+
+    const limit =
+      page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
+    const requestKey = `${selectedQuizCategoryKey}::${limit}`;
+
+    if (!force && lastFetchKeyRef.current === requestKey) {
+      return;
+    }
+
+    inFlightControllerRef.current?.abort();
+    const controller = new AbortController();
+    inFlightControllerRef.current = controller;
+    lastFetchKeyRef.current = requestKey;
 
     setIsLoading(true);
     setError(null);
@@ -92,12 +133,11 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
     });
 
     try {
-      const limit =
-        page.questionNumber || localStorage.getItem("practiceQuestions") || 10;
       const response = await fetch(
-        `${env.API_TEST}/questions/practice?categoryId=${categoryId}&limit=${limit}`,
+        `${env.API_TEST}/questions/?categoryIds=${selectedQuizCategoryIds.join(",")}&limit=${limit}`,
         {
           credentials: "include",
+          signal: controller.signal,
         }
       );
 
@@ -115,12 +155,18 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
         isCompleted: false,
       });
     } catch (err) {
+      if ((err as Error)?.name === "AbortError") {
+        return;
+      }
       console.error("Error fetching questions:", err);
       setError("Failed to load questions. Please try again.");
     } finally {
+      if (inFlightControllerRef.current === controller) {
+        inFlightControllerRef.current = null;
+      }
       setIsLoading(false);
     }
-  }, [page?.questionNumber, selectedQuizCategoryId]);
+  }, [page.questionNumber, selectedQuizCategoryIds, selectedQuizCategoryKey]);
 
   const handleQuizComplete = () => {};
 
@@ -145,13 +191,20 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
   }, [quizChildren]);
 
   useEffect(() => {
-    if (!selectedQuizCategoryId) {
+    if (selectedQuizCategoryIds.length === 0) {
+      lastFetchKeyRef.current = "";
       setCurrentQuestions([]);
       return;
     }
 
     fetchQuestions();
-  }, [fetchQuestions, selectedQuizCategoryId]);
+  }, [fetchQuestions, selectedQuizCategoryKey, selectedQuizCategoryIds.length]);
+
+  useEffect(() => {
+    return () => {
+      inFlightControllerRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     // Inject head scripts
@@ -368,7 +421,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                   
                   {/* Card Grid - 3 columns on desktop */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {currentItems.map((child: any) => {
+                    {page.children.map((child: any) => {
                       // Skip children with custom-link template
                       if (child.templateId === "custom-link") {
                         return null;
@@ -644,7 +697,7 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                                     {error}
                                   </p>
                                   <button
-                                    onClick={fetchQuestions}
+                                    onClick={() => fetchQuestions(true)}
                                     className="mt-2 text-sm font-medium text-red-700 dark:text-red-300 hover:text-red-600 dark:hover:text-red-400 underline"
                                   >
                                     Try Again

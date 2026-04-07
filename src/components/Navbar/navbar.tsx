@@ -8,6 +8,7 @@ import { env } from "@/config/env";
 import { LogOut, User, LayoutDashboard, Search, Menu, X } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import SearchBar from "./SearchBar";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -228,7 +229,6 @@ export default function Navbar({ navigation }: NavbarProps) {
   const [showSearch, setShowSearch] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -286,16 +286,6 @@ export default function Navbar({ navigation }: NavbarProps) {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Implement search functionality
-      // console.log('Searching for:', searchQuery);
-      // You can redirect to search results page or handle search as needed
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
-    }
-  };
-
   const toggleMobileSubmenu = (slug: string) => {
     setOpenMenus((prev) => ({
       ...prev,
@@ -344,12 +334,12 @@ export default function Navbar({ navigation }: NavbarProps) {
         {/* Desktop Navigation Links */}
         <div className="hidden lg:flex items-center gap-[1.8rem]">
           <NestedNavigation items={navigation} />
-          <Link 
+          {/* <Link 
             href="/about" 
             className="text-[0.76rem] font-bold tracking-[0.07em] uppercase text-[#7A8873] dark:text-gray-300 no-underline py-[0.2rem] border-b-2 border-transparent transition-all duration-[0.18s] hover:text-[#1865F2] hover:border-[#4A90D9]"
           >
             About 99Notes
-          </Link>
+          </Link> */}
           <Link 
             href="/blog" 
             className="text-[0.76rem] font-bold tracking-[0.07em] uppercase text-[#7A8873] dark:text-gray-300 no-underline py-[0.2rem] border-b-2 border-transparent transition-all duration-[0.18s] hover:text-[#1865F2] hover:border-[#4A90D9]"
@@ -371,22 +361,7 @@ export default function Navbar({ navigation }: NavbarProps) {
             
             {showSearch && (
               <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-[#E8EDE2] dark:border-gray-700 p-3">
-                <form onSubmit={handleSearch} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search notes, topics, questions..."
-                    className="flex-1 px-3 py-2 text-sm border border-[#E8EDE2] dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-[#1A1F16] dark:text-white placeholder-[#7A8873] dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent"
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-[#1865F2] text-white text-sm font-medium rounded-md hover:bg-[#1149C0] transition-colors"
-                  >
-                    Search
-                  </button>
-                </form>
+                <SearchBar compact onClose={() => setShowSearch(false)} />
               </div>
             )}
           </div>
@@ -486,21 +461,7 @@ export default function Navbar({ navigation }: NavbarProps) {
           <div className="h-full overflow-y-auto">
             {/* Mobile Search */}
             <div className="p-4 border-b border-[#E8EDE2] dark:border-gray-700">
-              <form onSubmit={handleSearch} className="flex gap-2">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search notes, topics, questions..."
-                  className="flex-1 px-3 py-2 text-sm border border-[#E8EDE2] dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-[#1A1F16] dark:text-white placeholder-[#7A8873] dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#1865F2] text-white text-sm font-medium rounded-md hover:bg-[#1149C0] transition-colors"
-                >
-                  Search
-                </button>
-              </form>
+              <SearchBar compact />
             </div>
 
             {/* Mobile Navigation Links */}
@@ -613,13 +574,13 @@ export default function Navbar({ navigation }: NavbarProps) {
               ))}
               
               {/* About and Blogs */}
-              <Link 
+              {/* <Link 
                 href="/about" 
                 className="block text-[0.9rem] font-bold tracking-[0.07em] uppercase text-[#1A1F16] dark:text-white hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 About 99Notes
-              </Link>
+              </Link> */}
               <Link 
                 href="/blog" 
                 className="block text-[0.9rem] font-bold tracking-[0.07em] uppercase text-[#1A1F16] dark:text-white hover:text-[#1865F2] dark:hover:text-blue-400 transition-colors"

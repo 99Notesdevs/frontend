@@ -50,8 +50,19 @@ export default function EditQuestionPage() {
     questionId: string | null;
   }>({ isOpen: false, questionId: null });
 
-  const normalizeCategoryIds = (question: Pick<Question, "categoryIds" | "categoryId">) => {
-    if (Array.isArray(question.categoryIds)) return question.categoryIds;
+  const normalizeCategoryIds = (
+    question: Pick<Question, "categoryIds" | "categoryId" | "categories">
+  ) => {
+    if (Array.isArray(question.categoryIds) && question.categoryIds.length > 0) {
+      return question.categoryIds;
+    }
+
+    if (Array.isArray(question.categories) && question.categories.length > 0) {
+      return question.categories
+        .map((category) => category.id)
+        .filter((id): id is number => typeof id === "number");
+    }
+
     return typeof question.categoryId === "number" ? [question.categoryId] : [];
   };
 
