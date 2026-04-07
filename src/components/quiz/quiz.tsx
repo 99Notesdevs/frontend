@@ -79,7 +79,7 @@ const Quiz: React.FC<QuizProps> = ({
     Record<number, boolean>
   >({});
   const [showResults, setShowResults] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(currentQuestionIndex);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSavePrompt, setShowSavePrompt] = useState(true);
@@ -101,7 +101,6 @@ const Quiz: React.FC<QuizProps> = ({
       setShowSavePrompt(true);
       setError(null);
       setIsLoading(false);
-      setCurrentQuestion(currentQuestionIndex);
     } else {
       setError("No questions available");
       setIsLoading(false);
@@ -153,12 +152,7 @@ const Quiz: React.FC<QuizProps> = ({
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      const nextQuestionIndex = currentQuestion + 1;
-      if (onQuestionAnswered) {
-        onQuestionAnswered(currentQuestion);
-      } else {
-        setCurrentQuestion(nextQuestionIndex);
-      }
+      setCurrentQuestion(currentQuestion + 1);
     } else {
       setShowResults(true);
     }
@@ -295,7 +289,7 @@ const Quiz: React.FC<QuizProps> = ({
         ) : (
           <div className="space-y-8">
             {/* Show only the current question */}
-            <div className="pr-2">
+            <div className="max-h-[500px] overflow-auto pr-2">
               {(() => {
                 const question = questions[currentQuestion];
 
