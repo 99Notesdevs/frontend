@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api } from "@/config/api/route";
 import { env } from "@/config/env";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +26,10 @@ interface Category {
   isLoading?: boolean;
 }
 
+interface ApiCategory extends Omit<Category, "weight" | "children" | "level"> {
+  weight: string | number;
+}
+
 // Fetch all categories from the API
 const fetchCategories = async (): Promise<Category[]> => {
   try {
@@ -47,7 +50,12 @@ const fetchCategories = async (): Promise<Category[]> => {
     if (!result.success) {
       throw new Error("Failed to fetch categories");
     }
-    return result.data;
+    return (result.data as ApiCategory[]).map((category) => ({
+      ...category,
+      weight: Number(category.weight) || 0,
+      children: [],
+      level: 1,
+    }));
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
@@ -73,6 +81,12 @@ const buildHierarchy = (categories: Category[]): Category[] => {
         if (child && parent.children) {
           parent.children.push(child);
         }
+      } else {
+        // Keep orphan categories visible when parent is missing from API response.
+        const orphanCategory = map.get(category.id);
+        if (orphanCategory) {
+          result.push(orphanCategory);
+        }
       }
     } else {
       const rootCategory = map.get(category.id);
@@ -84,15 +98,16 @@ const buildHierarchy = (categories: Category[]): Category[] => {
 
   // Third pass: calculate levels and sort by weight
   const calculateLevelsAndSort = (categories: Category[], currentLevel = 1) => {
+    categories.sort((a, b) => a.weight - b.weight);
     categories.forEach((category) => {
       category.level = currentLevel;
       if (category.children && category.children.length > 0) {
-        // Sort children by weight
-        category.children.sort((a, b) => a.weight - b.weight);
         calculateLevelsAndSort(category.children, currentLevel + 1);
       }
     });
   };
+
+  calculateLevelsAndSort(result);
 
   return result;
 };
@@ -100,13 +115,15 @@ const buildHierarchy = (categories: Category[]): Category[] => {
 // Category Item Component
 const CategoryItem = ({ 
   category, 
-  onDelete,
-  level = 1 
+  onDelete
 }: { 
   category: Category, 
-  onDelete: (id: number, name: string) => void,
-  level?: number
+  onDelete: (id: number, name: string) => void
 }) => {
+  const children = category.children ?? [];
+  const hasChildren = children.length > 0;
+  const [isExpanded, setIsExpanded] = useState(true);
+
   // Different background colors for different levels
   const levelColors = [
     'bg-blue-50 border-blue-200', // Level 1
@@ -117,15 +134,35 @@ const CategoryItem = ({
   ];
   
   const levelColor = levelColors[Math.min(category.level - 1, levelColors.length - 1)] || levelColors[0];
+  const indentSizeRem = 1.1;
   
   return (
-    <div className="mb-1">
+    <div className="mb-1" style={{ marginLeft: `${Math.max(category.level - 1, 0) * indentSizeRem}rem` }}>
       <div
-        className={`category-item ${levelColor} shadow-sm rounded-lg p-3 border transition-colors hover:shadow-md`}
-        style={{ marginLeft: `${(category.level - 1) * 1.5}rem` }}
+        className={`relative category-item ${levelColor} shadow-sm rounded-lg p-3 border transition-colors hover:shadow-md`}
       >
+        {category.level > 1 && (
+          <>
+            <span className="absolute -left-3 top-0 h-1/2 border-l border-gray-300" />
+            <span className="absolute -left-3 top-1/2 w-3 border-t border-gray-300" />
+          </>
+        )}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 flex-1">
+            {hasChildren ? (
+              <button
+                type="button"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                className="rounded-sm p-0.5 text-gray-500 hover:bg-white/80"
+                aria-label={isExpanded ? "Collapse children" : "Expand children"}
+              >
+                <ChevronRight
+                  className={`h-4 w-4 transition-transform ${isExpanded ? "rotate-90" : "rotate-0"}`}
+                />
+              </button>
+            ) : (
+              <span className="w-5" />
+            )}
             <div className={`w-3 h-3 rounded-full ${
               levelColor.includes('blue') ? 'bg-blue-500' :
               levelColor.includes('green') ? 'bg-green-500' :
@@ -154,6 +191,18 @@ const CategoryItem = ({
           </div>
         </div>
       </div>
+
+      {hasChildren && isExpanded && (
+        <div className="mt-1 ml-3 border-l border-dashed border-gray-300 pl-3">
+          {children.map((childCategory) => (
+            <CategoryItem
+              key={childCategory.id}
+              category={childCategory}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -211,15 +260,12 @@ const ManageCategories = () => {
       
       // Remove category from state
       const removeCategory = (items: Category[]): Category[] => {
-        return items.filter(item => {
-          if (item.id === categoryToDelete.id) {
-            return false;
-          }
-          if (item.children) {
-            return { ...item, children: removeCategory(item.children) };
-          }
-          return true;
-        });
+        return items
+          .filter((item) => item.id !== categoryToDelete.id)
+          .map((item) => ({
+            ...item,
+            children: item.children ? removeCategory(item.children) : [],
+          }));
       };
 
       setCategories(prevCategories => removeCategory(prevCategories));
