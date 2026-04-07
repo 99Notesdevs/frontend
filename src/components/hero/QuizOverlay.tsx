@@ -115,7 +115,15 @@ const QuizOverlay: React.FC<QuizOverlayProps> = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-[rgba(10,14,8,0.6)] backdrop-blur-md md:items-center md:p-4">
       <div className="relative w-full max-h-[94svh] overflow-hidden rounded-t-[18px] bg-white shadow-[0_-8px_60px_rgba(0,0,0,0.22)] md:max-h-[90vh] md:max-w-[660px] md:rounded-2xl md:shadow-2xl">
-        <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-[#E8EDE2] md:hidden" />
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8EDE2]">
+          <div className="mx-auto h-1 w-10 rounded-full bg-[#E8EDE2] md:hidden" />
+          <button
+            onClick={onClose}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-[#7A8873] transition-colors hover:bg-[#F5F7F4] hover:text-[#C0392B] md:absolute md:right-4 md:top-4 md:bg-white md:shadow-md md:border md:border-[#E8EDE2]"
+          >
+            × Close
+          </button>
+        </div>
         <div className="max-h-[94svh] overflow-y-auto md:max-h-[90vh]">
           <QuizWrapper
             questions={questions}
