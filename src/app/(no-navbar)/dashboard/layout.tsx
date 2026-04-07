@@ -44,6 +44,7 @@ const navigationItems = {
         { icon: FaAirbnb, text: "Admin Logs", path: "/dashboard/logs" },
         { icon: FaAirbnb, text: "Add Question", path: "/dashboard/addquestions" },
         { icon: FaEdit, text: "Edit Questions", path: "/dashboard/editquestion" },
+        { icon: FaEdit, text: "Manage Categories", path: "/dashboard/managecategories" },
       ],
     },
     {
