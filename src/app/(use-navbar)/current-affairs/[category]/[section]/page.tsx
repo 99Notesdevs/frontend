@@ -147,11 +147,16 @@ const CurrentAffairArticlePage = async ({
 
                     
                   
+                  {/* Always show title - use metaTitle from metadata if available, otherwise use article title */}
+                  <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-dark)] dark:text-white mb-1">
+                    {article?.metadata && JSON.parse(article.metadata).metaTitle 
+                      ? JSON.parse(article.metadata).metaTitle 
+                      : article?.title || 'Untitled Article'
+                    }
+                  </h1>
+                  
                   {article?.metadata && (
                     <>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-[var(--surface-dark)] dark:text-white mb-8">
-                      {JSON.parse(article.metadata).metaTitle}
-                    </h1>
                     <p className="text-sm text-[var(--text-tertiary)] dark:text-slate-300 mb-2" >
                       By {article.author} • {article.createdAt ? new Date(article.createdAt).toLocaleDateString('en-US', {
                         month: 'long',
