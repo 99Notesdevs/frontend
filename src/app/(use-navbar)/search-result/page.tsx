@@ -42,18 +42,22 @@ export default function SearchResult() {
         const searchUrl = `/search/global?query=${encodeURIComponent(query)}`;
         // console.log('Fetching search results from:', searchUrl);
         
-        const response = await api.get<SearchResultItem[] | { [key: string]: SearchResultItem[] }>(searchUrl);
+        const response = await api.get<any>(searchUrl);
         // console.log('Search API Response:', response);
         
         let searchResults: SearchResultItem[] = [];
         
-        // If response is an array, use it directly
-        if (Array.isArray(response)) {
-          searchResults = response;
+        // Extract pages from response structure
+        if (response?.data?.pages && Array.isArray(response.data.pages)) {
+          searchResults = response.data.pages as SearchResultItem[];
+        } else if (response?.pages && Array.isArray(response.pages)) {
+          searchResults = response.pages as SearchResultItem[];
+        } else if (Array.isArray(response)) {
+          searchResults = response as SearchResultItem[];
         } 
         // If response is an object with arrays as values, flatten them
         else if (response && typeof response === 'object') {
-          searchResults = Object.values(response).flat();
+          searchResults = Object.values(response).flat() as SearchResultItem[];
         }
         
         // console.log('Processed search results:', searchResults);
