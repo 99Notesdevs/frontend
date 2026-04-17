@@ -23,6 +23,24 @@ interface QuizWrapperProps {
   isLoading: boolean;
   error: string | null;
   onClose?: () => void;
+  // Quiz state props
+  selectedOptions: Record<number, number>;
+  setSelectedOptions: React.Dispatch<React.SetStateAction<Record<number, number>>>;
+  showExplanations: Record<number, boolean>;
+  setShowExplanations: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
+  showResults: boolean;
+  setShowResults: React.Dispatch<React.SetStateAction<boolean>>;
+  currentQuestion: number;
+  setCurrentQuestion: React.Dispatch<React.SetStateAction<number>>;
+  isNudgeOpen: boolean;
+  setIsNudgeOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  nudgeQuestionIndex: number | null;
+  setNudgeQuestionIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  resultStep: 0 | 1 | 2;
+  setResultStep: React.Dispatch<React.SetStateAction<0 | 1 | 2>>;
+  ctaLiveCount: number;
+  setCtaLiveCount: React.Dispatch<React.SetStateAction<number>>;
+  resetQuiz: () => void;
 }
 
 export default function QuizWrapper({
@@ -32,6 +50,23 @@ export default function QuizWrapper({
   isLoading,
   error,
   onClose,
+  selectedOptions,
+  setSelectedOptions,
+  showExplanations,
+  setShowExplanations,
+  showResults,
+  setShowResults,
+  currentQuestion,
+  setCurrentQuestion,
+  isNudgeOpen,
+  setIsNudgeOpen,
+  nudgeQuestionIndex,
+  setNudgeQuestionIndex,
+  resultStep,
+  setResultStep,
+  ctaLiveCount,
+  setCtaLiveCount,
+  resetQuiz,
 }: QuizWrapperProps) {
   const [currentQuestions, setCurrentQuestions] = useState<Question[]>(questions);
 
@@ -100,6 +135,23 @@ export default function QuizWrapper({
         questions={currentQuestions}
         onQuizComplete={onQuizComplete}
         onClose={onClose}
+        selectedOptions={selectedOptions}
+        setSelectedOptions={setSelectedOptions}
+        showExplanations={showExplanations}
+        setShowExplanations={setShowExplanations}
+        showResults={showResults}
+        setShowResults={setShowResults}
+        currentQuestion={currentQuestion}
+        setCurrentQuestion={setCurrentQuestion}
+        isNudgeOpen={isNudgeOpen}
+        setIsNudgeOpen={setIsNudgeOpen}
+        nudgeQuestionIndex={nudgeQuestionIndex}
+        setNudgeQuestionIndex={setNudgeQuestionIndex}
+        resultStep={resultStep}
+        setResultStep={setResultStep}
+        ctaLiveCount={ctaLiveCount}
+        setCtaLiveCount={setCtaLiveCount}
+        resetQuiz={resetQuiz}
       />
     </div>
   );

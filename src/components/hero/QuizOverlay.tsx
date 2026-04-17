@@ -22,12 +22,24 @@ const QuizOverlay: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasFetched, setHasFetched] = useState<boolean>(false);
+  
+  // Quiz state that needs to persist
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
+  const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
+  const [showResults, setShowResults] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [isNudgeOpen, setIsNudgeOpen] = useState(false);
+  const [nudgeQuestionIndex, setNudgeQuestionIndex] = useState<number | null>(null);
+  const [resultStep, setResultStep] = useState<0 | 1 | 2>(0);
+  const [ctaLiveCount, setCtaLiveCount] = useState(12843);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !hasFetched) {
       fetchQuestions();
+      setHasFetched(true);
     }
-  }, [isOpen]);
+  }, [isOpen, hasFetched]);
 
   const fetchQuestions = async () => {
     setIsLoading(true);
@@ -56,7 +68,19 @@ const QuizOverlay: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
   };
 
   const handleQuizComplete = () => {
-    // Handle quiz completion if needed
+    setShowResults(true);
+    setResultStep(0);
+  };
+
+  const resetQuiz = () => {
+    setSelectedOptions({});
+    setShowExplanations({});
+    setShowResults(false);
+    setCurrentQuestion(0);
+    setIsNudgeOpen(false);
+    setNudgeQuestionIndex(null);
+    setResultStep(0);
+    setCtaLiveCount(12843);
   };
 
   if (!isOpen) return null;
@@ -73,6 +97,24 @@ const QuizOverlay: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
             isLoading={isLoading}
             error={error}
             onClose={onClose}
+            // Quiz state props
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
+            showExplanations={showExplanations}
+            setShowExplanations={setShowExplanations}
+            showResults={showResults}
+            setShowResults={setShowResults}
+            currentQuestion={currentQuestion}
+            setCurrentQuestion={setCurrentQuestion}
+            isNudgeOpen={isNudgeOpen}
+            setIsNudgeOpen={setIsNudgeOpen}
+            nudgeQuestionIndex={nudgeQuestionIndex}
+            setNudgeQuestionIndex={setNudgeQuestionIndex}
+            resultStep={resultStep}
+            setResultStep={setResultStep}
+            ctaLiveCount={ctaLiveCount}
+            setCtaLiveCount={setCtaLiveCount}
+            resetQuiz={resetQuiz}
           />
         </div>
       </div>
