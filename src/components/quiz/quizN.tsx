@@ -18,6 +18,24 @@ interface QuizProps {
   questions: Question[];
   onQuizComplete: () => void;
   onClose?: () => void;
+  // Quiz state props
+  selectedOptions: Record<number, number>;
+  setSelectedOptions: React.Dispatch<React.SetStateAction<Record<number, number>>>;
+  showExplanations: Record<number, boolean>;
+  setShowExplanations: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
+  showResults: boolean;
+  setShowResults: React.Dispatch<React.SetStateAction<boolean>>;
+  currentQuestion: number;
+  setCurrentQuestion: React.Dispatch<React.SetStateAction<number>>;
+  isNudgeOpen: boolean;
+  setIsNudgeOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  nudgeQuestionIndex: number | null;
+  setNudgeQuestionIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  resultStep: 0 | 1 | 2;
+  setResultStep: React.Dispatch<React.SetStateAction<0 | 1 | 2>>;
+  ctaLiveCount: number;
+  setCtaLiveCount: React.Dispatch<React.SetStateAction<number>>;
+  resetQuiz: () => void;
 }
 
 // Normalize answer to 0-based option index.
@@ -78,17 +96,30 @@ const QUIZ_NUDGES: Record<number, { emoji: string; msg: string }> = {
   },
 };
 
-const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete, onClose }) => {
-  const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
-  const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
-  const [showResults, setShowResults] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+const Quiz: React.FC<QuizProps> = ({ 
+  questions = [], 
+  onQuizComplete, 
+  onClose,
+  selectedOptions,
+  setSelectedOptions,
+  showExplanations,
+  setShowExplanations,
+  showResults,
+  setShowResults,
+  currentQuestion,
+  setCurrentQuestion,
+  isNudgeOpen,
+  setIsNudgeOpen,
+  nudgeQuestionIndex,
+  setNudgeQuestionIndex,
+  resultStep,
+  setResultStep,
+  ctaLiveCount,
+  setCtaLiveCount,
+  resetQuiz,
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isNudgeOpen, setIsNudgeOpen] = useState(false);
-  const [nudgeQuestionIndex, setNudgeQuestionIndex] = useState<number | null>(null);
-  const [resultStep, setResultStep] = useState<0 | 1 | 2>(0);
-  const [ctaLiveCount, setCtaLiveCount] = useState(12843);
   const autoNextTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -301,20 +332,7 @@ const Quiz: React.FC<QuizProps> = ({ questions = [], onQuizComplete, onClose }) 
     await navigator.clipboard.writeText(text);
   };
 
-  const resetQuiz = () => {
-    if (autoNextTimerRef.current) {
-      window.clearTimeout(autoNextTimerRef.current);
-    }
-    setSelectedOptions({});
-    setShowExplanations({});
-    setShowResults(false);
-    setCurrentQuestion(0);
-    setIsNudgeOpen(false);
-    setNudgeQuestionIndex(null);
-    setResultStep(0);
-    setCtaLiveCount(12843);
-  };
-
+  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-10">
