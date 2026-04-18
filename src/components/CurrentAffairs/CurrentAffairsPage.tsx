@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/config/api/route";
 import ContentWrapper from "@/components/Blogs/ContentWrapper";
+import { isAuth } from "@/lib/isAuth";
 
 // Define interfaces to match the database schema
 interface Article {
@@ -35,6 +36,16 @@ interface CurrentAffair {
   imageUrl?: string;
 }
 
+interface StreakData {
+  currentStreak: number;
+  longestStreak: number;
+  lastVisited?: string;
+}
+
+interface VisitRecord {
+  date: string;
+}
+
 interface CurrentAffairsPageProps {
   category: string;
   initialCurrentAffair: CurrentAffair | null;
@@ -61,6 +72,10 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
   const [dailySectionsWithArticles, setDailySectionsWithArticles] = useState<
     Array<{ section: CurrentAffair; articles: Article[] }>
   >([]);
+  const [authUserId, setAuthUserId] = useState<number | null>(null);
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
+  const [visitedDateKeys, setVisitedDateKeys] = useState<Set<string>>(new Set());
+  const [isRecordingVisit, setIsRecordingVisit] = useState(false);
 
   const extractMetaDescription = (metadata?: string) => {
     if (!metadata) return "In-depth analysis of important current events and their relevance for UPSC Civil Services Examination.";
@@ -77,6 +92,79 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
     if (!slug) return category;
     const segments = slug.split("/").filter(Boolean);
     return segments[segments.length - 1] || category;
+  };
+
+  const toDateKey = (date: Date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, "0");
+    const day = `${date.getDate()}`.padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const getLast7Days = () => {
+    const days: Array<{ key: string; label: string }> = [];
+    const todayDate = new Date();
+
+    for (let i = 6; i >= 0; i -= 1) {
+      const d = new Date(todayDate);
+      d.setDate(todayDate.getDate() - i);
+      days.push({
+        key: toDateKey(d),
+        label: d.toLocaleDateString("en-US", { weekday: "short" }),
+      });
+    }
+
+    return days;
+  };
+
+  const fetchStreakAndVisits = async (userId: number) => {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(to.getDate() - 6);
+
+    const [streakResponse, visitsResponse] = await Promise.all([
+      api.get(`/currentAffair/user/${userId}/streak`) as Promise<{
+        success: boolean;
+        data: StreakData | null;
+      }>,
+      api.get(
+        `/currentAffair/user/${userId}/visits?from=${encodeURIComponent(toDateKey(from))}&to=${encodeURIComponent(toDateKey(to))}`
+      ) as Promise<{
+        success: boolean;
+        data: VisitRecord[] | null;
+      }>,
+    ]);
+
+    if (streakResponse.success) {
+      setStreakData(streakResponse.data || { currentStreak: 0, longestStreak: 0 });
+    }
+
+    if (visitsResponse.success && visitsResponse.data) {
+      const visitedKeys = new Set(
+        visitsResponse.data.map((visit) => toDateKey(new Date(visit.date)))
+      );
+      setVisitedDateKeys(visitedKeys);
+    }
+  };
+
+  const recordVisit = async (currentAffairId?: number) => {
+    if (!authUserId || !currentAffairId || isRecordingVisit) return;
+
+    try {
+      setIsRecordingVisit(true);
+      const response = (await api.post(
+        `/currentAffair/${currentAffairId}/visit`,
+        {}
+      )) as { success: boolean };
+
+      if (response.success) {
+        await fetchStreakAndVisits(authUserId);
+      }
+    } catch (err) {
+      console.error("Failed to record current affair visit:", err);
+    } finally {
+      setIsRecordingVisit(false);
+    }
   };
 
   const fetchByType = async (type: "daily" | "monthly" | "yearly") => {
@@ -159,6 +247,22 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
   }, [category, initialCurrentAffair?.type]);
 
   useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const auth = await isAuth();
+        if (auth.isAuthenticated && auth.userId) {
+          setAuthUserId(auth.userId);
+          await fetchStreakAndVisits(auth.userId);
+        }
+      } catch (err) {
+        console.error("Unable to initialize auth for streak widget:", err);
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  useEffect(() => {
     const loadTabSections = async () => {
       try {
         const sections = (await fetchByType(activeTab))
@@ -206,6 +310,11 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
     loadTabSections();
   }, [activeTab]);
 
+  useEffect(() => {
+    if (!currentAffair?.id) return;
+    void recordVisit(currentAffair.id);
+  }, [currentAffair?.id, authUserId]);
+
   const handleTabSwitch = (tabType: "daily" | "monthly" | "yearly") => {
     setActiveTab(tabType);
   };
@@ -238,6 +347,9 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
     month: "short",
     year: "numeric",
   });
+  const todayKey = toDateKey(today);
+  const isTodayMarked = visitedDateKeys.has(todayKey);
+  const last7Days = getLast7Days();
 
   return (
     <>
@@ -251,6 +363,10 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
             <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 text-[11px] font-black tracking-[0.12em] uppercase text-[#f5f1ecb3]">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
               {formattedDate}
+            </span>
+            <span className="inline-flex items-center gap-2 bg-[#E8B84B]/15 border border-[#E8B84B]/40 rounded-full px-3 py-1 text-[11px] font-black tracking-[0.12em] uppercase text-[#F5F1EC]">
+              <span className="text-[#E8B84B]">🔥</span>
+              {authUserId ? `${streakData?.currentStreak || 0} Day Streak` : "Login For Streak"}
             </span>
           </div>
 
@@ -297,6 +413,40 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
               📊 Yearly
             </button>
           </div>
+
+          {authUserId && (
+            <div className="mt-4 rounded-xl border border-white/15 bg-white/5 p-3">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <p className="text-[11px] uppercase tracking-[0.08em] font-black text-[#f5f1ecb3]">
+                  Weekly Consistency
+                </p>
+                <p className="text-[11px] text-[#f5f1ec99]">
+                  Best: {streakData?.longestStreak || 0} days
+                </p>
+              </div>
+              <div className="grid grid-cols-7 gap-2">
+                {last7Days.map((day) => {
+                  const isVisited = visitedDateKeys.has(day.key);
+                  return (
+                    <div key={day.key} className="text-center">
+                      <div className="text-[10px] uppercase tracking-[0.08em] text-[#f5f1ec80] mb-1">
+                        {day.label}
+                      </div>
+                      <div
+                        className={`h-8 rounded-md border text-[11px] font-black flex items-center justify-center ${
+                          isVisited
+                            ? "bg-[#1865F2] border-[#1865F2] text-white"
+                            : "bg-white/10 border-white/20 text-[#f5f1ec80]"
+                        }`}
+                      >
+                        {isVisited ? "✓" : "-"}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
         </div>
       </div>
@@ -468,8 +618,14 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
                             >
                               Read →
                             </Link>
-                            <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-1 rounded text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900 hover:text-green-700 dark:hover:text-green-300 hover:border-green-500 transition-colors">
-                              Mark Read
+                            <button
+                              onClick={() => {
+                                void recordVisit(currentAffair?.id);
+                              }}
+                              disabled={!authUserId || isRecordingVisit}
+                              className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-1 rounded text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900 hover:text-green-700 dark:hover:text-green-300 hover:border-green-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                              {isTodayMarked ? "Marked Today" : "Mark Read"}
                             </button>
                           </div>
                         </div>

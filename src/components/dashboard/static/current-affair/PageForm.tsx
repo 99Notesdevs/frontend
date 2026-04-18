@@ -14,6 +14,7 @@ import { uploadImageToS3 } from "@/config/imageUploadS3";
 import { CurrentArticleForm } from "@/components/dashboard/forms/CurrentArticleForm";
 import Drafts from "@/components/ui/drafts";
 import { api } from "@/config/api/route";
+import CurrentAffairCategorySelector from "./CurrentAffairCategorySelector";
 // Types for CurrentAffair models
 interface CurrentAffairType {
   id: number;
@@ -159,6 +160,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
     header: "",
     body: "",
   });
+  const [selectedArticleCategoryIds, setSelectedArticleCategoryIds] = useState<number[]>([]);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -451,6 +453,7 @@ export function PageForm({ editPage = null }: PageFormProps) {
         quizQuestions: data.quizQuestions,
         type: selectedType,
         link: selectedTemplate === "custom-link" ? data.link : "",
+        categoryIds: selectedArticleCategoryIds,
         metadata: JSON.stringify({
           metaTitle: data.metaTitle,
           metaDescription: data.metaDescription,
@@ -759,10 +762,17 @@ export function PageForm({ editPage = null }: PageFormProps) {
                   </Select>
 
                   {selectedTemplate === "article" ? (
-                    <CurrentArticleForm
-                      defaultValues={articleData}
-                      onSubmit={handleCreateArticle}
-                    />
+                    <div className="space-y-4">
+                      <CurrentAffairCategorySelector
+                        selectedCategoryIds={selectedArticleCategoryIds}
+                        onChange={setSelectedArticleCategoryIds}
+                        title="Attach GS Categories"
+                      />
+                      <CurrentArticleForm
+                        defaultValues={articleData}
+                        onSubmit={handleCreateArticle}
+                      />
+                    </div>
                   ) : (
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
