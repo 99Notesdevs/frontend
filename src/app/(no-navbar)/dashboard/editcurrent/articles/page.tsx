@@ -19,6 +19,7 @@ import {
   CurrentArticleFormValues,
 } from "@/components/dashboard/forms";
 import Drafts from "@/components/ui/drafts";
+import CurrentAffairCategorySelector from "@/components/dashboard/static/current-affair/CurrentAffairCategorySelector";
 
 interface CurrentAffairType {
   id: number;
@@ -43,6 +44,7 @@ interface CurrentAffairType {
   updatedAt: Date;
   imageUrl: string | null;
   quizQuestions: string | null;
+  categories?: Array<{ id: number; name: string }>;
 }
 
 export default function ArticlesPage() {
@@ -55,6 +57,7 @@ export default function ArticlesPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(
     selectedPage?.imageUrl || null
   );
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const token = Cookie.get("token");
 
   const handleEditSubmit = async (formData: CurrentArticleFormValues) => {
@@ -75,6 +78,7 @@ export default function ArticlesPage() {
         slug: selectedPage?.slug || "",
         updatedAt: new Date(),
         imageUrl: formData.imageUrl,
+        categoryIds: selectedCategoryIds,
         quizQuestions: formData.quizQuestions || "[]", // Ensure we have a valid string
         metadata: JSON.stringify({
           metaTitle: formData.metaTitle,
@@ -210,6 +214,7 @@ export default function ArticlesPage() {
       };
 
       setImagePreview(selectedPage.imageUrl || null);
+      setSelectedCategoryIds((selectedPage.categories || []).map((category) => category.id));
     }
   }, [selectedPage]);
 
@@ -373,67 +378,74 @@ export default function ArticlesPage() {
                   onSubmit={handleCustomLinkSubmit}
                 />
               ) : (
-                <CurrentArticleForm
-                  onSubmit={handleEditSubmit}
-                  defaultValues={{
-                    title: selectedPage.title,
-                    content: selectedPage.content || "",
-                    author: selectedPage.author || "",
-                    blogs: selectedPage.blogs || [],
-                    slug: selectedPage.slug || "",
-                    imageUrl: selectedPage.imageUrl || "",
-                    metaTitle: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).metaTitle || ""
-                      : "",
-                    metaDescription: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).metaDescription || ""
-                      : "",
-                    metaKeywords: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).metaKeywords || ""
-                      : "",
-                    robots: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).robots || ""
-                      : "",
-                    ogTitle: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).ogTitle || ""
-                      : "",
-                    ogDescription: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).ogDescription || ""
-                      : "",
-                    ogImage: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).ogImage || ""
-                      : "",
-                    ogType: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).ogType || ""
-                      : "",
-                    twitterCard: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).twitterCard || ""
-                      : "",
-                    twitterTitle: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).twitterTitle || ""
-                      : "",
-                    twitterDescription: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).twitterDescription ||
-                        ""
-                      : "",
-                    twitterImage: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).twitterImage || ""
-                      : "",
-                    canonicalUrl: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).canonicalUrl || ""
-                      : "",
-                    schemaData: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).schemaData || ""
-                      : "",
-                    quizQuestions: selectedPage.quizQuestions || "[]", // Ensure we always have a valid JSON string
-                    header: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).header || ""
-                      : "",
-                    body: selectedPage.metadata
-                      ? JSON.parse(selectedPage.metadata).body || ""
-                      : "",
-                  }}
-                />
+                <div className="space-y-4">
+                  <CurrentAffairCategorySelector
+                    selectedCategoryIds={selectedCategoryIds}
+                    onChange={setSelectedCategoryIds}
+                    title="Attach GS Categories"
+                  />
+                  <CurrentArticleForm
+                    onSubmit={handleEditSubmit}
+                    defaultValues={{
+                      title: selectedPage.title,
+                      content: selectedPage.content || "",
+                      author: selectedPage.author || "",
+                      blogs: selectedPage.blogs || [],
+                      slug: selectedPage.slug || "",
+                      imageUrl: selectedPage.imageUrl || "",
+                      metaTitle: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).metaTitle || ""
+                        : "",
+                      metaDescription: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).metaDescription || ""
+                        : "",
+                      metaKeywords: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).metaKeywords || ""
+                        : "",
+                      robots: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).robots || ""
+                        : "",
+                      ogTitle: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).ogTitle || ""
+                        : "",
+                      ogDescription: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).ogDescription || ""
+                        : "",
+                      ogImage: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).ogImage || ""
+                        : "",
+                      ogType: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).ogType || ""
+                        : "",
+                      twitterCard: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).twitterCard || ""
+                        : "",
+                      twitterTitle: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).twitterTitle || ""
+                        : "",
+                      twitterDescription: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).twitterDescription ||
+                          ""
+                        : "",
+                      twitterImage: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).twitterImage || ""
+                        : "",
+                      canonicalUrl: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).canonicalUrl || ""
+                        : "",
+                      schemaData: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).schemaData || ""
+                        : "",
+                      quizQuestions: selectedPage.quizQuestions || "[]", // Ensure we always have a valid JSON string
+                      header: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).header || ""
+                        : "",
+                      body: selectedPage.metadata
+                        ? JSON.parse(selectedPage.metadata).body || ""
+                        : "",
+                    }}
+                  />
+                </div>
               )}
             </div>
           </div>

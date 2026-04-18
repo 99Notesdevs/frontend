@@ -16,6 +16,7 @@ interface Question {
   categories?: Array<{ id: number; name: string }>;
   explaination: string;
   creatorName: string;
+  isCurrentAffair?: boolean;
   multipleCorrectType: boolean;
   completed: boolean;
   pyq: boolean;
@@ -37,6 +38,7 @@ export default function AddQuestionsPage() {
     categoryIds: [],
     explaination: "",
     creatorName: "",
+    isCurrentAffair: false,
     multipleCorrectType: false,
     completed: true,
     pyq: false,
@@ -244,6 +246,7 @@ export default function AddQuestionsPage() {
         categoryIds: selectedCategories,
         explaination: "",
         creatorName: creatorName || "",
+        isCurrentAffair: false,
         multipleCorrectType: false,
         completed: true,
         pyq: false,
@@ -636,6 +639,23 @@ export default function AddQuestionsPage() {
                     </div>
                     <label htmlFor="pyq" className="text-sm font-medium text-gray-700 cursor-pointer select-none">
                       Previous Year Question (PYQ)
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-indigo-300 transition-colors">
+                    <div className="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        id="isCurrentAffair"
+                        checked={Boolean(newQuestion.isCurrentAffair)}
+                        onChange={(e) =>
+                          setNewQuestion({ ...newQuestion, isCurrentAffair: e.target.checked })
+                        }
+                        className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors cursor-pointer"
+                      />
+                    </div>
+                    <label htmlFor="isCurrentAffair" className="text-sm font-medium text-gray-700 cursor-pointer select-none">
+                      Current Affair
                     </label>
                   </div>
 
