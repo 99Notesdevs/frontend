@@ -56,13 +56,21 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
         throw new Error("Search failed");
       }
 
-      const pages =
-        normalizedResponse?.data?.pages ??
-        normalizedResponse?.response?.data?.pages ??
-        normalizedResponse?.response?.data?.data?.pages ??
-        [];
-
-      setResults(Array.isArray(pages) ? pages : []);
+      // Extract pages from response with comprehensive fallbacks
+      let pages: any[] = [];
+      
+      // Try all possible response structures
+      if (normalizedResponse?.data?.pages && Array.isArray(normalizedResponse.data.pages)) {
+        pages = normalizedResponse.data.pages;
+      } else if (normalizedResponse?.response?.data?.pages && Array.isArray(normalizedResponse.response.data.pages)) {
+        pages = normalizedResponse.response.data.pages;
+      } else if (normalizedResponse?.response?.data?.data?.pages && Array.isArray(normalizedResponse.response.data.data.pages)) {
+        pages = normalizedResponse.response.data.data.pages;
+      } else if (normalizedResponse?.pages && Array.isArray(normalizedResponse.pages)) {
+        pages = normalizedResponse.pages;
+      }
+      
+      setResults(pages);
     } catch (err: any) {
       // Ignore abort errors
       if (err?.name === "AbortError") return;
@@ -183,16 +191,16 @@ const SearchBar = ({ onClose, compact = false }: SearchBarProps) => {
                   className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer text-gray-800 dark:text-slate-200 transition-colors duration-200 flex items-start gap-2"
                   onClick={() => handleResultClick(result.slug)}
                 >
-                  {result.imageUrl && (
+                  {result.imageUrl && typeof result.imageUrl === 'string' && result.imageUrl.trim() !== '' && (
                     <img
                       src={result.imageUrl}
-                      alt={result.title}
+                      alt={result.title || 'Article image'}
                       className="w-10 h-10 object-cover rounded"
                     />
                   )}
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-800 dark:text-white">
-                      {result.title || "Untitled"}
+                      {result.title && result.title.trim() !== "" ? result.title : "Untitled"}
                     </h3>
                     <p className="text-xs text-gray-600 dark:text-slate-400">
                       {result.content?.replace(/<[^>]*>/g, "").slice(0, 50)}...

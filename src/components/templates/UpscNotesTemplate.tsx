@@ -7,6 +7,9 @@ import { BaseTemplateProps } from "./types";
 import Ads from "../navigation/Ads";
 import Breadcrumb from "@/components/ui/breadcrumb";
 import { BackToTop } from "@/components/ui/reachtotop";
+import { Card } from "@/components/ui/card";
+import Image from "next/image";
+import Link from "next/link";
 
 export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
   const { title, content, metadata } = page;
@@ -89,6 +92,7 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
               containerClasses="bg-muted/40 dark:bg-slate-800/50 px-4 py-2 rounded-md"
               activeClasses="font-semibold"
             />
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mt-4 lg:mt-7">
               {/* Sidebar */}
               <aside className="lg:col-span-4 order-2 lg:order-1 mb-6 lg:mb-0">
@@ -183,6 +187,114 @@ export const UpscNotesTemplate: React.FC<BaseTemplateProps> = ({ page }) => {
 
               {/* Main Content Area */}
               <main className="lg:col-span-8 order-1 lg:order-2">
+                {/* Page Title with Underline */}
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 lg:p-6 mb-6">
+                  <h1 className="text-3xl font-bold text-[var(--primary)] text-center border-b-2 border-blue-600 dark:border-blue-400 pb-3">
+                    {title}
+                  </h1>
+                </div>
+
+                {/* Child Topics Section */}
+                {page.children && page.children.length > 0 && (
+                  <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 lg:p-6 mb-6">               
+                    
+                    {/* Card Grid - Responsive layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                      {page.children.map((child: any) => {
+                        // Skip children with custom-link template
+                        if (child.templateId === "custom-link") {
+                          return null;
+                        }
+
+                        // Handle imageUrl - it might be an array or invalid URL
+                        let childImage = "/placeholder-image.jpg";
+                        if (child.imageUrl) {
+                          // If imageUrl is an array, take the first valid element
+                          if (Array.isArray(child.imageUrl)) {
+                            childImage = child.imageUrl[0] && 
+                                         typeof child.imageUrl[0] === 'string' && 
+                                         child.imageUrl[0].trim() !== '' 
+                                       ? child.imageUrl[0] 
+                                       : "/placeholder-image.jpg";
+                          } else if (typeof child.imageUrl === 'string' && child.imageUrl.trim() !== '') {
+                            // Ensure it's a valid URL format
+                            if (child.imageUrl.startsWith('/') || child.imageUrl.startsWith('http://') || child.imageUrl.startsWith('https://')) {
+                              childImage = child.imageUrl;
+                            }
+                          }
+                        }
+                        
+                        const childImageAlt = child.title || "Topic image";
+
+                        return (
+                          <div
+                            key={child.id}
+                            className="group transform transition-all hover:-translate-y-1"
+                          >
+                            <Card 
+                              id={`child-card-${child.id}`}
+                              className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/90 dark:bg-slate-800/90 dark:border dark:border-slate-700 overflow-hidden"
+                            >
+                              {/* Card Stripe */}
+                              <div className="h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                              
+                              {/* Card Body */}
+                              <div className="p-3 sm:p-4">
+                                <div className="flex items-start gap-2 mb-2">
+                                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <span className="text-sm">ð</span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="text-sm font-semibold mb-1 text-[var(--primary)] line-clamp-2">
+                                      {child.title}
+                                    </h3>
+                                    <span className="inline-block text-xs font-bold uppercase tracking-wider px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                                      Topic
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <div className="relative w-full h-20 mb-3">
+                                  <Image
+                                    src={childImage}
+                                    alt={childImageAlt}
+                                    fill
+                                    className="object-cover rounded-lg"
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    placeholder="blur"
+                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A8A"
+                                  />
+                                </div>
+                                
+                                <p className="text-[var(--text-tertiary)] dark:text-slate-300 text-xs line-clamp-2 mb-3">
+                                  {child.content
+                                    ? child.content
+                                        .replace(/<[^>]*>/g, "") // Remove HTML tags
+                                        .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
+                                        .slice(0, 100) // Get first 100 characters
+                                        .trim() +
+                                      (child.content.length > 100 ? "..." : "")
+                                    : "No content available"}
+                                </p>
+                                
+                                <div className="flex gap-2">
+                                  <Link
+                                    href={`/${child.slug}`}
+                                    className="flex-1 inline-flex items-center justify-center bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors"
+                                  >
+                                    Read Notes â
+                                  </Link>
+                                </div>
+                              </div>
+                            </Card>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Main Article Content */}
                 <article className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 lg:p-8">
                   <div
                     className="prose prose-lg max-w-none dark:prose-invert
