@@ -289,7 +289,7 @@ const Quiz: React.FC<QuizProps> = ({
         ) : (
           <div className="space-y-8">
             {/* Show only the current question */}
-            <div className="max-h-[500px] overflow-auto pr-2">
+            <div className="max-h-[400px] overflow-auto pr-1">
               {(() => {
                 const question = questions[currentQuestion];
 
@@ -304,9 +304,9 @@ const Quiz: React.FC<QuizProps> = ({
 
                 return (
                   <div key={question.id} className="mb-6">
-                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
+                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-3 border border-gray-100 dark:border-gray-700">
                       {/* Categories, Difficulty, and PYQ Year */}
-                      <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="flex flex-wrap gap-2 mb-2">
                         {question.categories && question.categories.length > 0 && (
                           question.categories.slice(0, 3).map((category, index) => (
                             <span
@@ -328,21 +328,21 @@ const Quiz: React.FC<QuizProps> = ({
                           </span>
                         )}
                       </div>
-                      <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
+                      <h2 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
                         <span className="text-blue-600 dark:text-blue-400 font-bold mr-2">Q{currentQuestion + 1}.</span>
                         <div
                           className="prose prose-lg max-w-none"
                           dangerouslySetInnerHTML={{ __html: question.question }}
                         />
                       </h2>
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {question.options.map((option, index) => {
                           const isSelected =
                             selectedOptions[question.id] === index;
                           const isCorrect = index === getCorrectOptionIndex(question.answer);
                           const isShown = showExplanations[question.id];
                           let className =
-                            "flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-300 text-base hover:shadow-md";
+                            "flex items-center p-2 border rounded-lg cursor-pointer transition-all duration-300 text-sm hover:shadow-md";
                           if (isShown) {
                             if (isCorrect) {
                               className +=
@@ -391,13 +391,13 @@ const Quiz: React.FC<QuizProps> = ({
                         })}
 
                         {showExplanations[question.id] && (
-                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                          <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                             {question.explaination && (
                               <div>
-                                <p className="font-semibold text-blue-900 dark:text-blue-300 mb-3 text-base">
+                                <p className="font-semibold text-blue-900 dark:text-blue-300 mb-1 text-sm">
                                   Explanation:
                                 </p>
-                                <p className="text-blue-800 dark:text-blue-200 text-base leading-relaxed whitespace-pre-wrap break-words">
+                                <p className="text-blue-800 dark:text-blue-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
                                   <div
                                     className="prose prose-lg max-w-none"
                                     dangerouslySetInnerHTML={{ __html: question.explaination }}
@@ -413,8 +413,8 @@ const Quiz: React.FC<QuizProps> = ({
                 );
               })()}
             </div>
-            <div className="flex justify-between items-center mt-6 px-2">
-              <div className="text-base font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
+            <div className="flex justify-between items-center mt-4 px-1">
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
                 {currentQuestion + 1} / {questions.length}
               </div>
               <button
@@ -426,7 +426,7 @@ const Quiz: React.FC<QuizProps> = ({
                 disabled={
                   selectedOptions[questions[currentQuestion].id] === undefined
                 }
-                className={`px-8 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg transform hover:-translate-y-0.5 ${selectedOptions[questions[currentQuestion].id] === undefined
+                className={`px-6 py-2 rounded-lg transition-all duration-300 font-semibold shadow-lg transform hover:-translate-y-0.5 ${selectedOptions[questions[currentQuestion].id] === undefined
                     ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     : currentQuestion === questions.length - 1
                       ? "bg-green-600 text-white hover:bg-green-700 hover:shadow-xl"
