@@ -292,13 +292,7 @@ const CurrentAffairsPage: React.FC<CurrentAffairsPageProps> = ({
           const grouped = await Promise.all(
             sections.map(async (section) => {
               const sectionArticlesData = await fetchArticlesByParentSlug(section.slug, 0, 5);
-              // Sort articles by creation date (newest first)
-              const sortedSectionArticles = [...sectionArticlesData].sort((a, b) => {
-                const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                return dateB - dateA;
-              });
-              return { section, articles: sortedSectionArticles };
+              return { section, articles: sectionArticlesData };
             })
           );
           setDailySectionsWithArticles(grouped);
