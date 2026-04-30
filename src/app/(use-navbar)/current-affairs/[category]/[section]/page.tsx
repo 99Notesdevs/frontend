@@ -290,12 +290,13 @@ const CurrentAffairArticlePage = async ({
                 </div>
 
                 {/* Quiz Section */}
+                <div>
                 {quizQuestions.length > 0 && (
-                  <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-slate-700">
-                    <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white">Quiz</h3>
-                    {/* <QuizWrapper questions={quizQuestions} /> */}
+                  <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md border border-gray-200 dark:border-slate-700 p-0">
+                    <CurrentArticleQuiz questions={quizQuestions} />
                   </div>
                 )}
+                </div>
               </div>
             </div>
           </div>
@@ -314,12 +315,7 @@ const CurrentAffairArticlePage = async ({
             </Link>
           </div>
         )}
-        {quizQuestions.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold mb-4">Quiz</h2>
-            <CurrentArticleQuiz questions={quizQuestions} />
-          </div>
-        )}
+        
       </div>
     </div>
     </>

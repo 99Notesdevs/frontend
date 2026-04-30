@@ -167,7 +167,7 @@ export function QuizQuestions({
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium">Quiz Questions</h3>
-          <Button className="bg-slate-700" onClick={addQuestion}>Add Question</Button>
+          <Button className="bg-slate-700 hover:bg-slate-800" onClick={addQuestion}>Add Question</Button>
         </div>
 
         {questions.map((question, questionIndex) => (
@@ -189,34 +189,29 @@ export function QuizQuestions({
               <label className="block text-sm font-medium mb-1">
                 Question Text
               </label>
-              <TiptapEditor
-                content={question.question}
-                onChange={(content) => handleQuestionChange(questionIndex, content)}
-              />
+              <div className="max-h-[150px] overflow-hidden [&_.ProseMirror]:p-0 [&_.ProseMirror_p]:!my-0 [&_.ProseMirror_p:first-child]:!mt-0">
+                <TiptapEditor
+                  content={question.question}
+                  onChange={(content) => handleQuestionChange(questionIndex, content)}
+                />
+              </div>
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm font-medium">Options</label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => addOption(questionIndex, e)}
-                >
-                  Add Option
-                </Button>
-              </div>
+              <label className="block text-sm font-medium mb-1">Options</label>
               
               {question.options.map((option, optionIndex) => (
-                <div key={optionIndex} className="flex items-center space-x-2 mb-2">
+                <div key={optionIndex} className="flex items-center space-x-2 mb-4">
                   <span className="w-6 text-center">{String.fromCharCode(65 + optionIndex)}.</span>
                   <div className="flex-1 flex items-center gap-2">
-                    <TiptapEditor
-                      content={option}
-                      onChange={(content) => 
-                        handleOptionChange(questionIndex, optionIndex, content)
-                      }
-                    />
+                    <div className="max-h-[140px] overflow-hidden flex-1 [&_.ProseMirror]:p-0 [&_.ProseMirror_p]:!my-0 [&_.ProseMirror_p:first-child]:!mt-0">
+                      <TiptapEditor
+                        content={option}
+                        onChange={(content) => 
+                          handleOptionChange(questionIndex, optionIndex, content)
+                        }
+                      />
+                    </div>
                     <div className="flex items-center space-x-2">
                       <input
                         type="radio"
@@ -242,6 +237,15 @@ export function QuizQuestions({
                   </div>
                 </div>
               ))}
+              <div className="mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => addOption(questionIndex, e)}
+                >
+                  Add Option
+                </Button>
+              </div>
             </div>
             <div>
               <div className="flex items-center justify-between">
@@ -252,7 +256,7 @@ export function QuizQuestions({
                   Optional
                 </span>
               </div>
-              <div className="mt-2">
+              <div className="mt-2 max-h-[120px] overflow-hidden [&_.ProseMirror]:p-0 [&_.ProseMirror_p]:!my-0 [&_.ProseMirror_p:first-child]:!mt-0">
                 <TiptapEditor
                   content={question.explaination}
                   onChange={(content) => handleExplainationChange(questionIndex, content)}                />

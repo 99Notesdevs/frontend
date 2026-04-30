@@ -570,9 +570,6 @@ export function CurrentArticleForm({
             name="quizQuestions"
             render={({ field: { value, onChange } }) => (
               <FormItem>
-                <FormLabel className="text-gray-500 font-medium">
-                  Quiz Questions
-                </FormLabel>
                 <FormControl>
                   <QuizQuestions
                     defaultValue={value || "[]"}
