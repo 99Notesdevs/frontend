@@ -438,10 +438,10 @@ export const GeneralStudiesTemplate: React.FC<BaseTemplateProps> = ({
                         console.error("Error parsing child content:", error);
                         childContent = {};
                       }
-
-                      const childImagearray = JSON.parse(
-                        child.imageUrl || ""
-                      );
+                      let childImagearray = ["", ""];
+                      if(child && child.imageUrl && child.imageUrl.length > 0) {
+                        childImagearray = JSON.parse(child.imageUrl)
+                      }
                       const childImage = childImagearray[0];
                       const childImageAlt = childImagearray[1];
 
